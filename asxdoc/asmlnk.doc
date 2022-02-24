@@ -154,7 +154,7 @@
 
           D.2.6     Jump and Jump to Subroutine Instructions         D-4 
 
-        APPENDIX E  AS68HC08 ASSEMBLER                               E-1 
+        APPENDIX E  AS6808 ASSEMBLER                                 E-1 
           E.1     68HC08 REGISTER SET                                E-1 
           E.2     68HC08 INSTRUCTION SET                             E-1 
           E.2.1     Control Instructions                             E-2 
@@ -183,8 +183,8 @@
           F.2.11    6800 Compatibility Instructions                  F-6 
 
         APPENDIX G  AS6811 ASSEMBLER                                 G-1 
-          G.1     6811 REGISTER SET                                  G-1 
-          G.2     6811 INSTRUCTION SET                               G-1 
+          G.1     68HC11 REGISTER SET                                G-1 
+          G.2     68HC11 INSTRUCTION SET                             G-1 
           G.2.1     Inherent Instructions                            G-2 
           G.2.2     Branch Instructions                              G-2 
           G.2.3     Single Operand Instructions                      G-3 
@@ -193,97 +193,118 @@
           G.2.6     Jump and Jump to Subroutine Instructions         G-5 
           G.2.7     Long Register Instructions                       G-5 
 
-        APPENDIX H  AS6816 ASSEMBLER                                 H-1 
-          H.1     6816 REGISTER SET                                  H-1 
-          H.2     6816 INSTRUCTION SET                               H-1 
-          H.2.1     Inherent Instructions                            H-2 
-          H.2.2     Push/Pull Multiple Register Instructions         H-3 
-          H.2.3     Short Branch Instructions                        H-3 
-          H.2.4     Long Branch Instructions                         H-3 
-          H.2.5     Bit Manipulation Instructions                    H-3 
-          H.2.6     Single Operand Instructions                      H-4 
-          H.2.7     Double Operand Instructions                      H-5 
-          H.2.8     Index/Stack Register Instructions                H-5 
+        APPENDIX H  AS6812 ASSEMBLER                                 H-1 
+          H.1     68HC12 REGISTER SET                                H-1 
+          H.2     68HC12 INSTRUCTION SET                             H-1 
+          H.2.1     Inherent Instructions                            H-3 
+          H.2.2     Short Branch Instructions                        H-3 
+          H.2.3     Long Branch Instructions                         H-3 
+          H.2.4     Branch on Decrement, Test, or Increment          H-4 
+          H.2.5     Bit Clear and Set Instructions                   H-4 
+          H.2.6     Branch on Bit Clear or Set                       H-4 
+          H.2.7     Single Operand Instructions                      H-5 
+          H.2.8     Double Operand Instructions                      H-6 
 
 
                                                                  Page iv
         
 
 
-          H.2.9     Jump and Jump to Subroutine Instructions         H-6 
-          H.2.10    Condition Code Register Instructions             H-6 
-          H.2.11    Multiply and Accumulate Instructions             H-6 
+          H.2.9     Move Instructions                                H-6 
+          H.2.10    D-register Instructions                          H-6 
+          H.2.11    Index/Stack Register Instructions                H-7 
+          H.2.12    Jump and Jump/Call to Subroutine
+                    Instructions                                     H-7 
+          H.2.13    Other Special Instructions                       H-7 
+          H.2.14    Register - Register Instructions                 H-7 
+          H.2.15    Condition Code Register Instructions             H-7 
+          H.2.16    M68HC11 Compatibility Mode Instructions          H-8 
 
-        APPENDIX I  ASH8 ASSEMBLER                                   I-1 
-          I.1     H8/3XX REGISTER SET                                I-1 
-          I.2     H8/3XX INSTRUCTION SET                             I-1 
+        APPENDIX I  AS6816 ASSEMBLER                                 I-1 
+          I.1     68HC16 REGISTER SET                                I-1 
+          I.2     68HC16 INSTRUCTION SET                             I-1 
           I.2.1     Inherent Instructions                            I-2 
-          I.2.2     Branch Instructions                              I-2 
-          I.2.3     Single Operand Instructions                      I-3 
-          I.2.4     Double Operand Instructions                      I-4 
-          I.2.5     Mov Instructions                                 I-5 
-          I.2.6     Bit Manipulation Instructions                    I-6 
-          I.2.7     Extended Bit Manipulation Instructions           I-7 
-          I.2.8     Condition Code Instructions                      I-7 
-          I.2.9     Other Instructions                               I-8 
-          I.2.10    Jump and Jump to Subroutine Instructions         I-8 
+          I.2.2     Push/Pull Multiple Register Instructions         I-3 
+          I.2.3     Short Branch Instructions                        I-3 
+          I.2.4     Long Branch Instructions                         I-3 
+          I.2.5     Bit Manipulation Instructions                    I-3 
+          I.2.6     Single Operand Instructions                      I-4 
+          I.2.7     Double Operand Instructions                      I-5 
+          I.2.8     Index/Stack Register Instructions                I-5 
+          I.2.9     Jump and Jump to Subroutine Instructions         I-6 
+          I.2.10    Condition Code Register Instructions             I-6 
+          I.2.11    Multiply and Accumulate Instructions             I-6 
 
-        APPENDIX J  AS8085 ASSEMBLER                                 J-1 
-          J.1     8085 REGISTER SET                                  J-1 
-          J.2     8085 INSTRUCTION SET                               J-1 
+        APPENDIX J  ASH8 ASSEMBLER                                   J-1 
+          J.1     H8/3XX REGISTER SET                                J-1 
+          J.2     H8/3XX INSTRUCTION SET                             J-1 
           J.2.1     Inherent Instructions                            J-2 
-          J.2.2     Register/Memory/Immediate Instructions           J-2 
-          J.2.3     Call and Return Instructions                     J-2 
-          J.2.4     Jump Instructions                                J-2 
-          J.2.5     Input/Output/Reset Instructions                  J-3 
-          J.2.6     Move Instructions                                J-3 
-          J.2.7     Other Instructions                               J-3 
+          J.2.2     Branch Instructions                              J-2 
+          J.2.3     Single Operand Instructions                      J-3 
+          J.2.4     Double Operand Instructions                      J-4 
+          J.2.5     Mov Instructions                                 J-5 
+          J.2.6     Bit Manipulation Instructions                    J-6 
+          J.2.7     Extended Bit Manipulation Instructions           J-7 
+          J.2.8     Condition Code Instructions                      J-7 
+          J.2.9     Other Instructions                               J-8 
+          J.2.10    Jump and Jump to Subroutine Instructions         J-8 
 
-        APPENDIX K  ASZ80 ASSEMBLER                                  K-1 
-          K.1     .hd64 DIRECTIVE                                    K-1 
-          K.2     Z80 REGISTER SET AND CONDITIONS                    K-1 
-          K.3     Z80 INSTRUCTION SET                                K-2 
-          K.3.1     Inherent Instructions                            K-3 
-          K.3.2     Implicit Operand Instructions                    K-3 
-          K.3.3     Load Instruction                                 K-4 
-          K.3.4     Call/Return Instructions                         K-4 
-          K.3.5     Jump and Jump to Subroutine Instructions         K-4 
-          K.3.6     Bit Manipulation Instructions                    K-5 
-          K.3.7     Interrupt Mode and Reset Instructions            K-5 
-          K.3.8     Input and Output Instructions                    K-5 
-          K.3.9     Register Pair Instructions                       K-5 
-          K.3.10    HD64180 Specific Instructions                    K-6 
+        APPENDIX K  AS8085 ASSEMBLER                                 K-1 
+          K.1     8085 REGISTER SET                                  K-1 
+          K.2     8085 INSTRUCTION SET                               K-1 
+          K.2.1     Inherent Instructions                            K-2 
+          K.2.2     Register/Memory/Immediate Instructions           K-2 
+          K.2.3     Call and Return Instructions                     K-2 
+          K.2.4     Jump Instructions                                K-2 
+          K.2.5     Input/Output/Reset Instructions                  K-3 
+          K.2.6     Move Instructions                                K-3 
+          K.2.7     Other Instructions                               K-3 
 
-        APPENDIX L  AS6500 ASSEMBLER                                 L-1 
-          L.1     ACKNOWLEDGMENT                                     L-1 
-          L.2     6500 REGISTER SET                                  L-2 
-          L.3     6500 INSTRUCTION SET                               L-2 
-          L.3.1     Processor Specific Directives                    L-3 
-          L.3.2     65xx Core Inherent Instructions                  L-3 
-          L.3.3     65xx Core Branch Instructions                    L-3 
-          L.3.4     65xx Core Single Operand Instructions            L-3 
+        APPENDIX L  ASZ80 ASSEMBLER                                  L-1 
+          L.1     .hd64 DIRECTIVE                                    L-1 
 
 
                                                                   Page v
         
 
 
-          L.3.5     65xx Core Double Operand Instructions            L-4 
-          L.3.6     65xx Core Jump and Jump to Subroutine
-                    Instructions                                     L-4 
-          L.3.7     65xx Core Miscellaneous X and Y Register
-                    Instructions                                     L-4 
-          L.3.8     65F11 and 65F12 Specific Instructions            L-5 
-          L.3.9     65C00/21 and 65C29 Specific Instructions         L-5 
-          L.3.10    65C02, 65C102, and 65C112 Specific
-                    Instructions                                     L-6 
+          L.2     Z80 REGISTER SET AND CONDITIONS                    L-1 
+          L.3     Z80 INSTRUCTION SET                                L-2 
+          L.3.1     Inherent Instructions                            L-3 
+          L.3.2     Implicit Operand Instructions                    L-3 
+          L.3.3     Load Instruction                                 L-4 
+          L.3.4     Call/Return Instructions                         L-4 
+          L.3.5     Jump and Jump to Subroutine Instructions         L-4 
+          L.3.6     Bit Manipulation Instructions                    L-5 
+          L.3.7     Interrupt Mode and Reset Instructions            L-5 
+          L.3.8     Input and Output Instructions                    L-5 
+          L.3.9     Register Pair Instructions                       L-5 
+          L.3.10    HD64180 Specific Instructions                    L-6 
+
+        APPENDIX M  AS6500 ASSEMBLER                                 M-1 
+          M.1     ACKNOWLEDGMENT                                     M-1 
+          M.2     6500 REGISTER SET                                  M-2 
+          M.3     6500 INSTRUCTION SET                               M-2 
+          M.3.1     Processor Specific Directives                    M-3 
+          M.3.2     65xx Core Inherent Instructions                  M-3 
+          M.3.3     65xx Core Branch Instructions                    M-3 
+          M.3.4     65xx Core Single Operand Instructions            M-3 
+          M.3.5     65xx Core Double Operand Instructions            M-4 
+          M.3.6     65xx Core Jump and Jump to Subroutine
+                    Instructions                                     M-4 
+          M.3.7     65xx Core Miscellaneous X and Y Register
+                    Instructions                                     M-4 
+          M.3.8     65F11 and 65F12 Specific Instructions            M-5 
+          M.3.9     65C00/21 and 65C29 Specific Instructions         M-5 
+          M.3.10    65C02, 65C102, and 65C112 Specific
+                    Instructions                                     M-6 
 
 
                                                                  Page vi
         
 
 
-        ASxxxx Cross Assemblers, Version 1.7 
+        ASxxxx Cross Assemblers, Version 1.75 
 
         Submitted by:  
         Alan R.  Baldwin, 
@@ -291,14 +312,14 @@
         Kent State University 
         Kent, Ohio 44242 
 
-        Operating System:  TSX+, RT-11, PDOS, MS/DOS, Windows 3.x 
+        Operating System:  TSX+, RT-11, PDOS, MS/DOS, Windows 3.x/95 
         or other supporting K&R C.  
 
         Source Langauge:  C 
 
-           The ASxxxx Cross Assembler and Linker package (V1.7 November
-        1995) contains cross assemblers for the 6800(6802/6808),
-        6801(hd6303), 6804, 6805, 68HC08, 6809, 6811, 68HC16,
+           The ASxxxx Cross Assembler and Linker package (V1.75 October
+        1996) contains cross assemblers for the 6800(6802/6808),
+        6801(hd6303), 6804, 6805, 68HC08, 6809, 68HC11, 68HC12, 68HC16,
         8085(8080), z80(hd64180), H8/3xx, and 6500 series microproces-
         sors.  Complete source code is provided with the assem-
         bler/linker submission.  
@@ -309,7 +330,7 @@
 
            The ASxxxx Cross Assembler and Linker package is available
         from Kent State University at shop-pdp.kent.edu by "anonymous"
-        FTP.  
+        FTP or through the web page at http://shop-pdp.kent.edu/.  
 
 
                                                                 Page vii
@@ -364,8 +385,8 @@
 
 
                 baldwin@shop-pdp.kent.edu 
-                tel:  (216) 672 2531 
-                fax:  (216) 672 2959 
+                tel:  (330) 672 2531 
+                fax:  (330) 672 2959 
 
 
 
@@ -692,10 +713,10 @@
            The following characters are legal in ASxxxx source programs: 
 
              1.  The  letters  A  through Z.  Both upper- and lower-case
-                 letters are acceptable.  The assemblers are case sensi-
-                 tive,  i.e.  ABCD and abcd are different symbols.  (The
-                 assemblers can be made case insensitive by  recompiling
-                 with the appropriate switches.) 
+                 letters are acceptable.  The assemblers  are  not  case
+                 sensitive,  i.e.   ABCD  and abcd are the same symbols.
+                 (The assemblers can be made case  sensitive  by  recom-
+                 piling with the appropriate switches.) 
 
              2.  The digits 0 through 9 
 
@@ -1809,11 +1830,11 @@
         1.5  INVOKING ASXXXX 
 
 
-           The  ASxxxx  assemblers are command line oriented.  After the
-        assembler is started, enter the option(s) and file(s) to  assem-
-        ble following the 'argv:' prompt:  
+           The  ASxxxx assemblers are command line oriented.  The PC as-
+        semblers are started with the appropriate option(s) and  file(s)
+        to assemble following the assembler name:  
 
-        argv:  [-dqxgalosf] file1 [file2 file3 ...  file6] 
+        as6809 [-dqxgalosff] file1 [file2 file3 ...  file6] 
 
         The options are:  
 
@@ -2734,7 +2755,7 @@
            The assemblers and linker have been successfully compiled us-
         ing  the  DECUS C  (PDP-11)  compiler  (patch  level   9)   with
         RT-11/TSX+,  Eyring  Research  Institute,  Inc.   PDOS (680x0) C
-        V5.4b compiler, and Symantec C/C++ V6.1/V7.0.  
+        V5.4b compiler, and Symantec C/C++ V6.1/V7.2.  
 
            The  device  specific  header  file  (i.e.  m6800.h, m6801.h,
         etc.) contains the DECUS C 'BUILD' directives for  generating  a
@@ -3619,7 +3640,7 @@
 
                                    APPENDIX E
 
-                               AS68HC08 ASSEMBLER
+                                AS6808 ASSEMBLER
 
 
 
@@ -3639,9 +3660,9 @@
 
 
            The  following tables list all 68HC08 mnemonics recognized by
-        the AS68HC08 assembler.  The designation [] refers to a required
+        the AS6808 assembler.  The designation [] refers to  a  required
         addressing  mode  argument.   The  following  list specifies the
-        format for each addressing mode supported by AS68HC08:  
+        format for each addressing mode supported by AS6808:  
 
                 #data           immediate data
                                 byte or word data
@@ -3663,7 +3684,7 @@
                                 zero offset with post increment
 
 
-        AS68HC08 ASSEMBLER                                      PAGE E-2
+        AS6808 ASSEMBLER                                        PAGE E-2
         68HC08 INSTRUCTION SET
 
 
@@ -3707,7 +3728,7 @@
                 bclr    #data,*dir
 
 
-        AS68HC08 ASSEMBLER                                      PAGE E-3
+        AS6808 ASSEMBLER                                        PAGE E-3
         68HC08 INSTRUCTION SET
 
 
@@ -3736,7 +3757,7 @@
                 dbnz    [],label
 
 
-        AS68HC08 ASSEMBLER                                      PAGE E-4
+        AS6808 ASSEMBLER                                        PAGE E-4
         68HC08 INSTRUCTION SET
 
 
@@ -3783,7 +3804,7 @@
                 ais     #data
 
 
-        AS68HC08 ASSEMBLER                                      PAGE E-5
+        AS6808 ASSEMBLER                                        PAGE E-5
         68HC08 INSTRUCTION SET
 
 
@@ -4136,19 +4157,19 @@
 
 
 
-        G.1  6811 REGISTER SET 
+        G.1  68HC11 REGISTER SET 
 
-        The following is a list of the 6811 registers used by AS6811:  
+        The following is a list of the 68HC11 registers used by AS6811: 
 
                 a,b     -       8-bit accumulators
                 d       -       16-bit accumulator <a:b>
                 x,y     -       index registers
 
 
-        G.2  6811 INSTRUCTION SET 
+        G.2  68HC11 INSTRUCTION SET 
 
 
-           The  following  tables  list all 6811 mnemonics recognized by
+           The  following tables list all 68HC11 mnemonics recognized by
         the AS6811 assembler.  The designation [] refers to  a  required
         addressing  mode  argument.   The  following  list specifies the
         format for each addressing mode supported by AS6811:  
@@ -4175,11 +4196,11 @@
 
 
         AS6811 ASSEMBLER                                        PAGE G-2
-        6811 INSTRUCTION SET
+        68HC11 INSTRUCTION SET
 
 
            Note  that  not all addressing modes are valid with every in-
-        struction, refer to the 6811 technical data for valid modes.  
+        struction, refer to the 68HC11 technical data for valid modes.  
 
 
         G.2.1  Inherent Instructions 
@@ -4229,7 +4250,7 @@
 
 
         AS6811 ASSEMBLER                                        PAGE G-3
-        6811 INSTRUCTION SET
+        68HC11 INSTRUCTION SET
 
 
         G.2.3  Single Operand Instructions 
@@ -4284,7 +4305,7 @@
 
 
         AS6811 ASSEMBLER                                        PAGE G-4
-        6811 INSTRUCTION SET
+        68HC11 INSTRUCTION SET
 
 
         G.2.4  Double Operand Instructions 
@@ -4335,7 +4356,7 @@
 
 
         AS6811 ASSEMBLER                                        PAGE G-5
-        6811 INSTRUCTION SET
+        68HC11 INSTRUCTION SET
 
 
         G.2.6  Jump and Jump to Subroutine Instructions 
@@ -4368,15 +4389,343 @@
 
                                    APPENDIX H
 
+                                AS6812 ASSEMBLER
+
+
+
+
+
+        H.1  68HC12 REGISTER SET 
+
+        The following is a list of the 68HC12 registers used by AS6812: 
+
+                a,b     -       8-bit accumulators
+                d       -       16-bit accumulator <a:b>
+                x,y     -       index registers
+                sp,s    -       stack pointer
+                pc      -       program counter
+                ccr,cc  -       condition code register
+
+
+        H.2  68HC12 INSTRUCTION SET 
+
+
+           The  following tables list all 68HC12 mnemonics recognized by
+        the AS6812 assembler.  The designation [] refers to  a  required
+        addressing  mode  argument.   The  following  list specifies the
+        format for each addressing mode supported by AS6812:  
+
+                #data           immediate data
+                                byte or word data
+        
+                ext             extended addressing
+        
+                pg              memory page number
+        
+                *dir            direct page addressing
+                                (see .setdp directive)
+                                0 <= dir <= 255 
+        
+                label           branch label
+        
+                r,r1,r2         registers
+                                ccr,a,b,d,x,y,sp,pc
+        
+
+
+        AS6812 ASSEMBLER                                        PAGE H-2
+        68HC12 INSTRUCTION SET
+
+
+                -x      x-      register indexed, pre or
+                ,-x     ,x-     post autodecrement by 1
+        
+                n,-x    n,x-    register indexed, pre or
+                                post autodecrement by 1 - 8
+        
+                +x      x+      register indexed, pre or
+                ,+x     ,x+     post autoincrement by 1
+        
+                n,+x    n,x+    register indexed, pre or
+                                post autoincrement by 1 - 8
+        
+                offset,x        register indexed addressing
+                                   -16 <= offset <= 15    ---  5-bit
+                                  -256 <= offset <= -17   ---  9-bit
+                                    16 <= offset <= 255   ---  9-bit
+                                -32768 <= offset <= -257  --- 16-bit
+                                   256 <= offset <= 32767 --- 16-bit
+                                (external definition of offset
+                                 uses 16-bit mode)
+        
+                [offset,x]      register indexed indirect addressing
+                                -32768 <= offset <= 32767 --- 16-bit
+        
+                [,x]            register indexed indirect addressing
+                                zero offset
+        
+                a,x             accumulator offset indexed addressing
+        
+                [d,x]           d accumulator offset indexed
+                                indirect addressing
+
+        The  terms  data, dir, label, offset, and ext may all be expres-
+        sions.  
+
+           Note  that  not all addressing modes are valid with every in-
+        struction, refer to the 68HC12 technical data for valid modes.  
+
+
+        AS6812 ASSEMBLER                                        PAGE H-3
+        68HC12 INSTRUCTION SET
+
+
+        H.2.1  Inherent Instructions 
+
+                aba             bgnd            cba
+                daa             dex             dey
+                ediv            edivs           emul
+                emuls           fdiv            idiv
+                idivs           inx             iny
+                mem             mul             nop
+                psha            pshb            pshc
+                pshd            pshx            pshy
+                pula            pulb            pulc
+                puld            pulx            puly
+                rev             revw            rtc
+                rti             rts             sba
+                stop            swi             tab
+                tba             wai             wav
+                wavr
+
+
+        H.2.2  Short Branch Instructions 
+
+                bcc     label           bcs     label
+                beq     label           bge     label
+                bgt     label           bhi     label
+                bhis    label           bhs     label
+                ble     label           blo     label
+                blos    label           bls     label
+                blt     label           bmi     label
+                bne     label           bpl     label
+                bra     label           brn     label
+                bvc     label           bvs     label
+                bsr     label
+
+
+        H.2.3  Long Branch Instructions 
+
+                lbcc    label           lbcs    label
+                lbeq    label           lbge    label
+                lbgt    label           lbhi    label
+                lbhis   label           lbhs    label
+                lble    label           lblo    label
+                lblos   label           lbls    label
+                lblt    label           lbmi    label
+                lbne    label           lbpl    label
+                lbra    label           lbrn    label
+                lbvc    label           lbvs    label
+
+
+        AS6812 ASSEMBLER                                        PAGE H-4
+        68HC12 INSTRUCTION SET
+
+
+        H.2.4  Branch on Decrement, Test, or Increment 
+
+                dbeq    r,label         dbne    r,label
+                ibeq    r,label         ibne    r,label
+                tbeq    r,label         tbne    r,label
+
+
+        H.2.5  Bit Clear and Set Instructions 
+
+                bclr    [],#data
+                bset    [],#data
+
+
+        H.2.6  Branch on Bit Clear or Set 
+
+                brclr   [],#data,label
+                brset   [],#data,label
+
+
+        AS6812 ASSEMBLER                                        PAGE H-5
+        68HC12 INSTRUCTION SET
+
+
+        H.2.7  Single Operand Instructions 
+
+                asla            aslb
+                asl     []
+        
+                asra            asrb
+                asr     []
+        
+                clra            clrb
+                clr     []
+        
+                coma            comb
+                com     []
+        
+                deca            decb
+                dec     []
+        
+                inca            incb
+                inc     []
+        
+                lsla            lslb
+                lsl     []
+        
+                lsra            lsrb
+                lsr     []
+        
+                nega            negb
+                neg     []
+        
+                rola            rolb
+                rol     []
+        
+                rora            rorb
+                ror     []
+        
+                tsta            tstb
+                tst     []
+
+
+        AS6812 ASSEMBLER                                        PAGE H-6
+        68HC12 INSTRUCTION SET
+
+
+        H.2.8  Double Operand Instructions 
+
+                adca    []              adcb    []
+        
+                adda    []              addb    []
+        
+                anda    []              andb    []
+        
+                bita    []              bitb    []
+        
+                cmpa    []              cmpb    []
+        
+                eora    []              eorb    []
+        
+                ldaa    []      <=>     lda     []
+        
+                ldab    []      <=>     ldb     []
+        
+                oraa    []      <=>     ora     []
+        
+                orab    []      <=>     orb     []
+        
+                sbca    []              sbcb    []
+        
+                staa    []      <=>     sta     []
+        
+                stab    []      <=>     stb     []
+        
+                suba    []              subb    []
+
+
+        H.2.9  Move Instructions 
+
+                movb    [],[]           movw    [],[]
+
+
+        H.2.10  D-register Instructions 
+
+                addd    []              subd    []
+                cpd     []      <=>     cmpd    []
+                ldd     []              std     []
+
+
+        AS6812 ASSEMBLER                                        PAGE H-7
+        68HC12 INSTRUCTION SET
+
+
+        H.2.11  Index/Stack Register Instructions 
+
+                cps     []      <=>     cmps    []
+                cpx     []      <=>     cmpx    []
+                cpy     []      <=>     cmpy    []
+        
+                lds     []
+                ldx     []              ldy     []
+        
+                leas    []
+                leax    []              leay    []
+        
+                sts     []
+                stx     []              sty     []
+
+
+        H.2.12  Jump and Jump/Call to Subroutine Instructions 
+
+                call    [],pg
+                jmp     []              jsr     []
+
+
+        H.2.13  Other Special Instructions 
+
+                emacs   []
+                emaxd   []              emaxm   []
+                emind   []              eminm   []
+                etbl    []
+                maxa    []              maxm    []
+                mina    []              minm    []
+                tbl     []              trap    #data
+
+
+        H.2.14  Register - Register Instructions 
+
+                exg     r1,r2           sex     r1,r2
+                tfr     r1,r2
+
+
+        H.2.15  Condition Code Register Instructions 
+
+                andcc   #data           orcc    #data
+
+
+        AS6812 ASSEMBLER                                        PAGE H-8
+        68HC12 INSTRUCTION SET
+
+
+        H.2.16  M68HC11 Compatibility Mode Instructions 
+
+                abx             aby             clc
+                cli             clv             des
+                ins             sec             sei
+                sev             tap             tpa
+                tsx             tsy             txs
+                tys             xgdx            xgdy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   APPENDIX I
+
                                 AS6816 ASSEMBLER
 
 
 
 
 
-        H.1  6816 REGISTER SET 
+        I.1  68HC16 REGISTER SET 
 
-        The following is a list of the 6816 registers used by AS6816:  
+        The following is a list of the 68HC16 registers used by AS6816: 
 
                 a,b     -       8-bit accumulators
                 d       -       16-bit accumulator <a:b>
@@ -4387,10 +4736,10 @@
                 ccr     -       condition code
 
 
-        H.2  6816 INSTRUCTION SET 
+        I.2  68HC16 INSTRUCTION SET 
 
 
-           The  following  tables  list all 6816 mnemonics recognized by
+           The  following tables list all 68HC16 mnemonics recognized by
         the AS6816 assembler.  The designation [] refers to  a  required
         addressing  mode  argument.   The  following  list specifies the
         format for each addressing mode supported by AS6816:  
@@ -4412,8 +4761,8 @@
                 offset,x        register indexed addressing
 
 
-        AS6816 ASSEMBLER                                        PAGE H-2
-        6816 INSTRUCTION SET
+        AS6816 ASSEMBLER                                        PAGE I-2
+        68HC16 INSTRUCTION SET
 
 
                                      0 <= offset <= 255   ---  8-bit
@@ -4438,7 +4787,7 @@
         struction, refer to the 6816 technical data for valid modes.  
 
 
-        H.2.1  Inherent Instructions 
+        I.2.1  Inherent Instructions 
 
                 aba             abx             aby             abz
                 ace             aced            ade             adx
@@ -4464,16 +4813,16 @@
                 xgez
 
 
-        AS6816 ASSEMBLER                                        PAGE H-3
-        6816 INSTRUCTION SET
+        AS6816 ASSEMBLER                                        PAGE I-3
+        68HC16 INSTRUCTION SET
 
 
-        H.2.2  Push/Pull Multiple Register Instructions 
+        I.2.2  Push/Pull Multiple Register Instructions 
 
                 pshm    r,...           pulm    r,...
 
 
-        H.2.3  Short Branch Instructions 
+        I.2.3  Short Branch Instructions 
 
                 bcc     label           bcs     label
                 beq     label           bge     label
@@ -4488,7 +4837,7 @@
                 bsr     label
 
 
-        H.2.4  Long Branch Instructions 
+        I.2.4  Long Branch Instructions 
 
                 lbcc    label           lbcs    label
                 lbeq    label           lbge    label
@@ -4503,7 +4852,7 @@
                 lbsr    label
 
 
-        H.2.5  Bit Manipulation Instructions 
+        I.2.5  Bit Manipulation Instructions 
 
                 bclr    [],#data
                 bset    [],#data
@@ -4512,11 +4861,11 @@
                 brset   [],#data,label
 
 
-        AS6816 ASSEMBLER                                        PAGE H-4
-        6816 INSTRUCTION SET
+        AS6816 ASSEMBLER                                        PAGE I-4
+        68HC16 INSTRUCTION SET
 
 
-        H.2.6  Single Operand Instructions 
+        I.2.6  Single Operand Instructions 
 
                 asla                    aslb
                 asld                    asle
@@ -4569,11 +4918,11 @@
                 tst     []              tstw    []
 
 
-        AS6816 ASSEMBLER                                        PAGE H-5
-        6816 INSTRUCTION SET
+        AS6816 ASSEMBLER                                        PAGE I-5
+        68HC16 INSTRUCTION SET
 
 
-        H.2.7  Double Operand Instructions 
+        I.2.7  Double Operand Instructions 
 
                 adca    []              adcb    []
                 adcd    []              adce    []
@@ -4608,7 +4957,7 @@
                 subd    []              sube    []
 
 
-        H.2.8  Index/Stack Register Instructions 
+        I.2.8  Index/Stack Register Instructions 
 
                 cps     []              cpx     []
                 cpy     []              cpz     []
@@ -4620,21 +4969,21 @@
                 sty     []              stz     []
 
 
-        AS6816 ASSEMBLER                                        PAGE H-6
-        6816 INSTRUCTION SET
+        AS6816 ASSEMBLER                                        PAGE I-6
+        68HC16 INSTRUCTION SET
 
 
-        H.2.9  Jump and Jump to Subroutine Instructions 
+        I.2.9  Jump and Jump to Subroutine Instructions 
 
                 jmp     bank,[]         jsr     bank,[]
 
 
-        H.2.10  Condition Code Register Instructions 
+        I.2.10  Condition Code Register Instructions 
 
                 andp    #data           orp     #data
 
 
-        H.2.11  Multiply and Accumulate Instructions 
+        I.2.11  Multiply and Accumulate Instructions 
 
                 mac     #data           rmac    #data
                 mac     #xo,#yo         rmac    #xo,#yo
@@ -4652,7 +5001,7 @@
 
 
 
-                                   APPENDIX I
+                                   APPENDIX J
 
                                  ASH8 ASSEMBLER
 
@@ -4660,7 +5009,7 @@
 
 
 
-        I.1  H8/3XX REGISTER SET 
+        J.1  H8/3XX REGISTER SET 
 
         The following is a list of the H8 registers used by ASH8:  
 
@@ -4671,7 +5020,7 @@
                 ccr                     condition code
 
 
-        I.2  H8/3XX INSTRUCTION SET 
+        J.2  H8/3XX INSTRUCTION SET 
 
 
            The  following tables list all H8/3xx mnemonics recognized by
@@ -4685,7 +5034,7 @@
         
                 *dir            direct page addressing
                                 (see .setdp directive)
-                                0 <= dir <= 255 
+                                0xFF00 <= dir <= 0xFFFF
         
                 label           branch label
         
@@ -4698,7 +5047,7 @@
         
 
 
-        ASH8 ASSEMBLER                                          PAGE I-2
+        ASH8 ASSEMBLER                                          PAGE J-2
         H8/3XX INSTRUCTION SET
 
 
@@ -4723,7 +5072,7 @@
         struction, refer to the H8/3xx technical data for valid modes.  
 
 
-        I.2.1  Inherent Instructions 
+        J.2.1  Inherent Instructions 
 
                 eepmov
                 nop
@@ -4732,7 +5081,7 @@
                 rts
 
 
-        I.2.2  Branch Instructions 
+        J.2.2  Branch Instructions 
 
                 bcc     label                   bcs     label
                 beq     label                   bf      label
@@ -4748,11 +5097,11 @@
                 bsr     label
 
 
-        ASH8 ASSEMBLER                                          PAGE I-3
+        ASH8 ASSEMBLER                                          PAGE J-3
         H8/3XX INSTRUCTION SET
 
 
-        I.2.3  Single Operand Instructions 
+        J.2.3  Single Operand Instructions 
 
                 Free Form
         
@@ -4792,32 +5141,32 @@
                 push.w  rn                      pop.w   rn
 
 
-        ASH8 ASSEMBLER                                          PAGE I-4
+        ASH8 ASSEMBLER                                          PAGE J-4
         H8/3XX INSTRUCTION SET
 
 
-        I.2.4  Double Operand Instructions 
+        J.2.4  Double Operand Instructions 
 
                 Free Form
         
                 add     rnB,rnB                 add     #xx:8,rnB
                 add     rn,rn
+                adds    #1,rn                   adds    #2,rn
+                addx    rnB,rnB                 addx    #xx:8,rnB
         
                 cmp     rnB,rnB                 cmp     #xx:8,rnB
                 cmp     rn,rn
         
                 sub     rnB,rnB
                 sub     rn,rn
-        
-                addx    rnB,rnB                 addx    #xx:8,rnB
+                subs    #1,rn                   subs    #2,rn
+                subx    rnB,rnB                 subx    #xx:8,rnB
         
                 and     rnB,rnB                 and     #xx:8,rnB
                                                 and     #xx:8,ccr
         
                 or      rnB,rnB                 or      #xx:8,rnB
                                                 or      #xx:8,ccr
-        
-                subx    rnB,rnB                 subx    #xx:8,rnB
         
                 xor     rnB,rnB                 xor     #xx:8,rnB
                                                 xor     #xx:8,ccr
@@ -4848,11 +5197,11 @@
                                                 xor.b   #xx:8,ccr
 
 
-        ASH8 ASSEMBLER                                          PAGE I-5
+        ASH8 ASSEMBLER                                          PAGE J-5
         H8/3XX INSTRUCTION SET
 
 
-        I.2.5  Mov Instructions 
+        J.2.5  Mov Instructions 
 
                 Free Form
         
@@ -4902,11 +5251,11 @@
                 mov.b   rnB,label               mov.w   rn,label
 
 
-        ASH8 ASSEMBLER                                          PAGE I-6
+        ASH8 ASSEMBLER                                          PAGE J-6
         H8/3XX INSTRUCTION SET
 
 
-        I.2.6  Bit Manipulation Instructions 
+        J.2.6  Bit Manipulation Instructions 
 
                 bld     #xx:3,rnB               bld     #xx:3,@rn
                 bld     #xx:3,@dir              bld     #xx:3,dir
@@ -4949,11 +5298,11 @@
                 bixor   #xx:3,*@dir             bixor   #xx:3,*dir
 
 
-        ASH8 ASSEMBLER                                          PAGE I-7
+        ASH8 ASSEMBLER                                          PAGE J-7
         H8/3XX INSTRUCTION SET
 
 
-        I.2.7  Extended Bit Manipulation Instructions 
+        J.2.7  Extended Bit Manipulation Instructions 
 
                 bset    #xx:3,rnB               bset    #xx:3,@rn
                 bset    #xx:3,@dir              bset    #xx:3,dir
@@ -4984,7 +5333,7 @@
                 btst    rnB,*@dir               btst    rnB,*dir
 
 
-        I.2.8  Condition Code Instructions 
+        J.2.8  Condition Code Instructions 
 
                 andc    #xx:8,ccr               andc    #xx:8
                 and     #xx:8,ccr               and.b   #xx:8,ccr
@@ -5001,11 +5350,11 @@
                 stc     ccr,rnB                 stc     rnB
 
 
-        ASH8 ASSEMBLER                                          PAGE I-8
+        ASH8 ASSEMBLER                                          PAGE J-8
         H8/3XX INSTRUCTION SET
 
 
-        I.2.9  Other Instructions 
+        J.2.9  Other Instructions 
 
                 divxu   rnB,rn                  divxu.b rnB,rn
         
@@ -5018,7 +5367,7 @@
                 movtpe.b  @label,rnB            movtpe.b  label,rnB
 
 
-        I.2.10  Jump and Jump to Subroutine Instructions 
+        J.2.10  Jump and Jump to Subroutine Instructions 
 
                 jmp     @rn                     jmp     @@dir
                 jmp     @label                  jmp     label
@@ -5039,7 +5388,7 @@
 
 
 
-                                   APPENDIX J
+                                   APPENDIX K
 
                                 AS8085 ASSEMBLER
 
@@ -5047,7 +5396,7 @@
 
 
 
-        J.1  8085 REGISTER SET 
+        K.1  8085 REGISTER SET 
 
         The  following  is  a  list  of  the 8080/8085 registers used by
         AS8085:  
@@ -5058,7 +5407,7 @@
                 psw             -       status word
 
 
-        J.2  8085 INSTRUCTION SET 
+        K.2  8085 INSTRUCTION SET 
 
 
            The  following tables list all 8080/8085 mnemonics recognized
@@ -5085,11 +5434,11 @@
         modes.  
 
 
-        AS8085 ASSEMBLER                                        PAGE J-2
+        AS8085 ASSEMBLER                                        PAGE K-2
         8085 INSTRUCTION SET
 
 
-        J.2.1  Inherent Instructions 
+        K.2.1  Inherent Instructions 
 
                 cma             cmc
                 daa             di
@@ -5103,7 +5452,7 @@
                 xthl
 
 
-        J.2.2  Register/Memory/Immediate Instructions 
+        K.2.2  Register/Memory/Immediate Instructions 
 
                 adc     r       adc     m       aci     #data
                 add     r       add     m       adi     #data
@@ -5115,7 +5464,7 @@
                 xra     r       xra     m       xri     #data
 
 
-        J.2.3  Call and Return Instructions 
+        K.2.3  Call and Return Instructions 
 
                 cc      label           rc
                 cm      label           rm
@@ -5128,7 +5477,7 @@
                 call    label
 
 
-        J.2.4  Jump Instructions 
+        K.2.4  Jump Instructions 
 
                 jc      label
                 jm      label
@@ -5141,18 +5490,18 @@
                 jmp     label
 
 
-        AS8085 ASSEMBLER                                        PAGE J-3
+        AS8085 ASSEMBLER                                        PAGE K-3
         8085 INSTRUCTION SET
 
 
-        J.2.5  Input/Output/Reset Instructions 
+        K.2.5  Input/Output/Reset Instructions 
 
                 in      data
                 out     data
                 rst     data
 
 
-        J.2.6  Move Instructions 
+        K.2.6  Move Instructions 
 
                 mov     r1,r2
                 mov     r,m
@@ -5162,7 +5511,7 @@
                 mvi     m,#data
 
 
-        J.2.7  Other Instructions 
+        K.2.7  Other Instructions 
 
                 dcr     r               dcr     m
                 inr     r               inr     m
@@ -5190,7 +5539,7 @@
 
 
 
-                                   APPENDIX K
+                                   APPENDIX L
 
                                  ASZ80 ASSEMBLER
 
@@ -5198,7 +5547,7 @@
 
 
 
-        K.1  .hd64 DIRECTIVE 
+        L.1  .hd64 DIRECTIVE 
 
         Format:  
 
@@ -5210,7 +5559,7 @@
         flagged with an 'o' error.  
 
 
-        K.2  Z80 REGISTER SET AND CONDITIONS 
+        L.2  Z80 REGISTER SET AND CONDITIONS 
 
 
            The following is a complete list of register designations and
@@ -5232,11 +5581,11 @@
 
 
 
-        ASZ80 ASSEMBLER                                         PAGE K-2
+        ASZ80 ASSEMBLER                                         PAGE L-2
         Z80 INSTRUCTION SET
 
 
-        K.3  Z80 INSTRUCTION SET 
+        L.3  Z80 INSTRUCTION SET 
 
 
            The  following  tables  list all Z80/HD64180 mnemonics recog-
@@ -5274,11 +5623,11 @@
         modes.  
 
 
-        ASZ80 ASSEMBLER                                         PAGE K-3
+        ASZ80 ASSEMBLER                                         PAGE L-3
         Z80 INSTRUCTION SET
 
 
-        K.3.1  Inherent Instructions 
+        L.3.1  Inherent Instructions 
 
                 ccf             cpd
                 cpdr            cpi
@@ -5293,7 +5642,7 @@
                 rrd             scf
 
 
-        K.3.2  Implicit Operand Instructions 
+        L.3.2  Implicit Operand Instructions 
 
                 adc     a,[]            adc     []
                 add     a,[]            add     []
@@ -5314,11 +5663,11 @@
                 xor     a,[]            xor     []
 
 
-        ASZ80 ASSEMBLER                                         PAGE K-4
+        ASZ80 ASSEMBLER                                         PAGE L-4
         Z80 INSTRUCTION SET
 
 
-        K.3.3  Load Instruction 
+        L.3.3  Load Instruction 
 
                 ld      rg,[]           ld      [],rg
                 ld      (bc),a          ld      a,(bc)
@@ -5334,7 +5683,7 @@
                 ldi                     ldir
 
 
-        K.3.4  Call/Return Instructions 
+        L.3.4  Call/Return Instructions 
 
                 call    C,label         ret     C
                 call    M,label         ret     M
@@ -5347,7 +5696,7 @@
                 call    label           ret
 
 
-        K.3.5  Jump and Jump to Subroutine Instructions 
+        L.3.5  Jump and Jump to Subroutine Instructions 
 
                 jp      C,label         jp      M,label
                 jp      NC,label        jp      NZ,label
@@ -5364,18 +5713,18 @@
                 jr      label
 
 
-        ASZ80 ASSEMBLER                                         PAGE K-5
+        ASZ80 ASSEMBLER                                         PAGE L-5
         Z80 INSTRUCTION SET
 
 
-        K.3.6  Bit Manipulation Instructions 
+        L.3.6  Bit Manipulation Instructions 
 
                 bit     n,[]
                 res     n,[]
                 set     n,[]
 
 
-        K.3.7  Interrupt Mode and Reset Instructions 
+        L.3.7  Interrupt Mode and Reset Instructions 
 
                 im      n
                 im      n
@@ -5383,7 +5732,7 @@
                 rst     n
 
 
-        K.3.8  Input and Output Instructions 
+        L.3.8  Input and Output Instructions 
 
                 in      a,(n)           in      rg,(c)
                 ind                     indr
@@ -5394,7 +5743,7 @@
                 outi                    otir
 
 
-        K.3.9  Register Pair Instructions 
+        L.3.9  Register Pair Instructions 
 
                 add     hl,rp           add     ix,rp
                 add     iy,rp
@@ -5409,11 +5758,11 @@
                 push    rp              pop     rp
 
 
-        ASZ80 ASSEMBLER                                         PAGE K-6
+        ASZ80 ASSEMBLER                                         PAGE L-6
         Z80 INSTRUCTION SET
 
 
-        K.3.10  HD64180 Specific Instructions 
+        L.3.10  HD64180 Specific Instructions 
 
                 in0     rg,(n)
                 out0    (n),rg
@@ -5442,7 +5791,7 @@
 
 
 
-                                   APPENDIX L
+                                   APPENDIX M
 
                                 AS6500 ASSEMBLER
 
@@ -5450,7 +5799,7 @@
 
 
 
-        L.1  ACKNOWLEDGMENT 
+        M.1  ACKNOWLEDGMENT 
 
 
            Thanks  to  Marko  Makela  for his contribution of the AS6500
@@ -5479,11 +5828,11 @@
 
 
 
-        AS6500 ASSEMBLER                                        PAGE L-2
+        AS6500 ASSEMBLER                                        PAGE M-2
         6500 REGISTER SET
 
 
-        L.2  6500 REGISTER SET 
+        M.2  6500 REGISTER SET 
 
         The following is a list of the 6500 registers used by AS6500:  
 
@@ -5491,7 +5840,7 @@
                 x,y     -       index registers
 
 
-        L.3  6500 INSTRUCTION SET 
+        M.3  6500 INSTRUCTION SET 
 
 
            The  following  tables  list all 6500 family mnemonics recog-
@@ -5536,11 +5885,11 @@
         struction, refer to the 65xx technical data for valid modes.  
 
 
-        AS6500 ASSEMBLER                                        PAGE L-3
+        AS6500 ASSEMBLER                                        PAGE M-3
         6500 INSTRUCTION SET
 
 
-        L.3.1  Processor Specific Directives 
+        M.3.1  Processor Specific Directives 
 
 
            The  AS6500  cross  assembler has four (4) processor specific
@@ -5553,7 +5902,7 @@
                 .r65c02         Core plus 65C02, 65C102, and 65C112
 
 
-        L.3.2  65xx Core Inherent Instructions 
+        M.3.2  65xx Core Inherent Instructions 
 
                 brk                     clc
                 cld                     cli
@@ -5570,7 +5919,7 @@
                 tya
 
 
-        L.3.3  65xx Core Branch Instructions 
+        M.3.3  65xx Core Branch Instructions 
 
                 bcc     label           bhs     label
                 bcs     label           blo     label
@@ -5579,7 +5928,7 @@
                 bvc     label           bvs     label
 
 
-        L.3.4  65xx Core Single Operand Instructions 
+        M.3.4  65xx Core Single Operand Instructions 
 
                 asl     []
                 dec     []
@@ -5589,11 +5938,11 @@
                 ror     []
 
 
-        AS6500 ASSEMBLER                                        PAGE L-4
+        AS6500 ASSEMBLER                                        PAGE M-4
         6500 INSTRUCTION SET
 
 
-        L.3.5  65xx Core Double Operand Instructions 
+        M.3.5  65xx Core Double Operand Instructions 
 
                 adc     []
                 and     []
@@ -5606,12 +5955,12 @@
                 sta     []
 
 
-        L.3.6  65xx Core Jump and Jump to Subroutine Instructions 
+        M.3.6  65xx Core Jump and Jump to Subroutine Instructions 
 
                 jmp     []              jsr     []
 
 
-        L.3.7  65xx Core Miscellaneous X and Y Register Instructions 
+        M.3.7  65xx Core Miscellaneous X and Y Register Instructions 
 
                 cpx     []
                 cpy     []
@@ -5621,11 +5970,11 @@
                 sty     []
 
 
-        AS6500 ASSEMBLER                                        PAGE L-5
+        AS6500 ASSEMBLER                                        PAGE M-5
         6500 INSTRUCTION SET
 
 
-        L.3.8  65F11 and 65F12 Specific Instructions 
+        M.3.8  65F11 and 65F12 Specific Instructions 
 
                 bbr0    [],label                bbr1    [],label
                 bbr2    [],label                bbr3    [],label
@@ -5648,7 +5997,7 @@
                 smb6    []                      smb7    []
 
 
-        L.3.9  65C00/21 and 65C29 Specific Instructions 
+        M.3.9  65C00/21 and 65C29 Specific Instructions 
 
                 bbr0    [],label                bbr1    [],label
                 bbr2    [],label                bbr3    [],label
@@ -5676,11 +6025,11 @@
                 smb6    []                      smb7    []
 
 
-        AS6500 ASSEMBLER                                        PAGE L-6
+        AS6500 ASSEMBLER                                        PAGE M-6
         6500 INSTRUCTION SET
 
 
-        L.3.10  65C02, 65C102, and 65C112 Specific Instructions 
+        M.3.10  65C02, 65C102, and 65C112 Specific Instructions 
 
                 bbr0    [],label                bbr1    [],label
                 bbr2    [],label                bbr3    [],label

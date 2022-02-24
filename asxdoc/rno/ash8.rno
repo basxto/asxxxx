@@ -30,7 +30,7 @@ each addressing mode supported by ASH8:
 
 	*dir		direct page addressing
 			(see .setdp directive)
-			0 <= dir <= 255 
+			0xFF00 <= dir <= 0xFFFF
 
 	label		branch label
 
@@ -145,22 +145,22 @@ refer to the H8/3xx technical data for valid modes.
 
 	add	rnB,rnB			add	#xx:8,rnB
 	add	rn,rn
+	adds	#1,rn			adds	#2,rn
+	addx	rnB,rnB			addx	#xx:8,rnB
 
 	cmp	rnB,rnB			cmp	#xx:8,rnB
 	cmp	rn,rn
 
 	sub	rnB,rnB
 	sub	rn,rn
-
-	addx	rnB,rnB			addx	#xx:8,rnB
+	subs	#1,rn			subs	#2,rn
+	subx	rnB,rnB			subx	#xx:8,rnB
 
 	and	rnB,rnB			and	#xx:8,rnB
 					and	#xx:8,ccr
 
 	or	rnB,rnB			or	#xx:8,rnB
 					or	#xx:8,ccr
-
-	subx	rnB,rnB			subx	#xx:8,rnB
 
 	xor	rnB,rnB			xor	#xx:8,rnB
 					xor	#xx:8,ccr

@@ -1,7 +1,7 @@
 /* h8mch.c */
 
 /*
- * (C) Copyright 1994-1995
+ * (C) Copyright 1994-1996
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,7 +14,7 @@
 #include "asm.h"
 #include "h8.h"
 
-#define	NB	256
+#define	NB	512
 
 int	*bp;
 int	bm;
@@ -50,7 +50,7 @@ struct mne *mp;
 		if (more()) {
 			expr(&e1, 0);
 			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
-				if (e1.e_addr) {
+				if (e1.e_addr != ~0x00FF) {
 					err('b');
 				}
 			}
@@ -67,6 +67,7 @@ struct mne *mp;
 		if (espa) {
 			outdp(espa, &e1);
 		} else {
+			e1.e_addr = ~0x00FF;
 			outdp(dot.s_area, &e1);
 		}
 		lmode = SLIST;
@@ -239,20 +240,20 @@ struct mne *mp;
 					outrw(&e2, R_NORM);
 				} else {
 					outab(0x30 | v1);
-					outrb(&e2, R_PAG0);
-					pag0byte(&e2);
+					outrb(&e2, R_PAG);
+					pagebyte(&e2);
 				}
 				break;
 
 			case S_EXT:	/* Rs,@aa:16 */
-				if (abstype(&e2) || (t1 == S_WREG)) {
+				if (abstype(&e2) || t1 == S_WREG) {
 					outab(opcode + 0x02);
 					outab(0x80 | v1);
 					outrw(&e2, R_NORM);
 				} else {
 					outab(0x30 | v1);
-					outrb(&e2, R_PAG0);
-					pag0byte(&e2);
+					outrb(&e2, R_PAG);
+					pagebyte(&e2);
 				}
 				break;
 
@@ -302,8 +303,8 @@ struct mne *mp;
 					outrw(&e1, R_NORM);
 				} else {
 					outab(0x20 | v2);
-					outrb(&e1, R_PAG0);
-					pag0byte(&e1);
+					outrb(&e1, R_PAG);
+					pagebyte(&e1);
 				}
 				break;
 
@@ -314,8 +315,8 @@ struct mne *mp;
 					outrw(&e1, R_NORM);
 				} else {
 					outab(0x20 | v2);
-					outrb(&e1, R_PAG0);
-					pag0byte(&e1);
+					outrb(&e1, R_PAG);
+					pagebyte(&e1);
 				}
 				break;
 
@@ -586,8 +587,8 @@ struct mne *mp;
 
 		case S_INDM:	/* @@aa:8 */
 			outab(ophb + 0x02);
-			outrb(&e1, R_PAG0);
-			pag0byte(&e1);
+			outrb(&e1, R_USGN);
+			usgnbyte(&e1);
 			break;
 
 		default:
@@ -626,8 +627,8 @@ struct mne *mp;
 			case S_EXT:	/* Rn(byte),@aa:16 */
 			case S_DIR:	/* Rn(byte),*@aa:8 */
 				outab(0x7F);
-				outrb(&e2, R_PAG0);
-				pag0byte(&e2);
+				outrb(&e2, R_PAG);
+				pagebyte(&e2);
 				outaw(op | ((v1&0x000F) << 4));
 				break;
 			}
@@ -658,8 +659,8 @@ struct mne *mp;
 			case S_EXT:	/* #xx:3,@aa:16 */
 			case S_DIR:	/* #xx:3,*@aa:8 */
 				outab(0x7F);
-				outrb(&e2, R_PAG0);
-				pag0byte(&e2);
+				outrb(&e2, R_PAG);
+				pagebyte(&e2);
 				outaw(op | ((v1&0x0007) << 4));
 				break;
 			}
@@ -709,8 +710,8 @@ struct mne *mp;
 				} else {
 					outab(0x7F);
 				}
-				outrb(&e2, R_PAG0);
-				pag0byte(&e2);
+				outrb(&e2, R_PAG);
+				pagebyte(&e2);
 				outaw(op | ((v1&0x000F) << 4));
 				break;
 			}
@@ -757,11 +758,24 @@ register struct expr *esp;
 }
 
 VOID
-pag0byte(esp)
+usgnbyte(esp)
+register struct expr *esp;
+{
+	register v;
+
+	if (esp->e_flag == 0 && esp->e_base.e_ap == NULL) {
+		if (esp->e_addr & ~0x00FF) {
+			aerr();
+		}
+	}
+}
+
+VOID
+pagebyte(esp)
 register struct expr *esp;
 {
 	if (esp->e_flag == 0 && esp->e_base.e_ap == NULL) {
-		if (esp->e_addr & ~0x00FF) {
+		if ((esp->e_addr & ~0x00FF) != ~0x00FF) {
 			aerr();
 		}
 	}
@@ -785,9 +799,9 @@ register struct expr *esp;
 	} else
 	if (pass == 1) {
 		if (espv >= dot.s_addr) {
-			esp->e_addr -= fuzz;
+			espv = (esp->e_addr -= fuzz);
 		}
-		return(setbit((espv & 0xFF00) ? 1 : 0));
+		return(setbit(((espv & ~0x00FF) != ~0x00FF) ? 1 : 0));
 	} else {
 		return(getbit());
 	}
@@ -796,13 +810,36 @@ register struct expr *esp;
 /*
  * Machine specific initialization.
  * Set up the bit table.
+ * Process any setup code.
  */
 VOID
 minit()
 {
+	register char   **dp;
+
 	bp = bb;
 	bm = 1;
+
+	for (dp = dpcode; *dp; dp++) {
+		strcpy(ib,*dp);
+		cp = cb;
+		cpt = cbt;
+		ep = eb;
+		ip = ib;
+		if (setjmp(jump_env) == 0)
+			asmbl();
+	}
 }
+
+/*
+ * H8/3xx Initialization Coding
+ */
+char *dpcode[] = {
+	";	H8/3xx Direct Page Initialization",
+	"	.setdp	0xFF00,_CODE",
+	"",
+	0
+};
 
 /*
  * Store `b' in the next slot of the bit table.

@@ -48,7 +48,11 @@ register struct adsym *sp;
 {
 	register char *ptr;
 	register int i;
+	register char *ips;
+
+	ips = ip;
 	unget(getnb());
+
 	i = 0;
 	while ( *(ptr = (char *) &sp[i]) ) {
 		if (srch(ptr)) {
@@ -56,6 +60,7 @@ register struct adsym *sp;
 		}
 		i++;
 	}
+	ip = ips;
 	return(0);
 }
 

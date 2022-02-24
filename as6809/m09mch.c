@@ -1,7 +1,7 @@
 /* M09MCH:C */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1996
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,7 +14,7 @@
 #include "asm.h"
 #include "m6809.h"
 
-#define	NB	256
+#define	NB	512
 
 int	*bp;
 int	bm;
@@ -194,7 +194,7 @@ struct mne *mp;
 
 	case S_6800:
 		m68out(op);
-		break;		
+		break;
 
 	default:
 		err('o');

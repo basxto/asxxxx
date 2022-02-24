@@ -256,9 +256,9 @@ The following characters are legal in ASxxxx source programs:
 .list 1
 .list element
 The letters A through Z.  Both upper- and lower-case letters
-are acceptable.  The assemblers are case sensitive, i.e.
-ABCD and abcd are different symbols. (The assemblers can be made
-case insensitive by recompiling with the appropriate switches.)
+are acceptable.  The assemblers are not case sensitive, i.e.
+ABCD and abcd are the same symbols. (The assemblers can be made
+case sensitive by recompiling with the appropriate switches.)
 .list element
 The digits 0 through 9
 .list element
@@ -1286,11 +1286,11 @@ index register and the direct addressing is the offset.
 .tp 32
 .header level 1;INVOKING ASXXXX
 
-The ASxxxx assemblers are command line oriented. After the assembler
-is started, enter the option(s) and file(s) to assemble following the
-'argv:' prompt:
+The ASxxxx assemblers are command line oriented. The PC assemblers
+are started with the appropriate option(s) and file(s) to assemble
+following the assembler name:
 .skip
-argv: [-dqxgalosf] file1 [file2 file3 ... file6]
+as6809 [-dqxgalosff] file1 [file2 file3 ... file6]
 .skip
 The options are:
 .skip;.literal

@@ -49,7 +49,7 @@
 #define S_DIR		41
 
 /*
- * Direct Page (first 256 bytes)
+ * Direct Page (last 256 bytes)
  */
 #define	S_SDP		49
 
@@ -82,6 +82,8 @@
  */
 extern int index;
 
+extern char *dpcode[];
+
 struct	sdp
 {
 	addr_t	s_addr;
@@ -113,7 +115,8 @@ extern	int		srch();
 	/* h8mch.c */
 extern	VOID		machin();
 extern	VOID		normbyte();
-extern	VOID		pag0byte();
+extern	VOID		usgnbyte();
+extern	VOID		pagebyte();
 extern	int		abstype();
 extern	VOID		minit();
 extern	int		setbit();

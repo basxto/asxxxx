@@ -335,12 +335,14 @@ code0:  .word   a0
         .word   cnstnt0
 
         .area   A (OVR)
+	.follow	B
 
         cnstnt1 = 0x1234
 
 a0:     .word   0x00ff
 
         .area   B (ABS,OVR)
+	.follow C
 
         cnstnt2 = 0x5678
 
@@ -367,15 +369,17 @@ abcdabcd::                              ; global symbol
 ;
 ; symbol table
 ;
-;   B          **** GX  |     OVR        **** GX  |   1 a0         0000 GR
-;   a1         **** GX  |     a2         **** GX  |   2 abcdabcd   004A GR
-;   cnstnt0 =  ABCD G   |     cnstnt1 =  1234 G   |     cnstnt2 =  5678 G
-; 0 code0      0151 GR  |     extern     **** GX  |   0 lclsym0    00D3 GR
-; 0 lclsym1    010F GR  |     m       =  0000 G   |     n       =  0001 G
-;   n0x00   =  0000 G   |     n0x01   =  0001 G   |     n0x10   =  0010 G
-;   n0xeeff =  EEFF G   |     n0xff   =  00FF G   |     ofsbyte =  0014 G
-;   ofsword =  000A G   |   0 word       0090 GR
+;    B          **** GX  |     OVR        **** GX  |   1 a0         0000 R
+;    a1         **** GX  |     a2         **** GX  |   2 abcdabcd   004A GR
+;    cnstnt0 =  ABCD G   |     cnstnt1 =  1234 G   |     cnstnt2 =  5678 G
+;  0 code0      0151 GR  |     extern     **** GX  |   0 lclsym0    00D3 R
+;  0 lclsym1    010F R   |     m       =  0000     |     n       =  0001 
+;    n0x00   =  0000     |     n0x01   =  0001     |     n0x10   =  0010 
+;    n0xeeff =  EEFF     |     n0xff   =  00FF     |     ofsbyte =  0014 
+;    ofsword =  000A     |   0 word       0090 R
 ;
-;  0 _CODE      size  155   flags 0
-;  1 A          size   24   flags 4
-;  2 B          size   4A   flags C
+; area table
+;
+;   0 _CODE      size  155   flags 0
+;   1 A          size   24   flags 4
+;   2 B          size   4A   flags C

@@ -1,7 +1,7 @@
 /* asm.h */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1996
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,7 +9,7 @@
  * Kent, Ohio  44240
  */
 
-#define	VERSION	"V01.70"
+#define	VERSION	"V01.75"
 
 /*
  * Case Sensitivity Flag
@@ -425,7 +425,7 @@ extern	char	ctype[128];	/*	array of character types, one per
 
 #if	CASE_SENSITIVE
 #else
-extern	char	ccase[128];	/* an array of characters which 
+extern	char	ccase[128];	/* an array of characters which
 				 * perform the case translation function
 				 */
 #endif

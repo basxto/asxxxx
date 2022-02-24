@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1996
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,7 +9,7 @@
  * Kent, Ohio  44240
  */
 
-#define	VERSION	"V01.70"
+#define	VERSION	"V01.75"
 
 /*
  * Case Sensitivity Flag

@@ -47,17 +47,19 @@
 	; direct page test
 
 	.area	DIRECT	(ABS,OVR)
-	.setdp	0,DIRECT
+	.setdp
 
-	mov	*minus1,r0H	;*L 20 00  [96 FF]
-	mov	*zero,r0H	;   20 00  [96 00]
-	mov	*two55,r0H	;   20 00  [96 FF]
-	mov	*two56,r0H	;*L 20 00  [96 00]
+	dbase = 0xFF00			;default direct page base address
 
-	mov	*lminus1,r0H	;*L 20 00  [96 FF]
-	mov	*lzero,r0H	;   20 00  [96 00]
-	mov	*ltwo55,r0H	;   20 00  [96 FF]
-	mov	*ltwo56,r0H	;*L 20 00  [96 00]
+	mov	*dbase+minus1,r0H	;*L 20 00  [96 FF]
+	mov	*dbase+zero,r0H		;   20 00  [96 00]
+	mov	*dbase+two55,r0H	;   20 00  [96 FF]
+	mov	*dbase+two56,r0H	;*L 20 00  [96 00]
+
+	mov	*dbase+lminus1,r0H	;*L 20 00  [96 FF]
+	mov	*dbase+lzero,r0H	;   20 00  [96 00]
+	mov	*dbase+ltwo55,r0H	;   20 00  [96 FF]
+	mov	*dbase+ltwo56,r0H	;*L 20 00  [96 00]
 
 	; direct page boundary / length checking
 
@@ -65,9 +67,9 @@
 
 	.blkb	1
 
-	.area	PAGE0	(PAG)	;*L Linker -- page definition boundary error
+	.area	PAGE	(PAG)	;*L Linker -- page definition boundary error
 
-	.setdp	boundary,PAGE0	;*L Linker -- page boundary error
+	.setdp	boundary,PAGE	;*L Linker -- page boundary error
 
 	.blkb	0x101		;*L Linker -- page length error
 

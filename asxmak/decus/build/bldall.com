@@ -26,6 +26,9 @@ set log file=bldall.log
 @as6811.cmp
 @as6811.lnk
 !
+@as6812.cmp
+@as6812.lnk
+!
 @as6816.cmp
 @as6816.lnk
 !
@@ -39,5 +42,9 @@ set log file=bldall.log
 @ash8.lnk
 !
 @aslink.bld
+!
+@asxscn.bld
+!
+@asxcnv.bld
 !
 set log close

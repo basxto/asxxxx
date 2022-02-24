@@ -1,7 +1,7 @@
 /* M16MCH:C */
 
 /*
- * (C) Copyright 1991-1995
+ * (C) Copyright 1991-1996
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,7 +14,7 @@
 #include "asm.h"
 #include "m6816.h"
 
-#define	NB	256
+#define	NB	512
 
 int	*bp;
 int	bm;
@@ -94,7 +94,7 @@ struct mne *mp;
 			aerr();
 		}
 		break;
-		
+
 	case S_BIT:
 		t1 = addr(&e1);
 		comma();
@@ -183,7 +183,7 @@ struct mne *mp;
 				 * accounts for 6 of the 6 byte offset
 				 * required.  Thus no offset adjustment
 				 * is required.
-				 */ 
+				 */
 				outrw(&e3, R_PCR);
 			}
 		} else
@@ -235,7 +235,7 @@ struct mne *mp;
 					 * accounts for 4 of the 6 byte offset
 					 * required.  Thus a 2 byte adjustment
 					 * is required.
-					 */ 
+					 */
 					e3.e_addr -= 2;
 					outrb(&e3, R_PCR);
 				}
@@ -263,7 +263,7 @@ struct mne *mp;
 					 * accounts for 6 of the 6 byte offset
 					 * required.  Thus no offset adjustment
 					 * is required.
-					 */ 
+					 */
 					outrw(&e3, R_PCR);
 				}
 			}
@@ -596,7 +596,7 @@ struct mne *mp;
 			 * accounts for 4 of the 6 byte offset
 			 * required.  Thus a 2 byte adjustment
 			 * is required.
-			 */ 
+			 */
 			e1.e_addr -= 2;
 			outrw(&e1, R_PCR);
 		}
@@ -629,7 +629,7 @@ struct mne *mp;
 			 * accounts for 2 of the 6 byte offset
 			 * required.  Thus a 4 byte adjustment
 			 * is required.
-			 */ 
+			 */
 			e1.e_addr -= 4;
 			outrb(&e1, R_PCR);
 		}

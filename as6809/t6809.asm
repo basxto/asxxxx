@@ -49,7 +49,7 @@
 	cmps	*0x0e		;11 9c 0e
 	cmpu	#0x0f		;11 83 00 0f
 	cmpx	*0x10		;9c 10
-	cmpy	#0x11		;10 83 00 11
+	cmpy	#0x11		;10 8C 00 11
 	com	,x		;63 84
 	coma			;43
 	comb			;53
@@ -336,7 +336,7 @@
 	neg	[a,y]		;60 b6
 	neg	[0x11,y]	;60 b8 11
 	neg	[0x2233,y]	;60 b9 22 33
-	neg	[d,x]		;60 bb
+	neg	[d,x]		;60 9b
 ;	neg	[.+0x13,pcr]	;60 bc 10
 ;	neg	[.+0x1004,pcr]	;60 bd 10 00
 ;	neg	[0x2233]	;60 bf 22 33
@@ -538,8 +538,8 @@
 	neg	,x		;60 84
 	neg	b,x		;60 85
 	neg	a,x		;60 86
-	neg	nn,x		;60 88 nn
-	neg	mmnn,x		;60 89 mm nn
+	neg	nn,x		;60 88 11
+	neg	mmnn,x		;60 89 22 33
 	neg	d,x		;60 8b
 	neg	.+0x13,pcr	;60 8c 10
 	neg	.+0x1004,pcr	;60 8d 10 00
@@ -550,12 +550,12 @@
 	neg	[,x]		;60 94
 	neg	[b,x]		;60 95
 	neg	[a,x]		;60 96
-	neg	[nn,x]		;60 98 nn
-	neg	[mmnn,x]	;60 99 mm nn
+	neg	[nn,x]		;60 98 11
+	neg	[mmnn,x]	;60 99 22 33
 	neg	[d,x]		;60 9b
 	neg	[.+0x13,pcr]	;60 9c 10
 	neg	[.+0x1004,pcr]	;60 9d 10 00
-	neg	[mmnn]		;60 9f mm nn
+	neg	[mmnn]		;60 9f 22 33
 
 	neg	,y+		;60 a0
 	neg	,y++		;60 a1
@@ -564,8 +564,8 @@
 	neg	,y		;60 a4
 	neg	b,y		;60 a5
 	neg	a,y		;60 a6
-	neg	nn,y		;60 a8 nn
-	neg	mmnn,y		;60 a9 mm nn
+	neg	nn,y		;60 a8 11
+	neg	mmnn,y		;60 a9 22 33
 	neg	d,y		;60 ab
 ;	neg	.+0x13,pcr	;60 ac 10
 ;	neg	.+0x1004,pcr	;60 ad 10 00
@@ -576,12 +576,12 @@
 	neg	[,y]		;60 b4
 	neg	[b,y]		;60 b5
 	neg	[a,y]		;60 b6
-	neg	[nn,y]		;60 b8 nn
-	neg	[mmnn,y]	;60 b9 mm nn
-	neg	[d,x]		;60 bb
+	neg	[nn,y]		;60 b8 11
+	neg	[mmnn,y]	;60 b9 22 33
+	neg	[d,x]		;60 9b
 ;	neg	[.+0x13,pcr]	;60 bc 10
 ;	neg	[.+0x1004,pcr]	;60 bd 10 00
-;	neg	[mmnn]		;60 bf mm nn
+;	neg	[mmnn]		;60 bf 22 33
 
 	neg	,u+		;60 c0
 	neg	,u++		;60 c1
@@ -590,8 +590,8 @@
 	neg	,u		;60 c4
 	neg	b,u		;60 c5
 	neg	a,u		;60 c6
-	neg	nn,u		;60 c8 nn
-	neg	mmnn,u		;60 c9 mm nn
+	neg	nn,u		;60 c8 11
+	neg	mmnn,u		;60 c9 22 33
 	neg	d,u		;60 cb
 ;	neg	.+0x13,pcr	;60 cc 10
 ;	neg	.+0x1004,pcr	;60 cd 10 00
@@ -602,12 +602,12 @@
 	neg	[,u]		;60 d4
 	neg	[b,u]		;60 d5
 	neg	[a,u]		;60 d6
-	neg	[nn,u]		;60 d8 nn
-	neg	[mmnn,u]	;60 d9 mm nn
+	neg	[nn,u]		;60 d8 11
+	neg	[mmnn,u]	;60 d9 22 33
 	neg	[d,u]		;60 db
 ;	neg	[.+0x13,pcr]	;60 dc 10
 ;	neg	[.+0x1004,pcr]	;60 dd 10 00
-;	neg	[mmnn]		;60 df mm nn
+;	neg	[mmnn]		;60 df 22 33
 
 	neg	,s+		;60 e0
 	neg	,s++		;60 e1
@@ -616,8 +616,8 @@
 	neg	,s		;60 e4
 	neg	b,s		;60 e5
 	neg	a,s		;60 e6
-	neg	nn,s		;60 e8 nn
-	neg	mmnn,s		;60 e9 mm nn
+	neg	nn,s		;60 e8 11
+	neg	mmnn,s		;60 e9 22 33
 	neg	d,s		;60 eb
 ;	neg	.+0x13,pcr	;60 ec 10
 ;	neg	.+0x1004,pcr	;60 ed 10 00
@@ -628,12 +628,12 @@
 	neg	[,s]		;60 f4
 	neg	[b,s]		;60 f5
 	neg	[a,s]		;60 f6
-	neg	[nn,s]		;60 f8 nn
-	neg	[mmnn,s]	;60 f9 mm nn
+	neg	[nn,s]		;60 f8 11
+	neg	[mmnn,s]	;60 f9 22 33
 	neg	[d,s]		;60 fb
 ;	neg	[.+0x13,pcr]	;60 fc 10
 ;	neg	[.+0x1004,pcr]	;60 fd 10 00
-;	neg	[mmnn]		;60 ff mm nn
+;	neg	[mmnn]		;60 ff 22 33
 
 
 
@@ -805,8 +805,8 @@
 	neg	,x		;60 84
 	neg	b,x		;60 85
 	neg	a,x		;60 86
-	neg	nn,x		;60 88 nn
-	neg	mmnn,x		;60 89 mm nn
+	neg	nn,x		;60 88 11
+	neg	mmnn,x		;60 89 22 33
 	neg	d,x		;60 8b
 	neg	.+0x13,pcr	;60 8c 10
 	neg	.+0x1004,pcr	;60 8d 10 00
@@ -817,12 +817,12 @@
 	neg	[,x]		;60 94
 	neg	[b,x]		;60 95
 	neg	[a,x]		;60 96
-	neg	[nn,x]		;60 98 nn
-	neg	[mmnn,x]	;60 99 mm nn
+	neg	[nn,x]		;60 98 11
+	neg	[mmnn,x]	;60 99 22 33
 	neg	[d,x]		;60 9b
 	neg	[.+0x13,pcr]	;60 9c 10
 	neg	[.+0x1004,pcr]	;60 9d 10 00
-	neg	[mmnn]		;60 9f mm nn
+	neg	[mmnn]		;60 9f 22 33
 
 	neg	,y+		;60 a0
 	neg	,y++		;60 a1
@@ -831,8 +831,8 @@
 	neg	,y		;60 a4
 	neg	b,y		;60 a5
 	neg	a,y		;60 a6
-	neg	nn,y		;60 a8 nn
-	neg	mmnn,y		;60 a9 mm nn
+	neg	nn,y		;60 a8 11
+	neg	mmnn,y		;60 a9 22 33
 	neg	d,y		;60 ab
 ;	neg	.+0x13,pcr	;60 ac 10 10
 ;	neg	.+0x1004,pcr	;60 ad 10 00
@@ -843,12 +843,12 @@
 	neg	[,y]		;60 b4
 	neg	[b,y]		;60 b5
 	neg	[a,y]		;60 b6
-	neg	[nn,y]		;60 b8 nn
-	neg	[mmnn,y]	;60 b9 mm nn
-	neg	[d,x]		;60 bb
+	neg	[nn,y]		;60 b8 11
+	neg	[mmnn,y]	;60 b9 22 33
+	neg	[d,x]		;60 9b
 ;	neg	[.+0x13,pcr]	;60 bc 10
 ;	neg	[.+0x1004,pcr]	;60 bd 10 00
-;	neg	[mmnn]		;60 bf mm nn
+;	neg	[mmnn]		;60 bf 22 33
 
 	neg	,u+		;60 c0
 	neg	,u++		;60 c1
@@ -857,8 +857,8 @@
 	neg	,u		;60 c4
 	neg	b,u		;60 c5
 	neg	a,u		;60 c6
-	neg	nn,u		;60 c8 nn
-	neg	mmnn,u		;60 c9 mm nn
+	neg	nn,u		;60 c8 11
+	neg	mmnn,u		;60 c9 22 33
 	neg	d,u		;60 cb
 ;	neg	.+0x13,pcr	;60 cc 10
 ;	neg	.+0x1004,pcr	;60 cd 10 00
@@ -869,12 +869,12 @@
 	neg	[,u]		;60 d4
 	neg	[b,u]		;60 d5
 	neg	[a,u]		;60 d6
-	neg	[nn,u]		;60 d8 nn
-	neg	[mmnn,u]	;60 d9 mm nn
+	neg	[nn,u]		;60 d8 11
+	neg	[mmnn,u]	;60 d9 22 33
 	neg	[d,u]		;60 db
 ;	neg	[.+0x13,pcr]	;60 dc 10
 ;	neg	[.+0x1004,pcr]	;60 dd 10 00
-;	neg	[mmnn]		;60 df mm nn
+;	neg	[mmnn]		;60 df 22 33
 
 	neg	,s+		;60 e0
 	neg	,s++		;60 e1
@@ -883,8 +883,8 @@
 	neg	,s		;60 e4
 	neg	b,s		;60 e5
 	neg	a,s		;60 e6
-	neg	nn,s		;60 e8 nn
-	neg	mmnn,s		;60 e9 mm nn
+	neg	nn,s		;60 e8 11
+	neg	mmnn,s		;60 e9 22 33
 	neg	d,s		;60 eb
 ;	neg	.+0x13,pcr	;60 ec 10
 ;	neg	.+0x1004,pcr	;60 ed 10 00
@@ -895,12 +895,12 @@
 	neg	[,s]		;60 f4
 	neg	[b,s]		;60 f5
 	neg	[a,s]		;60 f6
-	neg	[nn,s]		;60 f8 nn
-	neg	[mmnn,s]	;60 f9 mm nn
+	neg	[nn,s]		;60 f8 11
+	neg	[mmnn,s]	;60 f9 22 33
 	neg	[d,s]		;60 fb
 ;	neg	[.+0x13,pcr]	;60 fc 10
 ;	neg	[.+0x1004,pcr]	;60 fd 10 00
-;	neg	[mmnn]		;60 ff mm nn
+;	neg	[mmnn]		;60 ff 22 33
 
 
 
@@ -948,81 +948,81 @@
 	.page
 	.sbttl	6800 compatibility instuctions with 6809 equivalents
 
-	aba
-	pshs	b	; aba
-	adda	,s+
+	aba		;34 04 ab e0
+	pshs	b	;34 04
+	adda	,s+	;ab e0
 
-	cba
-	pshs	b	;cba
-	cmpa	,s+
+	cba		;34 04 a1 e0
+	pshs	b	;34 04
+	cmpa	,s+	;a1 e0
 
-	clc
-	andcc	#0xFE	;clc
+	clc		;1c fe
+	andcc	#0xFE	;1c fe
 
-	cli
-	andcc	#0xEF	;cli
+	cli		;1c ef
+	andcc	#0xEF	;1c ef
 
-	clv
-	andcc	#0xFD	;clv
+	clv		;1c fd
+	andcc	#0xFD	;1c fd
 
-	des
-	leas	-1,s	;des
+	des		;32 7f
+	leas	-1,s	;32 7f
 
-	dex
-	leax	-1,x	;dex
+	dex		;30 1f
+	leax	-1,x	;30 1f
 
-	ins
-	leas	1,s	;ins
+	ins		;32 61
+	leas	1,s	;32 61
 
-	inx
-	leax	1,x	;inx
+	inx		;30 01
+	leax	1,x	;30 01
 
-	psha
-	pshs	a	;psha
+	psha		;34 02
+	pshs	a	;34 02
 
-	pshb
-	pshs	b	;pshb
+	pshb		;34 04
+	pshs	b	;34 04
 
-	pula
-	puls	a	;pula
+	pula		;35 02
+	puls	a	;35 02
 
-	pulb
-	puls	b	;pulb
+	pulb		;35 04
+	puls	b	;35 04
 
-	sba
-	pshs	b	;sba
-	suba	,s+
+	sba		;34 04 a0 e0
+	pshs	b	;34 04
+	suba	,s+	;a0 e0
 
-	sec
-	orcc	#0x01	;sec
+	sec		;1a 01
+	orcc	#0x01	;1a 01
 
-	sei
-	orcc	#0x10	;sei
+	sei		;1a 10
+	orcc	#0x10	;1a 10
 
-	sev
-	orcc	#0x02	;sev
+	sev		;1a 02
+	orcc	#0x02	;1a 02
 
-	tab
-	tfr	a,b	;tab
-	tsta
+	tab		;1f 89 4d
+	tfr	a,b	;1f 89
+	tsta		;4d
 
-	tap
-	tfr	a,cc	;tap
+	tap		;1f 8a
+	tfr	a,cc	;1f 8a
 
-	tba
-	tfr	b,a	;tba
-	tstb
+	tba		;1f 98 5d
+	tfr	b,a	;1f 98
+	tstb		;5d
 
-	tpa
-	tfr	cc,a	;tpa
+	tpa		;1f a8
+	tfr	cc,a	;1f a8
 
-	tsx
-	tfr	s,x	;tsx
+	tsx		;1f 41
+	tfr	s,x	;1f 41
 
-	txs
-	tfr	x,s	;txs
+	txs		;1f 14
+	tfr	x,s	;1f 14
 
-	wai
-	cwai	#0xFF	;wai
+	wai		;3c ff
+	cwai	#0xFF	;3c ff
 
 

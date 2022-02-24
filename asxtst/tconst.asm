@@ -47,7 +47,7 @@ bra8:	.blkb	0x00		;bra8:
 
 
 	.area	DIRECT	(ABS,OVR)
-	.setdp	0,DIRECT
+	.setdp
 
 	boundary	==	0x101
 
