@@ -1,0 +1,212 @@
+/* lklist.c */
+
+/*
+ * (C) Copyright 1989
+ * All Rights Reserved
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ */
+
+#include <stdio.h>
+#include "aslink.h"
+
+/*
+ * Increment the count of lines on the
+ * page. If the page overflows put out a page
+ * skip and linker header.
+ */
+VOID
+slew(fp)
+FILE *fp;
+{
+	register i;
+
+	if (lop++ >= NLPP) {
+		newpag(fp);
+		if (xflag == 0) {
+			fprintf(fp, "Hexidecimal\n\n");
+		} else
+		if (xflag == 1) {
+			fprintf(fp, "Octal\n\n");
+		} else
+		if (xflag == 2) {
+			fprintf(fp, "Decimal\n\n");
+		}
+		fprintf(fp, "Area       Addr   Size");
+		fprintf(fp, "   Decimal Bytes (Attributes)\n");
+		for(i=0;i<4;++i)
+			fprintf(fp, "      Value--Global");
+		fprintf(fp, "\n\n");
+		lop += 6;
+	}
+}
+
+/*
+ * New Page
+ */
+VOID
+newpag(fp)
+FILE *fp;
+{
+	fprintf(fp, "\faslink,  page %u.\n", ++page);
+	lop = 1;
+}
+
+/*
+ * Area Map Output
+ */
+VOID
+lstarea(rp)
+struct area *rp;
+{
+	register struct area *op;
+	register struct areax *oxp;
+	register c, i, j;
+	register char *ptr;
+	int nmsym;
+	addr_t a0, ai;
+	struct sym *sp;
+	struct sym **p;
+
+	putc('\n', mfp);
+	slew(mfp);
+	/*
+	 * Output Area Header
+	 */
+	ptr = &rp->a_id[0];
+	while (ptr < &rp->a_id[NCPS]) {
+		if (c = *ptr++) {
+			putc(c, mfp);
+		} else {
+			putc(' ', mfp);
+		}
+	}
+	i = rp->a_addr;
+	j = rp->a_size;
+	if (xflag == 0) {
+		fprintf(mfp, "   %04X   %04X", i, j);
+	} else
+	if (xflag == 1) {
+		fprintf(mfp, " %06o %06o", i, j);
+	} else
+	if (xflag == 2) {
+		fprintf(mfp, "  %05u  %05u", i, j);
+	}
+	fprintf(mfp, " = %6u. bytes ", j);
+	if (rp->a_flag & A_ABS) {
+		fprintf(mfp, "(ABS");
+	} else {
+		fprintf(mfp, "(REL");
+	}
+	if (rp->a_flag & A_OVR) {
+		fprintf(mfp, ",OVR)");
+	} else {
+		fprintf(mfp, ",CON)");
+	}
+
+	/*
+	 * Find number of symbols in area
+	 */
+	nmsym = 0;
+	oxp = rp->a_axp;
+	while (oxp) {
+		for (i=0; i<NHASH; i++) {
+			sp = symhash[i];
+			while (sp != NULL) {
+				if (oxp == sp->s_axp)
+					++nmsym;
+				sp = sp->s_sp;
+			}
+		}
+		oxp = oxp->a_axp;
+	}
+	if (nmsym == 0) {
+		putc('\n', mfp);
+		slew(mfp);
+		return;
+	}
+
+	/*
+	 * Allocate space for an array of pointers to symbols
+	 * and load array.
+	 */
+	if ( (p = (struct sym **) malloc(nmsym*sizeof(struct sym *)))
+		== NULL) {
+		fprintf(mfp, "\nInsufficient space to build Map Segment.\n");
+		slew(mfp);
+		return;
+	}
+	nmsym = 0;
+	oxp = rp->a_axp;
+	while (oxp) {
+		for (i=0; i<NHASH; i++) {
+			sp = symhash[i];
+			while (sp != NULL) {
+				if (oxp == sp->s_axp) {
+					p[nmsym++] = sp;
+				}
+				sp = sp->s_sp;
+			}
+		}
+		oxp = oxp->a_axp;
+	}
+
+	/*
+	 * Bubble Sort of Addresses in Symbol Table Array
+	 */
+	j = 1;
+	while (j) {
+		j = 0;
+		sp = p[0];
+		a0 = sp->s_addr + sp->s_axp->a_addr;
+		for (i=1; i<nmsym; ++i) {
+			sp = p[i];
+			ai = sp->s_addr + sp->s_axp->a_addr;
+			if (a0 > ai) {
+				j = 1;
+				p[i] = p[i-1];
+				p[i-1] = sp;
+			}
+			a0 = ai;
+		}
+	}
+
+	/*
+	 * Symbol Table Output
+	 */
+	i = 0;
+	while (i < nmsym) {
+		if (i % 4 == 0) {
+			fprintf(mfp, "\n");
+			slew(mfp);
+			fprintf(mfp, "     ");
+		}
+		sp = p[i];
+		j = sp->s_addr + sp->s_axp->a_addr;
+		if (xflag == 0) {
+			fprintf(mfp, "  %04X  ", j);
+		} else
+		if (xflag == 1) {
+			fprintf(mfp, "%06o  ", j);
+		} else
+		if (xflag == 2) {
+			fprintf(mfp, " %05u  ", j);
+		}
+		ptr = &sp->s_id[0];
+		while (ptr < &sp->s_id[NCPS]) {
+			if (c = *ptr++) {
+				putc(c, mfp);
+			} else {
+				putc(' ', mfp);
+			}
+		}
+		if (++i < nmsym)
+			if (i % 4 != 0)
+				fprintf(mfp, " | ");
+	}
+	putc('\n', mfp);
+	free(p);
+	slew(mfp);
+}
