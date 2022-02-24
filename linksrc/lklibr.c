@@ -1,7 +1,7 @@
 /* lklibr.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin

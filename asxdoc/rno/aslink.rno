@@ -54,10 +54,27 @@ If command line mode is selected, all linker commands come from stdin,
 if the command file mode is selected the commands are input from
 the specified file (extension must be .lnk).
 
-The linker is started via
 .skip
-.indent 8
-ASLINK	-(cfpn)
+.left margin +3
+Most sytems require the initial options to be entered on the command line:
+.left margin -3
+   
+.skip
+.indent +8
+ASLINK  -[cfpn] 
+.skip
+
+.left margin +3
+Some systems may request the arguments after the linker is
+started at a system specific prompt:
+.left margin -3
+
+.skip
+.indent +8
+ASLINK
+.indent +8
+argv:   -[cfpn]
+
 .skip
 After invoking the linker the valid options are:
 
@@ -66,15 +83,19 @@ After invoking the linker the valid options are:
 -i/-s###Intel Hex (file.ihx) or Motorola S19 (file.s19) image output
 file.
 .list element
+-z######Specifies that symbol names are case sensitive.
+.list element
 -m######Generate a map file (file.map). This file contains a list
 of the symbols (by area) with absolute addresses, sizes of linked
 areas, and other linking information.
 .list element
--u######Generate an updated listing file (file.rst) derived from
-the relocated addresses and data from the linker
+-w######Specifies that a wide listing format be used for the map file.
 .list element
 -xdq####Specifies the number radix for the map file (Hexidecimal, Decimal,
 or Octal).
+.list element
+-u######Generate an updated listing file (file.rst) derived from
+the relocated addresses and data from the linker
 .list element
 fileN###Files to be linked. Files may be on the same line as the above
 options or on a separate line(s) one file per line or multiple files
@@ -352,24 +373,25 @@ in groups of 4 bytes:
 
 .list 1
 .list element
-n1 is the relocation mode and object format
+n1 is the relocation mode and object format, for the adhoc
+extension modes refer to asxxxx.h or aslink.h
 .list 0
 .list element
-bit 0  word(0x00)/byte(0x01)
+bit#0##word(0x00)/byte(0x01)
 .list element
-bit 1  relocatable area(0x00)/symbol(0x02)
+bit#1##relocatable area(0x00)/symbol(0x02)
 .list element
-bit 2  normal(0x00)/PC relative(0x04) relocation
+bit#2##normal(0x00)/PC relative(0x04) relocation
 .list element
-bit 3  1-byte(0x00)/2-byte(0x08) object format for byte data
+bit#3##1-byte(0x00)/2-byte(0x08) object format for byte data
 .list element
-bit 4  signed(0x00)/unsigned(0x10) byte data
+bit#4##signed(0x00)/unsigned(0x10) byte data
 .list element
-bit 5  normal(0x00)/page '0'(0x20) reference
+bit#5##normal(0x00)/page '0'(0x20) reference
 .list element
-bit 6  normal(0x00)/page 'nnn'(0x40) reference
+bit#6##normal(0x00)/page 'nnn'(0x40) reference
 .list element
-bit 7  LSB byte(0x00)/MSB byte(0x80) with 2-byte mode
+bit#7##LSB byte(0x00)/MSB byte(0x80) with 2-byte mode
 .end list 0
 .list element
 n2 is a byte index into the corresponding (i.e. preceeding) T line data

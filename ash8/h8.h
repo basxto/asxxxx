@@ -1,7 +1,7 @@
 /* h8.h */
 
 /*
- * (C) Copyright 1994-1995
+ * (C) Copyright 1994-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,7 +12,7 @@
 /*)BUILD
 	$(PROGRAM) =	ASH8
 	$(INCLUDE) = {
-		ASM.H
+		ASXXXX.H
 		H8.H
 	}
 	$(FILES) = {
@@ -29,7 +29,7 @@
 		ASLIST.C
 		ASOUT.C
 	}
-	$(STACK) = 2000
+	$(STACK) = 3000
 */
 
 /*

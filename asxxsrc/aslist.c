@@ -1,19 +1,24 @@
 /* aslist.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
  */
 
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
 #include <alloc.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 /*)Module	aslist.c
  *
@@ -503,6 +508,7 @@ int flag;
  *					linked symbol lists
  *		char	symtbl[]	string "Symbol Table"
  *		FILE *	tfp		symbol table output file handle
+ *		int	wflag		-w, wide listing flag
  *		int	xflag		-x, listing radix flag
  *
  *	functions called:
@@ -607,12 +613,10 @@ FILE *fp;
 			fprintf(fp, "    ");
 		}
 		ptr = &sp->s_id[0];
-		while (ptr < &sp->s_id[NCPS]) {
-			if ((c = *ptr++) != 0) {
-				putc(c, fp);
-			} else {
-				putc(' ', fp);
-			}
+		if (wflag) {
+			fprintf(fp, "%-60.60s", ptr );	/* JLH */
+		} else {
+			fprintf(fp, "%-8.8s", ptr);
 		}
 		if (sp->s_flag & S_ASG) {
 			putc('=', fp);
@@ -654,21 +658,21 @@ FILE *fp;
 			putc('X', fp);
 			++j;
 		}
-#if NCPS-8
-		putc('\n', fp);
-		slew(fp, 0);
-		++i;
-#else
-		if (++i % 3 == 0) {
-			putc('\n', fp);
-			slew(fp, pflag);
-		} else
-		if (i < nmsym) {
-			while (j++ < 4)
-				putc(' ', fp);
-			fprintf(fp, "| ");
+		if (wflag) {
+			putc('\n', fp);		/* JLH */
+			slew(fp, 0);
+			++i;
+		} else {
+			if (++i % 3 == 0) {
+				putc('\n', fp);
+				slew(fp, pflag);
+			} else
+			if (i < nmsym) {
+				while (j++ < 4)
+					putc(' ', fp);
+				fprintf(fp, "| ");
+			}
 		}
-#endif
 	}
 	putc('\n', fp);
 
@@ -705,13 +709,12 @@ atable:
 			fprintf(fp, " %3u ", j);
 		}
 		ptr = &ap->a_id[0];
-		while (ptr < &ap->a_id[NCPS]) {
-			if ((c = *ptr++) != 0) {
-				putc(c, fp);
-			} else {
-				putc(' ', fp);
-			}
+		if (wflag) {
+			fprintf(fp, "%-40.40s", ptr );
+		} else {
+			fprintf(fp, "%-8.8s", ptr);
 		}
+
 		j = ap->a_size;
 		k = ap->a_flag;
 		if (xflag==0) {

@@ -1,12 +1,13 @@
 /* lklist.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
  */
 
 #include <stdio.h>
@@ -32,9 +33,9 @@
  *	lklist.c contains no local variables.
  */
 
-/*)Function	VOID	slew(fp)
+/*)Function	VOID	slew(xp)
  *
- *		FILE *	fp		output file handle
+ *		area *	xp		pointer to an area structure
  *
  *	The function slew() increments the page line counter.
  *	If the number of lines exceeds the maximum number of
@@ -42,43 +43,131 @@
  *	output.
  *
  *	local variables:
+ *		addr_t	ai		temporary
+ *		addr_t	aj		temporary
  *		int	i		loop counter
+ *		char *	ptr		pointer to an id string
  *
  *	global variables:
  *		int	lop		current line number on page
+ *		FILE	*mfp		Map output file handle
+ *		int	wflag		Wide format listing
  *		int	xflag		Map file radix type flag
  *
  *	functions called:
  *		int	fprintf()	c_library
  *		VOID	newpag()	lklist.c
+ *		char	putc()		c_library
  *
  *	side effects:
  *		The page line and the page count may be updated.
  */
 
 VOID
-slew(fp)
-FILE *fp;
+slew(xp)
+register struct area *xp;
 {
 	register i;
+	register char *ptr;
+ 	addr_t	ai, aj;
 
 	if (lop++ >= NLPP) {
-		newpag(fp);
+		newpag(mfp);
 		if (xflag == 0) {
-			fprintf(fp, "Hexidecimal\n\n");
+			fprintf(mfp, "Hexidecimal\n\n");
 		} else
 		if (xflag == 1) {
-			fprintf(fp, "Octal\n\n");
+			fprintf(mfp, "Octal\n\n");
 		} else
 		if (xflag == 2) {
-			fprintf(fp, "Decimal\n\n");
+			fprintf(mfp, "Decimal\n\n");
 		}
-		fprintf(fp, "Area       Addr   Size");
-		fprintf(fp, "   Decimal Bytes (Attributes)\n");
-		for(i=0;i<4;++i)
-			fprintf(fp, "      Value--Global");
-		fprintf(fp, "\n\n");
-		lop += 6;
+		if (wflag) {
+			fprintf(mfp,
+				"Area                               ");
+			fprintf(mfp,
+				"Addr   Size   Decimal Bytes (Attributes)\n");
+			fprintf(mfp,
+				"--------------------------------   ");
+			fprintf(mfp,
+				"----   ----   ------- ----- ------------\n");
+		} else {
+			fprintf(mfp,
+				"Area       Addr   Size");
+			fprintf(mfp,
+				"   Decimal Bytes (Attributes)\n");
+			fprintf(mfp,
+				"----       ----   ----");
+			fprintf(mfp,
+				"   ------- ----- ------------\n");
+		}
+		/*
+		 * Output Area Header
+		 */
+		ptr = &xp->a_id[0];
+		if (wflag) {
+			fprintf(mfp, "%-32.32s", ptr);
+		} else {
+			fprintf(mfp, "%-8.8s", ptr);
+		}
+		ai = xp->a_addr;
+		aj = xp->a_size;
+		if (xflag == 0) {
+			fprintf(mfp, "   %04X   %04X", ai, aj);
+		} else
+		if (xflag == 1) {
+			fprintf(mfp, " %06o %06o", ai, aj);
+		} else
+		if (xflag == 2) {
+			fprintf(mfp, "  %05u  %05u", ai, aj);
+		}
+		fprintf(mfp, " = %6u. bytes ", aj);
+		if (xp->a_flag & A_ABS) {
+			fprintf(mfp, "(ABS");
+		} else {
+			fprintf(mfp, "(REL");
+		}
+		if (xp->a_flag & A_OVR) {
+			fprintf(mfp, ",OVR");
+		} else {
+			fprintf(mfp, ",CON");
+		}
+		if (xp->a_flag & A_PAG) {
+			fprintf(mfp, ",PAG");
+		}
+		fprintf(mfp, ")\n");
+
+		if (xp->a_flag & A_PAG) {
+			ai = (ai & 0xFF);
+			aj = (aj > 256);
+			if (ai || aj) { fprintf(mfp, "  "); lop += 1; }
+			if (ai)      { fprintf(mfp, " Boundary"); }
+			if (ai & aj)  { fprintf(mfp, " /"); }
+			if (aj)      { fprintf(mfp, " Length"); }
+			if (ai || aj) { fprintf(mfp, " Error\n"); }
+		}
+
+		if (wflag) {
+			putc('\n', mfp);
+			fprintf(mfp,
+			"      Value  Global                           ");
+			fprintf(mfp,
+			"   Global Defined In Module\n");
+			fprintf(mfp,
+			"      -----  ---------------------------------");
+			fprintf(mfp,
+			"   ------------------------\n");
+		} else {
+			putc('\n', mfp);
+			for(i=0;i<4;++i)
+				fprintf(mfp, "      Value  Global");
+			putc('\n', mfp);
+			for(i=0;i<4;++i)
+				fprintf(mfp, "      -----  ------");
+			putc('\n', mfp);
+		}
+
+		lop += 9;
 	}
 }
 
@@ -110,230 +199,6 @@ FILE *fp;
 	lop = 1;
 }
 
-#if	NCPS-8
-
-/* NCPS != 8 */
-/*)Function	VOID	lstarea(xp)
- *
- *		area *	xp		pointer to an area structure
- *
- *	The function lstarea() creates the linker map output for
- *	the area specified by pointer xp.  The generated output
- *	area header includes the area name, starting address,
- *	size of area, number of words (in decimal), and the
- *	area attributes.  The symbols defined in this area are
- *	sorted by ascending address and output one per line
- *	in the selected radix.
- *
- *	local variables:
- *		areax *	oxp		pointer to an area extension structure
- *		int	c		character value
- *		int	i		loop counter
- *		int	j		bubble sort update status
- *		char *	ptr		pointer to an id string
- *		int	nmsym		number of symbols in area
- *		addr_t	a0		temporary
- *		addr_t	ai		temporary
- *		addr_t	aj		temporary
- *		sym *	sp		pointer to a symbol structure
- *		sym **	p		pointer to an array of
- *					pointers to symbol structures
- *
- *	global variables:
- *		FILE	*mfp		Map output file handle
- *		sym *symhash[NHASH] 	array of pointers to NHASH
- *				      	linked symbol lists
- *		int	xflag		Map file radix type flag
- *
- *	functions called:
- *		int	fprintf()	c_library
- *		VOID	free()		c_library
- *		char *	malloc()	c_library
- *		char	putc()		c_library
- *		VOID	slew()		lklist.c
- *
- *	side effects:
- *		Map output generated.
- */
-
-VOID
-lstarea(xp)
-struct area *xp;
-{
-	register struct area *op;
-	register struct areax *oxp;
-	register c, i, j;
-	register char *ptr;
-	int nmsym;
-	addr_t a0, ai, aj;
-	struct sym *sp;
-	struct sym **p;
-
-	putc('\n', mfp);
-	if (xflag == 0) {
-		fprintf(mfp, "Hexidecimal\n\n");
-	} else
-	if (xflag == 1) {
-		fprintf(mfp, "Octal\n\n");
-	} else
-	if (xflag == 2) {
-		fprintf(mfp, "Decimal\n\n");
-	}
-	fprintf(mfp, "Area                               ");
-	fprintf(mfp, "Addr   Size   Decimal Bytes (Attributes)\n");
-	fprintf(mfp, "--------------------------------   ");
-	fprintf(mfp, "----   ----   ------- ----- ------------\n");
-	/*
-	 * Output Area Header
-	 */
-	ptr = &xp->a_id[0];
-	while (ptr < &xp->a_id[NCPS]) {
-		if ((c = *ptr++) != 0) {
-			putc(c, mfp);
-		} else {
-			putc(' ', mfp);
-		}
-	}
-	ai = xp->a_addr;
-	aj = xp->a_size;
-	if (xflag == 0) {
-		fprintf(mfp, "   %04X   %04X", ai, aj);
-	} else
-	if (xflag == 1) {
-		fprintf(mfp, " %06o %06o", ai, aj);
-	} else
-	if (xflag == 2) {
-		fprintf(mfp, "  %05u  %05u", ai, aj);
-	}
-	fprintf(mfp, " = %6u. bytes ", aj);
-	if (xp->a_flag & A_ABS) {
-		fprintf(mfp, "(ABS");
-	} else {
-		fprintf(mfp, "(REL");
-	}
-	if (xp->a_flag & A_OVR) {
-		fprintf(mfp, ",OVR");
-	} else {
-		fprintf(mfp, ",CON");
-	}
-	if (xp->a_flag & A_PAG) {
-		fprintf(mfp, ",PAG");
-	}
-	fprintf(mfp, ")");
-	if (xp->a_flag & A_PAG) {
-		ai = (ai & 0xFF);
-		aj = (aj > 256);
-		if (ai || aj) { fprintf(mfp, "  "); }
-		if (ai)      { fprintf(mfp, " Boundary"); }
-		if (ai & aj)  { fprintf(mfp, " /"); }
-		if (aj)      { fprintf(mfp, " Length"); }
-		if (ai || aj) { fprintf(mfp, " Error"); }
-	}
-
-	/*
-	 * Find number of symbols in area
-	 */
-	nmsym = 0;
-	oxp = xp->a_axp;
-	while (oxp) {
-		for (i=0; i<NHASH; i++) {
-			sp = symhash[i];
-			while (sp != NULL) {
-				if (oxp == sp->s_axp)
-					++nmsym;
-				sp = sp->s_sp;
-			}
-		}
-		oxp = oxp->a_axp;
-	}
-	if (nmsym == 0) {
-		putc('\n', mfp);
-		return;
-	}
-
-	/*
-	 * Allocate space for an array of pointers to symbols
-	 * and load array.
-	 */
-	if ( (p = (struct sym **) malloc(nmsym*sizeof(struct sym *)))
-		== NULL) {
-		fprintf(mfp, "\nInsufficient space to build Map Segment.\n");
-		return;
-	}
-	nmsym = 0;
-	oxp = xp->a_axp;
-	while (oxp) {
-		for (i=0; i<NHASH; i++) {
-			sp = symhash[i];
-			while (sp != NULL) {
-				if (oxp == sp->s_axp) {
-					p[nmsym++] = sp;
-				}
-				sp = sp->s_sp;
-			}
-		}
-		oxp = oxp->a_axp;
-	}
-
-	/*
-	 * Bubble Sort of Addresses in Symbol Table Array
-	 */
-	j = 1;
-	while (j) {
-		j = 0;
-		sp = p[0];
-		a0 = sp->s_addr + sp->s_axp->a_addr;
-		for (i=1; i<nmsym; ++i) {
-			sp = p[i];
-			ai = sp->s_addr + sp->s_axp->a_addr;
-			if (a0 > ai) {
-				j = 1;
-				p[i] = p[i-1];
-				p[i-1] = sp;
-			}
-			a0 = ai;
-		}
-	}
-
-	/*
-	 * Symbol Table Output
-	 */
-	i = 0;
-	fprintf(mfp, "\n\n");
-	fprintf(mfp, "      Value  Global\n");
-	fprintf(mfp, "      -----  --------------------------------");
-	while (i < nmsym) {
-		fprintf(mfp, "\n");
-		fprintf(mfp, "     ");
-
-		sp = p[i];
-		aj = sp->s_addr + sp->s_axp->a_addr;
-		if (xflag == 0) {
-			fprintf(mfp, "  %04X  ", aj);
-		} else
-		if (xflag == 1) {
-			fprintf(mfp, "%06o  ", aj);
-		} else
-		if (xflag == 2) {
-			fprintf(mfp, " %05u  ", aj);
-		}
-		ptr = &sp->s_id[0];
-		while (ptr < &sp->s_id[NCPS]) {
-			if ((c = *ptr++) != 0) {
-				putc(c, mfp);
-			} else {
-				putc(' ', mfp);
-			}
-		}
-		i++;
-	}
-	putc('\n', mfp);
-	free(p);
-}
-
-#else
-
-/* NCPS == 8 */
 /*)Function	VOID	lstarea(xp)
  *
  *		area *	xp		pointer to an area structure
@@ -344,7 +209,7 @@ struct area *xp;
  *	size of area, number of words (in decimal), and the
  *	area attributes.  The symbols defined in this area are
  *	sorted by ascending address and output four per line
- *	in the selected radix.
+ *	in the selected radix (one per line in wide format).
  *
  *	local variables:
  *		areax *	oxp		pointer to an area extension structure
@@ -364,6 +229,7 @@ struct area *xp;
  *		FILE	*mfp		Map output file handle
  *		sym *symhash[NHASH] 	array of pointers to NHASH
  *				      	linked symbol lists
+ *		int	wflag		Wide format listing
  *		int	xflag		Map file radix type flag
  *
  *	functions called:
@@ -389,54 +255,8 @@ struct area *xp;
 	struct sym *sp;
 	struct sym **p;
 
-	putc('\n', mfp);
-	slew(mfp);
-	/*
-	 * Output Area Header
-	 */
-	ptr = &xp->a_id[0];
-	while (ptr < &xp->a_id[NCPS]) {
-		if ((c = *ptr++) != 0) {
-			putc(c, mfp);
-		} else {
-			putc(' ', mfp);
-		}
-	}
-	ai = xp->a_addr;
-	aj = xp->a_size;
-	if (xflag == 0) {
-		fprintf(mfp, "   %04X   %04X", ai, aj);
-	} else
-	if (xflag == 1) {
-		fprintf(mfp, " %06o %06o", ai, aj);
-	} else
-	if (xflag == 2) {
-		fprintf(mfp, "  %05u  %05u", ai, aj);
-	}
-	fprintf(mfp, " = %6u. bytes ", aj);
-	if (xp->a_flag & A_ABS) {
-		fprintf(mfp, "(ABS");
-	} else {
-		fprintf(mfp, "(REL");
-	}
-	if (xp->a_flag & A_OVR) {
-		fprintf(mfp, ",OVR");
-	} else {
-		fprintf(mfp, ",CON");
-	}
-	if (xp->a_flag & A_PAG) {
-		fprintf(mfp, ",PAG");
-	}
-	fprintf(mfp, ")");
-	if (xp->a_flag & A_PAG) {
-		ai = (ai & 0xFF);
-		aj = (aj > 256);
-		if (ai || aj) { fprintf(mfp, "  "); }
-		if (ai)      { fprintf(mfp, " Boundary"); }
-		if (ai & aj)  { fprintf(mfp, " /"); }
-		if (aj)      { fprintf(mfp, " Length"); }
-		if (ai || aj) { fprintf(mfp, " Error"); }
-	}
+	lop = NLPP;
+	slew(xp);
 
 	/*
 	 * Find number of symbols in area
@@ -455,8 +275,6 @@ struct area *xp;
 		oxp = oxp->a_axp;
 	}
 	if (nmsym == 0) {
-		putc('\n', mfp);
-		slew(mfp);
 		return;
 	}
 
@@ -466,8 +284,7 @@ struct area *xp;
 	 */
 	if ( (p = (struct sym **) malloc(nmsym*sizeof(struct sym *)))
 		== NULL) {
-		fprintf(mfp, "\nInsufficient space to build Map Segment.\n");
-		slew(mfp);
+		fprintf(mfp, "Insufficient space to build Map Segment.\n");
 		return;
 	}
 	nmsym = 0;
@@ -510,9 +327,8 @@ struct area *xp;
 	 */
 	i = 0;
 	while (i < nmsym) {
-		if (i % 4 == 0) {
-			fprintf(mfp, "\n");
-			slew(mfp);
+		if (wflag || (i % 4 == 0)) {
+			slew(xp);
 			fprintf(mfp, "     ");
 		}
 		sp = p[i];
@@ -527,22 +343,28 @@ struct area *xp;
 			fprintf(mfp, " %05u  ", aj);
 		}
 		ptr = &sp->s_id[0];
-		while (ptr < &sp->s_id[NCPS]) {
-			if ((c = *ptr++) != 0) {
-				putc(c, mfp);
-			} else {
-				putc(' ', mfp);
+		if (wflag) {
+			fprintf(mfp, "%-33.33s", ptr);
+			i++;
+			ptr = &sp->m_id[0];
+			if(ptr) {
+				fprintf(mfp, "   %-.28s", ptr);
 			}
+		} else {
+			fprintf(mfp, "%-8.8s", ptr);
+			if (++i < nmsym)
+				if (i % 4 != 0)
+					fprintf(mfp, " | ");
 		}
-		if (++i < nmsym)
-			if (i % 4 != 0)
-				fprintf(mfp, " | ");
+		if (wflag || (i % 4 == 0)) {
+			putc('\n', mfp);
+		}
 	}
-	putc('\n', mfp);
+	if (i % 4 != 0) {
+		putc('\n', mfp);
+	}
 	free(p);
-	slew(mfp);
 }
-#endif
 
 /*)Function	VOID	lkulist(i)
  *
@@ -626,16 +448,15 @@ int i;
 				}
 			}
 		}
-
 	/*
 	 * Copy remainder of LST to RST
 	 */
 	} else {
 		if (gline == 0)
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 
 		while (fgets(rb, sizeof(rb), tfp) != 0) {
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 		}
 		fclose(tfp);
 		tfp = NULL;
@@ -705,7 +526,7 @@ loop:	if (tfp == NULL)
 	 * Copy current LST to RST
 	 */
 	if (gline == 0) {
-		fprintf(rfp, rb);
+		fprintf(rfp, "%s", rb);
 		gline = 1;
 	}
 
@@ -731,7 +552,7 @@ loop:	if (tfp == NULL)
 	 * Must have an ASxxxx Listing line number
 	 */
 	if (!dgt(RAD10, &rb[30], 1)) {
-		fprintf(rfp, rb);
+		fprintf(rfp, "%s", rb);
 		goto loop;
 	}
 
@@ -740,7 +561,7 @@ loop:	if (tfp == NULL)
 	 */
 	if (radix == 16) {
 		if (!dgt(RAD16, &rb[3], 4)) {
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 			goto loop;
 		}
 		sprintf(str, "%04X", pc);
@@ -748,7 +569,7 @@ loop:	if (tfp == NULL)
 	} else
 	if (radix == 10) {
 		if (!dgt(RAD10, &rb[3], 5)) {
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 			goto loop;
 		}
 		sprintf(str, "%05d", pc);
@@ -756,7 +577,7 @@ loop:	if (tfp == NULL)
 	} else
 	if (radix == 8) {
 		if (!dgt(RAD8, &rb[3], 6)) {
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 			goto loop;
 		}
 		sprintf(str, "%06o", pc);
@@ -766,7 +587,7 @@ loop:	if (tfp == NULL)
 	/*
 	 * Copy updated LST text line to RST
 	 */
-	fprintf(rfp, rb);
+	fprintf(rfp, "%s", rb);
 	gcntr = 0;
 }
 
@@ -856,7 +677,7 @@ loop:	if (tfp == NULL)
 		 */
 		if (gcntr != -1) {
 			if (!dgt(RAD10, &rb[30], 1)) {
-				fprintf(rfp, rb);
+				fprintf(rfp, "%s", rb);
 				goto loop;
 			}
 			gcntr = 0;
@@ -880,7 +701,7 @@ loop:	if (tfp == NULL)
 		 * Number must be of proper radix
 		 */
 		if (!dgt(RAD16, rp, 2)) {
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 			gline = 1;
 			goto loop;
 		}
@@ -905,7 +726,7 @@ loop:	if (tfp == NULL)
 		 * Output text line when updates finished
 		 */
 		if (++gcntr == 6) {
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 			gline = 1;
 			gcntr = -1;
 		}
@@ -926,7 +747,7 @@ loop:	if (tfp == NULL)
 		 * Number must be of proper radix
 		 */
 		if (!dgt(RAD10, rp, 3)) {
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 			gline = 1;
 			goto loop;
 		}
@@ -951,7 +772,7 @@ loop:	if (tfp == NULL)
 		 * Output text line when updates finished
 		 */
 		if (++gcntr == 4) {
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 			gline = 1;
 			gcntr = -1;
 		}
@@ -972,7 +793,7 @@ loop:	if (tfp == NULL)
 		 * Number must be of proper radix
 		 */
 		if (!dgt(RAD8, rp, 3)) {
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 			gline = 1;
 			goto loop;
 		}
@@ -997,7 +818,7 @@ loop:	if (tfp == NULL)
 		 * Output text line when updates finished
 		 */
 		if (++gcntr == 4) {
-			fprintf(rfp, rb);
+			fprintf(rfp, "%s", rb);
 			gline = 1;
 			gcntr = -1;
 		}

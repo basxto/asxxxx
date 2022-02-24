@@ -1,7 +1,7 @@
 /* lkarea.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -130,7 +130,7 @@ newarea()
 	} else {
 		i = eval();
 		if (i && (ap->a_flag != i)) {
-		    fprintf(stderr, "Conflicting flags in area %.8s\n", id);
+		    fprintf(stderr, "Conflicting flags in area %s\n", id);
 		    lkerr++;
 		}
 	}
@@ -178,7 +178,7 @@ newarea()
  *
  *	functions called:
  *		VOID *	new()		lksym()
- *		char *	strcpy()	c_library
+ *		char *	strsto()	lksym.c
  *		int	symeq()		lksym.c
  *
  *	side effects:
@@ -197,7 +197,7 @@ char *id;
 	ap = areap;
 	axp = (struct areax *) new (sizeof(struct areax));
 	while (ap) {
-		if (symeq(id, ap->a_id)) {
+		if (symeq(id, ap->a_id, 0)) {
 			taxp = ap->a_axp;
 			while (taxp->a_axp)
 				taxp = taxp->a_axp;
@@ -220,7 +220,7 @@ char *id;
 	ap->a_axp = axp;
 	axp->a_bap = ap;
 	axp->a_bhp = hp;
-	strncpy(ap->a_id, id, NCPS);
+	ap->a_id = strsto(id);
 }
 
 /*)Function	VOID	lnkarea()
@@ -263,7 +263,7 @@ char *id;
  *			area address.  The size of the area
  *			is the sum of the section sizes.
  *
- *		NOTE:	Relocatable (REL) areas ae always concatenated
+ *		NOTE:	Relocatable (REL) areas are always concatenated
  *			with each other, thus relocatable area B
  *			(defined after area A) will follow
  *			relocatable area A independent of the
@@ -313,7 +313,7 @@ VOID
 lnkarea()
 {
 	register rloc;
-	char temp[NCPS];
+	char temp[NCPS+2];
 	struct sym *sp;
 
 	rloc = 0;
@@ -340,8 +340,8 @@ lnkarea()
 		 *	l_<areaname>	the length of the area
 		 */
 
-		if (! symeq(ap->a_id, _abs_)) {
-			strncpy(temp+2,ap->a_id,NCPS-2);
+		if (! symeq(ap->a_id, _abs_, 0)) {
+			strcpy(temp+2, ap->a_id);
 			*(temp+1) = '_';
 
 			*temp = 's';
@@ -397,7 +397,8 @@ register struct area *tap;
 	addr = tap->a_addr;
 	if ((tap->a_flag&A_PAG) && (addr & 0xFF)) {
 	    fprintf(stderr,
-	    "\n?ASlink-Warning-Paged Area %.8s Boundary Error\n", tap->a_id);
+		"\n?ASlink-Warning-Paged Area %s Boundary Error\n",
+		tap->a_id);
 	    lkerr++;
 	}
 	taxp = tap->a_axp;
@@ -425,7 +426,8 @@ register struct area *tap;
 	tap->a_size = size;
 	if ((tap->a_flag&A_PAG) && (size > 256)) {
 	    fprintf(stderr,
-	    "\n?ASlink-Warning-Paged Area %.8s Length Error\n", tap->a_id);
+		"\n?ASlink-Warning-Paged Area %s Length Error\n",
+		tap->a_id);
 	    lkerr++;
 	}
 }

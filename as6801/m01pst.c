@@ -1,7 +1,7 @@
 /* m01pst.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
-#include "asm.h"
+#include "asxxxx.h"
 #include "m6801.h"
 
 struct	mne	mne[] = {

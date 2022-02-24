@@ -335,14 +335,12 @@ code0:  .word   a0
         .word   cnstnt0
 
         .area   A (OVR)
-	.follow	B
 
         cnstnt1 = 0x1234
 
 a0:     .word   0x00ff
 
         .area   B (ABS,OVR)
-	.follow C
 
         cnstnt2 = 0x5678
 

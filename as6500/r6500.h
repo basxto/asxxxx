@@ -1,7 +1,7 @@
 /* r6500.h */
 
 /*
- * (C) Copyright 1995
+ * (C) Copyright 1995-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -23,7 +23,7 @@
 /*)BUILD
 	$(PROGRAM) =	AS6500
 	$(INCLUDE) = {
-		ASM.H
+		ASXXXX.H
 		R6500.H
 	}
 	$(FILES) = {
@@ -40,7 +40,7 @@
 		ASLIST.C
 		ASOUT.C
 	}
-	$(STACK) = 2000
+	$(STACK) = 3000
 */
 
 struct adsym

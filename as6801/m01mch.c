@@ -1,7 +1,7 @@
 /* m01mch.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
-#include "asm.h"
+#include "asxxxx.h"
 #include "m6801.h"
 
 int	hd63;
@@ -121,7 +121,7 @@ struct mne *mp;
 	case S_BRA:
 		expr(&e1, 0);
 		outab(op);
-		if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
+		if (mchpcr(&e1)) {
 			v1 = e1.e_addr - dot.s_addr - 1;
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
@@ -283,6 +283,30 @@ struct mne *mp;
 	}
 }
 
+/*
+ * Branch/Jump PCR Mode Check
+ */
+int
+mchpcr(esp)
+register struct expr *esp;
+{
+	if (esp->e_base.e_ap == dot.s_area) {
+		return(1);
+	}
+	if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+		/*
+		 * Absolute Destination
+		 *
+		 * Use the global symbol '.__.ABS.'
+		 * of value zero and force the assembler
+		 * to use this absolute constant as the
+		 * base value for the relocation.
+		 */
+		esp->e_flag = 1;
+		esp->e_base.e_sp = &sym[1];
+	}
+	return(0);
+}
 
 /*
  * The next character must be a

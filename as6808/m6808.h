@@ -12,7 +12,7 @@
 /*)BUILD
 	$(PROGRAM) =	AS6808
 	$(INCLUDE) = {
-		ASM.H
+		ASXXXX.H
 		M6808.H
 	}
 	$(FILES) = {
@@ -29,7 +29,7 @@
 		ASLIST.C
 		ASOUT.C
 	}
-	$(STACK) = 2000
+	$(STACK) = 3000
 */
 
 struct adsym

@@ -2,10 +2,10 @@
 <HEAD>
 <TITLE></TITLE>
 </HEAD>
-<BODY>
+<BODY BGCOLOR="#C0C0C0">
 
-<A href="http://shop-pdp.kent.edu/">
-<IMG width=343 height=58 border=0 SRC="welcom.gif" ALT = "Welcome"></A>
+<A href="../home.htm">
+<IMG width=343 height=58 border=0 SRC="welcom.gif" ALT="Welcome"></A>
 
 <H2>The Assembler Description</H2>
 
@@ -58,14 +58,14 @@ Format:
 
    The .module directive causes the string to be included in the
 assemblers output file as an identifier for this particular  ob-
-ject  module.   The  string  may  be  from  1 to 8 characters in
+ject  module.   The  string  may  be  from 1 to 79 characters in
 length.  Only one identifier is allowed  per  assembled  module.
 The  main use of this directive is to allow the linker to report
 a modules' use of undefined symbols.  At link time all undefined
 symbols  are  reported  and  the  modules  referencing  them are
 listed.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "title"></A><FONT COLOR="#FF0000">.title</FONT> Directive 
 
@@ -76,7 +76,7 @@ Format:
    The .title directive provides a character string to be placed
 on the second line of each page during listing.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "sbttl"></A><FONT COLOR="#FF0000">.sbttl</FONT> Directive 
 
@@ -87,7 +87,7 @@ Format:
    The .sbttl directive provides a character string to be placed
 on the third line of each page during listing.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "page"></A><FONT COLOR="#FF0000">.page</FONT> Directive 
 
@@ -102,7 +102,7 @@ ing .sbttl directive to appear  on  the  new  page.   The  .page
 source  line will not appear in the file listing.  Paging may be
 disabled by invoking the -p directive.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "byte"></A><FONT COLOR="#FF0000">.byte</FONT> and <FONT COLOR="#FF0000">.db</FONT> Directives 
 
@@ -127,7 +127,7 @@ where:  exp,    represent expressions that will be
    The  .byte  or .db directives are used to generate successive
 bytes of binary data in the object module.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "word"></A><FONT COLOR="#FF0000">.word</FONT> and <FONT COLOR="#FF0000">.dw</FONT> Directives 
 
@@ -150,7 +150,7 @@ where:  exp,    represent expressions that will occupy two
    The  .word  or .dw directives are used to generate successive
 words of binary data in the object module.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "blkb"></A><FONT COLOR="#FF0000">.blkb</FONT>, <FONT COLOR="#FF0000">.blkw</FONT>, and <FONT COLOR="#FF0000">.ds</FONT> Directives 
 
@@ -163,7 +163,7 @@ Format:
    The  .blkb  and .ds directives reserve byte blocks in the ob-
 ject module;  the .blkw directive reserves word blocks.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "ascii"></A><FONT COLOR="#FF0000">.ascii</FONT> Directive 
 
@@ -183,7 +183,7 @@ where:  string  is a string of printable ascii characters.
 The  .ascii  directive  places  one binary byte of data for each
 character in the string into the object module.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "ascis"></A><FONT COLOR="#FF0000">.ascis</FONT> Directive 
 
@@ -204,7 +204,7 @@ The  .ascis  directive  places  one binary byte of data for each
 character in the  string  into  the  object  module.   The  last
 character in the string will have the high order bit set.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "asciz"></A><FONT COLOR="#FF0000">.asciz</FONT> Directive 
 
@@ -226,7 +226,7 @@ character in the string into the object module.   Following  all
 the  character  data  a  zero  byte is inserted to terminate the
 character string.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "radix"></A><FONT COLOR="#FF0000">.radix</FONT> Directive 
 
@@ -249,7 +249,7 @@ where:  character  represents  a single character specifying the
                 H,h     Hexidecimal
                 X,x
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "even"></A><FONT COLOR="#FF0000">.even</FONT> Directive 
 
@@ -261,7 +261,7 @@ Format:
 contains an even boundary value by adding 1 if the current loca-
 tion is odd.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "odd"></A><FONT COLOR="#FF0000">.odd</FONT> Directive 
 
@@ -273,7 +273,7 @@ Format:
 contains an odd boundary value by adding one if the current  lo-
 cation is even.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "area"></A><FONT COLOR="#FF0000">.area</FONT> Directive 
 
@@ -298,7 +298,7 @@ where:  name    represents the symbolic name of the program sec-
 ing multiple programming and data sections.   The  name  is  the
 area  label used by the assembler and the linker to collect code
 from various separately assembled modules into one section.  The
-name may be from 1 to 8 characters in length.  
+name may be from 1 to 79 characters in length.  
 
    The options are specified within parenthesis and separated by
 commas as shown in the following example:  
@@ -354,7 +354,7 @@ for each program area:
 
         'l_<area>'      This is the length of the program area.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "org"></A><FONT COLOR="#FF0000">.org</FONT> Directive 
 
@@ -370,7 +370,7 @@ and will give a (q) error if used in a relocatable program area.
 The  .org  directive specifies that the current location counter
 is to become the specified absolute value.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "globl"></A><FONT COLOR="#FF0000">.globl</FONT> Directive 
 
@@ -399,7 +399,7 @@ they will be considered undefined.  The assembly directive  (-g)
 can  be  be  invoked to make all undefined symbols global at the
 end of pass 1.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "if"></A><FONT COLOR="#FF0000">.if</FONT>, <FONT COLOR="#FF0000">.else</FONT>, and <FONT COLOR="#FF0000">.endif</FONT> Directives 
 
@@ -460,7 +460,7 @@ delimiter (;):
 
         .endif
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "include"></A><FONT COLOR="#FF0000">.include</FONT> Directive 
 
@@ -483,7 +483,7 @@ file.  The maximum nesting level of source files specified by  a
 unlimited as each .include file is opened and then closed during
 each pass made by the assembler.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "setdp"></A><FONT COLOR="#FF0000">.setdp</FONT> Directive 
 
@@ -582,7 +582,7 @@ load  the dp register with the real base address but donot use a
 addressing,  where the dp register is the index register and the
 direct addressing is the offset.  
 
-<H5><A HREF= #Directives> => Section Index</A></H5>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -591,23 +591,9 @@ direct addressing is the offset.
 <P><A HREF="asmblr.htm #JUMP">
 <IMG width=32 height=32 border=0 SRC="spcshp.gif" ALIGN=bottom></A>
 <B>...  Exit the ASxxxx Documentation</B></A></P>
-<P><A href="http://shop-pdp.kent.edu/">
+<P><A href="../home.htm">
 <IMG width=32 height=32 border=0 SRC="home.gif" ALIGN=bottom></A>
 <B>...  Home Page</B></P>
 </H3>
 </BODY> 
 </HTML>
-
-
-
-
-
-
-
-
-
-
-
-
-
-

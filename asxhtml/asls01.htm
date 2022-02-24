@@ -2,10 +2,10 @@
 <HEAD>
 <TITLE></TITLE>
 </HEAD>
-<BODY>
+<BODY BGCOLOR="#C0C0C0">
 
-<A href="http://shop-pdp.kent.edu/">
-<IMG width=343 height=58 border=0 SRC="welcom.gif" ALT = "Welcome"></A>
+<A href="../home.htm">
+<IMG width=343 height=58 border=0 SRC="welcom.gif" ALT="Welcome"></A>
 
 <H2>The Linker Description</H2>
 
@@ -27,53 +27,67 @@ modes.  The allowed startup linker commands are:
 from stdin, if the command file mode is  selected  the  commands
 are input from the specified file (extension must be .lnk).  
 
-   The linker is started via 
 
-        ASLINK  -(cfpn) 
+   Most sytems require the initial options to be entered on the
+   command line:
+   
+       ASLINK  -[cfpn] 
+
+
+   Some systems may request the arguments after the linker is
+   started at a system specific prompt:
+
+       ASLINK
+       argv:   -[cfpn]
+
 
 After invoking the linker the valid options are:  
 
      1.  -i/-s   Intel Hex (file.ihx) or Motorola S19 (file.s19)
          image output file.  
 
-     2.  -m      Generate a map file (file.map).  This file con-
+     2.  -z      Specifies that symbol names are case sensitive. 
+
+     3.  -m      Generate a map file (file.map).  This file con-
          tains a list of the symbols (by area) with absolute ad-
          dresses,  sizes  of  linked  areas,  and  other linking
          information.  
 
-     3.  -u      Generate  an  updated  listing  file (file.rst)
+     4.  -w      Specifies  that  a  wide listing format be used
+         for the map file.  
+
+     5.  -xdq    Specifies  the  number  radix  for the map file
+         (Hexidecimal, Decimal, or Octal).  
+
+     6.  -u      Generate  an  updated  listing  file (file.rst)
          derived from the relocated addresses and data from  the
          linker 
 
-     4.  -xdq    Specifies  the  number  radix  for the map file
-         (Hexidecimal, Decimal, or Octal).  
-
-     5.  fileN   Files  to  be linked.  Files may be on the same
+     7.  fileN   Files  to  be linked.  Files may be on the same
          line as the above options or on a separate line(s)  one
          file  per line or multiple files separated by spaces or
          tabs.  
 
-     6.  -b  area = expression (one definition per line) 
+     8.  -b  area = expression (one definition per line) 
          This  specifies  an area base address where the expres-
          sion may contain constants and/or defined symbols  from
          the linked files.  
 
-     7.  -g  symbol = expression (one definition per line) 
-         This  specifies  the value for the symbol where the ex-
-         pression may contain constants and/or  defined  symbols
+     9.  -g  symbol = expression (one definition per line) 
+         This  specifies  the  value  for  the  symbol where the
+         expression may contain constants and/or defined symbols
          from the linked files.  
 
-     8.  -k  library directory path 
+    10.  -k  library directory path 
          (one  definition  per line) This specifies one possible
          path to an object library.  More than one path  is  al-
          lowed.  
 
-     9.  -l  library file specification 
+    11.  -l  library file specification 
          (one  definition  per  line)  This specifies a possible
          library file.  More than one file is allowed.  
 
-    10.  -e      or null line, terminates input to the linker.  
-
+    12.  -e      or null line, terminates input to the linker.  
 
 <H5><A HREF="aslink.htm #Index">  Return to the Linker Index</A></H5>
 </PRE></B></H4>
@@ -356,16 +370,17 @@ The nn nn value is the current area index, i.e.  which area  the
 current  values  were  assembled.  Relocation information is en-
 coded in groups of 4 bytes:  
 
-     1.  n1 is the relocation mode and object format 
-         1.  bit 0 word(0x00)/byte(0x01) 
-         2.  bit 1 relocatable area(0x00)/symbol(0x02) 
-         3.  bit 2 normal(0x00)/PC relative(0x04) relocation 
-         4.  bit  3  1-byte(0x00)/2-byte(0x08) object format for
+     1.  n1  is  the  relocation mode and object format, for the
+         adhoc extension modes refer to asxxxx.h or aslink.h 
+         1.  bit 0  word(0x00)/byte(0x01) 
+         2.  bit 1  relocatable area(0x00)/symbol(0x02) 
+         3.  bit 2  normal(0x00)/PC relative(0x04) relocation 
+         4.  bit 3  1-byte(0x00)/2-byte(0x08)  object format for
              byte data 
-         5.  bit 4 signed(0x00)/unsigned(0x10) byte data 
-         6.  bit 5 normal(0x00)/page '0'(0x20) reference 
-         7.  bit 6 normal(0x00)/page 'nnn'(0x40) reference 
-         8.  bit  7  LSB  byte(0x00)/MSB  byte(0x80) with 2-byte
+         5.  bit 4  signed(0x00)/unsigned(0x10) byte data 
+         6.  bit 5  normal(0x00)/page '0'(0x20) reference 
+         7.  bit 6  normal(0x00)/page 'nnn'(0x40) reference 
+         8.  bit 7  LSB  byte(0x00)/MSB  byte(0x80)  with 2-byte
              mode 
 
      2.  n2  is  a byte index into the corresponding (i.e.  pre-
@@ -610,25 +625,9 @@ Checksum Field       -  The  checksum  field is the 8 bit binary
 <P><A HREF="asxxxx.htm #JUMP">
 <IMG width=32 height=32 border=0 SRC="spcshp.gif" ALIGN=bottom></A>
 <B>...  Exit the ASxxxx Documentation</B></A></P>
-<P><A href="http://shop-pdp.kent.edu/">
+<P><A href="../home.htm">
 <IMG width=32 height=32 border=0 SRC="home.gif" ALIGN=bottom></A>
 <B>...  Home Page</B></P>
 </H3>
 </BODY> 
 </HTML>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

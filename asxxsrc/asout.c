@@ -1,19 +1,24 @@
 /* asout.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
  */
 
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
 #include <alloc.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 
 /*)Module	asout.c
@@ -183,6 +188,7 @@
  *		VOID	outgsd()
  *		VOID	outrb()
  *		VOID	outrw()
+ *		VOID	outr11()
  *		VOID	outsym()
  *		VOID	out_lb()
  *		VOID	out_lw()
@@ -202,8 +208,8 @@
 char	 txt[NTXT];
 char	 rel[NREL];
 
-char	*txtp = { &txt[0] };
-char	*relp = { &rel[0] };
+char	*txtp = &txt[0];
+char	*relp = &rel[0];
 
 /*)Function	VOID	outab(b)
  *
@@ -297,7 +303,6 @@ outaw(w)
  *		int	pass		assembler pass number
  *		
  *	functions called:
- *		VOID	aerr()		assubr.c
  *		VOID	outchk()	asout.c
  *		VOID	out_lb()	asout.c
  *		VOID	out_rb()	asout.c
@@ -368,7 +373,6 @@ int r;
  *		int	pass		assembler pass number
  *		
  *	functions called:
- *		VOID	aerr()		assubr.c
  *		VOID	outchk()	asout.c
  *		VOID	out_lw()	asout.c
  *		VOID	out_rw()	asout.c
@@ -561,6 +565,8 @@ outdot()
  *
  *	functions called:
  *		VOID	outbuf()	asout.c
+ *		VOID	out_rw()	asout.c
+ *		VOID	out_tw()	asout.c
  *
  *	side effects:
  *		Data and relocation buffers may be emptied and initialized.
@@ -584,7 +590,9 @@ outchk(nt, nr)
 	}
 }
 
-/*)Function	VOID	outbuf()
+/*)Function	VOID	outbuf(s)
+ *
+ *		char *	s		"R" or "P" or ("I" illegal)
  *
  *	The function outbuf() will output any bufferred data
  *	and relocation information to the .REL file.  The output
@@ -600,6 +608,7 @@ outchk(nt, nr)
  *		FILE *	ofp		relocation output file handle
  *
  *	functions called:
+ *		int	fprintf()	c_library
  *		VOID	out()		asout.c
  *
  *	side effects:
@@ -658,7 +667,6 @@ char *s;
  *		int	fprintf()	c_library
  *		VOID	outarea()	asout.c
  *		VOID	outsym()	asout.c
- *		int	putc()		c_library
  *
  *	side effects:
  *		All symbols are given reference numbers, all symbol
@@ -672,7 +680,7 @@ outgsd()
 	register struct sym  *sp;
 	register i, j;
 	char *ptr;
-	int c, narea, nglob, rn;
+	int narea, nglob, rn;
 
 	/*
 	 * Number of areas
@@ -714,11 +722,7 @@ outgsd()
 	if (module[0]) {
 		fprintf(ofp, "M ");
 		ptr = &module[0];
-		while (ptr < &module[NCPS]) {
-			if ((c = *ptr++) != 0)
-				putc(c, ofp);
-		}
-		putc('\n', ofp);
+		fprintf(ofp, "%s\n", ptr);
 	}
 
 	/*
@@ -775,7 +779,6 @@ outgsd()
  *
  *	functions called:
  *		int	fprintf()	c_library
- *		int	putc()		c_library
  *
  *	side effects:
  *		The A line is sent to the .REL file.
@@ -790,10 +793,7 @@ register struct area *ap;
 
 	fprintf(ofp, "A ");
 	ptr = &ap->a_id[0];
-	while (ptr < &ap->a_id[NCPS]) {
-		if ((c = *ptr++) != 0)
-			putc(c, ofp);
-	}
+	fprintf(ofp, "%s", ptr);
 	if (xflag == 0) {
 		fprintf(ofp, " size %X flags %X\n", ap->a_size, ap->a_flag);
 	} else
@@ -823,7 +823,6 @@ register struct area *ap;
  *
  *	functions called:
  *		int	fprintf()	c_library
- *		int	putc()		c_library
  *
  *	side effects:
  *		The S line is sent to the .REL file.
@@ -837,11 +836,8 @@ register struct sym *sp;
 	register c;
 
 	fprintf(ofp, "S ");
-	ptr = &sp->s_id[0];
-	while (ptr < &sp->s_id[NCPS]) {
-		if ((c = *ptr++) != 0)
-			putc(c, ofp);
-	}
+	ptr = &sp->s_id[0];	/* JLH */
+	fprintf(ofp, "%s", ptr);
 	fprintf(ofp, " %s", sp->s_type==S_NEW ? "Ref" : "Def");
 	if (xflag == 0) {
 		fprintf(ofp, "%04X\n", sp->s_addr);
@@ -1083,3 +1079,90 @@ hibyte(n)
 	return ((n>>8)&0377);
 }
 
+/*)Function	VOID	outr11(esp, op, r)
+ *
+ *		expr *	esp		pointer to expr structure
+ *		int	op		opcode
+ *		int	r		relocation mode
+ *
+ *	The function outr11() processes a word of generated code
+ *	in either absolute or relocatable format dependent upon
+ *	the data contained in the expr structure esp.  If the
+ *	.REL output is enabled then the appropriate information
+ *	is loaded into the txt and rel buffers.  The code is output
+ *	in a special format to the linker to allow relocation and
+ *	merging of the opcode and an 11 bit paged address as required
+ *	by the 8051 architecture.
+ *
+ *	This function based on code by
+ *		John L. Hartman
+ *		jhartman@compuserve.com
+ *
+ *	local variables:
+ *		int	n		symbol/area reference number
+ *		int *	relp		pointer to rel array
+ *		int *	txtp		pointer to txt array
+ *
+ *	global variables:
+ *		sym	dot		defined as sym[0]
+ *		int	oflag		-o, generate relocatable output flag
+ *		int	pass		assembler pass number
+ *		
+ *	functions called:
+ *		VOID	outchk()	asout.c
+ *		VOID	out_lw()	asout.c
+ *		VOID	out_rw()	asout.c
+ *		VOID	out_tw()	asout.c
+ *
+ *	side effects:
+ *		The current assembly address is incremented by 2.
+ */
+
+VOID
+outr11(esp, op, r)
+register struct expr *esp;
+int op;
+int r;
+{
+	register n;
+
+	if (pass == 2) {
+		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+			/*
+			 * Absolute Destination
+			 *
+			 * Use the global symbol '.__.ABS.'
+			 * of value zero and force the assembler
+			 * to use this absolute constant as the
+			 * base value for the relocation.
+			 */
+			esp->e_flag = 1;
+			esp->e_base.e_sp = &sym[1];
+		}
+		/*
+		 * Relocatable Destination.  Build THREE
+		 * byte output: relocatable word, followed
+		 * by op-code.  Linker will combine them.
+		 */
+		r |= R_WORD | esp->e_rlcf;
+		n = ((esp->e_addr & 0x0700) >> 3) | op;
+		n = (n << 8) | (esp->e_addr & 0xFF);
+		out_lw(n,r|R_RELOC);
+		if (oflag) {
+			outchk(3, 4);
+			out_tw(esp->e_addr);
+			*txtp++ = op;
+
+			if (esp->e_flag) {
+				n = esp->e_base.e_sp->s_ref;
+				r |= R_SYM;
+			} else {
+				n = esp->e_base.e_ap->a_ref;
+			}
+			*relp++ = r;
+			*relp++ = txtp - txt - 3;
+			out_rw(n);
+		}
+	}
+	dot.s_addr += 2;
+}

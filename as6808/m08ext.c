@@ -1,7 +1,7 @@
 /* m08ext.c */
 
 /*
- * (C) Copyright 1993-1995
+ * (C) Copyright 1993-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
-#include "asm.h"
+#include "asxxxx.h"
 #include "m6808.h"
 
 char	*cpu	= "Motorola 68HC08";

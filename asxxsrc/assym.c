@@ -1,19 +1,24 @@
 /* assym.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
  */
 
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
 #include <alloc.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 /*)Module	assym.c
  *
@@ -27,11 +32,15 @@
  *		sym *	lookup()
  *		mne *	mlookup()
  *		VOID *	new()
+ *		char *	strsto()
  *		int	symeq()
  *		VOID	syminit()
  *		VOID	symglob()
  *
- *	assym.c contains no local/static variables.
+ *	assym.c contains the static variables:
+ *		char *	pnext
+ *		int	bytes
+ *	used by the string store function.
  */
 
 /*)Function	VOID	syminit()
@@ -65,7 +74,7 @@
  *
  *	side effects:
  *		(1)	The symbol hash tables are initialized,
- *			the only defined symbol is '.'.
+ *			the predefined symbols are '.' and '.__.ABS.'.
  *		(2)	The mnemonic/directive hash tables are
  *			initialized with the assembler directives
  *			and mnemonics found in the machine dependent
@@ -140,9 +149,11 @@ char *id;
 
 	ap = areap;
 	while (ap) {
-		if (symeq(id, ap->a_id)) {
+		/*
+		 * JLH: case insensitive lookup always
+		 */
+		if(symeq(id, ap->a_id, 0))
 			return (ap);
-		}
 		ap = ap->a_ap;
 	}
 	return(NULL);
@@ -181,7 +192,10 @@ char *id;
 	h = hash(id);
 	mp = mnehash[h];
 	while (mp) {
-		if (symeq(id, mp->m_id))
+		/*
+		 * JLH: case insensitive lookup always
+		 */
+		if(symeq(id, mp->m_id, 0))
 			return (mp);
 		mp = mp->m_mp;
 	}
@@ -203,12 +217,14 @@ char *id;
  *		sym *	sp		pointer to a sym structure
  *
  *	global varaibles:
- *		sym * symhash[]		array of pointers to NHASH
+ *		sym *	symhash[]	array of pointers to NHASH
  *					linked symbol lists
+ *		int	zflag		enable symbol case sensitivity
  *
  *	functions called:
  *		int	hash()		assym.c
  *		VOID *	new()		assym.c
+ *		char *	strsto()	assym.c
  *		int	symeq()		assym.c
  *
  *	side effects:
@@ -226,7 +242,7 @@ char *id;
 	h = hash(id);
 	sp = symhash[h];
 	while (sp) {
-		if (symeq(id, sp->s_id))
+		if(symeq(id, sp->s_id, zflag))
 			return (sp);
 		sp = sp->s_sp;
 	}
@@ -234,7 +250,7 @@ char *id;
 	sp->s_sp = symhash[h];
 	symhash[h] = sp;
 	sp->s_tsym = NULL;
-	strncpy(sp->s_id, id, NCPS);
+	sp->s_id = strsto(id);
 	sp->s_type = S_NEW;
 	sp->s_flag = 0;
 	sp->s_area = NULL;
@@ -317,16 +333,20 @@ allglob()
 	}
 }
 
-/*)Function	int	symeq(p1, p2)
+/*)Function	int	symeq(p1, p2, cflag)
  *
+ *		int	cflag		case sensitive flag
  *		char *	p1		name string
  *		char *	p2		name string
  *
  *	The function symeq() compares the two name strings for a match.
  *	The return value is 1 for a match and 0 for no match.
  *
+ *		cflag == 0	case insensitve compare
+ *		cflag != 0	case sensitive compare
+ *
  *	local variables:
- *		int	h		loop counter
+ *		int	n		loop counter
  *
  *	global variables:
  *		char	ccase[]		an array of characters which
@@ -341,23 +361,30 @@ allglob()
  */
 
 int
-symeq(p1, p2)
+symeq(p1, p2, cflag)
 register char *p1, *p2;
+int cflag;
 {
 	register n;
 
-	n = NCPS;
-	do {
-
-#if	CASE_SENSITIVE
-		if (*p1++ != *p2++)
-			return (0);
-#else
-		if (ccase[*p1++] != ccase[*p2++])
-			return (0);
-#endif
-
-	} while (--n);
+	n = strlen(p1) + 1;
+	if(cflag) {
+		/*
+		 * Case Sensitive Compare
+		 */
+		do {
+			if (*p1++ != *p2++)
+				return (0);
+		} while (--n);
+	} else {
+		/*
+		 * Case Insensitive Compare
+		 */
+		do {
+			if (ccase[*p1++] != ccase[*p2++])
+				return (0);
+		} while (--n);
+	}
 	return (1);
 }
 
@@ -387,20 +414,91 @@ int
 hash(p)
 register char *p;
 {
-	register h, n;
+	register h;
 
 	h = 0;
-	n = NCPS;
-	do {
-
-#if	CASE_SENSITIVE
-		h += *p++;
-#else
+	while (*p) {
+		/*
+		 * JLH: case insensitive hash:
+		 * Doesn't much affect hashing, and allows
+		 * same function for mnemonics and symbols.
+		 */
 		h += ccase[*p++];
-#endif
-
-	} while (--n);
+	}
 	return (h&HMASK);
+}
+
+/*)Function	char *	strsto(str)
+ *
+ *		char *	str		pointer to string to save
+ *
+ *	Allocate space for "str", copy str into new space.
+ *	Return a pointer to the allocated string.
+ *
+ *	This function based on code by
+ *		John L. Hartman
+ *		jhartman@compuserve.com
+ *
+ *	local variables:
+ *		int	l		string length + 1
+ *		int	bytes		bytes remaining in buffer area
+ *		char *	p		pointer to head of copied string
+ *		char *	pnext		next location in buffer area
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		VOID *	new()		assym.c
+ *		char *	strncpy()	c_library
+ *
+ *	side effects:
+ *		Space allocated for string, string copied
+ *		to space.  Out of Space terminates assembler.
+ */
+ 
+/*
+ * To avoid wasting memory headers on small allocations, we
+ * allocate a big chunk and parcel it out as required.
+ * These static variables remember our hunk
+ */
+
+#define	STR_SPC	1024
+static	char *	pnext = NULL;
+static	int	bytes = 0;
+   
+char *
+strsto(str)
+char *str;
+{
+	int  l;
+	char *p;
+   
+	/*
+	 * What we need, including a null.
+	 */
+	l = strlen(str) + 1;
+
+	if (l > bytes) {
+		/*
+		 * No space.  Allocate a new hunk.
+		 * We lose the pointer to any old hunk.
+		 * We don't care, as the names are never deleted.
+		*/
+		pnext = (char *) new (STR_SPC);
+		bytes = STR_SPC;
+	}
+
+	/*
+	 * Copy the name and terminating null.
+	 */
+	p = pnext;
+	strncpy(p, str, l);
+
+	pnext += l;
+	bytes -= l;
+
+	return(p);
 }
 
 /*)Function	VOID *	new(n)

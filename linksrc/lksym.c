@@ -1,12 +1,17 @@
 /* lksym.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
  */
 
 #include <stdio.h>
@@ -24,13 +29,17 @@
  *		sym *	lkpsym()
  *		VOID *	new()
  *		sym *	newsym()
+ *		char *	strsto()
  *		VOID	symdef()
  *		int	symeq()
  *		VOID	syminit()
  *		VOID	symmod()
  *		addr_t	symval()
  *
- *	lksym.c contains no local/static variables.
+ *	lksym.c contains the static variables:
+ *		char *	pnext
+ *		int	bytes
+ *	used by the string store function.
  */
 
 /*)Function	VOID	syminit()
@@ -141,18 +150,23 @@ newsym()
 	} else
 	if (c == 'D') {
 		i = eval();
-		if (tsp->s_type & S_DEF && tsp->s_addr != i) {
-			fprintf(stderr, "Multiple definition of %.8s\n", id);
-			lkerr++;
+		if (tsp->s_type & S_DEF) {
+			if (tsp->s_addr != i) {
+				fprintf(stderr,
+					"Multiple definition of %s\n", id);
+				lkerr++;
+			}
+		} else {
+			/*
+			 * Set value and area extension link.
+			 */
+			tsp->s_addr = i;
+			tsp->s_axp = axp;
+			tsp->s_type |= S_DEF;
+			tsp->m_id = hp->m_id;
 		}
-		tsp->s_type |= S_DEF;
-		/*
-		 * Set value and area extension link.
-		 */
-		tsp->s_addr = i;
-		tsp->s_axp = axp;
 	} else {
-		fprintf(stderr, "Invalid symbol type %c for %.8s\n", c, id);
+		fprintf(stderr, "Invalid symbol type %c for %s\n", c, id);
 		lkexit(1);
 	}
 	/*
@@ -208,6 +222,7 @@ newsym()
 struct sym *
 lkpsym(id, f)
 char *id;
+int f;
 {
 	register struct sym *sp;
 	register h;
@@ -215,7 +230,7 @@ char *id;
 	h = hash(id);
 	sp = symhash[h];
 	while (sp != NULL) {
-		if (symeq(id, sp->s_id))
+		if (symeq(id, sp->s_id, zflag))
 			return (sp);
 		sp = sp->s_sp;
 	}
@@ -224,7 +239,7 @@ char *id;
 	sp = (struct sym *) new (sizeof(struct sym));
 	sp->s_sp = symhash[h];
 	symhash[h] = sp;
-	strncpy(sp->s_id, id, NCPS);
+	sp->s_id = strsto(id);		/* JLH */
 	return (sp);
 }
 
@@ -315,7 +330,7 @@ FILE *fp;
  *
  *	The function symmod() scans the header structures
  *	searching for a reference to the symbol structure
- *	pointer to by tsp.  The function then generates an error
+ *	pointed to by tsp.  The function then generates an error
  *	message whichs names the module having referenced the
  *	undefined variable.
  *
@@ -351,8 +366,12 @@ struct sym *tsp;
 		p = hp->s_list;
 		for (i=0; i<hp->h_nglob; ++i) {
 		    if (p[i] == tsp) {
-			fprintf(fp, "\n?ASlink-Warning-Undefined Global %8.8s ", tsp->s_id);
-			fprintf(fp, "referenced by module %8.8s\n", hp->m_id);
+			fprintf(fp,
+				"\n?ASlink-Warning-Undefined Global %s ",
+				tsp->s_id);
+			fprintf(fp,
+				"referenced by module %s\n",
+				hp->m_id);
 			lkerr++;
 		    }
 		}
@@ -361,16 +380,20 @@ struct sym *tsp;
 	}
 }
 
-/*)Function	int	symeq(p1, p2)
+/*)Function	int	symeq(p1, p2, cflag)
  *
+ *		int	cflag		case sensitive flag
  *		char *	p1		name string
  *		char *	p2		name string
  *
  *	The function symeq() compares the two name strings for a match.
  *	The return value is 1 for a match and 0 for no match.
  *
+ *		cflag == 0	case insensitve compare
+ *		cflag != 0	case sensitive compare
+ *
  *	local variables:
- *		int	h		loop counter
+ *		int	n		loop counter
  *
  *	global variables:
  *		char	ccase[]		an array of characters which
@@ -385,23 +408,30 @@ struct sym *tsp;
  */
 
 int
-symeq(p1, p2)
+symeq(p1, p2, cflag)
 register char *p1, *p2;
+int cflag;
 {
 	register n;
 
-	n = NCPS;
-	do {
-
-#if	CASE_SENSITIVE
-		if (*p1++ != *p2++)
-			return (0);
-#else
-		if (ccase[*p1++] != ccase[*p2++])
-			return (0);
-#endif
-
-	} while (--n);
+	n = strlen(p1) + 1;
+	if(cflag) {
+		/*
+		 * Case Sensitive Compare
+		 */
+		do {
+			if (*p1++ != *p2++)
+				return (0);
+		} while (--n);
+	} else {
+		/*
+		 * Case Insensitive Compare
+		 */
+		do {
+			if (ccase[*p1++] != ccase[*p2++])
+				return (0);
+		} while (--n);
+	}
 	return (1);
 }
 
@@ -425,27 +455,254 @@ register char *p1, *p2;
  *
  *	side effects:
  *		none
- *
  */
  
 int
 hash(p)
 register char *p;
 {
-	register h, n;
+	register h;
 
 	h = 0;
-	n = NCPS;
-	do {
-
-#if	CASE_SENSITIVE
-		h += *p++;
-#else
+	while (*p) {
+		/*
+		 * JLH: case insensitive hash:
+		 * Doesn't much affect hashing, and allows
+		 * same function for mnemonics and symbols.
+		 */
 		h += ccase[*p++];
-#endif
-
-	} while (--n);
+	}
 	return (h&HMASK);
+}
+
+#if	decus
+
+/*)Function	char *	strsto(str)
+ *
+ *		char *	str		pointer to string to save
+ *
+ *	Allocate space for "str", copy str into new space.
+ *	Return a pointer to the allocated string.
+ *
+ *	This function based on code by
+ *		John L. Hartman
+ *		jhartman@compuserve.com
+ *
+ *	local variables:
+ *		int	l		string length + 1
+ *		char *	p		string location
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		VOID *	new()		assym.c
+ *		char *	strncpy()	c_library
+ *
+ *	side effects:
+ *		Space allocated for string, string copied
+ *		to space.  Out of Space terminates linker.
+ */
+ 
+char *
+strsto(str)
+char *str;
+{
+	int  l;
+	char *p;
+   
+	/*
+	 * What we need, including a null.
+	 */
+	l = strlen(str) + 1;
+	p = (char *) new (l);
+
+	/*
+	 * Copy the name and terminating null.
+	 */
+	strncpy(p, str, l);
+	return(p);
+}
+
+/*
+ * This code is optimized for the PDP-11 (decus)
+ * which has a limited program space of 56K Bytes !
+ * Short strings and small structures are allocated
+ * from a memory hunk in new() to reduce the overhead
+ * from allocations directly by malloc().  Longer
+ * allocations are made directly by malloc.
+ * PDP-11 addressing requires that variables
+ * are allocated on a word boundary, (strings donot
+ * have this restriction,) all allocations will have
+ * at most 1 extra byte to maintain the word boundary
+ * requirement.
+ */
+
+/*)Function	VOID *	new(n)
+ *
+ *		unsigned int	n	allocation size in bytes
+ *
+ *	The function new() allocates n bytes of space and returns
+ *	a pointer to this memory.  If no space is available the
+ *	linker is terminated.
+ *
+ *	Allocate space for "str", copy str into new space.
+ *	Return a pointer to the allocated string.
+ *
+ *	This function based on code by
+ *		John L. Hartman
+ *		jhartman@compuserve.com
+ *
+ *	local variables:
+ *		int	bytes		bytes remaining in buffer area
+ *		int	i		loop counter
+ *		char *	p		pointer to head of copied string
+ *		char *	pnext		next location in buffer area
+ *		char *	q		a general pointer
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *		VOID *	malloc()	c_library
+ *
+ *	side effects:
+ *		Memory is allocated, if allocation fails
+ *		the linker is terminated.
+ */
+
+/*
+ * To avoid wasting memory headers on small allocations, we
+ * allocate a big chunk and parcel it out as required.
+ * These static variables remember our hunk.
+ */
+
+#define	STR_SPC	1024
+#define	STR_MIN	16
+static	char *	pnext = NULL;
+static	int	bytes = 0;
+   
+VOID *
+new(n)
+unsigned int n;
+{
+	register char *p,*q;
+	register unsigned int i;
+
+	/*
+	 * Always an even byte count
+	 */
+	n = (n+1) & 0xFFFE;
+
+	if (n > STR_MIN) {
+		/*
+		 * For allocations larger than
+		 * most structures and short strings
+		 * allocate the space directly.
+		 */
+		p = (char *) malloc(n);
+	} else {
+		/*
+		 * For smaller structures and
+		 * strings allocate from the hunk.
+		 */
+		if (n > bytes) {
+			/*
+			 * No space.  Allocate a new hunk.
+			 * We lose the pointer to any old hunk.
+			 * We don't care, as the pieces are never deleted.
+			*/
+			pnext = (char *) malloc (STR_SPC);
+			bytes = STR_SPC;
+		}
+		p = pnext;
+		pnext += n;
+		bytes -= n;
+	}
+	if (p == NULL) {
+		fprintf(stderr, "Out of space!\n");
+		lkexit(1);
+	}
+	for (i=0,q=p; i<n; i++) {
+		*q++ = 0;
+	}
+	return (p);
+}
+
+#else
+
+/*)Function	char *	strsto(str)
+ *
+ *		char *	str		pointer to string to save
+ *
+ *	Allocate space for "str", copy str into new space.
+ *	Return a pointer to the allocated string.
+ *
+ *	This function based on code by
+ *		John L. Hartman
+ *		jhartman@compuserve.com
+ *
+ *	local variables:
+ *		int	l		string length + 1
+ *		int	bytes		bytes remaining in buffer area
+ *		char *	p		pointer to head of copied string
+ *		char *	pnext		next location in buffer area
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		VOID *	new()		assym.c
+ *		char *	strncpy()	c_library
+ *
+ *	side effects:
+ *		Space allocated for string, string copied
+ *		to space.  Out of Space terminates assembler.
+ */
+ 
+/*
+ * To avoid wasting memory headers on small allocations, we
+ * allocate a big chunk and parcel it out as required.
+ * These static variables remember our hunk
+ */
+
+#define	STR_SPC	1024
+static	char *	pnext = NULL;
+static	int	bytes = 0;
+   
+char *
+strsto(str)
+char *str;
+{
+	int  l;
+	char *p;
+   
+	/*
+	 * What we need, including a null.
+	 */
+	l = strlen(str) + 1;
+
+	if (l > bytes) {
+		/*
+		 * No space.  Allocate a new hunk.
+		 * We lose the pointer to any old hunk.
+		 * We don't care, as the strings are never deleted.
+		*/
+		pnext = (char *) new (STR_SPC);
+		bytes = STR_SPC;
+	}
+
+	/*
+	 * Copy the name and terminating null.
+	 */
+	p = pnext;
+	strncpy(p, str, l);
+
+	pnext += l;
+	bytes -= l;
+
+	return(p);
 }
 
 /*)Function	VOID *	new(n)
@@ -488,3 +745,5 @@ unsigned int n;
 	}
 	return (p);
 }
+
+#endif

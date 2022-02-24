@@ -1,13 +1,15 @@
+.send toc .page size 58,72,8,2,1
+.send toc .indent levels 2
+.send toc .indent level titles 8,10,12
+.send toc .display number rl
+
 .page size 58,72,8,2,1
 .set paragraph 3,1,2
 .spacing 1
 .autoparagraph
 .headers mixed
 .headers on
-.send toc .page size 58,72,8,2,1
-.send toc .indent levels 2
-.send toc .indent level titles 8,10,12
-.send toc .display number rl
+
 .page
 #
 .break
@@ -17,7 +19,20 @@
 .center line;and
 .skip 2
 .center line;ASLINK Relocating Linker
+.skip 4
+.center line;Version###2.0
+.center line;August 1998
 
+.require "prefac"
+.require "cntrib"
+.require "abstra"
+
+.page size 58,72,8,2,1
+.set paragraph 3,1,2
+.spacing 1
+.autoparagraph
+.headers mixed
+.headers on
 .autotitle
 .autosubtitle
 
@@ -34,10 +49,9 @@
 .require "as6812"
 .require "as6816"
 .require "ash8"
+.require "as8051"
 .require "as8085"
 .require "asz80"
 .require "as6500"
 
-.send toc .page
-.send toc .require "asxxxx"
-.send toc .require "prefac"
+.send toc .end TOC

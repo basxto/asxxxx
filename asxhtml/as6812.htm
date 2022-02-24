@@ -2,10 +2,10 @@
 <HEAD>
 <TITLE></TITLE>
 </HEAD>
-<BODY>
+<BODY BGCOLOR="#C0C0C0">
 
-<A href="http://shop-pdp.kent.edu/">
-<IMG width=343 height=58 border=0 SRC="welcom.gif" ALT = "Welcome"></A>
+<A href="../home.htm">
+<IMG width=343 height=58 border=0 SRC="welcom.gif" ALT="Welcome"></A>
 
 <H2>AS6812  Assembler</H2>
 
@@ -19,7 +19,7 @@
 The following is a list of the 68HC12 registers used by AS6812: 
 
         a,b     -       8-bit accumulators
-        d       -       16-bit accumulator <a:b>
+        d       -       16-bit accumulator &lt;a:b&gt;
         x,y     -       index registers
         sp,s    -       stack pointer
         pc      -       program counter
@@ -43,7 +43,7 @@ format for each addressing mode supported by AS6812:
 
         *dir            direct page addressing
                         (see .setdp directive)
-                        0 <= dir <= 255 
+                        0 &lt;= dir &lt;= 255 
 
         label           branch label
 
@@ -63,16 +63,16 @@ format for each addressing mode supported by AS6812:
                         post autoincrement by 1 - 8
 
         offset,x        register indexed addressing
-                           -16 <= offset <= 15    ---  5-bit
-                          -256 <= offset <= -17   ---  9-bit
-                            16 <= offset <= 255   ---  9-bit
-                        -32768 <= offset <= -257  --- 16-bit
-                           256 <= offset <= 32767 --- 16-bit
+                           -16 &lt;= offset &lt;= 15    ---  5-bit
+                          -256 &lt;= offset &lt;= -17   ---  9-bit
+                            16 &lt;= offset &lt;= 255   ---  9-bit
+                        -32768 &lt;= offset &lt;= -257  --- 16-bit
+                           256 &lt;= offset &lt;= 32767 --- 16-bit
                         (external definition of offset
                          uses 16-bit mode)
 
         [offset,x]      register indexed indirect addressing
-                        -32768 <= offset <= 32767 --- 16-bit
+                        -32768 &lt;= offset &lt;= 32767 --- 16-bit
 
         [,x]            register indexed indirect addressing
                         zero offset
@@ -209,19 +209,19 @@ Double Operand Instructions
 
         eora    []              eorb    []
 
-        ldaa    []      <=>     lda     []
+        ldaa    []      &lt;=&gt;     lda     []
 
-        ldab    []      <=>     ldb     []
+        ldab    []      &lt;=&gt;     ldb     []
 
-        oraa    []      <=>     ora     []
+        oraa    []      &lt;=&gt;     ora     []
 
-        orab    []      <=>     orb     []
+        orab    []      &lt;=&gt;     orb     []
 
         sbca    []              sbcb    []
 
-        staa    []      <=>     sta     []
+        staa    []      &lt;=&gt;     sta     []
 
-        stab    []      <=>     stb     []
+        stab    []      &lt;=&gt;     stb     []
 
         suba    []              subb    []
 
@@ -234,15 +234,15 @@ Move Instructions
 D-register Instructions 
 
         addd    []              subd    []
-        cpd     []      <=>     cmpd    []
+        cpd     []      &lt;=&gt;     cmpd    []
         ldd     []              std     []
 
 
 Index/Stack Register Instructions 
 
-        cps     []      <=>     cmps    []
-        cpx     []      <=>     cmpx    []
-        cpy     []      <=>     cmpy    []
+        cps     []      &lt;=&gt;     cmps    []
+        cpx     []      &lt;=&gt;     cmpx    []
+        cpy     []      &lt;=&gt;     cmpy    []
 
         lds     []
         ldx     []              ldy     []
@@ -300,16 +300,9 @@ M68HC11 Compatibility Mode Instructions
 <P><A HREF="asxxxx.htm #JUMP">
 <IMG width=32 height=32 border=0 SRC="spcshp.gif" ALIGN=bottom></A>
 <B>...  Exit the ASxxxx Documentation</B></A></P>
-<P><A href="http://shop-pdp.kent.edu/">
+<P><A href="../home.htm">
 <IMG width=32 height=32 border=0 SRC="home.gif" ALIGN=bottom></A>
 <B>...  Home Page</B></P>
 </H3>
 </BODY> 
 </HTML>
-
-
-
-
-
-
-

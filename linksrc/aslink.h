@@ -1,24 +1,24 @@
 /* aslink.h */
 
 /*
- * (C) Copyright 1989-1996
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
- */
-
-#define	VERSION	"V01.75"
-
-/*
- * Case Sensitivity Flag
- */
-#define	CASE_SENSITIVE	0
-
-/*)Module	asmlnk.h
  *
- *	The module asmlnk.h contains the definitions for constants,
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
+ */
+
+#define	VERSION	"V02.00"
+
+/*)Module	aslink.h
+ *
+ *	The module aslink.h contains the definitions for constants,
  *	structures, global variables, and LKxxxx functions
  *	contained in the LKxxxx.c files.
  */
@@ -73,14 +73,14 @@
  * relocatable binary file.
  */
 
-#define	NCPS	8		/* characters per symbol */
-/* #define	NCPS	32 */	/* characters per symbol */
+#define NCPS	80		/* characters per symbol */
 #define	NDATA	16		/* actual data */
 #define	NINPUT	128		/* Input buffer size */
 #define	NHASH	64		/* Buckets in hash table */
 #define	HMASK	077		/* Hash mask */
 #define	NLPP	60		/* Lines per page */
 #define	NTXT	16		/* T values */
+#define	NMAX	78		/* Maximum S19/IHX line length */
 #define	FILSPC	80		/* File spec length */
 
 /*
@@ -116,11 +116,45 @@
 #define	R_PAG0	0040		/* Page '0' */
 #define	R_PAG	0100		/* Page 'nnn' */
 
-/*
- * Valid for R_BYT2:
- */
 #define	R_LSB	0000		/* output low byte */
 #define	R_MSB	0200		/* output high byte */
+
+/*
+ *	Additional "R_" functionality is required to support
+ *	some microprocesssor architectures.   The 'illegal'
+ *	"R_" mode of R_WORD | R_BYT2 is used as a designator
+ *	of the extended R_ modes.  The extended modes replace
+ *	the PAGING modes and are being added in an adhoc manner
+ *	as follows:
+ *
+ * Extended Mode relocation flags
+ *
+ *	   7     6     5     4     3     2     1     0
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ *	| MSB |  x  |  x  | USGN|  1  | PCR | SYM |  0  |
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ */
+
+#define	R_ECHEK	0011		/* Extended Mode Check Bits */
+#define	R_EXTND	0010		/* Extended Mode Code */
+#define	R_EMASK	0151		/* Extended Mode Mask */
+
+/* #define R_AREA 0000 */	/* Base type */
+/* #define R_SYM  0002 */
+
+/* #define R_NORM 0000 */	/* PC adjust */
+/* #define R_PCR  0004 */
+
+/* #define R_SGND 0000 */	/* Signed value */
+/* #define R_USGN 0020 */	/* Unsigned value */
+
+/* #define R_LSB  0000 */	/* output low byte */
+/* #define R_MSB  0200 */	/* output high byte */
+
+#define	R_J11	0010		/* JLH: 11 bit JMP and CALL (8051) */
+/* #define R_xxx  0050 */	/* Unused */
+/* #define R_xxx  0110 */	/* Unused */
+/* #define R_xxx  0150 */	/* Unused */
 
 /*
  * Global symbol types.
@@ -175,7 +209,7 @@ struct	head
 	struct	areax **a_list;	/* Area list */
 	int	h_nglob;	/* # of global symbols */
 	struct	sym   **s_list;	/* Globle symbol list */
-	char	m_id[NCPS];	/* Module name */
+	char *	m_id;		/* Module name */
 };
 
 /*
@@ -198,7 +232,7 @@ struct	area
 	addr_t	a_size;		/* Total size of the area */
 	char	a_type;		/* Area subtype */
 	char	a_flag;		/* Flag byte */
-	char	a_id[NCPS];	/* Name */
+	char *	a_id;		/* Name */
 };
 
 /*
@@ -244,7 +278,8 @@ struct	sym
 	char	s_type;		/* Symbol subtype */
 	char	s_flag;		/* Flag byte */
 	addr_t	s_addr;		/* Address */
-	char	s_id[NCPS];	/* Name */
+	char	*s_id;		/* Name (JLH) */
+	char	*m_id;		/* Module symbol define in */
 };
 
 /*
@@ -429,12 +464,9 @@ extern	char	ctype[];	/*	array of character types, one per
 #define	DGT10	DIGIT|RAD16|RAD10
 #define	LTR16	LETTER|RAD16
 
-#if	CASE_SENSITIVE
-#else
 extern	char	ccase[];	/*	an array of characters which
 				 *	perform the case translation function
 				 */
-#endif
 
 extern	struct	lfile	*filep;	/*	The pointers (lfile *) filep,
 				 *	(lfile *) cfp, and (FILE *) sfp
@@ -522,6 +554,10 @@ extern	int	pflag;		/*	print linker command file flag
 				 */
 extern	int	uflag;		/*	Listing relocation flag
 				 */
+extern	int	wflag;		/*	Enable wide format listing
+				 */
+extern	int	zflag;		/*	Enable symbol case sensitivity
+				 */
 extern	int	radix;		/*	current number conversion radix:
 				 *	2 (binary), 8 (octal), 10 (decimal),
 				 *	16 (hexadecimal)
@@ -541,7 +577,14 @@ extern	addr_t	rtval[];	/*	data associated with relocation
 				 */
 extern	int	rtflg[];	/*	indicates if rtval[] value is
 				 *	to be sent to the output file.
-				 *	(always set in this linker)
+				 */
+extern	char	rtbuf[];	/*	S19/IHX output buffer
+				 */
+extern	addr_t	rtadr0;		/*	rtbuf[] processing
+				 */
+extern	addr_t	rtadr1;		/*
+				 */
+extern	addr_t	rtadr2;		/*
 				 */
 extern	int	hilo;		/*	REL file byte ordering
 				 */
@@ -618,6 +661,7 @@ extern	int		hash();
 extern	struct	sym *	lkpsym();
 extern	VOID *		new();
 extern	struct	sym *	newsym();
+extern	char *		strsto();
 extern	VOID		symdef();
 extern	int		symeq();
 extern	VOID		syminit();
@@ -671,6 +715,9 @@ extern	VOID		search();
 
 /* lks19.c */
 extern	VOID		s19();
+extern	VOID		sflush();
 
 /* lkihx.c */
 extern	VOID		ihx();
+extern	VOID		iflush();
+

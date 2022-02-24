@@ -1,7 +1,7 @@
 /* lklex.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -37,7 +37,7 @@
 /*)Function	VOID	getid(id,c)
  *
  *		char *	id		a pointer to a string of
- *					maximum length NCPS
+ *					maximum length NCPS-1
  *		int	c		mode flag
  *					>=0	this is first character to
  *						copy to the string buffer
@@ -46,13 +46,12 @@
  *	The function getid() scans the current input text line
  *	from the current position copying the next LETTER | DIGIT string
  *	into the external string buffer (id).  The string ends when a non
- *	LETTER or DIGIT character is found. The maximum number of
- *	characters copied is NCPS.  If the input string is larger than
- *	NCPS characters then the string is truncated, if the input string
- *	is shorter than NCPS characters then the string is NULL filled.
- *	If the mode argument (c) is >=0 then (c) is the first character
- *	copied to the string buffer, if (c) is <0 then intervening white
- *	space (SPACES and TABS) are skipped.
+ *	LETTER or DIGIT character is found. The maximum number of characters
+ *	copied is NCPS-1.  If the input string is larger than NCPS-1
+ *	characters then the string is truncated.  The string is always
+ *	NULL terminated.  If the mode argument (c) is >=0 then (c) is
+ *	the first character copied to the string buffer, if (c) is <0
+ *	then intervening white space (SPACES and TABS) are skipped.
  *
  *	local variables:
  *		char *	p		pointer to external string buffer
@@ -87,18 +86,17 @@ char *id;
 	}
 	p = id;
 	do {
-		if (p < &id[NCPS])
+		if (p < &id[NCPS-1])
 			*p++ = c;
 	} while (ctype[c=get()] & (LETTER|DIGIT));
 	unget(c);
-	while (p < &id[NCPS])
-		*p++ = 0;
+	*p++ = 0;
 }
 
 /*)Function	VOID	getfid(fid,c)
  *
  *		char *	str		a pointer to a string of
- *					maximum length FILSPC
+ *					maximum length FILSPC-1
  *		int	c		this is first character to
  *					copy to the string buffer
  *
@@ -106,9 +104,9 @@ char *id;
  *	from the current position copying the next string
  *	into the external string buffer (str).  The string ends when a
  *	non SPACE type character is found. The maximum number of
- *	characters copied is FILSPC. If the input string is larger than
- *	FILSPC characters then the string is truncated, if the input string
- *	is shorter than FILSPC characters then the string is NULL filled.
+ *	characters copied is FILSPC-1. If the input string is larger than
+ *	FILSPC-1 characters then the string is truncated, if the input string
+ *	is shorter than FILSPC-1 characters then the string is NULL filled.
  *
  *	local variables:
  *		char *	p		pointer to external string buffer

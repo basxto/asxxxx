@@ -1,7 +1,7 @@
 /* lkhead.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -88,6 +88,10 @@ newhead()
 		thp->h_hp = hp;
 	}
 	/*
+	 * Defalt to No Module Defined
+	 */
+	hp->m_id = "";
+	/*
 	 * Set file pointer
 	 */
 	hp->h_lfile = cfp;
@@ -130,7 +134,7 @@ newhead()
  *	functions called:
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
- *		char *	strncpy()	c_library
+ *		char *	strsto()	lksym.c
  *
  *	side effects:
  *		The module name is copied into the head structure.
@@ -146,7 +150,7 @@ module()
 
 	if (headp) {
 		getid(id, -1);
-		strncpy(hp->m_id, id, NCPS);
+		hp->m_id = strsto(id);
 	} else {
 		fprintf(stderr, "No header defined\n");
 		lkerr++;

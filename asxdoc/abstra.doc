@@ -1,6 +1,6 @@
 
 
-        ASxxxx Cross Assemblers, Version 1.75, October 1996 
+        ASxxxx Cross Assemblers, Version 2.00, August 1998 
 
         Submitted by Alan R.  Baldwin, 
         Kent State University, Kent, Ohio 
@@ -15,14 +15,14 @@
            The  ASxxxx  assemblers are a series of microprocessor assem-
         blers written in the C programming  language.   This  collection
         contains cross assemblers for the 6800(6802/6808), 6801(hd6303),
-        6804, 6805, 68HC08, 6809,  68HC11,  68HC12  68HC16,  8085(8080),
-        z80(hd64180), H8/3xx, and 6500 series microprocessors.  Each as-
-        sembler has a  device  specific  section  which  includes:   (1)
-        device  description, byte order, and file extension information,
-        (2) a table of assembler general directives, special directives,
-        assembler  mnemonics and associated operation codes, (3) machine
-        specific code for processing the  device  mnemonics,  addressing
-        modes, and special directives.  
+        6804,  6805,  68HC08,  6809,  68HC11,  68HC12,   68HC16,   8051,
+        8085(8080),  z80(hd64180),  H8/3xx, and 6500 series microproces-
+        sors.  Each  assembler  has  a  device  specific  section  which
+        includes:   (1)  device description, byte order, and file exten-
+        sion information, (2) a table of assembler  general  directives,
+        special directives, assembler mnemonics and associated operation
+        codes, (3) machine  specific  code  for  processing  the  device
+        mnemonics, addressing modes, and special directives.  
 
            The assemblers have a common device independent section which
         handles the details of file input/output, symbol  table  genera-

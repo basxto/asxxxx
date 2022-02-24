@@ -1,7 +1,7 @@
 /* lkeval.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -296,7 +296,7 @@ term()
 	if (ctype[c] & LETTER) {
 		getid(id, c);
 		if ((sp = lkpsym(id, 0)) == NULL) {
-			fprintf(stderr, "Undefined symbol %8s\n", id);
+			fprintf(stderr, "Undefined symbol %s\n", id);
 			lkerr++;
 			return(0);
 		} else {

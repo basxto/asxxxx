@@ -1,7 +1,7 @@
 /* ASXSCN.C */
 
 /*
- * (C) Copyright 1989-1996
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,8 +11,9 @@
 
 
 #include <stdio.h>
+#include <string.h>
 #include <setjmp.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 
 static int inpfil;		/* Input File Counter	*/
@@ -98,8 +99,6 @@ char *argv[];
 	for (i=1; i<argc; ++i) {
 		p = argv[i];
 		if (*p == '-') {
-			if (inpfil >= 0)
-				usage();
 			++p;
 			while ((c = *p++) != 0)
 				switch(c) {
@@ -162,8 +161,14 @@ loop:
 			if ((ctype[*p++] & RAD16) != RAD16)
 				goto loop;
 		}
-		if (*p++ != ' ')
+
+		if ((ctype[*(p+1)] & RAD16) != RAD16)
 			goto loop;
+		if ((ctype[*(p+2)] & RAD16) != RAD16)
+			goto loop;
+
+		if (*p == ' ')
+			p++;
 
 		/*
 		 * Scan until ';' is found
@@ -176,6 +181,8 @@ loop:
 			goto loop;
 		if (*q == '\0')
 			goto loop;
+		if (*q == ' ')
+			q++;
 
 		/*
 		 * Compare Strings

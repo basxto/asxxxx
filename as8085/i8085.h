@@ -1,7 +1,7 @@
 /* i8085.h */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,7 +12,7 @@
 /*)BUILD
 	$(PROGRAM) =	AS8085
 	$(INCLUDE) = {
-		ASM.H
+		ASXXXX.H
 		I8085.H
 	}
 	$(FILES) = {
@@ -28,7 +28,7 @@
 		ASLIST.C
 		ASOUT.C
 	}
-	$(STACK) = 2000
+	$(STACK) = 3000
 */
 
 /*

@@ -1,7 +1,7 @@
 /* asexpr.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,7 +13,7 @@
 #include <setjmp.h>
 #include <string.h>
 #include <alloc.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 /*)Module	asexpr.c
  *

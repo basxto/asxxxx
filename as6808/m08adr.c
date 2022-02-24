@@ -1,7 +1,7 @@
 /* m08adr.c */
 
 /*
- * (C) Copyright 1993-1995
+ * (C) Copyright 1993-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
-#include "asm.h"
+#include "asxxxx.h"
 #include "m6808.h"
 
 int
@@ -163,18 +163,6 @@ register char *str;
 	register char *ptr;
 	ptr = ip;
 
-#if	CASE_SENSITIVE
-	while (*ptr && *str) {
-		if(*ptr != *str)
-			break;
-		ptr++;
-		str++;
-	}
-	if (*ptr == *str) {
-		ip = ptr;
-		return(1);
-	}
-#else
 	while (*ptr && *str) {
 		if(ccase[*ptr] != ccase[*str])
 			break;
@@ -185,7 +173,6 @@ register char *str;
 		ip = ptr;
 		return(1);
 	}
-#endif
 
 	if (!*str)
 		if (any(*ptr," \t\n,];")) {

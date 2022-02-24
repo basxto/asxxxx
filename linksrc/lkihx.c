@@ -1,12 +1,17 @@
 /* lkihx.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *   With enhancements by
+ * 	G. Osborn
+ *	gary@s-4.com.  
+ *
  */
 
 #include <stdio.h>
@@ -20,8 +25,9 @@
  *	output the relocated object code in the
  *	Intel Hex format.
  *
- *	lkihx.c contains the following function:
- *		VOID	ihx(i)
+ *	lkihx.c contains the following functions:
+ *		VOID	ihx()
+ *		VOID	iflush()
  *
  *	lkihx.c contains no local variables.
  */
@@ -82,11 +88,11 @@
  *		int	i		0 - process data
  *					1 - end of data
  *
- *	The function ihx() outputs the relocated data
- *	in the standard Intel Hex format.
+ *	The function ihx() loads the output buffer with
+ *	the relocated data.
  *
  *	local variables:
- *		addr_t	chksum		byte checksum
+ *		addr_t	j		temporary
  *
  *	global variables:
  *		int	hilo		byte order
@@ -94,6 +100,82 @@
  *		int	rtcnt		count of data words
  *		int	rtflg[]		output the data flag
  *		addr_t	rtval[]		relocated data
+ *		char	rtbuf[]		output buffer
+ *		addr_t	rtadr0		address temporary
+ *		addr_t	rtadr1		address temporary
+ *		addr_t	rtadr2		address temporary
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *		VOID	iflush()	lkihx.c
+ *
+ *	side effects:
+ *		The data is placed into the output buffer.
+ */
+
+/*
+ * The maximum number of Data Field bytes is NMAX less:
+ *	1	Record Mark Field
+ *	2	Record Length Field
+ *	4	Load Address Field
+ *	2	Record Type Field
+ *	2	Checksum Field
+ *
+ *	Divided by 2 (2 characters per byte)
+ */
+
+#define	MAXBYTES	((NMAX - 11)/2)
+
+VOID
+ihx(i)
+int i;
+{
+	register addr_t j;
+
+	if (i) {
+		if (hilo == 0) {
+			j = rtval[0];
+			rtval[0] = rtval[1];
+			rtval[1] = j;
+		}
+		rtadr2 = rtval[0] << 8 | rtval[1];
+		if (rtadr2 != rtadr1) {
+			/*
+			 * data bytes not contiguous between records
+			 */
+			iflush();
+			rtadr0 = rtadr1 = rtadr2;
+		}
+		for (j=2; j<rtcnt; j++) {
+			if (rtflg[j]) {
+				rtbuf[rtadr1++ - rtadr0] = rtval[j];
+				if (rtadr1 - rtadr0 == MAXBYTES) {
+					iflush();
+				}
+			}
+		}
+	} else {
+		iflush();
+		fprintf(ofp, ":00000001FF\n");
+	}
+}
+
+/*)Function	iflush()
+ *
+ *	The function iflush() outputs the relocated data
+ *	in the standard Intel Hex format.
+ *
+ *	local variables:
+ *		addr_t	chksum		byte checksum
+ *		int	i		loop counter
+ *		int	max		number of data bytes
+ *		int	reclen		record length
+ *
+ *	global variables:
+ *		FILE *	ofp		output file handle
+ *		char	rtbuf[]		output buffer
+ *		addr_t	rtadr0		address temporary
+ *		addr_t	rtadr1		address temporary
  *
  *	functions called:
  *		int	fprintf()	c_library
@@ -102,33 +184,46 @@
  *		The data is output to the file defined by ofp.
  */
 
-VOID
-ihx(i)
-{
-	register addr_t chksum;
+/*
+ * This function derived from the work
+ * of G. Osborn, gary@s-4.com.
+ * The new version concatenates the assembler
+ * output records when they represent contiguous
+ * memory segments to produces NMAX character
+ * Intel Hex output lines whenever possible, resulting
+ * in a substantial reduction in file size.
+ * More importantly, the download time
+ * to the target system is much improved.
+ */
 
-	if (i) {
-		if (hilo == 0) {
-			chksum = rtval[0];
-			rtval[0] = rtval[1];
-			rtval[1] = chksum;
-		}
-		for (i = 0, chksum = -2; i < rtcnt; i++) {
-			if (rtflg[i])
-				chksum++;
-		}
-		fprintf(ofp, ":%02X", chksum);
-		for (i = 0; i < rtcnt ; i++) {
-			if (rtflg[i]) {
-				fprintf(ofp, "%02X", rtval[i]);
-				chksum += rtval[i];
-			}
-			if (i == 1) {
-				fprintf(ofp, "00");
-			}
-		}
-		fprintf(ofp, "%02X\n", (-chksum) & 0xff);
-	} else {
-		fprintf(ofp, ":00000001FF\n");
+VOID
+iflush()
+{
+	addr_t	chksum;
+	register int i,max,reclen;
+
+	max = rtadr1 - rtadr0;
+	if (max == 0) {
+		return;
 	}
+
+	/*
+	 * Only the ":" and the checksum itself are excluded
+	 * from the checksum.  The record length includes
+	 * only the data bytes.
+	 */
+	reclen = max;
+	chksum = reclen;
+	chksum += rtadr0;
+	chksum += rtadr0 >> 8;
+	fprintf(ofp, ":%02X%04X00", reclen, rtadr0);
+	for (i=0; i<max; i++) {
+		chksum += rtbuf[i];
+		fprintf(ofp, "%02X", rtbuf[i] & 0x00ff);
+	}
+	/*
+	 * 2's complement
+	 */
+	fprintf(ofp, "%02X\n", (-chksum) & 0x00ff);
+	rtadr0 = rtadr1;
 }

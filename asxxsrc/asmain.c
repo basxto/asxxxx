@@ -1,7 +1,7 @@
 /* asmain.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,7 +13,7 @@
 #include <setjmp.h>
 #include <string.h>
 #include <alloc.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 
 /*)Module	asmain.c
@@ -66,6 +66,7 @@
  *		int	aflag		-a, make all symbols global flag
  *		char	afn[]		afile() constructed filespec
  *		area *	areap		pointer to an area structure
+ *		int	aserr		assembler error counter
  *		int	cb[]		array of assembler output values
  *		int	cbt[]		array of assembler relocation types
  *					describing the data in cb[]
@@ -113,7 +114,9 @@
  *		char	stb[]		Subtitle string buffer
  *		sym *	symp		pointer to a symbol structure
  *		int	tlevel		current conditional level
+ *		int	wflag		-w, enable wide listing format
  *		int	xflag		-x, listing radix flag
+ *		int	zflag		-z, enable symbol case sensitivity
  *		FILE *	lfp		list output file handle
  *		FILE *	ofp		relocation output file handle
  *		FILE *	tfp		symbol table output file handle
@@ -131,6 +134,7 @@
  *		VOID	lstsym()	aslist.c
  *		VOID	minit()		___mch.c
  *		VOID	newdot()	asmain.c
+ *		VOID	outbuf()	asout.c
  *		VOID	outchk()	asout.c
  *		VOID	outgsd()	asout.c
  *		int	rewind()	c-library
@@ -194,6 +198,16 @@ char *argv[];
 					pflag = 0;
 					break;
 
+				case 'w':
+				case 'W':
+					++wflag;
+					break;
+
+				case 'z':
+				case 'Z':
+					++zflag;
+					break;
+
 				case 'x':
 				case 'X':
 					xflag = 0;
@@ -238,6 +252,7 @@ char *argv[];
 		usage();
 	syminit();
 	for (pass=0; pass<3; ++pass) {
+		aserr = 0;
 		if (gflag && pass == 1)
 			symglob();
 		if (aflag && pass == 1)
@@ -266,6 +281,8 @@ char *argv[];
 		fuzz = 0;
 		dot.s_addr = 0;
 		dot.s_area = &dca;
+		outbuf("I");
+		outchk(0,0);
 		symp = &dot;
 		minit();
 		while (getline()) {
@@ -337,7 +354,6 @@ int i;
 	for (j=0; j<MAXINC && ifp[j] != NULL; j++) {
 		fclose(ifp[j]);
 	}
-
 	exit(i);
 }
 
@@ -427,6 +443,7 @@ int i;
  *		VOID	qerr()		assubr.c
  *		char *	strcpy()	c-library
  *		char *	strncpy()	c-library
+ *		char *	strsto()	assym.c
  *		VOID	unget()		aslex.c
  */
 
@@ -807,7 +824,7 @@ loop:
 		} else {
 			ap = (struct area *) new (sizeof(struct area));
 			ap->a_ap = areap;
-			strncpy(ap->a_id, id, NCPS);
+			ap->a_id = strsto(id);
 			ap->a_ref = areap->a_ref + 1;
 			ap->a_size = 0;
 			ap->a_fuzz = 0;
@@ -1053,7 +1070,7 @@ addr_t a;
 }
 
 char *usetxt[] = {
-	"Usage: [-dqxgalopsf] file1 [file2 file3 ...]",
+	"Usage: [-dqxgalospwzf] file1 [file2 file3 ...]",
 	"  d    decimal listing",
 	"  q    octal   listing",
 	"  x    hex     listing (default)",
@@ -1063,6 +1080,8 @@ char *usetxt[] = {
 	"  o    create object output file1[REL]",
 	"  s    create symbol output file1[SYM]",
 	"  p    disable listing pagination",
+	"  w    wide listing format for symbol table",
+	"  z    enable case sensitivity for symbols",
 	"  f    flag relocatable references by  `   in listing file",
 	" ff    flag relocatable references by mode in listing file",
 	"",

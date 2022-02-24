@@ -1,12 +1,17 @@
 /* lkrloc.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
  */
 
 #include <stdio.h>
@@ -228,7 +233,7 @@ relt()
  *		int	eval()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	ihx()		lkihx.c
- *		int	lkulist		lklist.c
+ *		VOID	lkulist		lklist.c
  *		int	more()		lklex.c
  *		VOID	relerr()	lkrloc.c
  *		VOID	s19()		lks19.c
@@ -326,50 +331,82 @@ relr()
 		}
 
 		/*
-		 * R_PAG0 or R_PAG addressing
+		 * Standard Modes
 		 */
-		if (mode & (R_PAG0|R_PAG)) {
-			paga  = sdp.s_area->a_addr;
-			pags  = sdp.s_addr;
-			reli -= paga + pags;
-		}
-
-		/*
-		 * R_BYTE or R_WORD operation
-		 */
-		if (mode & R_BYTE) {
-			if (mode & R_BYT2) {
-				if (mode & R_MSB) {
-					relv = adb_hi(reli, rtp);
-				} else {
-					relv = adb_lo(reli, rtp);
-				}
-			} else {
-				relv = adb_b(reli, rtp);
-			}
-		} else {
+		if ((mode & R_ECHEK) != R_EXTND) {
 			/*
-			 * R_WORD with the R_BYT2 mode is flagged
-			 * as an 'r' error by the assembler,
-			 * but it is processed here anyway.
+			 * R_PAG0 or R_PAG addressing
 			 */
-			if (mode & R_BYT2) {
-				if (mode & R_MSB) {
-					relv = adw_hi(reli, rtp);
+			if (mode & (R_PAG0|R_PAG)) {
+				paga  = sdp.s_area->a_addr;
+				pags  = sdp.s_addr;
+				reli -= paga + pags;
+			}
+
+			/*
+			 * R_BYTE or R_WORD operation
+			 */
+			if (mode & R_BYTE) {
+				if (mode & R_BYT2) {
+					if (mode & R_MSB) {
+						relv = adb_hi(reli, rtp);
+					} else {
+						relv = adb_lo(reli, rtp);
+					}
+					rtofst += 1;
 				} else {
-					relv = adw_lo(reli, rtp);
+					relv = adb_b(reli, rtp);
 				}
 			} else {
 				relv = adw_w(reli, rtp);
 			}
-		}
 
+			/*
+			 * Page Relocation Error Checking
+			 */
+			if (mode & R_PAG0 && (relv & ~0xFF || paga || pags))
+				error = 3;
+			if (mode & R_PAG  && (relv & ~0xFF))
+				error = 4;
 		/*
-		 * R_BYTE with R_BYT2 offset adjust
+		 * Extended Modes
 		 */
-		if (mode & R_BYTE) {
-			if (mode & R_BYT2) {
+		} else {
+			switch(mode & R_EMASK) {
+			case R_J11:
+				/*
+				 * JLH: 11 bit jump destination for 8051.
+				 * Forms two byte instruction with
+				 * op-code bits in the MIDDLE!
+				 * rtp points at 3 byte locus:
+				 * first two will get the instructiion
+				 * third one has raw op-code
+				 */
+				/*
+				 * Calculate absolute destination
+				 * relv must be on same 2K page as pc
+				*/
+				relv = adw_w(reli, rtp);
+
+				if ((relv & ~0x7ff) !=
+				   ((pc + rtp - rtofst) & ~0x7ff)) {
+					error = 4;
+				}
+
+				/*
+				 * Merge MSB (byte 0) with op-code,
+				 * ignoring top 5 bits of address.
+				 * Then hide the op-code
+				 */
+				rtval[rtp] = rtval[rtp+2] |
+						((rtval[rtp] & 0x07)<<5);
+				rtflg[rtp+2] = 0;
 				rtofst += 1;
+				break;
+
+			default:
+				error = 5;
+				break;
 			}
 		}
 
@@ -387,14 +424,6 @@ relr()
 			if (r != (addr_t) ~0x7F && r != 0)
 				error = 2;
 		}
-
-		/*
-		 * Page Relocation Error Checking
-		 */
-		if (mode & R_PAG0 && (relv & ~0xFF || paga || pags))
-			error = 3;
-		if (mode & R_PAG  && (relv & ~0xFF))
-			error = 4;
 
 		/*
 		 * Error Processing
@@ -423,7 +452,8 @@ char *errmsg[] = {
 	"Unsigned Byte error",
 	"Byte PCR relocation error",
 	"Page0 relocation error",
-	"Page Mode relocation error"
+	"Page Mode relocation error",
+	"Undefined Extended Mode error"
 };
 
 
@@ -976,8 +1006,8 @@ char *str;
 	 * Print symbol if symbol based
 	 */
 	if (mode & R_SYM) {
-		fprintf(fptr, " for symbol  %.*s\n",
-			NCPS, &s[rindex]->s_id[0]);
+		fprintf(fptr, " for symbol  %s\n",
+			&s[rindex]->s_id[0]);
 	} else {
 		fprintf(fptr, "\n");
 	}
@@ -985,10 +1015,12 @@ char *str;
 	/*
 	 * Print Ref Info
 	 */
+/*         111111111122222222223333333333444444444455555555556666666666777*/
+/*123456789012345678901234567890123456789012345678901234567890123456789012*/
 	fprintf(fptr,
-		"         file        module      area        offset\n");
+"         file              module            area              offset\n");
 	fprintf(fptr,
-		"  Refby  %-8.8s    %-8.8s    %-8.8s    ",
+"  Refby  %-14.14s    %-14.14s    %-14.14s    ",
 			hp->h_lfile->f_idp,
 			&hp->m_id[0],
 			&a[aindex]->a_bap->a_id[0]);
@@ -1002,8 +1034,10 @@ char *str;
 	} else {
 		raxp = a[rindex];
 	}
+/*         111111111122222222223333333333444444444455555555556666666666777*/
+/*123456789012345678901234567890123456789012345678901234567890123456789012*/
 	fprintf(fptr,
-		"  Defin  %-8.8s    %-8.8s    %-8.8s    ",
+"  Defin  %-14.14s    %-14.14s    %-14.14s    ",
 			raxp->a_bhp->h_lfile->f_idp,
 			&raxp->a_bhp->m_id[0],
 			&raxp->a_bap->a_id[0]);
@@ -1125,10 +1159,12 @@ char *str;
 	/*
 	 * Print PgDef Info
 	 */
+/*         111111111122222222223333333333444444444455555555556666666666777*/
+/*123456789012345678901234567890123456789012345678901234567890123456789012*/
 	fprintf(fptr,
-		"         file        module      pgarea      pgoffset\n");
+"         file              module            pgarea            pgoffset\n");
 	fprintf(fptr,
-		"  PgDef  %-8.8s    %-8.8s    %-8.8s    ",
+"  PgDef  %-14.14s    %-14.14s    %-14.14s    ",
 			thp->h_lfile->f_idp,
 			&thp->m_id[0],
 			&sdp.s_area->a_id[0]);

@@ -1,7 +1,7 @@
 /* h8ext.c */
 
 /*
- * (C) Copyright 1994-1995
+ * (C) Copyright 1994-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 char	*cpu	= "Hitachi H8/3xx";
 char	*dsft	= "ASM";

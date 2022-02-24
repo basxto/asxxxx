@@ -1,19 +1,24 @@
 /* asdata.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
  */
 
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
 #include <alloc.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 /*)Module	asdata.c
  *
@@ -83,6 +88,10 @@ int	sflag;		/*	-s, generate symbol table flag
 			 */
 int	pflag;		/*	-p, enable listing pagination
 			 */
+int	wflag;		/*	-w, enable wide listing format
+			 */
+int	zflag;		/*	-z, enable symbol case sensitivity
+			 */
 int	xflag;		/*	-x, listing radix flag
 			 */
 int	fflag;		/*	-f(f), relocations flagged flag
@@ -144,7 +153,7 @@ char	module[NCPS];	/*	module name string
  *	struct	mne
  *	{
  *		struct	mne *m_mp;	Hash link
- *		char	m_id[NCPS];	Mnemonic
+ *		char *	m_id;		Mnemonic (JLH)
  *		char	m_type;		Mnemonic subtype
  *		char	m_flag;		Mnemonic flags
  *		addr_t	m_valu;		Value
@@ -169,7 +178,7 @@ struct	mne	*mnehash[NHASH];
  *	{
  *		struct	sym  *s_sp;	Hash link
  *		struct	tsym *s_tsym;	Temporary symbol link
- *		char	s_id[NCPS];	Symbol
+ *		char	*s_id;		Symbol (JLH)
  *		char	s_type;		Symbol subtype
  *		char	s_flag;		Symbol flags
  *		struct	area *s_area;	Area line, 0 if absolute
@@ -178,7 +187,8 @@ struct	mne	*mnehash[NHASH];
  *	};
  */
 struct	sym	sym[] = {
-	NULL,	NULL,	".",	S_USER,	S_END,	NULL,	0,	0
+	NULL,	NULL,	".",	    S_USER, 0,			NULL,0,0,
+	NULL,	NULL,	".__.ABS.", S_USER, S_ASG|S_GBL|S_END,	NULL,0,0
 };
 
 struct	sym	*symp;		/*	pointer to a symbol structure
@@ -204,7 +214,7 @@ struct	sym *symhash[NHASH];	/*	array of pointers to NHASH
  *	struct	area
  *	{
  *		struct	area *a_ap;	Area link
- *		char	a_id[NCPS];	Area Name
+ *		char *	a_id;		Area Name
  *		int	a_ref;		Reference number
  *		addr_t	a_size;		Area size
  *		addr_t	a_fuzz;		Area fuzz
@@ -256,8 +266,6 @@ char	ctype[128] = {
  *	an array of characters which
  *	perform the case translation function
  */
-#if	CASE_SENSITIVE
-#else
 char	ccase[128] = {
 /*NUL*/	'\000',	'\001',	'\002',	'\003',	'\004',	'\005',	'\006',	'\007',
 /*BS*/	'\010',	'\011',	'\012',	'\013',	'\014',	'\015',	'\016',	'\017',
@@ -276,4 +284,3 @@ char	ccase[128] = {
 /*p*/	'\160',	'\161',	'\162',	'\163',	'\164',	'\165',	'\166',	'\167',
 /*x*/	'\170',	'\171',	'\172',	'\173',	'\174',	'\175',	'\176',	'\177'
 };	
-#endif

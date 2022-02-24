@@ -1,7 +1,7 @@
 /* M16EXT:C */
 
 /*
- * (C) Copyright 1991-1995
+ * (C) Copyright 1991-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
-#include "asm.h"
+#include "asxxxx.h"
 
 char	*cpu	= "Motorola 68HC16";
 char	*dsft	= "ASM";

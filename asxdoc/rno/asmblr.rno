@@ -174,11 +174,11 @@ The legal characters for defining labels are:
 .break;.indent 8;__ (underscore)
 
 
-A label may be any length, however, only the first eight (8) characters
+A label may be any length, however only the first 79 characters
 are significant and, therefore must be unique among all labels in the
 source program (not necessarily among separately compiled modules).
 An error code(s)
-(m#or#p) will be generated in the assembly listing if the first eight
+(m#or#p) will be generated in the assembly listing if the first 79
 characters in two or more labels are the same.  The m code is caused
 by the redeclaration of the symbol or its reference by another statement.
 The p code is generated because the symbols location is changing on each
@@ -256,9 +256,9 @@ The following characters are legal in ASxxxx source programs:
 .list 1
 .list element
 The letters A through Z.  Both upper- and lower-case letters
-are acceptable.  The assemblers are not case sensitive, i.e.
+are acceptable.  The assemblers, by default, are not case sensitive, i.e.
 ABCD and abcd are the same symbols. (The assemblers can be made
-case sensitive by recompiling with the appropriate switches.)
+case sensitive by using the -z command line option.)
 .list element
 The digits 0 through 9
 .list element
@@ -476,9 +476,9 @@ dollar signs (_$), periods (_.), and underscores (__) only.
 The first character of a symbol must not be a number
 (except in the case of local symbols).
 .list element
-The first eight characters of a symbol must be unique.
-A symbol can be written with more than eight legal characters,
-but the ninth and subsequent characters are ignored.
+The first 79 characters of a symbol must be unique.
+A symbol can be written with more than 79 legal characters,
+but the 80th and subsequent characters are ignored.
 .list element
 Spaces and Tabs must not be embedded within a symbol.
 .end list
@@ -773,7 +773,7 @@ _.module	string
 
 The .module directive causes the string to be included in the assemblers
 output file as an identifier for this particular object module.  The
-string may be from 1 to 8 characters in length. Only one identifier is
+string may be from 1 to 79 characters in length. Only one identifier is
 allowed per assembled module. The main use of this directive is to
 allow the linker to report a modules' use of undefined symbols. At link
 time all undefined symbols are reported and the modules referencing them
@@ -991,7 +991,7 @@ labels.
 The .area directive provides a means of defining and separating multiple
 programming and data sections. The name is the area label used by the
 assembler and the linker to collect code from various separately assembled
-modules into one section. The name may be from 1 to 8 characters in length.
+modules into one section. The name may be from 1 to 79 characters in length.
 
 The options are specified within parenthesis and separated by commas
 as shown in the following example:
@@ -1031,6 +1031,7 @@ Multiple invocations of the .area directive with the same name must
 specify the same options or leave the options field blank, this defaults
 to the previously specified options for this program area.
 
+.skip
 .tp 10
 The ASxxxx assemblers automatically provide two program sections:
 .skip;.left margin +24
@@ -1042,6 +1043,7 @@ symbols and their values.
 This program area is of type (REL,CON).
 .left margin -24
 
+.skip
 .tp 10
 The ASxxxx assemblers also automatically generate two symbols for each
 program area:
@@ -1051,6 +1053,9 @@ program area:
 .skip;indent -16
 'l___<area_>'######This is the length of the program area.
 .left margin -24
+
+.skip
+The .area names and options are never case sensitive.
 
 .header level 2;_.org Directive
 Format:
@@ -1283,7 +1288,7 @@ is equivalent to indexed addressing, where the dp register is the
 index register and the direct addressing is the offset.
 
 
-.tp 32
+.tp 35
 .header level 1;INVOKING ASXXXX
 
 The ASxxxx assemblers are command line oriented. The PC assemblers
@@ -1309,6 +1314,9 @@ The options are:
 	s	create symbol output file1.sym
 
 	p	disable listing pagination
+	w	wide listing format for symbol table
+
+	z	enable case sensitivity for symbols
 
 		relocatable reference flagging:
 

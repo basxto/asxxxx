@@ -26,7 +26,7 @@ following files:
 .list element;M09MCH.C
 .list element;M09ADR.C
 .list element;M09PST.C
-.list element;ASM.H
+.list element;ASXXXX.H
 .list element;ASMAIN.C
 .list element;ASLEX.C
 .list element;ASSYM.C
@@ -63,19 +63,6 @@ handle the details of file input_/output, symbol table generation,
 program_/data areas, expression analysis, and assembler directive
 processing.
 
-The assembler defaults to the not case sensitive mode.
-This may be altered by changing the case sensitivity flag in asm.h to
-.skip
-.literal
-	/*
-	 * Case Sensitivity Flag
-	 */
-	#define	CASE_SENSITIVE	1
-.end literal
-
-The assemblers and linker should be compiled with the same
-case sensitivity option.
-
 
 .header level 1;Building ASLINK
 
@@ -99,17 +86,4 @@ following files:
 .list element;LKIHX.C
 .end list
 
-
-The linker defaults to the not case sensitive mode.  This may be altered
-by changing the case sensitivity flag in aslink.h to
-.skip
-.literal
-	/*
-	 * Case Sensitivity Flag
-	 */
-	#define	CASE_SENSITIVE	1
-.end literal
-
-The linker and assemblers should be compiled with the same
-case sensitivity option.
 

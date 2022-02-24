@@ -1,7 +1,7 @@
 /* m6816.h */
 
 /*
- * (C) Copyright 1991-1995
+ * (C) Copyright 1991-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,7 +12,7 @@
 /*)BUILD
 	$(PROGRAM) =	AS6816
 	$(INCLUDE) = {
-		ASM.H
+		ASXXXX.H
 		M6816.H
 	}
 	$(FILES) = {
@@ -29,7 +29,7 @@
 		ASLIST.C
 		ASOUT.C
 	}
-	$(STACK) = 2000
+	$(STACK) = 3000
 */
 
 /*

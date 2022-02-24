@@ -1,6 +1,6 @@
 /* M12MCH:C */
 /*
- * (C) Copyright 1989-1996
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
-#include "asm.h"
+#include "asxxxx.h"
 #include "m6812.h"
 
 #define	NB	512
@@ -79,7 +79,7 @@ struct mne *mp;
 	case S_BRA:
 		expr(&e1, 0);
 		outab(op);
-		if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
+		if (mchpcr(&e1)) {
 			v1 = e1.e_addr - dot.s_addr - 1;
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
@@ -95,7 +95,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(PAGE2);
 		outab(op);
-		if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
+		if (mchpcr(&e1)) {
 			v1 = e1.e_addr - dot.s_addr - 2;
 			outaw(v1);
 		} else {
@@ -324,7 +324,7 @@ struct mne *mp;
 		expr(&e3, 0);
 		genout(cpg, op, rf, &e1);
 		outrb(&e2, R_NORM);
-		if (e3.e_base.e_ap == NULL || e3.e_base.e_ap == dot.s_area) {
+		if (mchpcr(&e3)) {
 			v3 = e3.e_addr - dot.s_addr - 1;
 			if ((v3 < -128) || (v3 > 127))
 				aerr();
@@ -831,6 +831,31 @@ getbit()
 		++bp;
 	}
 	return (f);
+}
+
+/*
+ * Branch/Jump PCR Mode Check
+ */
+int
+mchpcr(esp)
+register struct expr *esp;
+{
+	if (esp->e_base.e_ap == dot.s_area) {
+		return(1);
+	}
+	if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+		/*
+		 * Absolute Destination
+		 *
+		 * Use the global symbol '.__.ABS.'
+		 * of value zero and force the assembler
+		 * to use this absolute constant as the
+		 * base value for the relocation.
+		 */
+		esp->e_flag = 1;
+		esp->e_base.e_sp = &sym[1];
+	}
+	return(0);
 }
 
 /*

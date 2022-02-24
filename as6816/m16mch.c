@@ -1,7 +1,7 @@
 /* M16MCH:C */
 
 /*
- * (C) Copyright 1991-1996
+ * (C) Copyright 1991-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
-#include "asm.h"
+#include "asxxxx.h"
 #include "m6816.h"
 
 #define	NB	512
@@ -165,7 +165,7 @@ struct mne *mp;
 			mchubyt(&e2);
 			outrb(&e2, R_USGN);
 			outrw(&e1, R_NORM);
-			if (mchabs(&e3)) {
+			if (mchpcr(&e3)) {
 				/*
 				 * pc     = address following instruction - 6
 				 *        = (dot.s_addr + 2) - 6
@@ -194,7 +194,7 @@ struct mne *mp;
 			if (mchindx(t1, &e1)) {
 				t1 |= T_IND16;
 			} else {
-				if (mchabs(&e3)) {
+				if (mchpcr(&e3)) {
 					vn = e3.e_addr - dot.s_addr - 4;
 					if ((vn < -128) || (vn > 127)) {
 						t1 |= T_IND16;
@@ -215,7 +215,7 @@ struct mne *mp;
 				outrb(&e2, R_USGN);
 				mchubyt(&e1);
 				outrb(&e1, R_USGN);
-				if (mchabs(&e3)) {
+				if (mchpcr(&e3)) {
 					/*
 					 * pc     = address following instruction - 4
 					 *        = (dot.s_addr + 1) - 4
@@ -245,7 +245,7 @@ struct mne *mp;
 				mchubyt(&e2);
 				outrb(&e2, R_USGN);
 				outrw(&e1, R_NORM);
-				if (mchabs(&e3)) {
+				if (mchpcr(&e3)) {
 					/*
 					 * pc     = address following instruction - 6
 					 *        = (dot.s_addr + 2) - 6
@@ -290,8 +290,8 @@ struct mne *mp;
 		if (more()) {
 			comma();
 			t2 = addr(&e2);
-			if ((t1 != T_IMM) || !mchabs(&e1) ||
-			    (t2 != T_IMM) || !mchabs(&e2))
+			if ((t1 != T_IMM) || !mchcon(&e1) ||
+			    (t2 != T_IMM) || !mchcon(&e2))
 				aerr();
 			outab(op);
 			outab(((e1.e_addr << 4) & 0xF0) | (e2.e_addr & 0x0F));
@@ -577,7 +577,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(cpg);
 		outab(op);
-		if (mchabs(&e1)) {
+		if (mchpcr(&e1)) {
 			/*
 			 * pc     = address following instruction - 4
 			 *        = (dot.s_addr + 2) - 4
@@ -608,7 +608,7 @@ struct mne *mp;
 	case S_BSR:
 		expr(&e1, 0);
 		outab(op);
-		if (mchabs(&e1)) {
+		if (mchpcr(&e1)) {
 			/*
 			 * pc     = address following instruction - 2
 			 *        = (dot.s_addr + 1) - 2
@@ -647,27 +647,27 @@ struct mne *mp;
 }
 
 /*
- * Check if argument is absolute
+ * Check if argument is a constant
  */
 int
-mchabs(e1)
+mchcon(e1)
 struct expr *e1;
 {
-	if (e1->e_base.e_ap == NULL || e1->e_base.e_ap == dot.s_area) {
-		return(-1);
+	if (e1->e_base.e_ap == NULL && e1->e_flag == 0) {
+		return(1);
 	}
 	return(0);
 }
 
 /*
- * Addressing error if argument is absolute
+ * Addressing error if argument is a constant
  * and unsigned byte is greater than 0x00FF
  */
 VOID
 mchubyt(e1)
 struct expr *e1;
 {
-	if (mchabs(e1) && (e1->e_addr & 0xFF00)) {
+	if (mchcon(e1) && (e1->e_addr & 0xFF00)) {
 		aerr();
 	}
 }
@@ -790,6 +790,31 @@ getbit()
 		++bp;
 	}
 	return (f);
+}
+
+/*
+ * Branch/Jump PCR Mode Check
+ */
+int
+mchpcr(esp)
+register struct expr *esp;
+{
+	if (esp->e_base.e_ap == dot.s_area) {
+		return(1);
+	}
+	if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+		/*
+		 * Absolute Destination
+		 *
+		 * Use the global symbol '.__.ABS.'
+		 * of value zero and force the assembler
+		 * to use this absolute constant as the
+		 * base value for the relocation.
+		 */
+		esp->e_flag = 1;
+		esp->e_base.e_sp = &sym[1];
+	}
+	return(0);
 }
 
 /*

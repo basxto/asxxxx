@@ -1,12 +1,17 @@
 /* lkdata.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *	John L. Hartman	(JLH)
+ *	jhartman@compuserve.com
+ *
  */
 
 #include <stdio.h>
@@ -48,6 +53,10 @@ int	pflag;		/*	print linker command file flag
 			 */
 int	uflag;		/*	Listing relocation flag
 			 */
+int	wflag;		/*	Enable wide format listing
+			 */
+int	zflag;		/*	Enable symbol case sensitivity
+			 */
 int	radix;		/*	current number conversion radix:
 			 *	2 (binary), 8 (octal), 10 (decimal),
 			 *	16 (hexadecimal)
@@ -67,7 +76,14 @@ addr_t	rtval[NTXT];	/*	data associated with relocation
 			 */
 int	rtflg[NTXT];	/*	indicates if rtval[] value is
 			 *	to be sent to the output file.
-			 *	(always set in this linker)
+			 */
+char	rtbuf[NMAX];	/*	S19/IHX output buffer
+			 */
+addr_t	rtadr0 = 0;	/*	rtbuf[] processing
+			 */
+addr_t	rtadr1 = 0;	/*
+			 */
+addr_t	rtadr2 = 0;	/*
 			 */
 int	hilo;		/*	REL file byte ordering
 			 */
@@ -158,7 +174,7 @@ FILE	*tfp;		/*	File handle for input
  *		struct	areax **a_list;		Area list
  *		int	h_nglob;		# of global symbols
  *		struct	sym   **s_list;		Global symbol list
- *		char	m_id[NCPS];		Module name
+ *		char *	m_id;			Module name
  *	};
  */
 struct	head	*headp;	/*	The pointer to the first
@@ -188,7 +204,7 @@ struct	head	*hp;	/*	Pointer to the current
  *		addr_t	a_size;			Total size of the area
  *		char	a_type;			Area subtype
  *		char	a_flag;			Flag byte
- *		char	a_id[NCPS];		Name
+ *		char *	a_id;			Name
  *	};
  */
 struct	area	*areap;	/*	The pointer to the first
@@ -245,7 +261,8 @@ struct	areax	*axp;	/*	Pointer to the current
  *		char	s_type;			Symbol subtype
  *		char	s_flag;			Flag byte
  *		addr_t	s_addr;			Address
- *		char	s_id[NCPS];		Name
+ *		char	*s_id;			Name (JLH)
+ *		char	*m_id;			Module
  *	};
  */
 struct	sym *symhash[NHASH]; /*	array of pointers to NHASH
@@ -438,8 +455,6 @@ char	ctype[128] = {
  *	an array of characters which
  *	perform the case translation function
  */
-#if	CASE_SENSITIVE
-#else
 char	ccase[128] = {
 /*NUL*/	'\000',	'\001',	'\002',	'\003',	'\004',	'\005',	'\006',	'\007',
 /*BS*/	'\010',	'\011',	'\012',	'\013',	'\014',	'\015',	'\016',	'\017',
@@ -458,4 +473,3 @@ char	ccase[128] = {
 /*p*/	'\160',	'\161',	'\162',	'\163',	'\164',	'\165',	'\166',	'\167',
 /*x*/	'\170',	'\171',	'\172',	'\173',	'\174',	'\175',	'\176',	'\177'
 };	
-#endif

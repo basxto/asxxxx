@@ -1,7 +1,7 @@
 /* m04mch.c */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1998
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
-#include "asm.h"
+#include "asxxxx.h"
 #include "m6804.h"
 
 /*
@@ -176,7 +176,7 @@ struct mne *mp;
 		if (type == S_BYPM)
 			v1 = 0x81;
 		outab(v1);
-		if (e2.e_base.e_ap == NULL || e2.e_base.e_ap == dot.s_area) {
+		if (mchpcr(&e2)) {
 			v2 = e2.e_addr - dot.s_addr - 1;
 			if ((v2 < -128) || (v2 > 127))
 				aerr();
@@ -204,7 +204,7 @@ struct mne *mp;
 		outab(op + (e1.e_addr & 0x07));
 		outrb(&e2, R_USGN);
 		if (type == S_BTB) {
-			if (e3.e_base.e_ap == NULL || e3.e_base.e_ap == dot.s_area) {
+			if (e3.e_base.e_ap == dot.s_area) {
 				v3 = e3.e_addr - dot.s_addr - 1;
 				if ((v3 < -128) || (v3 > 127))
 					aerr();
@@ -222,6 +222,30 @@ struct mne *mp;
 	}
 }
 
+/*
+ * Branch/Jump PCR Mode Check
+ */
+int
+mchpcr(esp)
+register struct expr *esp;
+{
+	if (esp->e_base.e_ap == dot.s_area) {
+		return(1);
+	}
+	if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+		/*
+		 * Absolute Destination
+		 *
+		 * Use the global symbol '.__.ABS.'
+		 * of value zero and force the assembler
+		 * to use this absolute constant as the
+		 * base value for the relocation.
+		 */
+		esp->e_flag = 1;
+		esp->e_base.e_sp = &sym[1];
+	}
+	return(0);
+}
 
 /*
  * The next character must be a

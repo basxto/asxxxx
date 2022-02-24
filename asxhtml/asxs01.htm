@@ -2,10 +2,10 @@
 <HEAD>
 <TITLE></TITLE>
 </HEAD>
-<BODY>
+<BODY BGCOLOR="#C0C0C0">
 
-<A href="http://shop-pdp.kent.edu/">
-<IMG width=343 height=58 border=0 SRC="welcom.gif" ALT = "Welcome"></A>
+<A href="../home.htm">
+<IMG width=343 height=58 border=0 SRC="welcom.gif" ALT="Welcome"></A>
 
 <H2>The Assembler Description</H2>
 
@@ -37,7 +37,7 @@ number of bytes for each assembled source line is estimated.
 (external) using the ASxxxx switch -g, otherwise undefined  sym-
 bols will be flagged as errors during succeeding passes.
   
-<H5><A HREF= #Assemblers> => Section Index</A></H5>
+<H5><A HREF= #Assemblers> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Pass2"></A><FONT COLOR="#FF0000">Assembly Pass 2</FONT>
 
@@ -49,7 +49,7 @@ struction allows multiple forms based upon the relative distance
 to the addressed location, or other factors.   Pass  2  resolves
 these cases and determines the address of all symbols.
   
-<H5><A HREF= #Assemblers> => Section Index</A></H5>
+<H5><A HREF= #Assemblers> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Pass3"></A><FONT COLOR="#FF0000">Assembly Pass 3</FONT>
 
@@ -63,7 +63,7 @@ the  relocatable assembled code, the linker ASLINK will use this
 information to generate an absolute load file (Motorola or Intel
 formats).
   
-<H5><A HREF= #Assemblers> => Section Index</A></H5>
+<H5><A HREF= #Assemblers> =&gt; Section Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -109,7 +109,7 @@ operator.
 time.  Each statement causes a particular operation to  be  per-
 formed.  
 
-<H5><A HREF= #Source> => Section Index</A></H5>
+<H5><A HREF= #Source> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Label"></A><FONT COLOR="#FF0000">Label Field</FONT>  -
 
@@ -182,11 +182,11 @@ The legal characters for defining labels are:
         $ (Dollar sign) 
         _ (underscore) 
 
-   A  label may be any length, however, only the first eight (8)
+   A  label  may  be  any  length,  however,  only the first  79
 characters are significant and, therefore must be  unique  among
 all   labels  in  the  source  program  (not  necessarily  among
 separately compiled modules).  An error code(s) (m or p) will be
-generated  in the assembly listing if the first eight characters
+generated  in the assembly  listing if the  first  79 characters
 in two or more labels are the same.  The m code is caused by the
 redeclaration  of  the symbol or its reference by another state-
 ment.  The p code is generated because the symbols  location  is
@@ -199,7 +199,7 @@ later section.
    The  label  must  not  start  with  the  sequence $$, as this
 represents the temporary radix 16 for constants.  
 
-<H5><A HREF= #Source> => Section Index</A></H5>
+<H5><A HREF= #Source> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Operator"></A><FONT COLOR="#FF0000">Operator Field</FONT>  -
 
@@ -219,7 +219,7 @@ the operator field from the preceeding and following fields.
 
    An operator is terminated by a space, tab or end of line.  
 
-<H5><A HREF= #Source> => Section Index</A></H5>
+<H5><A HREF= #Source> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Operand"></A><FONT COLOR="#FF0000">Operand Field</FONT>  -
 
@@ -247,7 +247,7 @@ field and defines the beginning of the comment field.   When  no
 comment  field  follows,  the operand field is terminated by the
 end of the source line.  
 
-<H5><A HREF= #Source> => Section Index</A></H5>
+<H5><A HREF= #Source> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Comment"></A><FONT COLOR="#FF0000">Comment Field</FONT>  -
 
@@ -258,7 +258,7 @@ the end of the line.  This field is optional and may contain any
    Comments  do not affect assembly processing or program execu-
 tion.  
 
-<H5><A HREF= #Source> => Section Index</A></H5>
+<H5><A HREF= #Source> =&gt; Section Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -289,7 +289,7 @@ pressions.
 
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <H4><B><PRE>
-<A NAME = "#Character"></A><FONT COLOR="#FF0000">Character Set</FONT> 
+<A NAME = "Character"></A><FONT COLOR="#FF0000">Character Set</FONT> 
 
    The following characters are legal in ASxxxx source programs: 
 
@@ -360,11 +360,11 @@ Table 3         Assembler Operators
 Table 4         Unary Operators 
 ---------------------------------------------------------------- 
 
-        <   Left bracket        <FEDC   Produces  the lower byte
+        &lt;   Left bracket        &lt;FEDC   Produces  the lower byte
                                         value of the expression.
                                         (DC) 
 
-        >   Right bracket       >FEDC   Produces  the upper byte
+        &gt;   Right bracket       &gt;FEDC   Produces  the upper byte
                                         value of the expression.
                                         (FE) 
 
@@ -392,11 +392,11 @@ Table 4         Unary Operators
 Table 5         Binary Operators 
 ---------------------------------------------------------------- 
 
-        <<  Double          0800 << 4   Produces the 4 bit 
+        &lt;&lt;  Double          0800 &lt;&lt; 4   Produces the 4 bit 
             Left bracket                left-shifted   value  of
                                         0800.  (8000) 
 
-        >>  Double          0800 >> 4   Produces the 4 bit 
+        &gt;&gt;  Double          0800 &gt;&gt; 4   Produces the 4 bit 
             Right bracket               right-shifted  value  of
                                         0800.  (0080) 
 
@@ -414,7 +414,7 @@ Table 5         Binary Operators
                                         operator.        (signed
                                         16-bit quotient) 
 
-        &   Ampersand       A & B       Logical AND operator.  
+        &amp;   Ampersand       A &amp; B       Logical AND operator.  
 
         |   Bar             A | B       Logical OR operator.  
 
@@ -432,7 +432,7 @@ Table 6         Temporary Radix Operators
 
         $%,   0b, 0B            Binary radix operator.  
 
-        $&,   0o, 0O, 0q, 0Q    Octal radix operator.  
+        $&amp;,   0o, 0O, 0q, 0Q    Octal radix operator.  
 
         $#,   0d, 0D            Decimal radix operator.  
 
@@ -448,7 +448,7 @@ Table 6         Temporary Radix Operators
 
 ---------------------------------------------------------------- 
 
-<H5><A HREF= #Symbols> => Section Index</A></H5>
+<H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "User"></A><FONT COLOR="#FF0000">User-Defined Symbols</FONT> 
 
@@ -466,14 +466,14 @@ The following rules govern the creation of user-defined symbols:
      2.  The  first  character  of a symbol must not be a number
          (except in the case of local symbols).  
 
-     3.  The  first eight characters of a symbol must be unique.
-         A symbol can be written  with  more  than  eight  legal
-         characters, but the ninth and subsequent characters are
+     3.  The  first  79  characters of a  symbol must be unique.
+         A  symbol  can be  written  with  more  than  79  legal
+         characters, but the 80th  and subsequent characters are
          ignored.  
 
      4.  Spaces and Tabs must not be embedded within a symbol.  
 
-<H5><A HREF= #Symbols> => Section Index</A></H5>
+<H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Local"></A><FONT COLOR="#FF0000">Local Symbols</FONT> 
 
@@ -528,7 +528,7 @@ Example of local symbols:
                 deca
                 bne     1$
 
-<H5><A HREF= #Symbols> => Section Index</A></H5>
+<H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Current"></A><FONT COLOR="#FF0000">Current Location Counter</FONT> 
 
@@ -619,7 +619,7 @@ num3:   .word   0               ;The label num3 has
    The  .blkb  and .blkw directives are the preferred methods of
 allocating space.  
 
-<H5><A HREF= #Symbols> => Section Index</A></H5>
+<H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Numbers"><A/><FONT COLOR="#FF0000">Numbers</FONT>
 
@@ -637,7 +637,7 @@ numbers may (but need not) be preceeded by a plus sign.
    Numbers are always considered to be absolute values, therefor
 they are never relocatable.  
 
-<H5><A HREF= #Symbols> => Section Index</A></H5>
+<H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Terms"></A><FONT COLOR="#FF0000">Terms</FONT>
 
@@ -668,7 +668,7 @@ following:
 
      5.  A unary operator followed by a symbol or number.  
 
-<H5><A HREF= #Symbols> => Section Index</A></H5>
+<H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "Expressions"></A><FONT COLOR="#FF0000">Expressions</FONT>
 
@@ -688,12 +688,12 @@ Expressions are evaluate with an operand hierarchy as follows:
         +       -               addition and
                                 subtraction second.
 
-        <<      >>              left shift and
+        &lt;&lt;      &gt;&gt;              left shift and
                                 right shift third.
 
         ^                       exclusive or fourth.
 
-        &                       logical and fifth.
+        &amp;                       logical and fifth.
 
         |                       logical or last
 
@@ -743,7 +743,7 @@ tinctions are important:
          tially  defined following assembly and must be resolved
          at link time.  
 
-<H5><A HREF= #Symbols> => Section Index</A></H5>
+<H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -752,20 +752,9 @@ tinctions are important:
 <P><A HREF="asmblr.htm #JUMP">
 <IMG width=32 height=32 border=0 SRC="spcshp.gif" ALIGN=bottom></A>
 <B>...  Exit the ASxxxx Documentation</B></A></P>
-<P><A href="http://shop-pdp.kent.edu/">
+<P><A href="../home.htm">
 <IMG width=32 height=32 border=0 SRC="home.gif" ALIGN=bottom></A>
 <B>...  Home Page</B></P>
 </H3>
 </BODY> 
 </HTML>
-
-
-
-
-
-
-
-
-
-
-
