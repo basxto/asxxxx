@@ -9,9 +9,9 @@
  * Kent, Ohio  44240
  *
  *   With enhancements from
+ *
  *	John L. Hartman	(JLH)
  *	jhartman@compuserve.com
- *
  */
 
 #include <stdio.h>
@@ -38,6 +38,7 @@
  *		sym *	lookup()
  *		mne *	mlookup()
  *		VOID *	new()
+ *		sym *	slookup()
  *		char *	strsto()
  *		int	symeq()
  *		VOID	syminit()
@@ -204,6 +205,48 @@ char *id;
 		if(symeq(id, mp->m_id, 0))
 			return (mp);
 		mp = mp->m_mp;
+	}
+	return (NULL);
+}
+
+/*)Function	sym *	slookup(id)
+ *
+ *		char *	id		symbol name string
+ *
+ *	The function lookup() searches the symbol hash tables for
+ *	a symbol name match returning a pointer to the sym structure
+ *	eles it returns a NULL.
+ *
+ *	local variables:
+ *		int	h		computed hash value
+ *		sym *	sp		pointer to a sym structure
+ *
+ *	global varaibles:
+ *		sym *	symhash[]	array of pointers to NHASH
+ *					linked symbol lists
+ *		int	zflag		enable symbol case sensitivity
+ *
+ *	functions called:
+ *		int	hash()		assym.c
+ *		int	symeq()		assym.c
+ *
+ *	side effects:
+ *		none
+ */
+
+struct sym *
+slookup(id)
+char *id;
+{
+	register struct sym *sp;
+	register int h;
+
+	h = hash(id, zflag);
+	sp = symhash[h];
+	while (sp) {
+		if(symeq(id, sp->s_id, zflag))
+			return (sp);
+		sp = sp->s_sp;
 	}
 	return (NULL);
 }

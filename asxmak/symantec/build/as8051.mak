@@ -10,8 +10,8 @@ DEBUG		= 0
 NDEBUG		= 1
 !ENDIF
 
-PROJ		= AS8051
-APPTYPE		= DOS EXE
+PROJ		= as8051
+APPTYPE		= DOSX EXE
 PROJTYPE	= EXE
 
 CC		= SC
@@ -37,7 +37,7 @@ CREATETARGETDIR	=
 
 LIBS		= 
 
-CFLAGS		=  -ms -C -S -3 -a2 -c -g -gd 
+CFLAGS		=  -mx -C -S -3 -a4 -c -g -gd 
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
@@ -56,7 +56,7 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 
 LIBS		= 
 
-CFLAGS		=  -A -r -J -ms -o+time -3 -a2 -c 
+CFLAGS		=  -A -r -J -mx -o+time -3 -a4 -c 
 LFLAGS		=  /DE /PACKF /XN
 DEFINES		= 
 !ENDIF
@@ -69,7 +69,7 @@ DEBUGGERFLAGS	=
 AFLAGS		= $(CFLAGS) 
 HELPFLAGS	= 
 
-MODEL		= S
+MODEL		= N
 
 PAR		= PROJS BATS OBJS
 
@@ -186,7 +186,7 @@ clean:
 		-del $(TARGETDIR)\$$SCW$$.$(PROJTYPE)
 		-del $(TARGETDIR)\$(PROJ).CLE
 		-del $(OUTPUTDIR)\SCPH.SYM
-		-del AS8051.dpd
+		-del as8051.dpd
 		-del $(OBJS)
 
 cleanres:
@@ -202,8 +202,8 @@ link:
 
 
 
-!IF EXIST (AS8051.dpd)
-!INCLUDE AS8051.dpd
+!IF EXIST (as8051.dpd)
+!INCLUDE as8051.dpd
 !ENDIF
 
 

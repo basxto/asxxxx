@@ -9,12 +9,15 @@
  * Kent, Ohio  44240
  *
  *   With enhancements from
+ *
  *	John L. Hartman	(JLH)
  *	jhartman@compuserve.com
  *
+ *	Bill McKinnon (BM)
+ *	w_mckinnon@conknet.com
  */
 
-#define	VERSION	"V02.30"
+#define	VERSION	"V03.00"
 
 /*)Module	asxxxx.h
  *
@@ -162,7 +165,7 @@ struct	area
 #define	R_PCR	0004
 
 #define	R_BYT1	0000		/* Byte count for R_BYTE = 1 */
-#define	R_BYT2	0010		/* Byte count for R_BYTE = 2 */
+#define	R_BYTX	0010		/* Byte count for R_BYTE = X */
 
 #define	R_SGND	0000		/* Signed Byte */
 #define	R_USGN	0020		/* Unsigned Byte */
@@ -177,7 +180,7 @@ struct	area
 /*
  *	Additional "R_" functionality is required to support
  *	some microprocesssor architectures.   The 'illegal'
- *	"R_" mode of R_WORD | R_BYT2 is used as a designator
+ *	"R_" mode of R_WORD | R_BYTX is used as a designator
  *	of the extended R_ modes.  The extended modes replace
  *	the PAGING modes and are being added in an adhoc manner
  *	as follows:
@@ -207,15 +210,17 @@ struct	area
 /* #define R_MSB  0200 */	/* output high byte */
 
 #define	R_J11	0010		/* JLH: 11 bit JMP and CALL (8051) */
-/* #define R_xxx  0050 */	/* Unused */
-/* #define R_xxx  0110 */	/* Unused */
-/* #define R_xxx  0150 */	/* Unused */
+#define R_J19   0050		/* BM:	19 bit JMP and CALL (DS80C390) */
+#define R_3BYTE 0110		/* 	3-Byte */
+#define R_4BYTE 0150		/*	4-Byte */
 
 /*
  * Listing Control Flags
  */
 
-#define	R_HIGH	0040000		/* High Byte */
+#define	R_HIGH	0010000		/* High Byte */
+#define	R_BYT3	0020000		/* 3rd  Byte */
+#define	R_BYT4	0040000		/* 4th  Byte */
 #define	R_RELOC	0100000		/* Relocation */
 
 #define	R_DEF	00		/* Global def. */
@@ -283,28 +288,29 @@ struct	sym
 				/* unused slot */
 				/* unused slot */
 
-#define	S_BYTE		5	/* .byte */
-#define	S_WORD		6	/* .word */
-#define	S_ASCII		7	/* .ascii */
-#define	S_ASCIZ		8	/* .asciz */
-#define	S_BLK		9	/* .blkb or .blkw */
-#define	S_INCL		10	/* .include */
-#define	S_DAREA		11	/* .area */
-#define	S_ATYP		12	/* .area type */
-#define	S_AREA		13	/* .area name */
-#define	S_GLOBL		14	/* .globl */
-#define	S_PAGE		15	/* .page */
-#define	S_TITLE		16	/* .title */
-#define	S_SBTL		17	/* .sbttl */
-#define	S_IF		18	/* .if */
-#define	S_ELSE		19	/* .else */
-#define	S_ENDIF		20	/* .endif */
-#define	S_EVEN		21	/* .even */
-#define	S_ODD		22	/* .odd */
-#define	S_RADIX		23	/* .radix */
-#define	S_ORG		24	/* .org */
-#define	S_MODUL		25	/* .module */
-#define	S_ASCIS		26	/* .ascis */
+#define	S_DATA		5	/* .byte, .word, .3byte, .4byte */
+#define	S_ASCII		6	/* .ascii */
+#define	S_ASCIZ		7	/* .asciz */
+#define	S_BLK		8	/* .blkb or .blkw */
+#define	S_INCL		9	/* .include */
+#define	S_DAREA		10	/* .area */
+#define	S_ATYP		11	/* .area type */
+#define	S_AREA		12	/* .area name */
+#define	S_GLOBL		13	/* .globl */
+#define	S_PAGE		14	/* .page */
+#define	S_TITLE		15	/* .title */
+#define	S_SBTL		16	/* .sbttl */
+#define	S_IF		17	/* .if */
+#define	S_ELSE		18	/* .else */
+#define	S_ENDIF		19	/* .endif */
+#define	S_EVEN		20	/* .even */
+#define	S_ODD		21	/* .odd */
+#define	S_RADIX		22	/* .radix */
+#define	S_ORG		23	/* .org */
+#define	S_MODUL		24	/* .module */
+#define	S_ASCIS		25	/* .ascis */
+#define	S_ERROR		26	/* .assume or .error */
+#define	S_BITS		27	/* .8bit, .16bit, .24bit, .32bit */
 
 
 /*
@@ -414,6 +420,14 @@ extern	int	xflag;		/*	-x, listing radix flag
 				 */
 extern	int	fflag;		/*	-f(f), relocations flagged flag
 				 */
+extern	int	a_bytes;	/*	REL file T Line address length
+				 */
+extern	addr_t	a_mask;		/*	Address Mask
+				 */
+extern	addr_t	s_mask;		/*	Sign Mask
+				 */
+extern	addr_t	v_mask;		/*	Value Mask
+				 */
 extern	addr_t	laddr;		/*	address of current assembler line,
 				 *	equate, or value of .if argument
 				 */
@@ -461,6 +475,8 @@ extern	int	cbt[NCODE];	/*	array of assembler relocation types
 extern	char	tb[NTITL];	/*	Title string buffer
 				 */
 extern	char	stb[NSBTL];	/*	Subtitle string buffer
+				 */
+extern	char	erb[NINPUT+4];	/*	Error string buffer
 				 */
 extern	char	symtbl[];	/*	string "Symbol Table"
 				 */
@@ -584,6 +600,7 @@ extern	struct	mne *	mlookup(char *id);
 extern	int		hash(char *p, int cflag);
 extern	struct	sym *	lookup(char *id);
 extern	char *		new(unsigned int n);
+extern	struct	sym *	slookup(char *id);
 extern	char *		strsto(char *str);
 extern	int		symeq(char *p1, char *p2, int cflag);
 extern	VOID		syminit(void);
@@ -604,6 +621,7 @@ extern	VOID		abscheck(struct expr *esp);
 extern	addr_t		absexpr(void);
 extern	VOID		clrexpr(struct expr *esp);
 extern	int		digit(int c, int r);
+extern	VOID		exprmasks(int n);
 extern	int		is_abs(struct expr *esp);
 extern	VOID		expr(struct expr *esp, int n);
 extern	int		oprio(int c);
@@ -611,32 +629,45 @@ extern	VOID		term(struct expr *esp);
 
 /* aslist.c */
 extern	VOID		list(void);
-extern	VOID		list1(char *wp, int *wpt, int nb, int f);
+extern	VOID		list1(char *wp, int *wpt, int nb, int n, int f);
 extern	VOID		list2(int t);
 extern	VOID		lstsym(FILE *fp);
 extern	VOID		slew(FILE *fp, int flag);
 
 /* asout.c */
-extern	int		hibyte(int n);
-extern	int		lobyte(int n);
+extern	int		lobyte(int v);
+extern	int		hibyte(int v);
+extern	int		thrdbyte(int v);
+extern	int		frthbyte(int v);
 extern	VOID		out(char *p, int n);
-extern	VOID		outab(int b);
 extern	VOID		outarea(struct area *ap);
-extern	VOID		outaw(int w);
 extern	VOID		outdp(struct area *carea, struct expr *esp);
 extern	VOID		outall(void);
 extern	VOID		outdot(void);
 extern	VOID		outbuf(char *s);
 extern	VOID		outchk(int nt, int nr);
 extern	VOID		outgsd(void);
+extern	VOID		outsym(struct sym *sp);
+extern	VOID		outab(int v);
+extern	VOID		outaw(int v);
+extern	VOID		outa3b(int v);
+extern	VOID		outa4b(int v);
+extern	VOID		outaxb(int i, int v);
+extern	VOID		outatxb(int i, int v);
 extern	VOID		outrb(struct expr *esp, int r);
 extern	VOID		outrw(struct expr *esp, int r);
-extern	VOID		outr11(struct expr *esp, int op, int r);	/* JLH */
-extern	VOID		outsym(struct sym *sp);
-extern	VOID		out_lb(int b, int n);
-extern	VOID		out_lw(int n, int t);
+extern	VOID		outr3b(struct expr *esp, int r);
+extern	VOID		outr4b(struct expr *esp, int r);
+extern	VOID		outrxb(int i, struct expr *esp, int r);
+extern	VOID		outr11(struct expr *esp, int op);	/* JLH */
+extern	VOID		outr19(struct expr *esp, int op);	/* BM */
+extern	VOID		out_lb(int v, int t);
+extern	VOID		out_lw(int v, int t);
+extern	VOID		out_l3b(int v, int t);
+extern	VOID		out_l4b(int v, int t);
+extern	VOID		out_lxb(int i, int v, int t);
 extern	VOID		out_rw(int n);
-extern	VOID		out_tw(int n);
+extern	VOID		out_txb(int i, int v);
 
 /* Machine dependent variables */
 
@@ -668,7 +699,6 @@ extern	int		main(int argc, char *argv[]);
 extern	char *		usetxt[];
 extern	VOID		usage(int n);
 */
-
 extern	int		dgt(int rdx, char *str, int n);
 
 #else
@@ -702,6 +732,7 @@ extern	struct	mne *	mlookup();
 extern	int		hash();
 extern	struct	sym *	lookup();
 extern	char *		new();
+extern	struct	sym *	slookup();
 extern	char *		strsto();
 extern	int		symeq();
 extern	VOID		syminit();
@@ -722,6 +753,7 @@ extern	VOID		abscheck();
 extern	addr_t		absexpr();
 extern	VOID		clrexpr();
 extern	int		digit();
+extern	VOID		exprmasks();
 extern	int		is_abs();
 extern	VOID		expr();
 extern	int		oprio();
@@ -735,26 +767,39 @@ extern	VOID		lstsym();
 extern	VOID		slew();
 
 /* asout.c */
-extern	int		hibyte();
 extern	int		lobyte();
+extern	int		hibyte();
+extern	int		thrdbyte();
+extern	int		frthbyte();
 extern	VOID		out();
-extern	VOID		outab();
 extern	VOID		outarea();
-extern	VOID		outaw();
 extern	VOID		outdp();
 extern	VOID		outall();
 extern	VOID		outdot();
 extern	VOID		outbuf();
 extern	VOID		outchk();
 extern	VOID		outgsd();
+extern	VOID		outsym();
+extern	VOID		outab();
+extern	VOID		outaw();
+extern	VOID		outa3b();
+extern	VOID		outa4b();
+extern	VOID		outaxb();
+extern	VOID		outatxb();
 extern	VOID		outrb();
 extern	VOID		outrw();
+extern	VOID		outr3b();
+extern	VOID		outr4b();
+extern	VOID		outrxb();
 extern	VOID		outr11();	/* JLH */
-extern	VOID		outsym();
+extern	VOID		outr19();	/* BM */
 extern	VOID		out_lb();
 extern	VOID		out_lw();
+extern	VOID		out_l3b();
+extern	VOID		out_l4b();
+extern	VOID		out_lxb();
 extern	VOID		out_rw();
-extern	VOID		out_tw();
+extern	VOID		out_txb();
 
 /* Machine dependent variables */
 
@@ -786,7 +831,6 @@ extern	int		main();
 extern	char *		usetxt[];
 extern	VOID		usage();
 */
-
 extern	int		dgt();
 
 #endif

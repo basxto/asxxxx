@@ -9,6 +9,7 @@
  * Kent, Ohio  44240
  *
  *   With enhancements from
+ *
  *	John L. Hartman	(JLH)
  *	jhartman@compuserve.com
  *
@@ -51,6 +52,7 @@
  *	local variables:
  *		int *	wp		pointer to the assembled data bytes
  *		int *	wpt		pointer to the data byte mode
+ *		int	n		number of bytes listed per line
  *		int	nb		computed number of assembled bytes
  *		int	l_addr		laddr (int) truncated to 2-bytes
  *
@@ -82,12 +84,47 @@
  *		Listing or symbol output updated.
  */
 
+/* The Output Formats
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+   |    |               |     | |
+ee XXXX xx xx xx xx xx xx LLLLL *************	HEX(16)
+ee 000000 ooo ooo ooo ooo LLLLL *************	OCTAL(16)
+ee  DDDDD ddd ddd ddd ddd LLLLL *************	DECIMAL(16)
+                     XXXX
+		   OOOOOO
+		    DDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+     |       |                  |     | |
+ee    XXXXXX xx xx xx xx xx xx xx LLLLL *********	HEX(24)
+ee   OO000000 ooo ooo ooo ooo ooo LLLLL *********	OCTAL(24)
+ee   DDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(24)
+                           XXXXXX
+			 OOOOOOOO
+			 DDDDDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+  |          |                  |     | |
+ee  XXXXXXXX xx xx xx xx xx xx xx LLLLL *********	HEX(32)
+eeOOOOO000000 ooo ooo ooo ooo ooo LLLLL *********	OCTAL(32)
+ee DDDDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(32)
+                         XXXXXXXX
+		      OOOOOOOOOOO
+		       DDDDDDDDDD
+*/
+
 VOID
 list()
 {
-	register char *wp;
+	register char *frmt, *wp;
 	register int *wpt;
-	register int nb;
+	register int n, nb;
 	register int l_addr;
 
 	if (lfp == NULL || lmode == NLIST)
@@ -125,7 +162,13 @@ list()
 	 * Source listing only option.
 	 */
 	if (lmode == SLIST) {
-		fprintf(lfp, "%24s%5u %s\n", "", line, ib);
+		switch(a_bytes) {
+		default:
+		case 2: frmt = "%24s%5u %s\n"; break;
+		case 3:
+		case 4: frmt = "%32s%5u %s\n"; break;
+		}
+		fprintf(lfp, frmt, "", line, ib);
 		return;
 	}
 	if (lmode == ALIST) {
@@ -133,9 +176,9 @@ list()
 	}
 
 	/*
-	 * Truncate (int) to 2-Bytes
+	 * Truncate (int) to N-Bytes
 	 */
-	l_addr = laddr & 0xFFFF;
+	l_addr = laddr & a_mask;
 
 	/*
 	 * HEX output Option.
@@ -145,17 +188,35 @@ list()
 		 * Equate only
 		 */
 		if (lmode == ELIST) {
-			fprintf(lfp, "%18s%04X", "", l_addr);
-			fprintf(lfp, "  %5u %s\n", line, ib);
+			switch(a_bytes) {
+			default:
+			case 2: frmt = "%19s%04X"; break;
+			case 3: frmt = "%25s%06X"; break;
+			case 4: frmt = "%23s%08X"; break;
+			}
+			fprintf(lfp, frmt, "", l_addr);
+			fprintf(lfp, " %5u %s\n", line, ib);
 			return;
 		}
 
 		/*
 		 * Address (with allocation)
 		 */
-		fprintf(lfp, " %04X", l_addr);
+		switch(a_bytes) {
+		default:
+		case 2: frmt = " %04X"; break;
+		case 3: frmt = "    %06X"; break;
+		case 4: frmt = "  %08X"; break;
+		}
+		fprintf(lfp, frmt, l_addr);
 		if (lmode == ALIST || lmode == BLIST) {
-			fprintf(lfp, "%19s%5u %s\n", "", line, ib);
+			switch(a_bytes) {
+			default:
+			case 2: frmt = "%19s%5u %s\n"; break;
+			case 3:
+			case 4: frmt = "%22s%5u %s\n"; break;
+			}
+			fprintf(lfp, frmt, "", line, ib);
 			outdot();
 			return;
 		}
@@ -164,20 +225,31 @@ list()
 		nb = (int) (cp - cb);
 
 		/*
+		 * Bytes per Line and Spacing
+		 */
+		switch(a_bytes) {
+		default:
+		case 2: n = 6; frmt = "%7s"; break;
+		case 3:
+		case 4: n = 7; frmt = "%12s"; break;
+		}
+
+		/*
 		 * First line of output for this source line with data.
 		 */
-		list1(wp, wpt, nb, 1);
+		list1(wp, wpt, nb, n, 1);
 		fprintf(lfp, " %5u %s\n", line, ib);
 
 		/*
 		 * Subsequent lines of output if more data.
 		 */
-		while ((nb -= 6) > 0) {
-			wp += 6;
-			wpt += 6;
+		while ((nb - n) > 0) {
+			nb -= n;
+			wp += n;
+			wpt += n;
 			slew(lfp, 0);
-			fprintf(lfp, "%7s", "");
-			list1(wp, wpt, nb, 0);
+			fprintf(lfp, frmt, "");
+			list1(wp, wpt, nb, n, 0);
 			putc('\n', lfp);
 		}
 	} else
@@ -189,17 +261,35 @@ list()
 		 * Equate only
 		 */
 		if (lmode == ELIST) {
-			fprintf(lfp, "%16s%06o", "", l_addr);
-			fprintf(lfp, "  %5u %s\n", line, ib);
+			switch(a_bytes) {
+			default:
+			case 2: frmt = "%17s%06o"; break;
+			case 3: frmt = "%23s%08o"; break;
+			case 4: frmt = "%20s%011o"; break;
+			}
+			fprintf(lfp, frmt, "", l_addr);
+			fprintf(lfp, " %5u %s\n", line, ib);
 			return;
 		}
 
 		/*
 		 * Address (with allocation)
 		 */
-		fprintf(lfp, " %06o", l_addr);
+		switch(a_bytes) {
+		default:
+		case 2: frmt = " %06o"; break;
+		case 3: frmt = "   %08o"; break;
+		case 4: frmt = "%011o"; break;
+		}
+		fprintf(lfp, frmt, l_addr);
 		if (lmode == ALIST || lmode == BLIST) {
-			fprintf(lfp, "%17s%5u %s\n", "", line, ib);
+			switch(a_bytes) {
+			default:
+			case 2: frmt = "%17s%5u %s\n"; break;
+			case 3:
+			case 4: frmt = "%21s%5u %s\n"; break;
+			}
+			fprintf(lfp, frmt, "", line, ib);
 			outdot();
 			return;
 		}
@@ -208,20 +298,31 @@ list()
 		nb = (int) (cp - cb);
 
 		/*
+		 * Bytes per Line and Spacing
+		 */
+		switch(a_bytes) {
+		default:
+		case 2: n = 4; frmt = "%9s"; break;
+		case 3:
+		case 4: n = 5; frmt = "%13s"; break;
+		}
+
+		/*
 		 * First line of output for this source line with data.
 		 */
-		list1(wp, wpt, nb, 1);
+		list1(wp, wpt, nb, n, 1);
 		fprintf(lfp, " %5u %s\n", line, ib);
 
 		/*
 		 * Subsequent lines of output if more data.
 		 */
-		while ((nb -= 4) > 0) {
-			wp += 4;
-			wpt += 4;
+		while ((nb - n) > 0) {
+			nb -= n;
+			wp += n;
+			wpt += n;
 			slew(lfp, 0);
-			fprintf(lfp, "%9s", "");
-			list1(wp, wpt, nb, 0);
+			fprintf(lfp, frmt, "");
+			list1(wp, wpt, nb, n, 0);
 			putc('\n', lfp);
 		}
 	} else
@@ -233,17 +334,35 @@ list()
 		 * Equate only
 		 */
 		if (lmode == ELIST) {
-			fprintf(lfp, "%16s%05u", "", l_addr);
-			fprintf(lfp, "   %5u %s\n", line, ib);
+			switch(a_bytes) {
+			default:
+			case 2: frmt = "%18s%05u"; break;
+			case 3: frmt = "%23s%08u"; break;
+			case 4: frmt = "%21s%010u"; break;
+			}
+			fprintf(lfp, frmt, "", l_addr);
+			fprintf(lfp, " %5u %s\n", line, ib);
 			return;
 		}
 
 		/*
 		 * Address (with allocation)
 		 */
-		fprintf(lfp, "  %05u", l_addr);
+		switch(a_bytes) {
+		default:
+		case 2: frmt = "  %05u"; break;
+		case 3: frmt = "   %08u"; break;
+		case 4: frmt = " %010u"; break;
+		}
+		fprintf(lfp, frmt, l_addr);
 		if (lmode == ALIST || lmode == BLIST) {
-			fprintf(lfp, "%17s%5u %s\n", "", line, ib);
+			switch(a_bytes) {
+			default:
+			case 2: frmt = "%17s%5u %s\n"; break;
+			case 3:
+			case 4: frmt = "%21s%5u %s\n"; break;
+			}
+			fprintf(lfp, frmt, "", line, ib);
 			outdot();
 			return;
 		}
@@ -252,28 +371,40 @@ list()
 		nb = (int) (cp - cb);
 
 		/*
+		 * Bytes per Line and Spacing
+		 */
+		switch(a_bytes) {
+		default:
+		case 2: n = 4; frmt = "%9s"; break;
+		case 3:
+		case 4: n = 5; frmt = "%13s"; break;
+		}
+
+		/*
 		 * First line of output for this source line with data.
 		 */
-		list1(wp, wpt, nb, 1);
+		list1(wp, wpt, nb, n, 1);
 		fprintf(lfp, " %5u %s\n", line, ib);
 
 		/*
 		 * Subsequent lines of output if more data.
 		 */
-		while ((nb -= 4) > 0) {
-			wp += 4;
-			wpt += 4;
+		while ((nb - n) > 0) {
+			nb -= n;
+			wp += n;
+			wpt += n;
 			slew(lfp, 0);
-			fprintf(lfp, "%9s", "");
-			list1(wp, wpt, nb, 0);
+			fprintf(lfp, frmt, "");
+			list1(wp, wpt, nb, n, 0);
 			putc('\n', lfp);
 		}
 	}
 }
 
-/*)Function	VOID	list1(wp, wpt, nw, f)
+/*)Function	VOID	list1(wp, wpt, nw, n, f)
  *
  *		int	f		fill blank fields (1)
+ *		int	n		number of bytes listed per line
  *		int	nb		number of data bytes
  *		int *	wp		pointer to data bytes
  *		int *	wpt		pointer to data byte mode
@@ -293,9 +424,9 @@ list()
  */
 
 VOID
-list1(wp, wpt, nb, f)
+list1(wp, wpt, nb, n, f)
 register char *wp;
-register int *wpt, nb, f;
+register int *wpt, nb, n, f;
 {
 	register int i;
 
@@ -306,8 +437,8 @@ register int *wpt, nb, f;
 		/*
 		 * Bound number of words to HEX maximum per line.
 		 */
-		if (nb > 6)
-			nb = 6;
+		if (nb > n)
+			nb = n;
 
 		/*
 		 * Output bytes.
@@ -321,9 +452,8 @@ register int *wpt, nb, f;
 		 * Output blanks if required.
 		 */
 		if (f) {
-			while (i < 6) {
+			while (i++ < n) {
 				fprintf(lfp, "   ");
-				++i;
 			}
 		}
 	} else
@@ -334,8 +464,8 @@ register int *wpt, nb, f;
 		/*
 		 * Bound number of words to OCTAL maximum per line.
 		 */
-		if (nb > 4)
-			nb = 4;
+		if (nb > n)
+			nb = n;
 
 		/*
 		 * Output bytes.
@@ -349,9 +479,8 @@ register int *wpt, nb, f;
 		 * Output blanks if required.
 		 */
 		if (f) {
-			while (i < 4) {
+			while (i++ < n) {
 				fprintf(lfp, "    ");
-				++i;
 			}
 		}
 	} else
@@ -362,8 +491,8 @@ register int *wpt, nb, f;
 		/*
 		 * Bound number of words to DECIMAL maximum per line.
 		 */
-		if (nb > 4)
-			nb = 4;
+		if (nb > n)
+			nb = n;
 
 		/*
 		 * Output bytes.
@@ -377,9 +506,8 @@ register int *wpt, nb, f;
 		 * Output blanks if required.
 		 */
 		if (f) {
-			while (i < 4) {
+			while (i++ < n) {
 				fprintf(lfp, "    ");
-				++i;
 			}
 		}
 	}
@@ -425,13 +553,13 @@ register int t;
 	/*
 	 * Designate a relocatable word by its mode:
 	 *	page0 or paged		*
-	 *	unsigned		u (v)
-	 *	operand offset		p (q)
-	 *	relocatable symbol	r (s)
+	 *	unsigned		u (v) (U) (V)
+	 *	operand offset		p (q) (P) (Q)
+	 *	relocatable symbol	r (s) (R) (S)
 	 */
 	if (fflag >= 2) {
 		if (t & R_RELOC) {
-			if (t & (R_PAG0|R_PAG)) {
+			if ((t & (R_PAG0|R_PAG)) && ((t & R_ECHEK) != R_EXTND)) {
 				c = '*';
 			} else if (t & R_USGN) {
 				c = 'u';
@@ -440,7 +568,8 @@ register int t;
 			} else {
 				c = 'r';
 			}
-			if (t & R_HIGH) c += 1;
+			if (t & R_HIGH || t & R_BYT4) c += 1;
+			if (t & R_BYT3 || t & R_BYT4) c &= ~0x20;
 		}
 	}
 
@@ -485,12 +614,21 @@ slew(fp,flag)
 FILE *fp;
 int flag;
 {
+	register char *frmt;
+
 	if ((lop++ >= NLPP) && flag) {
 		fprintf(fp, "\fASxxxx Assembler %s  (%s), page %u.\n",
 			VERSION, cpu, ++page);
+		switch(xflag) {
+		default:
+		case 0:	frmt = "Hexidecimal [%d-Bits]\n"; break;
+		case 1:	frmt = "Octal [%d-Bits]\n"; break;
+		case 2:	frmt = "Decimal [%d-Bits]\n"; break;
+		}
+		fprintf(fp, frmt, 8 * a_bytes);
 		fprintf(fp, "%s\n", tb);
 		fprintf(fp, "%s\n\n", stb);
-		lop = 5;
+		lop = 6;
 	}
 }
 
@@ -542,7 +680,7 @@ lstsym(fp)
 FILE *fp;
 {
 	register int c, i, j, k;
-	register char *ptr;
+	register char *frmt, *ptr;
 	int nmsym, narea;
 	struct sym *sp;
 	struct sym **p;
@@ -615,51 +753,94 @@ FILE *fp;
 		sp = p[i];
 		if (sp->s_area) {
 			j = sp->s_area->a_ref;
-			if (xflag == 0) {
-				fprintf(fp, " %2X ", j);
-			} else
-			if (xflag == 1) {
-				fprintf(fp, "%3o ", j);
-			} else
-			if (xflag == 2) {
-				fprintf(fp, "%3u ", j);
+			switch(xflag) {
+			default:
+			case 0:	frmt = " %2X "; break;
+			case 1:	frmt = "%3o "; break;
+			case 2:	frmt = "%3u "; break;
 			}
+			fprintf(fp, frmt, j);
 		} else {
 			fprintf(fp, "    ");
 		}
+
 		ptr = &sp->s_id[0];
 		if (wflag) {
-			fprintf(fp, "%-60.60s", ptr );	/* JLH */
+			fprintf(fp, "%-55.55s", ptr );	/* JLH */
 		} else {
-			fprintf(fp, "%-8.8s", ptr);
+			fprintf(fp, "%-14.14s", ptr);
 		}
 		if (sp->s_flag & S_ASG) {
-			putc('=', fp);
+			fprintf(fp, " = ");
 		} else {
-			putc(' ', fp);
+			fprintf(fp, "   ");
 		}
 		if (sp->s_type == S_NEW) {
-			if (xflag == 0) {
-				fprintf(fp, "  **** ");
-			} else
-			if (xflag == 1) {
-				fprintf(fp, "****** ");
-			} else
-			if (xflag == 2) {
-				fprintf(fp, " ***** ");
+			switch(a_bytes) {
+			default:
+			case 2:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "  **** "; break;
+				case 1:	frmt = "****** "; break;
+				case 2:	frmt = " ***** "; break;
+				}
+				break;
+
+			case 3:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "  ****** "; break;
+				case 1:	frmt = "******** "; break;
+				case 2:	frmt = "******** "; break;
+				}
+				break;
+
+			case 4:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "   ******** "; break;
+				case 1:	frmt = "*********** "; break;
+				case 2:	frmt = " ********** "; break;
+				}
+				break;
+
 			}
+			fprintf(fp, frmt);
 		} else {
 			j = sp->s_addr & 0xFFFF;
-			if (xflag == 0) {
-				fprintf(fp, "  %04X ", j);
-			} else
-			if (xflag == 1) {
-				fprintf(fp, "%06o ", j);
-			} else
-			if (xflag == 2) {
-				fprintf(fp, " %05u ", j);
+			switch(a_bytes) {
+			default:
+			case 2:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "  %04X "; break;
+				case 1:	frmt = "%06o "; break;
+				case 2:	frmt = " %05u "; break;
+				}
+				break;
+
+			case 3:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "  %06X "; break;
+				case 1:	frmt = "%08o "; break;
+				case 2:	frmt = "%08u "; break;
+				}
+				break;
+
+			case 4:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "   %08X "; break;
+				case 1:	frmt = "%011o "; break;
+				case 2:	frmt = " %010u "; break;
+				}
+				break;
 			}
+			fprintf(fp, frmt, j);
 		}
+
 		j = 0;
 		if (sp->s_flag & S_GBL) {
 			putc('G', fp);
@@ -678,7 +859,7 @@ FILE *fp;
 			slew(fp, 0);
 			++i;
 		} else {
-			if (++i % 3 == 0) {
+			if (++i % 2 == 0) {
 				putc('\n', fp);
 				slew(fp, pflag);
 			} else
@@ -714,32 +895,52 @@ atable:
 		for (j=i+1; j<narea; ++j)
 			ap = ap->a_ap;
 		j = ap->a_ref;
-		if (xflag == 0) {
-			fprintf(fp, "  %2X ", j);
-		} else
-		if (xflag == 1) {
-			fprintf(fp, " %3o ", j);
-		} else
-		if (xflag == 2) {
-			fprintf(fp, " %3u ", j);
+		switch(xflag) {
+		default:
+		case 0:	frmt = "  %2X "; break;
+		case 1:	frmt = " %3o "; break;
+		case 2:	frmt = " %3u "; break;
 		}
+		fprintf(fp, frmt, j);
+
 		ptr = &ap->a_id[0];
 		if (wflag) {
-			fprintf(fp, "%-40.40s", ptr );
+			fprintf(fp, "%-35.35s", ptr );
 		} else {
-			fprintf(fp, "%-8.8s", ptr);
+			fprintf(fp, "%-14.14s", ptr);
 		}
 
 		j = ap->a_size & 0xFFFF;
 		k = ap->a_flag;
-		if (xflag==0) {
-			fprintf(fp, "   size %4X   flags %X\n", j, k);
-		} else
-		if (xflag==1) {
-			fprintf(fp, "   size %6o   flags %o\n", j, k);
-		} else
-		if (xflag==2) {
-			fprintf(fp, "   size %5u   flags %u\n", j, k);
+		switch(a_bytes) {
+		default:
+		case 2:
+			switch(xflag) {
+			default:
+			case 0:	frmt = "   size %4X   flags %3X\n"; break;
+			case 1:	frmt = "   size %6o   flags %3o\n"; break;
+			case 2:	frmt = "   size %5u   flags %3u\n"; break;
+			}
+			break;
+
+		case 3:
+			switch(xflag) {
+			default:
+			case 0:	frmt = "   size %6X   flags %3X\n"; break;
+			case 1:	frmt = "   size %8o   flags %3o\n"; break;
+			case 2:	frmt = "   size %8u   flags %3u\n"; break;
+			}
+			break;
+
+		case 4:
+			switch(xflag) {
+			default:
+			case 0:	frmt = "   size %8X   flags %3X\n"; break;
+			case 1:	frmt = "   size %11o   flags %3o\n"; break;
+			case 2:	frmt = "   size %10u   flags %3u\n"; break;
+			}
+			break;
 		}
+		fprintf(fp, frmt, j, k);
 	}		
 }

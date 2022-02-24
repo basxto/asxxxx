@@ -609,7 +609,7 @@ a0:	.word	0x00ff			; FF 00
 
 abcdabcd::				; global symbol
 
-	.sbttl	Assembler Output File asmtst.sym
+	.sbttl	Assembler Output File asmt_.sym
 
 ;       assembled by:
 ;                asxxxx -glosxff asmt_.asm

@@ -29,10 +29,10 @@ struct	mne	mne[] = {
     {	NULL,	"NOPAG",	S_ATYP,		0,	A_NOPAG	},
     {	NULL,	"PAG",		S_ATYP,		0,	A_PAG	},
 
-    {	NULL,	".byte",	S_BYTE,		0,	0	},
-    {	NULL,	".db",		S_BYTE,		0,	0	},
-    {	NULL,	".word",	S_WORD,		0,	0	},
-    {	NULL,	".dw",		S_WORD,		0,	0	},
+    {	NULL,	".byte",	S_DATA,		0,	1	},
+    {	NULL,	".db",		S_DATA,		0,	1	},
+    {	NULL,	".word",	S_DATA,		0,	2	},
+    {	NULL,	".dw",		S_DATA,		0,	2	},
     {	NULL,	".ascii",	S_ASCII,	0,	0	},
     {	NULL,	".asciz",	S_ASCIZ,	0,	0	},
     {	NULL,	".blkb",	S_BLK,		0,	1	},
@@ -53,6 +53,8 @@ struct	mne	mne[] = {
     {	NULL,	".org",		S_ORG,		0,	0	},
     {	NULL,	".module",	S_MODUL,	0,	0	},
     {	NULL,	".ascis",	S_ASCIS,	0,	0	},
+    {	NULL,	".assume",	S_ERROR,	0,	0	},
+    {	NULL,	".error",	S_ERROR,	0,	1	},
 
 	/* 6811 Compatibility */
 
@@ -433,67 +435,6 @@ struct	mne	mne[] = {
     {	NULL,	"psh",		S_PSH,		S_END,	0x30	},
 };
 
-#ifdef	decus
-
-struct opdata mc6811[] = {
-
-    {{	0x1A, 0xE5,	/*	leax	b,x	;abx	*/
-	0x00, 0x00	}},
-
-    {{	0x19, 0xED,	/*	leay	b,y	;aby	*/
-	0x00, 0x00	}},
-
-    {{	0x10, 0xFE,	/*	andcc	#0xFE	;clc	*/
-	0x00, 0x00	}},
-
-    {{	0x10, 0xEF,	/*	andcc	#0xEF	;cli	*/
-	0x00, 0x00	}},
-
-    {{	0x10, 0xFD,	/*	andcc	#0xFD	;clv	*/
-	0x00, 0x00	}},
-
-    {{	0x1B, 0x9F,	/*	leas	-1,s	;des	*/
-	0x00, 0x00	}},
-
-    {{	0x1B, 0x81,	/*	leas	1,s	;ins	*/
-	0x00, 0x00	}},
-
-    {{	0x14, 0x01,	/*	orcc	#0x01	;sec	*/
-	0x00, 0x00	}},
-
-    {{	0x14, 0x10,	/*	orcc	#0x10	;sei	*/
-	0x00, 0x00	}},
-
-    {{	0x14, 0x02,	/*	orcc	#0x02	;sev	*/
-	0x00, 0x00	}},
-
-    {{	0xB7, 0x02,	/*	tfr	a,cc	;tap	*/
-	0x00, 0x00	}},
-
-    {{	0xB7, 0x20,	/*	tfr	cc,a	;tpa	*/
-	0x00, 0x00	}},
-
-    {{	0xB7, 0x75,	/*	tfr	s,x	;tsx	*/
-	0x00, 0x00	}},
-
-    {{	0xB7, 0x76,	/*	tfr	s,y	;tsy	*/
-	0x00, 0x00	}},
-
-    {{	0xB7, 0x57,	/*	tfr	x,s	;txs	*/
-	0x00, 0x00	}},
-
-    {{	0xB7, 0x67,	/*	tfr	y,s	;tys	*/
-	0x00, 0x00	}},
-
-    {{	0xB7, 0xC5,	/*	exg	d,x	;xgdx	*/
-	0x00, 0x00	}},
-
-    {{	0xB7, 0xC6,	/*	exg	d,y	;xgdy	*/
-	0x00, 0x00	}}
-};
-
-#else
-
 struct opdata mc6811[] = {
 
     {{	(char) 0x1A, (char) 0xE5,	/*	leax	b,x	;abx	*/
@@ -550,5 +491,3 @@ struct opdata mc6811[] = {
     {{	(char) 0xB7, (char) 0xC6,	/*	exg	d,y	;xgdy	*/
 	(char) 0x00, (char) 0x00	}}
 };
-
-#endif

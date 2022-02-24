@@ -6,53 +6,50 @@
 --------------------Configuration: aslink - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\WINDOWS\TEMP\RSP7001.TMP" with contents
+Creating temporary file "C:\WINDOWS\TEMP\RSP9201.TMP" with contents
 [
 /nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Release/aslink.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "C:\ASXXXX\linksrc\lkarea.c"
 "C:\ASXXXX\linksrc\lkdata.c"
 "C:\ASXXXX\linksrc\lkeval.c"
 "C:\ASXXXX\linksrc\lkhead.c"
-"C:\ASXXXX\Linksrc\Lkihx.c"
 "C:\ASXXXX\linksrc\lklex.c"
 "C:\ASXXXX\linksrc\lklibr.c"
 "C:\ASXXXX\linksrc\lklist.c"
 "C:\ASXXXX\linksrc\lkmain.c"
+"C:\ASXXXX\linksrc\lkout.c"
 "C:\ASXXXX\linksrc\lkrloc.c"
-"C:\ASXXXX\Linksrc\Lks19.c"
 "C:\ASXXXX\linksrc\lksym.c"
 ]
-Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP7001.TMP" 
-Creating temporary file "C:\WINDOWS\TEMP\RSP7002.TMP" with contents
+Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP9201.TMP" 
+Creating temporary file "C:\WINDOWS\TEMP\RSP9202.TMP" with contents
 [
 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/aslink.pdb" /machine:I386 /out:"..\..\exe\aslink.exe" 
 .\Release\lkarea.obj
 .\Release\lkdata.obj
 .\Release\lkeval.obj
 .\Release\lkhead.obj
-.\Release\Lkihx.obj
 .\Release\lklex.obj
 .\Release\lklibr.obj
 .\Release\lklist.obj
 .\Release\lkmain.obj
+.\Release\lkout.obj
 .\Release\lkrloc.obj
-.\Release\Lks19.obj
 .\Release\lksym.obj
 ]
-Creating command line "link.exe @C:\WINDOWS\TEMP\RSP7002.TMP"
+Creating command line "link.exe @C:\WINDOWS\TEMP\RSP9202.TMP"
 <h3>Output Window</h3>
 Compiling...
 lkarea.c
 lkdata.c
 lkeval.c
 lkhead.c
-Lkihx.c
 lklex.c
 lklibr.c
 lklist.c
 lkmain.c
+lkout.c
 lkrloc.c
-Lks19.c
 lksym.c
 Linking...
 

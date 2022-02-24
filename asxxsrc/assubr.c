@@ -32,6 +32,7 @@
  *		VOID	err()
  *		VOID	qerr()
  *		VOID	rerr()
+ *		char *	geterr()
  *
  *	assubr.c contains the local array of *error[]
  */
@@ -227,13 +228,14 @@ char *
 geterr(c)
 int c;
 {
-	int	i;
+	int i;
 
 	for (i=0; errors[i]!=NULL; i++) {
 		if (c == errors[i][1]) {
 			return(errors[i]);
 		}
 	}
-	return(NULL);
+	sprintf(erb, "<e> %.*s", (int) (sizeof(erb)-5), ib);
+	return(erb);
 }
 

@@ -1,5 +1,5 @@
 /* STRING.H */
-/* DECUC C */
+/* DECUS C */
 
 extern	char *	strcat();
 extern	char *	strchr();

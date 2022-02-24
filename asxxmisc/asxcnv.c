@@ -25,6 +25,7 @@
 
 static int inpfil;		/* Input File Counter	*/
 static int radix;		/* Radix Flag		*/
+static int a_bytes;		/* Addressing Bytes	*/
 static int aserr;		/* Error Counter	*/
 
 static FILE *nfp;		/* Input File Handle	*/
@@ -38,38 +39,22 @@ static char scline[256];	/* Input text line	*/
  *	ASCII character
  */
 char	ctype[128] = {
-/*NUL*/		ILL,		ILL,		ILL,		ILL,
-/*EOT*/		ILL,		ILL,		ILL,		ILL,
-/*BS*/		ILL,		SPACE,		ILL,		ILL,
-/*FF*/		SPACE,		ILL,		ILL,		ILL,
-/*DLE*/		ILL,		ILL,		ILL,		ILL,
-/*DC4*/		ILL,		ILL,		ILL,		ILL,
-/*CAN*/		ILL,		ILL,		ILL,		ILL,
-/*FS*/		ILL,		ILL,		ILL,		ILL,
-/*SPC*/		SPACE,		ETC,		ETC,		ETC,
-/*$*/		LETTER,		BINOP,		BINOP,		ETC,
-/*(*/		ETC,		ETC,		BINOP,		BINOP,
-/*,*/		ETC,		BINOP,		LETTER,		BINOP,
-/*0*/		DGT2,		DGT2,		DGT8,		DGT8,
-/*4*/		DGT8,		DGT8,		DGT8,		DGT8,
-/*8*/		DGT10,		DGT10,		ETC,		ETC,
-/*<*/		BINOP,		ETC,		BINOP,		ETC,
-/*@*/		ETC,		LTR16,		LTR16,		LTR16,
-/*D*/		LTR16,		LTR16,		LTR16,		LETTER,
-/*H*/		LETTER,		LETTER,		LETTER,		LETTER,
-/*L*/		LETTER,		LETTER,		LETTER,		LETTER,
-/*P*/		LETTER,		LETTER,		LETTER,		LETTER,
-/*T*/		LETTER,		LETTER,		LETTER,		LETTER,
-/*X*/		LETTER,		LETTER,		LETTER,		ETC,
-/*\*/		ETC,		ETC,		BINOP,		LETTER,
-/*`*/		ETC,		LTR16,		LTR16,		LTR16,
-/*d*/		LTR16,		LTR16,		LTR16,		LETTER,
-/*h*/		LETTER,		LETTER,		LETTER,		LETTER,
-/*l*/		LETTER,		LETTER,		LETTER,		LETTER,
-/*p*/		LETTER,		LETTER,		LETTER,		LETTER,
-/*t*/		LETTER,		LETTER,		LETTER,		LETTER,
-/*x*/		LETTER,		LETTER,		LETTER,		ETC,
-/*|*/		BINOP,		ETC,		ETC,		ETC
+/*NUL*/	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,
+/*BS*/	ILL,	SPACE,	ILL,	ILL,	SPACE,	ILL,	ILL,	ILL,
+/*DLE*/	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,
+/*CAN*/	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,
+/*SPC*/	SPACE,	ETC,	ETC,	ETC,	LETTER,	BINOP,	BINOP,	ETC,
+/*(*/	ETC,	ETC,	BINOP,	BINOP,	ETC,	BINOP,	LETTER,	BINOP,
+/*0*/	DGT2,	DGT2,	DGT8,	DGT8,	DGT8,	DGT8,	DGT8,	DGT8,
+/*8*/	DGT10,	DGT10,	ETC,	ETC,	BINOP,	ETC,	BINOP,	ETC,
+/*@*/	ETC,	LTR16,	LTR16,	LTR16,	LTR16,	LTR16,	LTR16,	LETTER,
+/*H*/	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,
+/*P*/	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,
+/*X*/	LETTER,	LETTER,	LETTER,	ETC,	ETC,	ETC,	BINOP,	LETTER,
+/*`*/	ETC,	LTR16,	LTR16,	LTR16,	LTR16,	LTR16,	LTR16,	LETTER,
+/*h*/	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,
+/*p*/	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,
+/*x*/	LETTER,	LETTER,	LETTER,	ETC,	BINOP,	ETC,	ETC,	ETC
 };
 
 /*
@@ -77,38 +62,22 @@ char	ctype[128] = {
  *	perform the case translation function
  */
 char	ccase[128] = {
-/*NUL*/		'\000',		'\001',		'\002',		'\003',
-/*EOT*/		'\004',		'\005',		'\006',		'\007',
-/*BS*/		'\010',		'\011',		'\012',		'\013',
-/*FF*/		'\014',		'\015',		'\016',		'\017',
-/*DLE*/		'\020',		'\021',		'\022',		'\023',
-/*DC4*/		'\024',		'\025',		'\026',		'\027',
-/*CAN*/		'\030',		'\031',		'\032',		'\033',
-/*FS*/		'\034',		'\035',		'\036',		'\037',
-/*SPC*/		'\040',		'\041',		'\042',		'\043',
-/*$*/		'\044',		'\045',		'\046',		'\047',
-/*(*/		'\050',		'\051',		'\052',		'\053',
-/*,*/		'\054',		'\055',		'\056',		'\057',
-/*0*/		'\060',		'\061',		'\062',		'\063',
-/*4*/		'\064',		'\065',		'\066',		'\067',
-/*8*/		'\070',		'\071',		'\072',		'\073',
-/*<*/		'\074',		'\075',		'\076',		'\077',
-/*@*/		'\100',		'\141',		'\142',		'\143',
-/*D*/		'\144',		'\145',		'\146',		'\147',
-/*H*/		'\150',		'\151',		'\152',		'\153',
-/*L*/		'\154',		'\155',		'\156',		'\157',
-/*P*/		'\160',		'\161',		'\162',		'\163',
-/*T*/		'\164',		'\165',		'\166',		'\167',
-/*X*/		'\170',		'\171',		'\172',		'\133',
-/*\*/		'\134',		'\135',		'\136',		'\137',
-/*`*/		'\140',		'\141',		'\142',		'\143',
-/*d*/		'\144',		'\145',		'\146',		'\147',
-/*h*/		'\150',		'\151',		'\152',		'\153',
-/*l*/		'\154',		'\155',		'\156',		'\157',
-/*p*/		'\160',		'\161',		'\162',		'\163',
-/*t*/		'\164',		'\165',		'\166',		'\167',
-/*x*/		'\170',		'\171',		'\172',		'\173',
-/*|*/		'\174',		'\175',		'\176',		'\177'
+/*NUL*/	'\000',	'\001',	'\002',	'\003',	'\004',	'\005',	'\006',	'\007',
+/*BS*/	'\010',	'\011',	'\012',	'\013',	'\014',	'\015',	'\016',	'\017',
+/*DLE*/	'\020',	'\021',	'\022',	'\023',	'\024',	'\025',	'\026',	'\027',
+/*CAN*/	'\030',	'\031',	'\032',	'\033',	'\034',	'\035',	'\036',	'\037',
+/*SPC*/	'\040',	'\041',	'\042',	'\043',	'\044',	'\045',	'\046',	'\047',
+/*(*/	'\050',	'\051',	'\052',	'\053',	'\054',	'\055',	'\056',	'\057',
+/*0*/	'\060',	'\061',	'\062',	'\063',	'\064',	'\065',	'\066',	'\067',
+/*8*/	'\070',	'\071',	'\072',	'\073',	'\074',	'\075',	'\076',	'\077',
+/*@*/	'\100',	'\141',	'\142',	'\143',	'\144',	'\145',	'\146',	'\147',
+/*H*/	'\150',	'\151',	'\152',	'\153',	'\154',	'\155',	'\156',	'\157',
+/*P*/	'\160',	'\161',	'\162',	'\163',	'\164',	'\165',	'\166',	'\167',
+/*X*/	'\170',	'\171',	'\172',	'\133',	'\134',	'\135',	'\136',	'\137',
+/*`*/	'\140',	'\141',	'\142',	'\143',	'\144',	'\145',	'\146',	'\147',
+/*h*/	'\150',	'\151',	'\152',	'\153',	'\154',	'\155',	'\156',	'\157',
+/*p*/	'\160',	'\161',	'\162',	'\163',	'\164',	'\165',	'\166',	'\167',
+/*x*/	'\170',	'\171',	'\172',	'\173',	'\174',	'\175',	'\176',	'\177'
 };
 
 
@@ -140,6 +109,7 @@ char *argv[];
 	 * Set Defaults
 	 */
 	radix = 16;
+	a_bytes = 2;
 	inpfil = 0;
 	aserr = 0;
 
@@ -165,6 +135,18 @@ char *argv[];
 				case 'q':
 				case 'Q':
 					radix = 8;
+					break;
+
+				case '2':
+					a_bytes = 2;
+					break;
+
+				case '3':
+					a_bytes = 3;
+					break;
+
+				case '4':
+					a_bytes = 4;
 					break;
 
 				default:
@@ -193,8 +175,12 @@ char *argv[];
 	/* ldgt	Last Data Digit in Line		*/
 	/* lcon	Line Continuation Length	*/
 
-	ldgt = 25;
-	lcon = 32;
+	switch(a_bytes) {
+	default:
+	case 2: ldgt = 25; lcon = 32; break;
+	case 3:
+	case 4: ldgt = 33; lcon = 40; break;
+	}
 
 	/*
 	 * Convert listing file to a source file
@@ -205,7 +191,7 @@ loop:
 		scline[strlen(scline)-1] = '\0';
 		p = scline;
 
-		/* The Output Format
+		/* The Output Formats
 		| Tabs- |       |       |       |       |       |
 		          11111111112222222222333333333344444-----
 		012345678901234567890123456789012345678901234-----
@@ -216,6 +202,28 @@ loop:
 		                     XXXX
 				   OOOOOO
 				    DDDDD
+
+		| Tabs- |       |       |       |       |       |
+		          11111111112222222222333333333344444-----
+		012345678901234567890123456789012345678901234-----
+		     |       |                  |     | |
+		ee    XXXXXX xx xx xx xx xx xx xx LLLLL *********	HEX(24)
+		ee   OO000000 ooo ooo ooo ooo ooo LLLLL *********	OCTAL(24)
+		ee   DDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(24)
+		                           XXXXXX
+					 OOOOOOOO
+					 DDDDDDDD
+
+		| Tabs- |       |       |       |       |       |
+		          11111111112222222222333333333344444-----
+		012345678901234567890123456789012345678901234-----
+		  |          |                  |     | |
+		ee  XXXXXXXX xx xx xx xx xx xx xx LLLLL *********	HEX(32)
+		eeOOOOO000000 ooo ooo ooo ooo ooo LLLLL *********	OCTAL(32)
+		ee DDDDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(32)
+		                         XXXXXXXX
+				      OOOOOOOOOOO
+				       DDDDDDDDDD
 		*/
 
 		/* p	Starting position of program counter	*/
@@ -227,17 +235,32 @@ loop:
 		default:
 		case 16:
 			rdx = RAD16;
-			p += 3; n = 4; l = 2; m = 6;
+			switch(a_bytes) {
+			default:
+			case 2: p += 3; n = 4; l = 2; m = 6; break;
+			case 3: p += 6; n = 6; l = 2; m = 7; break;
+			case 4: p += 4; n = 8; l = 2; m = 7; break;
+			}
 			break;
 
 		case 8:
 			rdx = RAD10;
-			p += 3; n = 6; l = 3; m = 4;
+			switch(a_bytes) {
+			default:
+			case 2: p += 3; n = 6; l = 3; m = 4; break;
+			case 3: p += 5; n = 8; l = 3; m = 5; break;
+			case 4: p += 2; n = 11; l = 3; m = 5; break;
+			}
 			break;
 
 		case 10:
 			rdx = RAD10;
-			p += 4; n = 5; l = 3; m = 4;
+			switch(a_bytes) {
+			default:
+			case 2: p += 4; n = 5; l = 3; m = 4; break;
+			case 3: p += 5; n = 8; l = 3; m = 5; break;
+			case 4: p += 3; n = 10; l = 3; m = 5; break;
+			}
 			break;
 		}
 
@@ -411,10 +434,13 @@ unsigned int n;
 }
 
 char *usetxt[] = {
-	"Usage: [-dqx] file",
+	"Usage: [-dqx234] file",
 	"  d    decimal listing",
 	"  q    octal   listing",
 	"  x    hex     listing (default)",
+        "  2    16-Bit  address (default)",
+	"  3    24-Bit  address",
+	"  4    32-Bit  address",
 	"",
 	NULL
 };

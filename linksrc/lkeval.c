@@ -47,7 +47,7 @@
  *	numerical value.
  *
  *	Notes about the arithmetic:
- *		The coding emulates 16-Bit unsigned
+ *		The coding emulates X-Bit unsigned
  *		arithmetic operations.  This allows
  *		program compilation without regard to the
  *		intrinsic integer length of the host
@@ -85,7 +85,7 @@ eval()
 		c = get();
 	}
 	unget(c);
-	return((n & 0x8000) ? n | ~0x7FFF : n & 0x7FFF);
+	return((n & s_mask) ? n | ~v_mask : n & v_mask);
 }
 
 /*)Function	addr_t	expr(n)
@@ -98,7 +98,7 @@ eval()
  *	returns the value.
  *
  *	Notes about the arithmetic:
- *		The coding emulates 16-Bit unsigned
+ *		The coding emulates X-Bit unsigned
  *		arithmetic operations.  This allows
  *		program compilation without regard to the
  *		intrinsic integer length of the host
@@ -150,10 +150,10 @@ int n;
 		ve = expr(p);
 
 		/*
-		 * 16-Bit Unsigned Aritmetic
+		 * X-Bit Unsigned Arithmetic
 		 */
-		v  &= 0xFFFF;
-		ve &= 0xFFFF;
+		v  &= a_mask;
+		ve &= a_mask;
 
 		if (c == '+') {
 			v += ve;
@@ -204,7 +204,7 @@ int n;
 				break;
 			}
 		}
-		v = (v & 0x8000) ? v | ~0x7FFF : v & 0x7FFF;
+		v = (v & s_mask) ? v | ~v_mask : v & v_mask;
 	}
 	unget(c);
 	return(v);
@@ -217,7 +217,7 @@ int n;
  *	( +, -, ~, ', ", >, or < ).
  *
  *	Notes about the arithmetic:
- *		The coding emulates 16-Bit unsigned
+ *		The coding emulates X-Bit unsigned
  *		arithmetic operations.  This allows
  *		program compilation without regard to the
  *		intrinsic integer length of the host
@@ -287,7 +287,7 @@ term()
 			v  =  getmap(-1)&0377;
 			v |= (getmap(-1)&0377)<<8;
 		}
-		return((v & 0x8000) ? v | ~0x7FFF : v & 0x7FFF);
+		return((v & s_mask) ? v | ~v_mask : v & v_mask);
 	}
 	if (c == '>' || c == '<') {
 		v = expr(100);
@@ -335,7 +335,7 @@ term()
 			c = get();
 		}
 		unget(c);
-		return((v & 0x8000) ? v | ~0x7FFF : v & 0x7FFF);
+		return((v & s_mask) ? v | ~v_mask : v & v_mask);
 	}
 	if (ctype[c] & LETTER) {
 		getid(id, c);

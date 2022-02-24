@@ -12,9 +12,11 @@
  *	John L. Hartman	(JLH)
  *	jhartman@compuserve.com
  *
+ *	Bill McKinnon
+ *	w_mckinnon@conknet.com
  */
 
-#define	VERSION	"V02.30"
+#define	VERSION	"V03.00"
 
 /*)Module	aslink.h
  *
@@ -83,7 +85,7 @@
 
 #define NCPS	80		/* characters per symbol */
 #define	NDATA	16		/* actual data */
-#define	NINPUT	128		/* Input buffer size */
+#define	NINPUT	200		/* Input buffer size */
 #define	NHASH	64		/* Buckets in hash table */
 #define	HMASK	077		/* Hash mask */
 #define	NLPP	60		/* Lines per page */
@@ -115,7 +117,7 @@
 #define	R_PCR	0004
 
 #define	R_BYT1	0000		/* Byte count for R_BYTE = 1 */
-#define	R_BYT2	0010		/* Byte count for R_BYTE = 2 */
+#define	R_BYTX	0010		/* Byte count for R_BYTE = X */
 
 #define	R_SGND	0000		/* Signed value */
 #define	R_USGN	0020		/* Unsigned value */
@@ -130,7 +132,7 @@
 /*
  *	Additional "R_" functionality is required to support
  *	some microprocesssor architectures.   The 'illegal'
- *	"R_" mode of R_WORD | R_BYT2 is used as a designator
+ *	"R_" mode of R_WORD | R_BYTX is used as a designator
  *	of the extended R_ modes.  The extended modes replace
  *	the PAGING modes and are being added in an adhoc manner
  *	as follows:
@@ -160,9 +162,9 @@
 /* #define R_MSB  0200 */	/* output high byte */
 
 #define	R_J11	0010		/* JLH: 11 bit JMP and CALL (8051) */
-/* #define R_xxx  0050 */	/* Unused */
-/* #define R_xxx  0110 */	/* Unused */
-/* #define R_xxx  0150 */	/* Unused */
+#define R_J19   0050		/* BM:	19 bit JMP and CALL (DS80C390) */
+#define R_3BYTE	0110		/* 	24 bit */
+#define R_4BYTE	0150		/* 	32 bit */
 
 /*
  * Global symbol types.
@@ -598,7 +600,9 @@ extern	int	rtflg[];	/*	indicates if rtval[] value is
 				 */
 extern	char	rtbuf[];	/*	S19/IHX output buffer
 				 */
-extern	addr_t	rtadr0;		/*	rtbuf[] processing
+extern	int	rtaflg;		/*	rtbuf[] processing
+				 */
+extern	addr_t	rtadr0;		/*
 				 */
 extern	addr_t	rtadr1;		/*
 				 */
@@ -606,7 +610,15 @@ extern	addr_t	rtadr2;		/*
 				 */
 extern	int	obj_flag;	/*	Linked file/library object output flag
 				 */
+extern	int	a_bytes;	/*	REL file T Line address length
+				 */
 extern	int	hilo;		/*	REL file byte ordering
+				 */
+extern	addr_t	a_mask;		/*	Address Mask
+				 */
+extern	addr_t	s_mask;		/*	Sign Mask
+				 */
+extern	addr_t	v_mask;		/*	Value Mask
 				 */
 extern	int	gline;		/*	LST file relocation active
 				 *	for current line
@@ -702,20 +714,22 @@ extern	addr_t		term(void);
 
 /* lklist.c */
 extern	int		dgt(int rdx, char *str, int n);
+extern	VOID		newpag(FILE *fp);
+extern	VOID		slew(struct area *xp);
+extern	VOID		lstarea(struct area *xp);
 extern	VOID		lkulist(int i);
 extern	VOID		lkalist(addr_t pc);
 extern	VOID		lkglist(addr_t pc, int v);
-extern	VOID		lstarea(struct area *xp);
-extern	VOID		newpag(FILE *fp);
-extern	VOID		slew(struct area *xp);
 
 /* lkrloc.c */
-extern	addr_t		adb_b(addr_t v, int i);
+extern	addr_t		adb_1b(addr_t v, int i);
+extern	addr_t		adb_2b(addr_t v, int i);
+extern	addr_t		adb_3b(addr_t v, int i);
+extern	addr_t		adb_4b(addr_t v, int i);
+extern	addr_t		adb_xb(addr_t v, int i);
 extern	addr_t		adb_hi(addr_t v, int i);
 extern	addr_t		adb_lo(addr_t v, int i);
-extern	addr_t		adw_w(addr_t v, int i);
-extern	addr_t		adw_hi(addr_t v, int i);
-extern	addr_t		adw_lo(addr_t v, int i);
+extern	addr_t		adw_xb(int x, addr_t v, int i);
 extern	addr_t		evword(void);
 extern	VOID		rele(void);
 extern	VOID		reloc(int c);
@@ -738,13 +752,12 @@ extern	VOID		library(void);
 extern	VOID		loadfile(char *filspc);
 extern	VOID		search(void);
 
-/* lks19.c */
-extern	VOID		s19(int i);
-extern	VOID		sflush(void);
-
-/* lkihx.c */
-extern	VOID		ihx(int i);
+/* lkout.c */
+extern	VOID		lkout(int i);
+extern	VOID		ixx(int i);
 extern	VOID		iflush(void);
+extern	VOID		sxx(int i);
+extern	VOID		sflush(void);
 
 #else
 
@@ -806,20 +819,22 @@ extern	addr_t		term();
 
 /* lklist.c */
 extern	int		dgt();
+extern	VOID		newpag();
+extern	VOID		slew();
+extern	VOID		lstarea();
 extern	VOID		lkulist();
 extern	VOID		lkalist();
 extern	VOID		lkglist();
-extern	VOID		lstarea();
-extern	VOID		newpag();
-extern	VOID		slew();
 
 /* lkrloc.c */
-extern	addr_t		adb_b();
+extern	addr_t		adb_1b();
+extern	addr_t		adb_2b();
+extern	addr_t		adb_3b();
+extern	addr_t		adb_4b();
+extern	addr_t		adb_xb();
 extern	addr_t		adb_hi();
 extern	addr_t		adb_lo();
-extern	addr_t		adw_w();
-extern	addr_t		adw_hi();
-extern	addr_t		adw_lo();
+extern	addr_t		adw_xb();
 extern	addr_t		evword();
 extern	VOID		rele();
 extern	VOID		reloc();
@@ -842,13 +857,12 @@ extern	VOID		library();
 extern	VOID		loadfile();
 extern	VOID		search();
 
-/* lks19.c */
-extern	VOID		s19();
-extern	VOID		sflush();
-
-/* lkihx.c */
-extern	VOID		ihx();
+/* lkout.c */
+extern	VOID		lkout();
+extern	VOID		ixx();
 extern	VOID		iflush();
+extern	VOID		sxx();
+extern	VOID		sflush();
 
 #endif
 

@@ -68,7 +68,7 @@ have different radices.
 (s) option, the symbol table is placed at the end of the listing
 file.  
 
-<H5><A HREF="asmblr.htm #Index">  Return to the Assembler Index</A></H5>
+<H5><A HREF="asmblr.htm#Index">  Return to the Assembler Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -104,6 +104,8 @@ is the source/include file.
 
       (d)   Indicates a direct page addressing error.  
 
+      (e)   Caused by a .error or .assume directive.
+
       (i)   Caused  by  an  .include file error or an .if/.endif
             mismatch.  
 
@@ -130,7 +132,7 @@ is the source/include file.
 
       (z)   Divide by 0 or Modulus by 0 error:  result is 0.
 
-<H5><A HREF="asmblr.htm #Index">  Return to the Assembler Index</A></H5>
+<H5><A HREF="asmblr.htm#Index">  Return to the Assembler Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -141,16 +143,18 @@ is the source/include file.
 
 <H4><B><PRE>
    The  (-l) option produces an ascii output listing file.  Each
-page of output contains a four line header:  
+page of output contains a five line header:  
 
 
      1.  The ASxxxx program name and page number 
 
-     2.  Title from a .title directive (if any) 
+     2.  Assembler Radix and Address Bits
 
-     3.  Subtitle from a .sbttl directive (if any) 
+     3.  Title from a .title directive (if any) 
 
-     4.  Blank line 
+     4.  Subtitle from a .sbttl directive (if any) 
+
+     5.  Blank line 
 
 
 
@@ -171,8 +175,9 @@ Each succeeding line contains five fields:
    The error field may contain upto 2 error flags indicating any
 errors encountered while assembling this line of source code.  
 
-   The  current  location counter field displays the 16-bit pro-
-gram position.  This field will be in the selected radix.  
+   The  current  location  counter  field  displays  the 16-bit,
+24-bit, or 32-bit program position.  This field will be  in  the
+selected radix.  
 
    The generated code follows the program location.  The listing
 radix determines the number of bytes that will be  displayed  in
@@ -215,7 +220,37 @@ characters:
 
      7.  s   high byte relocation 
 
-<H5><A HREF="asmblr.htm #Index">  Return to the Assembler Index</A></H5>
+
+   Assemblers  which  use 24-bit or 32-bit addressing use an ex-
+tended flagging mode:  
+
+     1.  *   paged relocation 
+
+     2.  u   1st  byte of unsigned value 
+
+     3.  v   2nd  byte of unsigned value 
+
+     4.  U   3rd  byte of unsigned value 
+
+     5.  V   4th  byte of unsigned value 
+
+     6.  p   PCR 1st  byte of relocation value or PCR byte 
+
+     7.  q   PCR 2nd  byte of relocation value 
+
+     8.  P   PCR 3rd  byte of relocation value 
+
+     9.  Q   PCR 4th  byte of relocation value 
+
+    10.  r   1st  byte of relocation value or byte relocation 
+
+    11.  s   2nd  byte of relocation value 
+
+    12.  R   3rd  byte of relocation value 
+
+    13.  S   4th  byte of relocation value 
+
+<H5><A HREF="asmblr.htm#Index">  Return to the Assembler Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -256,7 +291,7 @@ ing information:
 the program area numbers and the defined program areas, the size
 of the program areas, and the area flags (attributes).  
 
-<H5><A HREF="asmblr.htm #Index">  Return to the Assembler Index</A></H5>
+<H5><A HREF="asmblr.htm#Index">  Return to the Assembler Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -271,13 +306,17 @@ needed by the linker to bind multiple object modules into a com-
 plete  loadable  memory  image.   The object module contains the
 following designators:  
 
-        [XDQ][HL]
+        [XDQ][HL][234]
                 X       Hexidecimal radix
                 D       Decimal radix
                 Q       Octal radix
 
                 H       Most significant byte first
                 L       Least significant byte first
+
+                2       16-Bit Addressing
+                3       24-Bit Addressing
+                4       32-Bit Addressing
 
         H       Header 
         M       Module
@@ -291,18 +330,20 @@ following designators:
 designators and the format of the information contained  in  the
 object file.  
 
-<H5><A HREF="asmblr.htm #Index">  Return to the Assembler Index</A></H5>
+<H5><A HREF="asmblr.htm#Index">  Return to the Assembler Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 
-<H3>
-<P><A HREF="asxxxx.htm #JUMP">
+<H4>
+<P><A HREF="asxxxx.htm#JUMP">
 <IMG width=32 height=32 border=0 SRC="spcshp.gif" ALIGN=bottom></A>
 <B>...  Exit the ASxxxx Documentation</B></A></P>
+
 <P><A href="../home.htm">
 <IMG width=32 height=32 border=0 SRC="home.gif" ALIGN=bottom></A>
 <B>...  Home Page</B></P>
-</H3>
+</H4>
+
 </BODY> 
 </HTML>

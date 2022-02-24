@@ -29,12 +29,16 @@ operands.  Legal operands differ with each directive.
 <LI><A HREF= #title>  .title Directive </A>
 <LI><A HREF= #sbttl>  .sbttl Directive </A>
 <LI><A HREF= #page>  .page Directive </A>
+<LI><A HREF= #error>  .error Directive </A>
 <LI><A HREF= #byte>  .byte and .db Directives </A>
 <LI><A HREF= #word>  .word and .dw Directives </A>
-<LI><A HREF= #blkb>  .blkb, .blkw, and .ds Directives </A>
+<LI><A HREF= #3byte>  .3byte Directive </A>
+<LI><A HREF= #4byte>  .4byte and .quad Directives </A>
+<LI><A HREF= #blkb>  .blkb, .blkw, .ds, .blk3, and .blk4 Directives </A>
 <LI><A HREF= #ascii>  .ascii Directive </A>
 <LI><A HREF= #ascis>  .ascis Directive </A>
 <LI><A HREF= #asciz>  .asciz Directive </A>
+<LI><A HREF= #assume>  .assume Directive </A>
 <LI><A HREF= #radix>  .radix Directive </A>
 <LI><A HREF= #even>  .even Directive </A>
 <LI><A HREF= #odd>  .odd Directive </A>
@@ -44,8 +48,9 @@ operands.  Legal operands differ with each directive.
 <LI><A HREF= #if>  .if, .else, and .endif Directives </A>
 <LI><A HREF= #include>  .include Directive </A>
 <LI><A HREF= #setdp>  .setdp Directive </A>
+<LI><A HREF= #bits>  .16bit, .24bit, and .32bit Directives </A>
 <BR><BR>
-<LI><A HREF="asmblr.htm #Index">  Return to the Assembler Index</A>
+<LI><A HREF="asmblr.htm#Index">  Return to the Assembler Index</A>
 </UL></B></H4>
 
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
@@ -104,6 +109,25 @@ disabled by invoking the -p directive.
 
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<A NAME = "error"></A><FONT COLOR="#FF0000">.error</FONT> Directive 
+
+Format:  
+
+        .error exp 
+
+where:  exp     represents   an  absolute  expression.   If  the
+                evaluation of the expression results  in  a  non
+                zero value then an 'e' error is reported and the
+                text line is listed in the generated error.  
+
+
+   The  .error  directive  is  useful to report configuration or
+value errors during the assembly process.  (The .error directive
+is  identical in function to the .assume directive, just perhaps
+more descriptive.) 
+
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
+<HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "byte"></A><FONT COLOR="#FF0000">.byte</FONT> and <FONT COLOR="#FF0000">.db</FONT> Directives 
 
 Format:  
@@ -152,16 +176,71 @@ words of binary data in the object module.
 
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
-<A NAME = "blkb"></A><FONT COLOR="#FF0000">.blkb</FONT>, <FONT COLOR="#FF0000">.blkw</FONT>, and <FONT COLOR="#FF0000">.ds</FONT> Directives 
+<A NAME = "3byte"></A><FONT COLOR="#FF0000">.3byte</FONT> Directive 
+
+Format:  
+
+        .3byte  exp             ;Stores the binary value
+                                ;of the expression in
+                                ;the next triple (3 bytes).
+        
+        .3byte  exp1,exp2,expn  ;Stores the binary values
+                                ;of the list of expressions
+                                ;in successive triples
+                                ;(3 bytes).
+        
+where:  exp,    represent expressions that will occupy three
+        exp1,   bytes of data. Each expression will be
+        .       calculated as a 24-bit word expression.
+        .       Multiple expressions must be
+        expn    separated by commas.
+
+   The  .3byte  directive is used to generate successive triples
+of binary data in the object module.  (This  directive  is  only
+available in assemblers supporting 24-bit addressing.) 
+
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
+<HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<A NAME = "4byte"></A><FONT COLOR="#FF0000">.4byte</FONT> and <FONT COLOR="#FF0000">.quad</FONT> Directives 
+
+Format:  
+
+        .4byte  exp             ;Stores the binary value
+        .quad   exp             ;of the expression in
+                                ;the next quad (4 bytes).
+        
+        .4byte  exp1,exp2,expn  ;Stores the binary values
+        .quad   exp1,exp2,expn  ;of the list of expressions
+                                ;in successive quads
+                                ;(4 bytes).
+        
+where:  exp,    represent expressions that will occupy three
+        exp1,   bytes of data. Each expression will be
+        .       calculated as a 32-bit word expression.
+        .       Multiple expressions must be
+        expn    separated by commas.
+
+   The  .4byte or .quad directive is used to generate successive
+quads of binary data in the object module.  (This  directive  is
+only available in assemblers supporting 32-bit addressing.) 
+
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
+<HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<A NAME = "blkb"></A><FONT COLOR="#FF0000">.blkb</FONT>, <FONT COLOR="#FF0000">.blkw</FONT>, <FONT COLOR="#FF0000">.ds</FONT>, <FONT COLOR="#FF0000">.3byte</FONT>, and <FONT COLOR="#FF0000">.4byte</FONT> Directives 
 
 Format:  
 
         .blkb   N       ;reserve N bytes of space
         .blkw   N       ;reserve N words of space
         .ds     N       ;reserve N bytes of space
+        .blk3   N       ;reserve N triples of space
+        .blk4   N       ;reserve N quads of space
 
    The  .blkb  and .ds directives reserve byte blocks in the ob-
-ject module;  the .blkw directive reserves word blocks.  
+ject module;  the .blkw directive  reserves  word  blocks;   the
+.blk3  reserves  3 byte blocks(available in assembles supporting
+24-bit addressing);  the .blk4 reserves 4 byte blocks (available
+in assemblers supporting 32-bit addressing).  
 
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
@@ -225,6 +304,24 @@ The  .asciz  directive  places  one binary byte of data for each
 character in the string into the object module.   Following  all
 the  character  data  a  zero  byte is inserted to terminate the
 character string.  
+
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
+<HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<A NAME = "assume"></A><FONT COLOR="#FF0000">.assume</FONT> Directive 
+
+Format:  
+
+        .assume exp 
+
+where:  exp     represents   an  absolute  expression.   If  the
+                evaluation of the expression results  in  a  non
+                zero value then an 'e' error is reported and the
+                text line is listed in the generated error.  
+
+
+   The  .assume  directive  is useful to check assumptions about
+assembler values.  (The .assume directive is identical in  func-
+tion to the .error directive, just perhaps more descriptive.) 
 
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
@@ -345,7 +442,8 @@ sections:
                         symbols and their values.  
 
         '_CODE'         This  is  the default program/data area.
-                        This program area is of type (REL,CON). 
+                        This program area is of type (REL,CON).
+
 The  ASxxxx  assemblers  also automatically generate two symbols
 for each program area:  
 
@@ -589,17 +687,35 @@ addressing,  where the dp register is the index register and the
 direct addressing is the offset.  
 
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
+<HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<A NAME = "bits"></A><FONT COLOR="#FF0000">.16bit</FONT>, <FONT COLOR="#FF0000">.24bit</FONT>, and <FONT COLOR="#FF0000">.32bit</FONT> Directives 
+
+Format:  
+
+        .16bit          ;specify 16-bit addressing
+        .24bit          ;specify 24-bit addressing
+        .32bit          ;specify 32-bit addressing
+
+
+   The  .16bit, .24bit, and .32bit directives are special direc-
+tives for assembler configuration when default  values  are  not
+used.  (Currently only the as8xCxxx assembler can use the .16bit
+and .24bit directives in special mode.)
+ 
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 
-<H3>
-<P><A HREF="asmblr.htm #JUMP">
+<H4>
+<P><A HREF="asxxxx.htm#JUMP">
 <IMG width=32 height=32 border=0 SRC="spcshp.gif" ALIGN=bottom></A>
 <B>...  Exit the ASxxxx Documentation</B></A></P>
+
 <P><A href="../home.htm">
 <IMG width=32 height=32 border=0 SRC="home.gif" ALIGN=bottom></A>
 <B>...  Home Page</B></P>
-</H3>
+</H4>
+
 </BODY> 
 </HTML>

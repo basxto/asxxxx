@@ -32,6 +32,10 @@ all:
 	../exe/asxscn ../../../asxtst/asmth.lst
 	../exe/as8085 -glaxff ../../../asxtst/asmtl.asm
 	../exe/asxscn ../../../asxtst/asmtl.lst
+	../exe/as8xcxxx -glaxff ../../../asxtst/asmth.asm
+	../exe/asxscn ../../../asxtst/asmth.lst
+	../exe/as8xcxxx -glaxff ../../../asxtst/asmt3h.asm
+	../exe/asxscn -x3 ../../../asxtst/asmt3h.lst
 	../exe/as8051 -glaxff ../../../asxtst/asmth.asm
 	../exe/asxscn ../../../asxtst/asmth.lst
 	../exe/asz80 -glaxff ../../../asxtst/asmtl.asm
@@ -74,6 +78,8 @@ all:
 	../exe/asxscn ../../../as8085/t8085.lst
 	../exe/as8051 -glaxff ../../../as8051/t8051.asm
 	../exe/asxscn ../../../as8051/t8051.lst
+	../exe/as8xcxxx -glaxff ../../../as8xcxxx/t80c390.asm
+	../exe/asxscn -x3 ../../../as8xcxxx/t80c390.lst
 	../exe/asz80 -glaxff ../../../asz80/tz80.asm
 	../exe/asxscn ../../../asz80/tz80.lst
 	../exe/ash8 -glaxff ../../../ash8/th8.asm

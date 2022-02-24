@@ -418,7 +418,7 @@ getline()
 loop:	if (cfp && cfp->f_type == F_STD)
 		fprintf(stdout, "ASlink >> ");
 
-	if (sfp == NULL || fgets(ib, sizeof ib, sfp) == NULL) {
+	if (sfp == NULL || fgets(ib, sizeof(ib)-2, sfp) == NULL) {
 		obj_flag = 0;
 		if (sfp) {
 			if(sfp != stdin) {

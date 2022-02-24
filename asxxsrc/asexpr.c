@@ -7,6 +7,11 @@
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *   With enhancements from
+ *
+ *	Bill McKinnon (BM)
+ *	w_mckinnon@conknet.com
  */
 
 #include <stdio.h>
@@ -56,7 +61,7 @@
  *	the expr structure supplied by the user.
  *
  *	Notes about the arithmetic:
- *		The coding emulates 16-Bit unsigned
+ *		The coding emulates N-Bit unsigned
  *		arithmetic operations.  This allows
  *		program compilation without regard to the
  *		intrinsic integer length of the host
@@ -121,8 +126,8 @@ int n;
 		/*
 		 * 16-Bit Unsigned Arithmetic
 		 */
-		ae = esp->e_addr & 0xFFFF;
-		ar = re.e_addr & 0xFFFF;
+		ae = esp->e_addr & a_mask;
+		ar = re.e_addr & a_mask;
 
 		if (c == '+') {
 			/*
@@ -219,7 +224,7 @@ int n;
 				break;
 			}
 		}
-		esp->e_addr = (ae & 0x8000) ? ae | ~0x7FFF : ae & 0x7FFF;
+		esp->e_addr = (ae & s_mask) ? ae | ~v_mask : ae & v_mask;
 	}
 	unget(c);
 }
@@ -268,7 +273,7 @@ absexpr()
  *	based (e.flag != 0) on global references.
  *
  *	Notes about the arithmetic:
- *		The coding emulates 16-Bit unsigned
+ *		The coding emulates N-Bit unsigned
  *		arithmetic operations.  This allows
  *		program compilation without regard to the
  *		intrinsic integer length of the host
@@ -364,10 +369,10 @@ register struct expr *esp;
 		    esp->e_addr  = (getmap(-1)&0377);
 		    esp->e_addr |= (getmap(-1)&0377)<<8;
 		}
-		if (esp->e_addr & 0x8000) {
-			esp->e_addr |= ~0x7FFF;
+		if (esp->e_addr & s_mask) {
+			esp->e_addr |= ~v_mask;
 		} else {
-			esp->e_addr &=  0x7FFF;
+			esp->e_addr &=  v_mask;
 		}
 		return;
 	}
@@ -385,7 +390,7 @@ register struct expr *esp;
 			/*
 			 * let linker perform msb/lsb, lsb is default
 			 */
-			esp->e_rlcf |= R_BYT2;
+			esp->e_rlcf |= R_BYTX;
 			if (c == '>')
 				esp->e_rlcf |= R_MSB;
 			return;
@@ -456,7 +461,7 @@ register struct expr *esp;
 			c = get();
 		}
 		unget(c);
-		esp->e_addr = (n & 0x8000) ? n | ~0x7FFF : n & 0x7FFF;
+		esp->e_addr = (n & s_mask) ? n | ~v_mask : n & v_mask;
 		return;
 	}
 	/*
@@ -490,7 +495,7 @@ register struct expr *esp;
 			}
 			unget(c);
 			esp->e_mode = S_USER;
-			esp->e_addr = (n & 0x8000) ? n | ~0x7FFF : n & 0x7FFF;
+			esp->e_addr = (n & s_mask) ? n | ~v_mask : n & v_mask;
 			return;
 		}
 		unget(c);
@@ -715,3 +720,57 @@ register struct expr *esp;
 	esp->e_base.e_ap = NULL;
 	esp->e_rlcf = 0;
 }
+
+/*)Function	VOID	exprmasks(esp)
+ *
+ *		int	n		T Line Bytes in Address
+ *
+ *	The function exprmasks() configures the assembler
+ *	for 16, 24, or 32-Bit Data/Addresses.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		int	a_bytes		T Line Bytes in Address
+ *		addr_t	a_mask		Address mask
+ *		addr_t	s_mask		Sign mask
+ *		addr_t	v_mask		Value mask
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		The arithmetic precision parameters are set.
+ */
+ 
+VOID
+exprmasks(n)
+int n;
+{
+	a_bytes = n;
+
+	switch(a_bytes) {
+	default:
+		a_bytes = 2;
+	case 2:
+		a_mask = 0x0000FFFF;
+		s_mask = 0x00008000;
+		v_mask = 0x00007FFF;
+		break;
+
+	case 3:
+		a_mask = 0x00FFFFFF;
+		s_mask = 0x00800000;
+		v_mask = 0x007FFFFF;
+		break;
+
+	case 4:
+		a_mask = 0xFFFFFFFF;
+		s_mask = 0x80000000;
+		v_mask = 0x7FFFFFFF;
+		break;
+	}
+}
+
+

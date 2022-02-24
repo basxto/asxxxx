@@ -8,10 +8,13 @@
  * 721 Berkeley St.
  * Kent, Ohio  44240
  *
- *   With enhancements from
+ *   With enhancements from:
+ *
  *	John L. Hartman	(JLH)
  *	jhartman@compuserve.com
  *
+ *	Bill McKinnon (BM)
+ *	w_mckinnon@conknet.com
  */
 
 #include <stdio.h>
@@ -31,12 +34,14 @@
  *	perform the relocation calculations.
  *
  *	lkrloc.c contains the following functions:
- *		addr_t	adb_b()
+ *		addr_t	adb_1b()
+ *		addr_t	adb_2b()
+ *		addr_t	adb_3b()
+ *		addr_t	adb_4b()
+ *		addr_t	adb_xb()
  *		addr_t	adb_lo()
  *		addr_t	adb_hi()
- *		addr_t	adw_w()
- *		addr_t	adw_lo()
- *		addr_t	adw_hi()
+ *		addr_t	adw_xb()
  *		VOID	erpdmp()
  *		VOID	errdmp()
  *		addr_t	evword()
@@ -116,9 +121,9 @@ int c;
  *	rtval[] array, rtflg[] is set, and the number of
  *	evaluations is maintained in rtcnt.
  *
- *		T Line 
+ *		T Line
  *
- *		T xx xx nn nn nn nn nn ...  
+ *		T xx xx nn nn nn nn nn ...
  *
  *
  *		In:	"T n0 n1 n2 n3 ... nn"
@@ -133,7 +138,7 @@ int c;
  * 	The  T  line contains the assembled code output by the assem-
  *	bler with xx xx being the offset address from the  current  area
  *	base address and nn being the assembled instructions and data in
- *	byte format.  
+ *	byte format.
  *
  *	local variable:
  *		none
@@ -174,37 +179,37 @@ relt()
  *	translation of the LST files to RST files may be
  *	performed.
  *
- *		R Line 
+ *		R Line
  *
- *		R 0 0 nn nn n1 n2 xx xx ...  
+ *		R 0 0 nn nn n1 n2 xx xx ...
  *
  * 	The R line provides the relocation information to the linker.
  *	The nn nn value is the current area index, i.e.  which area  the
  *	current  values  were  assembled.  Relocation information is en-
- *	coded in groups of 4 bytes:  
+ *	coded in groups of 4 bytes:
  *
- *	1.  n1 is the relocation mode and object format 
- *	 	1.  bit 0 word(0x00)/byte(0x01) 
- *	 	2.  bit 1 relocatable area(0x00)/symbol(0x02) 
- *	 	3.  bit 2 normal(0x00)/PC relative(0x04) relocation 
- *	 	4.  bit  3  1-byte(0x00)/2-byte(0x08) object format for
- *		    byte data 
- *	 	5.  bit 4 signed(0x00)/unsigned(0x10) byte data 
- *	 	6.  bit 5 normal(0x00)/page '0'(0x20) reference 
- *	 	7.  bit 6 normal(0x00)/page 'nnn'(0x40) reference 
+ *	1.  n1 is the relocation mode and object format
+ *	 	1.  bit 0 word(0x00)/byte(0x01)
+ *	 	2.  bit 1 relocatable area(0x00)/symbol(0x02)
+ *	 	3.  bit 2 normal(0x00)/PC relative(0x04) relocation
+ *	 	4.  bit 3  1-byte(0x00)/2-byte(0x08) byte data
+ *	 	5.  bit 4 signed(0x00)/unsigned(0x10) byte data
+ *	 	6.  bit 5 normal(0x00)/page '0'(0x20) reference
+ *	 	7.  bit 6 normal(0x00)/page 'nnn'(0x40) reference
+ *		8.  bit 7 LSB(0x00)/MSB(0x80) byte
  *
  *	2.  n2  is  a byte index into the corresponding (i.e.  pre-
  *	 	ceeding) T line data (i.e.  a pointer to the data to be
  *	 	updated  by  the  relocation).   The T line data may be
  *	 	1-byte or  2-byte  byte  data  format  or  2-byte  word
- *	 	format.  
+ *	 	format.
  *
  *	3.  xx xx  is the area/symbol index for the area/symbol be-
  *	 	ing referenced.  the corresponding area/symbol is found
- *		in the header area/symbol lists.  
+ *		in the header area/symbol lists.
  *
  *	The groups of 4 bytes are repeated for each item requiring relo-
- *	cation in the preceeding T line.  
+ *	cation in the preceeding T line.
  *
  *	local variable:
  *		areax	**a		pointer to array of area pointers
@@ -226,28 +231,31 @@ relt()
  *		sym	**s		pointer to array of symbol pointers
  *
  *	global variables:
+ *		int	a_bytes		T Line Address Bytes
  *		head	*hp		pointer to the head structure
+ *		int	oflag		output type flag
  *		rerr	rerr		linker error structure
  *		FILE	*stderr		standard error device
+ *		int	uflag		relocation listing flag
  *
  *	called functions:
- *		addr_t	adb_b()		lkrloc.c
+ *		addr_t	adb_1b()	lkrloc.c
+ *		addr_t	adb_2b()	lkrloc.c
+ *		addr_t	adb_xb()	lkrloc.c
  *		addr_t	adb_lo()	lkrloc.c
  *		addr_t	adb_hi()	lkrloc.c
- *		addr_t	adw_w()		lkrloc.c
  *		addr_t	evword()	lkrloc.c
  *		int	eval()		lkeval.c
  *		int	fprintf()	c_library
- *		VOID	ihx()		lkihx.c
+ *		VOID	lkout()		lkout.c
  *		VOID	lkulist		lklist.c
  *		int	more()		lklex.c
  *		VOID	relerr()	lkrloc.c
- *		VOID	s19()		lks19.c
  *		int	symval()	lksym.c
  *
  *	side effects:
  *		The R and T lines are combined to produce
- *		relocated code and data.  Output S19 / IHX
+ *		relocated code and data.  Output Sxx / Ixx
  *		and relocated listing files may be produced.
  *
  */
@@ -257,8 +265,8 @@ relr()
 {
 	register int mode;
 	register addr_t reli, relv;
-	int aindex, rindex, rtp, error;
-	addr_t r, rtbase, rtofst, paga, pags, pc;
+	int aindex, rindex, rtp, error, v;
+	addr_t rtbase, rtofst, rtpofst, paga, pags, pc;
 	struct areax **a;
 	struct sym **s;
 
@@ -289,13 +297,13 @@ relr()
 	/*
 	 * Base values
 	 */
-	rtbase = adw_w(0, 0);
-	rtofst = 2;
+	rtbase = adb_xb(0, 0);
+	rtofst = a_bytes;
 
 	/*
 	 * Relocate address
 	 */
-	pc = adw_w(a[aindex]->a_addr, 0);
+	pc = adb_xb(a[aindex]->a_addr, 0);
 
 	/*
 	 * Do remaining relocations
@@ -303,6 +311,7 @@ relr()
 	while (more()) {
 		error = 0;
 		relv = 0;
+		rtpofst = rtofst;
 		mode = eval();
 		rtp = eval();
 		rindex = evword();
@@ -356,65 +365,123 @@ relr()
 			 * R_BYTE or R_WORD operation
 			 */
 			if (mode & R_BYTE) {
-				if (mode & R_BYT2) {
+				if (mode & R_BYTX) {
 					if (mode & R_MSB) {
 						relv = adb_hi(reli, rtp);
 					} else {
 						relv = adb_lo(reli, rtp);
 					}
-					rtofst += 1;
+					rtofst += (a_bytes - 1);
 				} else {
-					relv = adb_b(reli, rtp);
+					relv = adb_1b(reli, rtp);
 				}
 			} else {
-				relv = adw_w(reli, rtp);
+				relv = adw_xb(2, reli, rtp);
+				rtofst += (a_bytes - 2);
 			}
 
 			/*
 			 * Page Relocation Error Checking
 			 */
 			if (mode & R_PAG0 && (relv & ~0xFF || paga || pags))
-				error = 3;
-			if (mode & R_PAG  && (relv & ~0xFF))
 				error = 4;
+			if (mode & R_PAG  && (relv & ~0xFF))
+				error = 5;
 		/*
 		 * Extended Modes
 		 */
 		} else {
 			switch(mode & R_EMASK) {
 			case R_J11:
+				if ((hilo == 0) || (a_bytes < 2)) {
+					error = 8;
+				}
 				/*
 				 * JLH: 11 bit jump destination for 8051.
 				 * Forms two byte instruction with
 				 * op-code bits in the MIDDLE!
 				 * rtp points at 3 byte locus:
-				 * first two will get the instructiion
+				 * first two will get the address,
 				 * third one has raw op-code
 				 */
+				relv = adw_xb(2, reli, rtp);
+
 				/*
 				 * Calculate absolute destination
 				 * relv must be on same 2K page as pc
-				*/
-				relv = adw_w(reli, rtp);
-
+				 */
 				if ((relv & ~0x7ff) !=
 				   ((pc + rtp - rtofst) & ~0x7ff)) {
-					error = 4;
+					error = 6;
 				}
 
+				rtofst += (a_bytes - 2);
+
 				/*
-				 * Merge MSB (byte 0) with op-code,
+				 * Merge MSB with op-code,
 				 * ignoring top 5 bits of address.
-				 * Then hide the op-code
+				 * Then hide the op-code.
 				 */
-				rtval[rtp] = rtval[rtp+2] |
-						((rtval[rtp] & 0x07)<<5);
-				rtflg[rtp+2] = 0;
+ 				rtval[rtp + (a_bytes - 2)] =
+					rtval[rtp + a_bytes] |
+					((rtval[rtp + (a_bytes - 2)] & 0x07)<<5);
+				rtflg[rtp + a_bytes] = 0;
 				rtofst += 1;
 				break;
 
+			case R_J19:
+				if ((hilo == 0) || (a_bytes < 3)) {
+					error = 8;
+				}
+				/*
+				 * BK: 19 bit jump destination for DS80C390.
+				 * Forms four byte instruction with
+				 * op-code bits in the MIDDLE!
+				 * rtp points at 4 byte locus:
+				 * first three will get the address,
+				 * fourth one has raw op-code
+				 */
+				relv = adw_xb(3, reli, rtp);
+
+				/*
+				 * Calculate absolute destination
+				 * relv must be on same 512K page as pc
+				 */
+				if ((relv & ~0x7ffff) !=
+				   ((pc + rtp - rtofst) & ~0x7ffff)) {
+					error = 7;
+				}
+
+				rtofst += (a_bytes - 3);
+
+				/*
+				 * Merge MSB with op-code,
+				 * ignoring top 5 bits of address.
+				 * Then hide the op-code.
+				 */
+				rtval[rtp + (a_bytes - 3)] =
+					rtval[rtp + a_bytes] |
+					((rtval[rtp + (a_bytes - 3)] & 0x07)<<5);
+				rtflg[rtp + a_bytes] = 0;
+				rtofst += 1;
+				break;
+
+			case R_3BYTE:
+				/*
+				 * 24 bit destination
+				 */
+				relv = adb_3b(reli, rtp);
+				break;
+
+			case R_4BYTE:
+				/*
+				 * 32 bit destination
+				 */
+				relv = adb_4b(reli, rtp);
+				break;
+
 			default:
-				error = 5;
+				error = 8;
 				break;
 			}
 		}
@@ -428,10 +495,15 @@ relr()
 		/*
 		 * PCR Relocation Error Checking
 		 */
-		if (mode & R_PCR && mode & R_BYTE) {
-			r = relv & ~0x7F;
-			if (r != (addr_t) ~0x7F && r != 0)
-				error = 2;
+		if (mode & R_PCR) {
+			v = relv - reli;
+			if ((mode & R_BYTE) && (mode & R_BYTX)) {
+				if ((v < ~0x7F) || (v > 0x7F))
+					error = 2;
+			} else {
+				if ((v < ~0x7FFF) || (v > 0x7FFF))
+					error = 3;
+			}
 		}
 
 		/*
@@ -440,7 +512,7 @@ relr()
 		if (error) {
 			rerr.aindex = aindex;
 			rerr.mode = mode;
-			rerr.rtbase = rtbase + rtp - rtofst - 1;
+			rerr.rtbase = rtbase + rtp - rtpofst;
 			rerr.rindex = rindex;
 			rerr.rval = relv - reli;
 			relerr(errmsg[error-1]);
@@ -449,19 +521,19 @@ relr()
 	if (uflag != 0) {
 		lkulist(1);
 	}
-	if (oflag == 1) {
-		ihx(1);
-	} else
-	if (oflag == 2) {
-		s19(1);
+	if (oflag != 0) {
+		lkout(1);
 	}
 }
 
 char *errmsg[] = {
 	"Unsigned Byte error",
 	"Byte PCR relocation error",
+	"Word PCR relocation error",
 	"Page0 relocation error",
 	"Page Mode relocation error",
+	"2K Page relocation error",
+	"512K Page relocation error",
 	"Undefined Extended Mode error"
 };
 
@@ -473,22 +545,22 @@ char *errmsg[] = {
  *	previous T line data to set the base page address
  *	and test the paging boundary and length.
  *
- *		P Line 
+ *		P Line
  *
- *		P 0 0 nn nn n1 n2 xx xx 
+ *		P 0 0 nn nn n1 n2 xx xx
  *
  * 	The  P  line provides the paging information to the linker as
  *	specified by a .setdp directive.  The format of  the  relocation
  *	information is identical to that of the R line.  The correspond-
- *	ing T line has the following information:  
- *		T xx xx aa aa bb bb 
+ *	ing T line has the following information:
+ *		T xx xx aa aa bb bb
  *
  * 	Where  aa aa is the area reference number which specifies the
  *	selected page area and bb bb is the base address  of  the  page.
  *	bb bb will require relocation processing if the 'n1 n2 xx xx' is
  *	specified in the P line.  The linker will verify that  the  base
  *	address is on a 256 byte boundary and that the page length of an
- *	area defined with the PAG type is not larger than 256 bytes.  
+ *	area defined with the PAG type is not larger than 256 bytes.
  *
  *	local variable:
  *		areax	**a		pointer to array of area pointers
@@ -506,7 +578,7 @@ char *errmsg[] = {
  *		FILE	*stderr		standard error device
  *
  *	called functions:
- *		addr_t	adw_w()		lkrloc.c
+ *		addr_t	adb_2b()		lkrloc.c
  *		addr_t	evword()	lkrloc.c
  *		int	eval()		lkeval.c
  *		int	fprintf()	c_library
@@ -579,13 +651,13 @@ relp()
 			}
 			relv = a[rindex]->a_addr;
 		}
-		adw_w(relv, rtp);
+		adb_xb(relv, rtp);
 	}
 
 	/*
 	 * Paged values
 	 */
-	aindex = adw_w(0,2);
+	aindex = adb_xb(0,a_bytes);
 	if (aindex >= hp->h_narea) {
 		fprintf(stderr, "P area error\n");
 		lkerr++;
@@ -593,7 +665,7 @@ relp()
 	}
 	sdp.s_areax = a[aindex];
 	sdp.s_area = sdp.s_areax->a_bap;
-	sdp.s_addr = adw_w(0,4);
+	sdp.s_addr = adb_xb(0,a_bytes*2);
 	if (sdp.s_area->a_addr & 0xFF || sdp.s_addr & 0xFF)
 		relerp("Page Definition Boundary Error");
 }
@@ -611,9 +683,8 @@ relp()
  *		int	uflag		relocation listing flag
  *
  *	called functions:
- *		VOID	ihx()		lkihx.c
+ *		VOID	iout()		lkout.c
  *		VOID	lkulist()	lklist.c
- *		VOID	s19()		lks19.c
  *
  *	side effects:
  *		All open output files are closed.
@@ -626,11 +697,8 @@ rele()
 	if (uflag != 0) {
 		lkulist(0);
 	}
-	if (oflag == 1) {
-		ihx(0);
-	} else
-	if (oflag == 2) {
-		s19(0);
+	if (oflag != 0) {
+		lkout(0);
 	}
 }
 
@@ -669,12 +737,12 @@ evword()
 	return(v);
 }
 
-/*)Function	addr_t 	adb_b(v, i)
+/*)Function	addr_t 	adb_1b(v, i)
  *
  *		int	v		value to add to byte
  *		int	i		rtval[] index
  *
- *	The function adb_b() adds the value of v to
+ *	The function adb_1b() adds the value of v to
  *	the single byte value contained in rtval[i].
  *	The new value of rtval[i] is returned.
  *
@@ -688,16 +756,212 @@ evword()
  *		none
  *
  *	side effects:
- *		The value of rtval[] is changed.
+ *		The byte value of rtval[] is changed.
  *
  */
 
 addr_t
-adb_b(v, i)
+adb_1b(v, i)
 register addr_t v;
 register int i;
 {
 	return(rtval[i] += v);
+}
+
+/*)Function	addr_t 	adb_2b(v, i)
+ *
+ *		int	v		value to add to word
+ *		int	i		rtval[] index
+ *
+ *	The function adb_2b() adds the value of v to the
+ *	2 byte value contained in rtval[i] and rtval[i+1].
+ *	The new value of rtval[i] / rtval[i+1] is returned.
+ *
+ *	local variable:
+ *		addr_t	j		temporary evaluation variable
+ *
+ *	global variables:
+ *		hilo			byte ordering parameter
+ *
+ *	called functions:
+ *		none
+ *
+ *	side effects:
+ *		The 2 byte value of rtval[] is changed.
+ *
+ */
+
+addr_t
+adb_2b(v, i)
+register addr_t v;
+register int i;
+{
+	register addr_t j;
+
+	if (hilo) {
+		j = v + (rtval[i] << 8) +
+			(rtval[i+1] & 0xff);
+		rtval[i] = (j >> 8) & 0xff;
+		rtval[i+1] = j & 0xff;
+	} else {
+		j = v + (rtval[i] & 0xff) +
+			(rtval[i+1] << 8);
+		rtval[i] = j & 0xff;
+		rtval[i+1] = (j >> 8) & 0xff;
+	}
+	return(j);
+}
+
+/*)Function	addr_t 	adb_3b(v, i)
+ *
+ *		int	v		value to add to word
+ *		int	i		rtval[] index
+ *
+ *	The function adb_3b() adds the value of v to the
+ *	three byte value contained in rtval[i], rtval[i+1], and rtval[i+2].
+ *	The new value of rtval[i] / rtval[i+1] / rtval[i+2] is returned.
+ *
+ *	local variable:
+ *		addr_t	j		temporary evaluation variable
+ *
+ *	global variables:
+ *		hilo			byte ordering parameter
+ *
+ *	called functions:
+ *		none
+ *
+ *	side effects:
+ *		The 3 byte value of rtval[] is changed.
+ *
+ */
+
+addr_t
+adb_3b(v, i)
+register addr_t v;
+register int i;
+{
+	register addr_t j;
+
+	if (hilo) {
+		j = v + (((rtval[i] << 16) & 0xff0000) +
+			 ((rtval[i+1] << 8 ) & 0xff00) +
+			 ((rtval[i+2]) & 0xff));
+		rtval[i] = (j >> 16) & 0xff;
+		rtval[i+1] = (j >> 8) & 0xff;
+		rtval[i+2] = j & 0xff;
+	} else {
+		j = v + (((rtval[i+2] << 16) & 0xff0000) +
+			 ((rtval[i+1] << 8 ) & 0xff00) +
+			 ((rtval[i]) & 0xff));
+		rtval[i] = j & 0xff;
+		rtval[i+1] = (j >> 8) & 0xff;
+		rtval[i+2] = (j >> 16) & 0xff;
+    }
+    return(j);
+}
+
+/*)Function	addr_t 	adb_4b(v, i)
+ *
+ *		int	v		value to add to word
+ *		int	i		rtval[] index
+ *
+ *	The function adb_4b() adds the value of v to the
+ *	four byte value contained in rtval[i], ..., rtval[i+3].
+ *	The new value of rtval[i], ...,  rtval[i+3] is returned.
+ *
+ *	local variable:
+ *		addr_t	j		temporary evaluation variable
+ *
+ *	global variables:
+ *		hilo			byte ordering parameter
+ *
+ *	called functions:
+ *		none
+ *
+ *	side effects:
+ *		The 4 byte value of rtval[] is changed.
+ *
+ */
+
+addr_t
+adb_4b(v, i)
+register addr_t v;
+register int i;
+{
+	register addr_t j;
+
+	if (hilo) {
+		j = v + (((rtval[i] << 24) & 0xff000000) +
+			 ((rtval[i+1] << 16) & 0xff0000) +
+			 ((rtval[i+2] << 8 ) & 0xff00) +
+			 ((rtval[i+3]) & 0xff));
+		rtval[i] = (j >> 24) & 0xff;
+		rtval[i+1] = (j >> 16) & 0xff;
+		rtval[i+2] = (j >> 8) & 0xff;
+		rtval[i+3] = j & 0xff;
+	} else {
+		j = v + (((rtval[i+3] << 24) & 0xff000000) +
+			 ((rtval[i+2] << 16) & 0xff0000) +
+			 ((rtval[i+1] << 8 ) & 0xff00) +
+			 ((rtval[i]) & 0xff));
+		rtval[i] = j & 0xff;
+		rtval[i+1] = (j >> 8) & 0xff;
+		rtval[i+2] = (j >> 16) & 0xff;
+		rtval[i+3] = (j >> 24) & 0xff;
+    }
+    return(j);
+}
+
+/*)Function	addr_t 	adb_xb(v, i)
+ *
+ *		int	v		value to add to x-bytes
+ *		int	i		rtval[] index
+ *
+ *	The function adx_x() adds the value of v to
+ *	the value contained in rtval[i] for x-bytes.
+ *	The new value of rtval[i] for x-bytes is returned.
+ *
+ *	local variable:
+ *		none
+ *
+ *	global variables:
+ *		none
+ *
+ *	called functions:
+ *		addr_t	adb_1b()	lkrloc.c
+ *		addr_t	adb_2b()	lkrloc.c
+ *		addr_t	adb_3b()	lkrloc.c
+ *		addr_t	adb_4b()	lkrloc.c
+ *
+ *	side effects:
+ *		The x-byte value of rtval[] is changed.
+ *
+ */
+
+addr_t
+adb_xb(v, i)
+register addr_t v;
+register int i;
+{
+	addr_t j;
+
+	switch(a_bytes){
+	case 1:
+		j = adb_1b(v, i);
+		return(j & 0x80 ? j | ~0x7F : j & 0x7F);
+	case 2:
+		j = adb_2b(v, i);
+		return(j & 0x8000 ? j | ~0x7FFF : j & 0x7FFF);
+	case 3:
+		j = adb_3b(v, i);
+		return(j & 0x800000 ? j | ~0x7FFFFF : j & 0x7FFFFF);
+	case 4:
+		j = adb_4b(v, i);
+		return(j & 0x80000000 ? j | ~0x7FFFFFFF : j & 0x7FFFFFFF);
+	default:
+		return(0);
+	}
+	return(0);
 }
 
 /*)Function	addr_t 	adb_lo(v, i)
@@ -706,9 +970,10 @@ register int i;
  *		int	i		rtval[] index
  *
  *	The function adb_lo() adds the value of v to the
- *	double byte value contained in rtval[i] and rtval[i+1].
- *	The new value of rtval[i] / rtval[i+1] is returned.
- *	The MSB rtflg[] is cleared.
+ *	value contained in rtval[i] through rtval[i + a_bytes - 1].
+ *	The new value of rtval[i] ... is returned.
+ *	The rtflg[] flags are cleared for all rtval[i] ... except
+ *	the LSB.
  *
  *	local variable:
  *		addr_t	j		temporary evaluation variable
@@ -721,8 +986,8 @@ register int i;
  *
  *	side effects:
  *		The value of rtval[] is changed.
- *		The rtflg[] value corresponding to the
- *		MSB of the word value is cleared to reflect
+ *		The rtflg[] values corresponding to all bytes
+ *		except the LSB of the value are cleared to reflect
  *		the fact that the LSB is the selected byte.
  *
  */
@@ -733,15 +998,15 @@ addr_t	v;
 int	i;
 {
 	register addr_t j;
+	register int m, n;
 
-	j = adw_w(v, i);
+	j = adb_xb(v, i);
 	/*
-	 * Remove Hi byte
+	 * LSB is lowest order byte of data
 	 */
-	if (hilo) {
-		rtflg[i] = 0;
-	} else {
-		rtflg[i+1] = 0;
+	m = (hilo ? a_bytes-1 : 0);
+	for (n=0; n<a_bytes; n++) {
+		if(n != m) rtflg[i+n] = 0;
 	}
 	return (j);
 }
@@ -752,8 +1017,8 @@ int	i;
  *		int	i		rtval[] index
  *
  *	The function adb_hi() adds the value of v to the
- *	double byte value contained in rtval[i] and rtval[i+1].
- *	The new value of rtval[i] / rtval[i+1] is returned.
+ *	value contained in rtval[i] through rtval[i + a_bytes - 1].
+ *	The new value of rtval[i] .... is returned.
  *	The LSB rtflg[] is cleared.
  *
  *	local variable:
@@ -767,8 +1032,8 @@ int	i;
  *
  *	side effects:
  *		The value of rtval[] is changed.
- *		The rtflg[] value corresponding to the
- *		LSB of the word value is cleared to reflect
+ *		The rtflg[] values corresponding to all bytes
+ *		except the 2nd byte (MSB) are cleared to reflect
  *		the fact that the MSB is the selected byte.
  *
  */
@@ -779,150 +1044,63 @@ addr_t	v;
 int	i;
 {
 	register addr_t j;
+	register int m, n;
 
-	j = adw_w(v, i);
+	j = adb_xb(v, i);
 	/*
-	 * Remove Lo byte
+	 * MSB is next lowest order byte of data
 	 */
-	if (hilo) {
-		rtflg[i+1] = 0;
-	} else {
+	m = (hilo ? a_bytes-2 : 1);
+	for (n=0; n<a_bytes; n++) {
+		if(n != m) rtflg[i+n] = 0;
+	}
+	return (j);
+}
+
+/*)Function	addr_t 	adw_xb(x, v, i)
+ *
+ *		int	x		number of bytes to allow
+ *		int	v		value to add to byte
+ *		int	i		rtval[] index
+ *
+ *	The function adw_xb() adds the value of v to the
+ *	value contained in rtval[i] through rtval[i + a_bytes - 1].
+ *	The new value of rtval[i] .... is returned.
+ *	The rtflg[] is cleared for bytes of higher order than x.
+ *
+ *	local variable:
+ *		addr_t	j		temporary evaluation variable
+ *
+ *	global variables:
+ *		hilo			byte ordering parameter
+ *
+ *	called functions:
+ *		none
+ *
+ *	side effects:
+ *		The value of rtval[] is changed.
+ *		The rtflg[] values corresponding to all bytes
+ *		of higher order than x are cleared to reflect
+ *		the fact that x bytes are selected.
+ *
+ */
+
+addr_t
+adw_xb(x, v, i)
+int x;
+addr_t v;
+int i;
+{
+	register addr_t j;
+	register int n;
+
+	j = adb_xb(v, i);
+	/*
+	 * X LS Bytes
+	 */
+	i += (hilo ? 0 : x);
+	for (n=0; n<(a_bytes-x); n++,i++) {
 		rtflg[i] = 0;
-	}
-	return (j);
-}
-
-/*)Function	addr_t 	adw_w(v, i)
- *
- *		int	v		value to add to word
- *		int	i		rtval[] index
- *
- *	The function adw_w() adds the value of v to the
- *	word value contained in rtval[i] and rtval[i+1].
- *	The new value of rtval[i] / rtval[i+1] is returned.
- *
- *	local variable:
- *		addr_t	j		temporary evaluation variable
- *
- *	global variables:
- *		hilo			byte ordering parameter
- *
- *	called functions:
- *		none
- *
- *	side effects:
- *		The word value of rtval[] is changed.
- *
- */
-
-addr_t
-adw_w(v, i)
-register addr_t v;
-register int i;
-{
-	register addr_t j;
-
-	if (hilo) {
-		j = v + (rtval[i] << 8) + (rtval[i+1] & 0xff);
-		rtval[i] = (j >> 8) & 0xff;
-		rtval[i+1] = j & 0xff;
-	} else {
-		j = v + (rtval[i] & 0xff) + (rtval[i+1] << 8);
-		rtval[i] = j & 0xff;
-		rtval[i+1] = (j >> 8) & 0xff;
-	}
-	return(j);
-}
-
-/*)Function	addr_t 	adw_lo(v, i)
- *
- *		int	v		value to add to byte
- *		int	i		rtval[] index
- *
- *	The function adw_lo() adds the value of v to the
- *	double byte value contained in rtval[i] and rtval[i+1].
- *	The new value of rtval[i] / rtval[i+1] is returned.
- *	The MSB rtval[] is zeroed.
- *
- *	local variable:
- *		addr_t	j		temporary evaluation variable
- *
- *	global variables:
- *		hilo			byte ordering parameter
- *
- *	called functions:
- *		none
- *
- *	side effects:
- *		The value of rtval[] is changed.
- *		The MSB of the word value is cleared to reflect
- *		the fact that the LSB is the selected byte.
- *
- */
-
-addr_t
-adw_lo(v, i)
-addr_t	v;
-int	i;
-{
-	register addr_t j;
-
-	j = adw_w(v, i);
-	/*
-	 * Clear Hi byte
-	 */
-	if (hilo) {
-		rtval[i] = 0;
-	} else {
-		rtval[i+1] = 0;
-	}
-	return (j);
-}
-
-/*)Function	addr_t 	adw_hi(v, i)
- *
- *		int	v		value to add to byte
- *		int	i		rtval[] index
- *
- *	The function adw_hi() adds the value of v to the
- *	double byte value contained in rtval[i] and rtval[i+1].
- *	The new value of rtval[i] / rtval[i+1] is returned.
- *	The MSB and LSB values are interchanged.
- *	The MSB rtval[] is zeroed.
- *
- *	local variable:
- *		addr_t	j		temporary evaluation variable
- *
- *	global variables:
- *		hilo			byte ordering parameter
- *
- *	called functions:
- *		none
- *
- *	side effects:
- *		The value of rtval[] is changed.
- *		The MSB and LSB values are interchanged and
- *		then the MSB cleared.
- *
- */
-
-addr_t
-adw_hi(v, i)
-addr_t	v;
-int	i;
-{
-	register addr_t j;
-
-	j = adw_w(v, i);
-	/*
-	 * LSB = MSB, Clear MSB
-	 */
-	if (hilo) {
-		rtval[i+1] = rtval[i];
-		rtval[i] = 0;
-	} else {
-		rtval[i] = rtval[i+1];
-		rtval[i+1] = 0;
 	}
 	return (j);
 }
@@ -1024,10 +1202,11 @@ char *str;
 	/*
 	 * Print Ref Info
 	 */
-/*         111111111122222222223333333333444444444455555555556666666666777*/
-/*123456789012345678901234567890123456789012345678901234567890123456789012*/
+/*         11111111112222222222333333333344444444445555555555666666666677777*/
+/*12345678901234567890123456789012345678901234567890123456789012345678901234*/
+/*        |                 |                 |                 |           */
 	fprintf(fptr,
-"         file              module            area              offset\n");
+"         file              module            area                   offset\n");
 	fprintf(fptr,
 "  Refby  %-14.14s    %-14.14s    %-14.14s    ",
 			hp->h_lfile->f_idp,
@@ -1043,8 +1222,9 @@ char *str;
 	} else {
 		raxp = a[rindex];
 	}
-/*         111111111122222222223333333333444444444455555555556666666666777*/
-/*123456789012345678901234567890123456789012345678901234567890123456789012*/
+/*         11111111112222222222333333333344444444445555555555666666666677777*/
+/*12345678901234567890123456789012345678901234567890123456789012345678901234*/
+/*        |                 |                 |                 |           */
 	fprintf(fptr,
 "  Defin  %-14.14s    %-14.14s    %-14.14s    ",
 			raxp->a_bhp->h_lfile->f_idp,
@@ -1085,15 +1265,36 @@ prntval(fptr, v)
 FILE *fptr;
 addr_t v;
 {
-	if (xflag == 0) {
-		fprintf(fptr, "%04X\n", v);
-	} else
-	if (xflag == 1) {
-		fprintf(fptr, "%06o\n", v);
-	} else
-	if (xflag == 2) {
-		fprintf(fptr, "%05u\n", v);
+	register char *frmt;
+
+	switch(xflag) {
+	default:
+	case 0:
+		switch(a_bytes) {
+		default:
+		case 2: frmt = "       %04X\n"; break;
+		case 3: frmt = "     %06X\n"; break;
+		case 4: frmt = "    %08X\n"; break;
+		}
+		break;
+	case 1:
+		switch(a_bytes) {
+		default:
+		case 2: frmt = "     %06o\n"; break;
+		case 3: frmt = "   %08o\n"; break;
+		case 4: frmt = "%011o\n"; break;
+		}
+		break;
+	case 2:
+		switch(a_bytes) {
+		default:
+		case 2: frmt = "      %05u\n"; break;
+		case 3: frmt = "   %08u\n"; break;
+		case 4: frmt = " %010u\n"; break;
+		}
+		break;
 	}
+	fprintf(fptr, frmt, v);
 }
 
 /*)Function	VOID	relerp(str)

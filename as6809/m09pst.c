@@ -29,10 +29,10 @@ struct	mne	mne[] = {
     {	NULL,	"NOPAG",	S_ATYP,		0,	A_NOPAG	},
     {	NULL,	"PAG",		S_ATYP,		0,	A_PAG	},
 
-    {	NULL,	".byte",	S_BYTE,		0,	0	},
-    {	NULL,	".db",		S_BYTE,		0,	0	},
-    {	NULL,	".word",	S_WORD,		0,	0	},
-    {	NULL,	".dw",		S_WORD,		0,	0	},
+    {	NULL,	".byte",	S_DATA,		0,	1	},
+    {	NULL,	".db",		S_DATA,		0,	1	},
+    {	NULL,	".word",	S_DATA,		0,	2	},
+    {	NULL,	".dw",		S_DATA,		0,	2	},
     {	NULL,	".ascii",	S_ASCII,	0,	0	},
     {	NULL,	".asciz",	S_ASCIZ,	0,	0	},
     {	NULL,	".blkb",	S_BLK,		0,	1	},
@@ -53,6 +53,8 @@ struct	mne	mne[] = {
     {	NULL,	".org",		S_ORG,		0,	0	},
     {	NULL,	".module",	S_MODUL,	0,	0	},
     {	NULL,	".ascis",	S_ASCIS,	0,	0	},
+    {	NULL,	".assume",	S_ERROR,	0,	0	},
+    {	NULL,	".error",	S_ERROR,	0,	1	},
 
 	/* 6800 Compatibility */
 
@@ -254,85 +256,6 @@ struct	mne	mne[] = {
     {	NULL,	"bsr",		S_BRA,		S_END,	0x8D	}
 };
 
-#ifdef	decus
-
-struct opdata mc6800[] = {
-
-    {{	0x34, 0x04,	/*	pshs	b	;aba	*/
-	0xab, 0xe0	/*	adda	,s+	*/	}},
-
-    {{	0x34, 0x04,	/*	pshs	b	;cba	*/
-	0xa1, 0xe0	/*	cmpa	,s+	*/	}},
-
-    {{	0x1c, 0xfe,	/*	andcc	#0xFE	;clc	*/
-	0x00, 0x00	}},
-
-    {{	0x1c, 0xef,	/*	andcc	#0xEF	;cli	*/
-	0x00, 0x00	}},
-
-    {{	0x1c, 0xfd,	/*	andcc	#0xFD	;clv	*/
-	0x00, 0x00	}},
-
-    {{	0x32, 0x7f,	/*	leas	-1,s	;des	*/
-	0x00, 0x00	}},
-
-    {{	0x30, 0x1f,	/*	leax	-1,x	;dex	*/
-	0x00, 0x00	}},
-
-    {{	0x32, 0x61,	/*	leas	1,s	;ins	*/
-	0x00, 0x00	}},
-
-    {{	0x30, 0x01,	/*	leax	1,x	;inx	*/
-	0x00, 0x00	}},
-
-    {{	0x34, 0x02,	/*	pshs	a	;psha	*/
-	0x00, 0x00	}},
-
-    {{	0x34, 0x04,	/*	pshs	b	;pshb	*/
-	0x00, 0x00	}},
-
-    {{	0x35, 0x02,	/*	puls	a	;pula	*/
-	0x00, 0x00	}},
-
-    {{	0x35, 0x04,	/*	puls	b	;pulb	*/
-	0x00, 0x00	}},
-
-    {{	0x34, 0x04,	/*	pshs	b	;sba	*/
-	0xa0, 0xe0	/*	suba	,s+	*/	}},
-
-    {{	0x1a, 0x01,	/*	orcc	#0x01	;sec	*/
-	0x00, 0x00	}},
-
-    {{	0x1a, 0x10,	/*	orcc	#0x10	;sei	*/
-	0x00, 0x00	}},
-
-    {{	0x1a, 0x02,	/*	orcc	#0x02	;sev	*/
-	0x00, 0x00	}},
-
-    {{	0x1f, 0x89,	/*	tfr	a,b	;tab	*/
-	0x4d, 0x00	/*	tsta	*/	}},
-
-    {{	0x1f, 0x8a,	/*	tfr	a,cc	;tap	*/
-	0x00, 0x00	}},
-
-    {{	0x1f, 0x98,	/*	tfr	b,a	;tba	*/
-	0x5d, 0x00	/*	tstb	*/	}},
-
-    {{	0x1f, 0xa8,	/*	tfr	cc,a	;tpa	*/
-	0x00, 0x00	}},
-
-    {{	0x1f, 0x41,	/*	tfr	s,x	;tsx	*/
-	0x00, 0x00	}},
-
-    {{	0x1f, 0x14,	/*	tfr	x,s	;txs	*/
-	0x00, 0x00	}},
-
-    {{	0x3c, 0xff,	/*	cwai	#0xFF	;wai	*/
-	0x00, 0x00	}}
-};
-
-#else
-
 struct opdata mc6800[] = {
 
     {{	(char) 0x34, (char) 0x04,	/*	pshs	b	;aba	*/
@@ -407,5 +330,3 @@ struct opdata mc6800[] = {
     {{	(char) 0x3c, (char) 0xff,	/*	cwai	#0xFF	;wai	*/
 	(char) 0x00, (char) 0x00	}}
 };
-
-#endif

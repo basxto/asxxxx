@@ -261,6 +261,7 @@ char *argv[];
 	}
 	if (inpfil < 0)
 		usage(ER_WARNING);
+	exprmasks(2);
 	syminit();
 	for (pass=0; pass<3; ++pass) {
 		aserr = 0;
@@ -608,7 +609,7 @@ loop:
 	}
 	/*
 	 * If the next character is a = then an equate is being processed.
-	 * A double == defines a global equate.  If this is new variable
+	 * A double == defines a global equate.  If this is a new variable
 	 * then create a symbol structure.
 	 */
 	if (c == '=') {
@@ -721,18 +722,33 @@ loop:
 		lmode = ALIST;
 		break;
 
-	case S_BYTE:
-	case S_WORD:
+	case S_DATA:
+		if ((addr_t) a_bytes < mp->m_valu) {
+			err('o');
+		}
 		do {
 			clrexpr(&e1);
 			expr(&e1, 0);
-			if (mp->m_type == S_BYTE) {
-				outrb(&e1, R_NORM);
-			} else {
-				outrw(&e1, R_NORM);
+			switch(mp->m_valu) {
+			default:
+			case 1:	outrb(&e1, R_NORM); break;
+			case 2: outrw(&e1, R_NORM); break;
+			case 3: outr3b(&e1, R_NORM); break;
+			case 4: outr4b(&e1, R_NORM); break;
 			}
 		} while ((c = getnb()) == ',');
 		unget(c);
+		break;
+
+	case S_ERROR:
+		clrexpr(&e1);
+		if (more()) {
+			expr(&e1, 0);
+		}
+		if (e1.e_addr != 0) {
+			err('e');
+		}
+		lmode = SLIST;
 		break;
 
 	case S_ASCII:
@@ -760,6 +776,9 @@ loop:
 		break;
 
 	case S_BLK:
+		if ((addr_t) a_bytes < mp->m_valu) {
+			err('o');
+		}
 		clrexpr(&e1);
 		expr(&e1, 0);
 		outchk(HUGE,HUGE);

@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#  10/04/00	Alan Baldwin	Created for LINUX gcc 2.7.2.1 / make /
+#  25 March 2000		Created for LINUX gcc 2.7.2.1 / make /
 #
 ######################################################################
 
@@ -12,7 +12,7 @@
 all:	as6500 as6800 as6801 as6804	\
 	as6805 as6808 as6809 as6811	\
 	as6812 as6816 as8051 as8085	\
-	ash8 asz80	\
+	ash8 asz80 as8xcxxx	\
 	aslink	\
 	asxcnv asxscn
 
@@ -34,6 +34,7 @@ clean:
 	rm -f $(SRC8085)*.o
 	rm -f $(SRCH8)*.o
 	rm -f $(SRCZ80)*.o
+	rm -f $(SRC8XCXXX)*.o
 	rm -f *.new
 
 
@@ -67,7 +68,7 @@ SRC8051=	$(ASXBAS)as8051/
 SRC8085=	$(ASXBAS)as8085/
 SRCH8=		$(ASXBAS)ash8/
 SRCZ80=		$(ASXBAS)asz80/
-
+SRC8XCXXX=	$(ASXBAS)as8xcxxx/
 
 .SUFFIXES:	.c .o .new
 
@@ -228,9 +229,19 @@ asz80.new:	$(ASXXSRC) $(ASZ80SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASZ80SRC) -o asz80.new
 
 
-ASLINK =	lkarea.o lkdata.o lkeval.o lkhead.o	\
-		lkihx.o lklex.o lklibr.o lklist.o	\
-		lkmain.o lkrloc.o lks19.o lksym.o
+AS8XCXXX =	ds8adr.o ds8ext.o ds8mch.o ds8pst.o
+
+AS8XCXXXSRC =	$(addprefix $(SRC8XCXXX),$(AS8XCXXX))
+
+$(AS8XCXXXSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC8XCXXX)ds8.h
+
+as8xcxxx.new:	$(ASXXSRC) $(AS8XCXXXSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8XCXXXSRC) -o as8xcxxx.new
+
+
+ASLINK =	lkmain.o lkarea.o lkdata.o lkeval.o	\
+		lkhead.o lklex.o lklibr.o lklist.o	\
+		lkrloc.o lksym.o lkout.o
 
 ASLINKSRC =	$(addprefix $(SRCLNK),$(ASLINK))
 

@@ -45,7 +45,7 @@ struct mne *mp;
 		 * Top 3 bits become the MSBs of the op-code.
 		 */
 		expr(&e, 0);
-		outr11(&e, op, R_J11);
+		outr11(&e, op);
 		break;
 
 	case S_JMP16:

@@ -3,7 +3,7 @@
 #		DJGPP Version
 #		=============
 #
-#  9 April 2000			Created for DJGPP gcc 2.8.1 / make /
+#  25 March 2000		Created for DJGPP gcc 2.8.1 / make /
 #
 ####################################################################
 
@@ -12,7 +12,7 @@
 all:	as6500.sv as6800.sv as6801.sv as6804.sv	\
 	as6805.sv as6808.sv as6809.sv as6811.sv	\
 	as6812.sv as6816.sv as8051.sv as8085.sv	\
-	ash8.sv asz80.sv	\
+	as8xcxxx.sv ash8.sv asz80.sv	\
 	aslink.sv	\
 	asxcnv.sv asxscn.sv
 
@@ -33,6 +33,7 @@ as6812:		as6812.sv
 as6816:		as6816.sv
 as8051:		as8051.sv
 as8085:		as8085.sv
+as8xcxxx:	as8xcxxx.sv
 ash8:		ash8.sv
 asz80:		asz80.sv
 
@@ -70,6 +71,7 @@ SRC6812=	$(ASXBAS)as6812/
 SRC6816=	$(ASXBAS)as6816/
 SRC8051=	$(ASXBAS)as8051/
 SRC8085=	$(ASXBAS)as8085/
+SRC8xcxxx=	$(ASXBAS)as8xcxxx/
 SRCH8=		$(ASXBAS)ash8/
 SRCZ80=		$(ASXBAS)asz80/
 
@@ -77,7 +79,7 @@ VPATH =		$(SRCASX);	$(SRCLNK);	$(SRCMISC);	\
 		$(SRC6500);	$(SRC6800);	$(SRC6801);	$(SRC6804);	\
 		$(SRC6805);	$(SRC6808);	$(SRC6809);	$(SRC6811);	\
 		$(SRC6812);	$(SRC6816);	$(SRC8051);	$(SRC8085);	\
-		$(SRCH8);	$(SRCZ80)
+		$(SRC8xcxxx);	$(SRCH8);	$(SRCZ80)
 
 
 .SUFFIXES:	.c .o .new .sv
@@ -284,6 +286,21 @@ as8085.new:	$(ASXX) $(AS8085)
 
 
 ####################################################################
+# AS8xcxxx
+####################################################################
+
+AS8xcxxx =	ds8ext.o ds8pst.o ds8mch.o ds8adr.o
+
+ds8ext.o :	$(SRC8xcxxx)ds8ext.c $(SRC8xcxxx)ds8.h $(SRCASX)asxxxx.h
+ds8pst.o :	$(SRC8xcxxx)ds8pst.c $(SRC8xcxxx)ds8.h $(SRCASX)asxxxx.h
+ds8mch.o :	$(SRC8xcxxx)ds8mch.c $(SRC8xcxxx)ds8.h $(SRCASX)asxxxx.h
+ds8adr.o :	$(SRC8xcxxx)ds8adr.c $(SRC8xcxxx)ds8.h $(SRCASX)asxxxx.h
+
+as8xcxxx.new:	$(ASXX) $(AS8xcxxx)
+	$(LD) $(LDFLAGS) $(ASXX) $(AS8xcxxx) -o as8xcxxx.new
+
+
+####################################################################
 # ASH8
 ####################################################################
 
@@ -319,7 +336,7 @@ asz80.new:	$(ASXX) $(ASZ80)
 
 ASLINK =	lkmain.o lkhead.o lkarea.o lklex.o	\
 		lksym.o lkeval.o lkdata.o lklibr.o	\
-		lklist.o lkrloc.o lkihx.o lks19.o
+		lklist.o lkrloc.o lkout.o
 
 lkmain.o :	$(SRCLNK)lkmain.c $(SRCLNK)aslink.h
 lkhead.o :	$(SRCLNK)lkhead.c $(SRCLNK)aslink.h
@@ -331,8 +348,7 @@ lkdata.o :	$(SRCLNK)lkdata.c $(SRCLNK)aslink.h
 lklibr.o :	$(SRCLNK)lklibr.c $(SRCLNK)aslink.h
 lklist.o :	$(SRCLNK)lklist.c $(SRCLNK)aslink.h
 lkrloc.o :	$(SRCLNK)lkrloc.c $(SRCLNK)aslink.h
-lkihx.o :	$(SRCLNK)lkihx.c  $(SRCLNK)aslink.h
-lks19.o :	$(SRCLNK)lks19.c  $(SRCLNK)aslink.h
+lkout.o :	$(SRCLNK)lkout.c  $(SRCLNK)aslink.h
 
 aslink.new:	$(ASLINK)
 	$(LD) $(LDFLAGS) $(ASLINK) -o aslink.new

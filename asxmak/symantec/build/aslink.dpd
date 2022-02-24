@@ -11,9 +11,6 @@ c:\asxxxx\asxmak\symantec\build\lkeval.OBJ: \
 c:\asxxxx\asxmak\symantec\build\lkhead.OBJ: \
 	..\..\..\linksrc\lkhead.c \
 	..\..\..\LINKSRC\aslink.h 
-c:\asxxxx\asxmak\symantec\build\lkihx.OBJ: \
-	..\..\..\linksrc\lkihx.c \
-	..\..\..\LINKSRC\aslink.h 
 c:\asxxxx\asxmak\symantec\build\lklex.OBJ: \
 	..\..\..\linksrc\lklex.c \
 	..\..\..\LINKSRC\aslink.h 
@@ -29,9 +26,9 @@ c:\asxxxx\asxmak\symantec\build\lkmain.OBJ: \
 c:\asxxxx\asxmak\symantec\build\lkrloc.OBJ: \
 	..\..\..\linksrc\lkrloc.c \
 	..\..\..\LINKSRC\aslink.h 
-c:\asxxxx\asxmak\symantec\build\lks19.OBJ: \
-	..\..\..\linksrc\lks19.c \
-	..\..\..\LINKSRC\aslink.h 
 c:\asxxxx\asxmak\symantec\build\lksym.OBJ: \
 	..\..\..\linksrc\lksym.c \
+	..\..\..\LINKSRC\aslink.h 
+c:\asxxxx\asxmak\symantec\build\lkout.OBJ: \
+	..\..\..\linksrc\lkout.c \
 	..\..\..\LINKSRC\aslink.h 

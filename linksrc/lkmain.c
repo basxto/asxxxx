@@ -69,10 +69,11 @@
  *	in one of the four supported formats.
  *
  *	local variables:
- *		char *	p		pointer to an argument string
+ *		char *	frmt		temporary format specifier
  *		int	c		character from argument string
  *		int	i		loop counter
  *		int	j		loop counter
+ *		int	k		loop counter
  *
  *	global variables:
  *				 	text line in ib[]
@@ -140,6 +141,7 @@ int argc;
 char *argv[];
 {
 	register int c, i, j, k;
+	register char *frmt;
 
 	fprintf(stdout, "\n");
 
@@ -256,13 +258,25 @@ char *argv[];
 			 * Open output file
 			 */
 			if (oflag == 1) {
-				ofp = afile(linkp->f_idp, "ihx", 1);
+				switch(a_bytes) {
+				default:
+				case 2: frmt = "ihx"; break;
+				case 3:
+				case 4: frmt = "i86"; break;
+				}
+				ofp = afile(linkp->f_idp, frmt, 1);
 				if (ofp == NULL) {
 					lkexit(ER_FATAL);
 				}
 			} else
 			if (oflag == 2) {
-				ofp = afile(linkp->f_idp, "s19", 1);
+				switch(a_bytes) {
+				default:
+				case 2: frmt = "s19"; break;
+				case 3: frmt = "s28"; break;
+				case 4: frmt = "s37"; break;
+				}
+				ofp = afile(linkp->f_idp, frmt, 1);
 				if (ofp == NULL) {
 					lkexit(ER_FATAL);
 				}
@@ -331,6 +345,9 @@ int i;
  *				 	head structure of a linked list
  *		head	*hp		Pointer to the current
  *				 	head structure
+ *		sdp	sdp		Base Paged structure
+ *		int	a_bytes		T Line address bytes
+ *		int	hilo		Byte ordering
  *		int	pass		linker pass number
  *		int	radix		current number conversion radix
  *
@@ -415,11 +432,52 @@ link()
 		break;
 	}
 	if (c == 'X' || c == 'D' || c == 'Q') {
-		if ((c = get()) == 'H') {
-			hilo = 1;
-		} else
-		if (c == 'L') {
-			hilo = 0;
+		while ((c = get()) != 0) {
+			switch(c) {
+			case 'H':
+				hilo = 1;
+				break;
+
+			case 'L':
+				hilo = 0;
+				break;
+
+			case '2':
+				a_bytes = 2;
+				break;
+
+			case '3':
+				a_bytes = 3;
+				break;
+
+			case '4':
+				a_bytes = 4;
+				break;
+
+			default:
+				break;
+			}
+		}
+		switch(a_bytes) {
+		default:
+			a_bytes = 2;
+		case 2:
+			a_mask = 0x0000FFFF;
+			s_mask = 0x00008000;
+			v_mask = 0x00007FFF;
+			break;
+
+		case 3:
+			a_mask = 0x00FFFFFF;
+			s_mask = 0x00800000;
+			v_mask = 0x007FFFFF;
+			break;
+
+		case 4:
+			a_mask = 0xFFFFFFFF;
+			s_mask = 0x80000000;
+			v_mask = 0x7FFFFFFF;
+			break;
 		}
 	}
 }
@@ -657,7 +715,7 @@ parse()
 						filep = startp;
 					}
 					return(0);
-					
+
 				case 'i':
 				case 'I':
 					oflag = 1;
@@ -842,7 +900,7 @@ doparse()
 	sfp = NULL;
 	filep = startp;
 	while (1) {
-		ip = ib;					
+		ip = ib;
 		if (getline() == 0)
 			break;
 		if (pflag && cfp->f_type != F_STD)
@@ -902,7 +960,7 @@ bassav()
 	bsp->b_strp = (char *) new (strlen(ip)+1);
 	strcpy(bsp->b_strp, ip);
 }
-	
+
 /*)Function	VOID	setbas()
  *
  *	The function setbas() scans the base address lines in hte
@@ -1013,7 +1071,7 @@ gblsav()
 	gsp->g_strp = (char *) new (strlen(ip)+1);
 	strcpy(gsp->g_strp, ip);
 }
-	
+
 /*)Function	VOID	setgbl()
  *
  *	The function setgbl() scans the global variable lines in the
@@ -1231,8 +1289,8 @@ char *usetxt[] = {
 	"  -k   Library path specification, one per -k",
 	"  -l   Library file specification, one per -l",
 	"Relocation:",
-	"  -b   area base address = expression",
-	"  -g   global symbol = expression",
+	"  -b   area base address=expression",
+	"  -g   global symbol=expression",
 	"Map format:",
 	"  -m   Map output generated as file[.map]",
 	"  -w   Wide listing format for map file",
@@ -1240,8 +1298,8 @@ char *usetxt[] = {
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
-	"  -i   Intel Hex as file[.ihx]",
-	"  -s   Motorola S19 as file[.s19]",
+	"  -i   Intel Hex as file[.i--]",
+	"  -s   Motorola S Record as file[.s--]",
 	"  -o   Linked file/library object output enable (default)",
 	"  -v   Linked file/library object output disable",
 	"List:",

@@ -1,7 +1,7 @@
 /* i51pst.c */
 
 /*
- * (C) Copyright 1989-2000
+ * (C) Copyright 1998-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -32,10 +32,10 @@ struct	mne	mne[] = {
     {	NULL,	"NOPAG",	S_ATYP,		0,	A_NOPAG	},
     {	NULL,	"PAG",		S_ATYP,		0,	A_PAG	},
 
-    {	NULL,	".byte",	S_BYTE,		0,	0	},
-    {	NULL,	".db",		S_BYTE,		0,	0	},
-    {	NULL,	".word",	S_WORD,		0,	0	},
-    {	NULL,	".dw",		S_WORD,		0,	0	},
+    {	NULL,	".byte",	S_DATA,		0,	1	},
+    {	NULL,	".db",		S_DATA,		0,	1	},
+    {	NULL,	".word",	S_DATA,		0,	2	},
+    {	NULL,	".dw",		S_DATA,		0,	2	},
     {	NULL,	".ascii",	S_ASCII,	0,	0	},
     {	NULL,	".asciz",	S_ASCIZ,	0,	0	},
     {	NULL,	".blkb",	S_BLK,		0,	1	},
@@ -56,6 +56,8 @@ struct	mne	mne[] = {
     {	NULL,	".org",		S_ORG,		0,	0	},
     {	NULL,	".module",	S_MODUL,	0,	0	},
     {	NULL,	".ascis",	S_ASCIS,	0,	0	},
+    {	NULL,	".assume",	S_ERROR,	0,	0	},
+    {	NULL,	".error",	S_ERROR,	0,	1	},
 
 	/* 8051 */
 

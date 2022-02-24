@@ -43,7 +43,7 @@ The allowed linker commands are:
 
      3.  -p/-n   enable/disable echoing commands to stdout.  
 
-     4.  -i/-s   Intel Hex (file.ihx) or Motorola S19 (file.s19)
+     4.  -i/-s   Intel Hex (file.i--) or Motorola S19 (file.s--)
          image output file.  
 
      5.  -o/-v   Specifies      that      subsequent      linked
@@ -94,7 +94,7 @@ The allowed linker commands are:
 
     16.  -e      or null line, terminates input to the linker.  
 
-<H5><A HREF="aslink.htm #Index">  Return to the Linker Index</A></H5>
+<H5><A HREF="aslink.htm#Index">  Return to the Linker Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -157,7 +157,7 @@ d:\special\io_comm.rel         (absolute path/file)
 all  other path(s)/file(s) don't exist.  (No errors are reported
 for non existant path(s)/file(s).) 
 
-<H5><A HREF="aslink.htm #Index">  Return to the Linker Index</A></H5>
+<H5><A HREF="aslink.htm#Index">  Return to the Linker Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -248,7 +248,7 @@ the linked main module(s).  The -o/-v  options  can  be  applied
 repeatedly  to specify a single linked file, groups of files, or
 libraries for object code inclusion or suppression.  
 
-<H5><A HREF="aslink.htm #Index">  Return to the Linker Index</A></H5>
+<H5><A HREF="aslink.htm#Index">  Return to the Linker Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -264,7 +264,7 @@ modules into a complete loadable memory image.
 
 The object module contains the following designators:  
 
-        [XDQ][HL]
+        [XDQ][HL][234]
                 X       Hexidecimal radix
                 D       Decimal radix
                 Q       Octal radix
@@ -272,7 +272,11 @@ The object module contains the following designators:
                 H       Most significant byte first
                 L       Least significant byte first
 
-        H       Header 
+                2       16-Bit Addressing
+                3       24-Bit Addressing
+                4       32-Bit Addressing
+
+		  H       Header 
         M       Module
         A       Area
         S       Symbol
@@ -292,16 +296,17 @@ The object module contains the following designators:
 <LI><A HREF= #RLine>  R Line </A>
 <LI><A HREF= #PLine>  P Line </A>
 <BR><BR>
-<LI><A HREF="aslink.htm #Index">  Return to the Linker Index</A>
+<LI><A HREF="aslink.htm#Index">  Return to the Linker Index</A>
 </UL></B></H4>
 
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <H4><B><PRE>
 <A NAME = "Object"></A><FONT COLOR="#FF0000">Object Module Format</FONT>
 
-   The  first  line  of  an object module contains the [XDQ][HL]
-format specifier (i.e.  XH indicates  a  hexidecimal  file  with
-most significant byte first) for the following designators.  
+   The   first   line   of   an   object   module  contains  the
+[XDQ][HL][234] format specifier  (i.e.   XH2  indicates  a  hex-
+idecimal  file  with  most significant byte first and 16-bit ad-
+dressing) for the following designators.  
 
 <H5><A HREF= #Index> => Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
@@ -394,8 +399,7 @@ coded in groups of 4 bytes:
          5.  bit 4  signed(0x00)/unsigned(0x10) byte data 
          6.  bit 5  normal(0x00)/page '0'(0x20) reference 
          7.  bit 6  normal(0x00)/page 'nnn'(0x40) reference 
-         8.  bit 7  LSB  byte(0x00)/MSB  byte(0x80)  with 2-byte
-             mode 
+         8.  bit 7  LSB  byte(0x00)/MSB  byte(0x80)
 
      2.  n2  is  a byte index into the corresponding (i.e.  pre-
          ceeding) T line data (i.e.  a pointer to the data to be
@@ -435,6 +439,27 @@ area defined with the PAG type is not larger than 256 bytes.
 area defined in the input REL file.  All ASxxxx assemblers  will
 specify the _CODE area first, making this the default page area. 
 
+<H5><A HREF= #Index> => Section Index</A></H5>
+<HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
+<A NAME = "Bits"></A><FONT COLOR="#FF0000">24-Bit and 32-Bit Addressing</FONT>
+
+   When  24-bit  or  32-bit  addressing is specified in the file
+format line [XDQ][HL][234] then the S and T Lines have  modified
+formats:  
+        S string Defnnnnnn                      (24-bit)
+        S string Refnnnnnn                      (24-bit)
+        T xx xx xx nn nn nn nn nn ...           (24-bit)
+        
+        S string Defnnnnnnnn                    (32-bit)
+        S string Refnnnnnnnn                    (32-bit)
+        T xx xx xx xx nn nn nn nn nn ...        (32-bit)
+
+   The  multibyte  formats for byte data replace the 2-byte form
+for 16-bit data with 3-byte or 4-byte data for 24-bit or  32-bit
+data  respectively.  The 2nd byte format (also named MSB) always
+uses the second byte of the 2, 3, or 4-byte data.
+  
 <H5><A HREF= #Index> => Section Index</A></H5>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -499,12 +524,22 @@ The R line processing produces various errors:
   Refby  t           Pagetest    PROGRAM     0006
   Defin  t           Pagetest    DIRECT      0100
 
+?ASlink-Warning-2K Page relocation error
+         file        module      area        offset
+  Refby  t           Pagetest    A           0000
+  Defin  t           Pagetest    A           0800
+
+?ASlink-Warning-512K Page relocation error
+         file        module      area        offset
+  Refby  t           Pagetest    A           000000
+  Defin  t           Pagetest    A           080000
+
 These  error messages specify the file, module, area, and offset
 within the area of the code  referencing  (Refby)  and  defining
 (Defin) the symbol.  If the symbol is defined in the same module
 as the reference the linker is unable to report the symbol name.
 The  assembler  listing file(s) should be examined at the offset
-from the specified area to located the offending code.  
+from the specified area to locate the offending code.  
 
    The errors are:  
 
@@ -520,13 +555,21 @@ from the specified area to located the offending code.
      4.  The page mode error is generated if the direct variable
          is not within the current direct page (6809).  
 
-<H5><A HREF="aslink.htm #Index">  Return to the Linker Index</A></H5>
+     5.  The  2K  Page  relocation  error  is  generated  if the
+         destination is not within the current  2K  page  (8051,
+         DS8xCxxx).  
+
+     6.  The  512K  Page  relocation  error  is generated if the
+         destination  is  not  within  the  current  512K   page
+         (DS80C390).  
+
+<H5><A HREF="aslink.htm#Index">  Return to the Linker Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
-<A NAME = "Intel"></A>
+<A NAME = "IntelIHX"></A>
 <H3><B>
-<IMG SRC = "green.gif" ALT = "-">... Intel Hex Output Format</A>
+<IMG SRC = "green.gif" ALT = "-">... Intel IHX Output Format (16-Bit)</A>
 </B></H3>
 
 <H4><B><PRE>
@@ -579,13 +622,74 @@ Checksum Field       -  The  checksum  field is the 8 bit binary
                         to  two  ascii  characters,  high  digit
                         first.  
 
-<H5><A HREF="aslink.htm #Index">  Return to the Linker Index</A></H5>
+<H5><A HREF="aslink.htm#Index">  Return to the Linker Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
-<A NAME = "Motorola"></A>
+<A NAME = "IntelI86"></A>
 <H3><B>
-<IMG SRC = "green.gif" ALT = "-">... Motorola S1-S9 Output Format</A>
+<IMG SRC = "green.gif" ALT = "-">... Intel I86 Output Format (24 or 32-Bit)</A>
+</B></H3>
+
+<H4><B><PRE>
+Record Mark Field    -  This  field  signifies  the  start  of a
+                        record, and consists of an  ascii  colon
+                        (:).  
+
+Record Length Field  -  This   field   consists   of  two  ascii
+                        characters which indicate the number  of
+                        data   bytes   in   this   record.   The
+                        characters are the result of  converting
+                        the  number  of  bytes  in binary to two
+                        ascii characters, high digit first.   An
+                        End  of  File  record contains two ascii
+                        zeros in this field.  
+
+Load Address Field   -  This  field  consists  of the four ascii
+                        characters which result from  converting
+                        the  the  binary value of the address in
+                        which to begin loading this record.  The
+                        order is as follows:  
+
+                            High digit of high byte of address. 
+                            Low digit of high byte of address.  
+                            High digit of low byte of address.  
+                            Low digit of low byte of address.  
+
+                        In an End of File record this field con-
+                        sists of either four ascii zeros or  the
+                        program  entry  address.   Currently the
+                        entry address option is not supported.  
+
+Record Type Field    -  This  field  identifies the record type,
+                        which is either 0 for  data  records,  1
+                        for  an  End  of File record, or 4 for a
+                        segment  record.   It  consists  of  two
+                        ascii characters, with the high digit of
+                        the record type first, followed  by  the
+                        low digit of the record type.  
+
+Data Field           -  This  field consists of the actual data,
+                        converted to two ascii characters,  high
+                        digit first.  There are no data bytes in
+                        the End of File record.  
+
+Checksum Field       -  The  checksum  field is the 8 bit binary
+                        sum of the record length field, the load
+                        address  field,  the  record type field,
+                        and the data field.  This  sum  is  then
+                        negated  (2's  complement) and converted
+                        to  two  ascii  characters,  high  digit
+                        first.
+
+<H4><B><PRE>
+<H5><A HREF="aslink.htm#Index">  Return to the Linker Index</A></H5>
+</PRE></B></H4>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<A NAME = "MotorolaS1"></A>
+<H3><B>
+<IMG SRC = "green.gif" ALT = "-">... Motorola S1-S9 Output Format (16-Bit)</A>
 </B></H3>
 
 <H4><B><PRE>
@@ -630,18 +734,128 @@ Checksum Field       -  The  checksum  field is the 8 bit binary
                         ment)   and   converted   to  two  ascii
                         characters, high digit first.  
 
-<H5><A HREF="aslink.htm #Index">  Return to the Linker Index</A></H5>
+<H5><A HREF="aslink.htm#Index">  Return to the Linker Index</A></H5>
+</PRE></B></H4>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<A NAME = "MotorolaS2"></A>
+<H3><B>
+<IMG SRC = "green.gif" ALT = "-">... Motorola S2-S8 Output Format (24-Bit)</A>
+</B></H3>
+
+<H4><B><PRE>
+Record Type Field    -  This  field  signifies  the  start  of a
+                        record and  identifies  the  the  record
+                        type as follows:  
+
+                            Ascii S2 - Data Record 
+                            Ascii S8 - End of File Record 
+
+Record Length Field  -  This  field  specifies the record length
+                        which includes the  address,  data,  and
+                        checksum   fields.   The  8  bit  record
+                        length value is converted to  two  ascii
+                        characters, high digit first.  
+
+Load Address Field   -  This  field  consists  of  the six ascii
+                        characters which result from  converting
+                        the  the  binary value of the address in
+                        which to begin loading this record.  The
+                        order is as follows:  
+
+                            High digit of 3rd byte of address.  
+                            Low digit of 3rd byte of address.  
+                            High digit of high byte of address. 
+                            Low digit of high byte of address.  
+                            High digit of low byte of address.  
+                            Low digit of low byte of address.  
+
+                        In an End of File record this field con-
+                        sists of either six ascii zeros  or  the
+                        program  entry  address.   Currently the
+                        entry address option is not supported.  
+
+Data Field           -  This  field consists of the actual data,
+                        converted to two ascii characters,  high
+                        digit first.  There are no data bytes in
+                        the End of File record.  
+
+Checksum Field       -  The  checksum  field is the 8 bit binary
+                        sum of the record length field, the load
+                        address field, and the data field.  This
+                        sum is then  complemented  (1's  comple-
+                        ment)   and   converted   to  two  ascii
+                        characters, high digit first.
+
+<H5><A HREF="aslink.htm#Index">  Return to the Linker Index</A></H5>
+</PRE></B></H4>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<A NAME = "MotorolaS3"></A>
+<H3><B>
+<IMG SRC = "green.gif" ALT = "-">... Motorola S3-S7 Output Format (32-Bit)</A>
+</B></H3>
+
+<H4><B><PRE>
+Record Type Field    -  This  field  signifies  the  start  of a
+                        record and  identifies  the  the  record
+                        type as follows:  
+
+                            Ascii S3 - Data Record 
+                            Ascii S7 - End of File Record 
+
+Record Length Field  -  This  field  specifies the record length
+                        which includes the  address,  data,  and
+                        checksum   fields.   The  8  bit  record
+                        length value is converted to  two  ascii
+                        characters, high digit first.  
+
+Load Address Field   -  This  field  consists of the eight ascii
+                        characters which result from  converting
+                        the  the  binary value of the address in
+                        which to begin loading this record.  The
+                        order is as follows:  
+
+                            High digit of 4th byte of address.  
+                            Low digit of 4th byte of address.  
+                            High digit of 3rd byte of address.  
+                            Low digit of 3rd byte of address.  
+                            High digit of high byte of address. 
+                            Low digit of high byte of address.  
+                            High digit of low byte of address.  
+                            Low digit of low byte of address.  
+
+                        In an End of File record this field con-
+                        sists of either eight ascii zeros or the
+                        program  entry  address.   Currently the
+                        entry address option is not supported.  
+
+Data Field           -  This  field consists of the actual data,
+                        converted to two ascii characters,  high
+                        digit first.  There are no data bytes in
+                        the End of File record.  
+
+Checksum Field       -  The  checksum  field is the 8 bit binary
+                        sum of the record length field, the load
+                        address field, and the data field.  This
+                        sum is then  complemented  (1's  comple-
+                        ment)   and   converted   to  two  ascii
+                        characters, high digit first.
+
+<H5><A HREF="aslink.htm#Index">  Return to the Linker Index</A></H5>
 </PRE></B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 
-<H3>
-<P><A HREF="asxxxx.htm #JUMP">
+<H4>
+<P><A HREF="asxxxx.htm#JUMP">
 <IMG width=32 height=32 border=0 SRC="spcshp.gif" ALIGN=bottom></A>
 <B>...  Exit the ASxxxx Documentation</B></A></P>
+
 <P><A href="../home.htm">
 <IMG width=32 height=32 border=0 SRC="home.gif" ALIGN=bottom></A>
 <B>...  Home Page</B></P>
-</H3>
+</H4>
+
 </BODY> 
 </HTML>

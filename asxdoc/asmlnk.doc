@@ -34,289 +34,8 @@
 
 
 
-                                 Version   2.30
+                                 Version   3.00
                                    April 2000
-
-
-        CHAPTER 1  THE ASSEMBLER                                     1-1 
-          1.1     THE ASXXXX ASSEMBLERS                              1-1 
-          1.1.1     Assembly Pass 1                                  1-2 
-          1.1.2     Assembly Pass 2                                  1-2 
-          1.1.3     Assembly Pass 3                                  1-2 
-          1.2     SOURCE PROGRAM FORMAT                              1-3 
-          1.2.1     Statement Format                                 1-3 
-          1.2.1.1     Label Field                                    1-3 
-          1.2.1.2     Operator Field                                 1-5 
-          1.2.1.3     Operand Field                                  1-5 
-          1.2.1.4     Comment Field                                  1-6 
-          1.3     SYMBOLS AND EXPRESSIONS                            1-6 
-          1.3.1     Character Set                                    1-6 
-          1.3.2     User-Defined Symbols                            1-10 
-          1.3.3     Local Symbols                                   1-11 
-          1.3.4     Current Location Counter                        1-12 
-          1.3.5     Numbers                                         1-14 
-          1.3.6     Terms                                           1-14 
-          1.3.7     Expressions                                     1-15 
-          1.4     GENERAL ASSEMBLER DIRECTIVES                      1-16 
-          1.4.1     .module Directive                               1-16 
-          1.4.2     .title Directive                                1-17 
-          1.4.3     .sbttl Directive                                1-17 
-          1.4.4     .page Directive                                 1-17 
-          1.4.5     .byte and .db Directives                        1-17 
-          1.4.6     .word and .dw Directives                        1-18 
-          1.4.7     .blkb, .blkw, and .ds Directives                1-18 
-          1.4.8     .ascii Directive                                1-18 
-          1.4.9     .ascis Directive                                1-19 
-          1.4.10    .asciz Directive                                1-19 
-          1.4.11    .radix Directive                                1-20 
-          1.4.12    .even Directive                                 1-20 
-          1.4.13    .odd Directive                                  1-20 
-          1.4.14    .area Directive                                 1-21 
-          1.4.15    .org Directive                                  1-22 
-          1.4.16    .globl Directive                                1-23 
-          1.4.17    .if, .else, and .endif Directives               1-23 
-          1.4.18    .include Directive                              1-24 
-          1.4.19    .setdp Directive                                1-25 
-          1.5     INVOKING ASXXXX                                   1-27 
-          1.6     ERRORS                                            1-28 
-          1.7     LISTING FILE                                      1-29 
-          1.8     SYMBOL TABLE FILE                                 1-31 
-          1.9     OBJECT FILE                                       1-31 
-
-        CHAPTER 2  THE LINKER                                        2-1 
-          2.1     ASLINK RELOCATING LINKER                           2-1 
-          2.2     INVOKING ASLINK                                    2-2 
-          2.3     LIBRARY PATH(S) AND FILE(S)                        2-3 
-          2.4     ASLINK PROCESSING                                  2-4 
-          2.5     LINKER INPUT FORMAT                                2-6 
-          2.5.1     Object Module Format                             2-7 
-          2.5.2     Header Line                                      2-7 
-          2.5.3     Module Line                                      2-7 
-          2.5.4     Symbol Line                                      2-7 
-          2.5.5     Area Line                                        2-8 
-
-
-                                                                 Page ii
-        
-
-
-          2.5.6     T Line                                           2-8 
-          2.5.7     R Line                                           2-8 
-          2.5.8     P Line                                           2-9 
-          2.6     LINKER ERROR MESSAGES                              2-9 
-          2.7     INTEL HEX OUTPUT FORMAT                           2-12 
-          2.8     MOTORLA S1-S9 OUTPUT FORMAT                       2-13 
-
-        CHAPTER 3  BUILDING ASXXXX AND ASLINK                        3-1 
-          3.1     BUILDING AN ASSEMBLER                              3-1 
-          3.2     BUILDING ASLINK                                    3-2 
-
-        APPENDIX A  AS6800 ASSEMBLER                                 A-1 
-          A.1     6800 REGISTER SET                                  A-1 
-          A.2     6800 INSTRUCTION SET                               A-1 
-          A.2.1     Inherent Instructions                            A-2 
-          A.2.2     Branch Instructions                              A-2 
-          A.2.3     Single Operand Instructions                      A-3 
-          A.2.4     Double Operand Instructions                      A-4 
-          A.2.5     Jump and Jump to Subroutine Instructions         A-4 
-          A.2.6     Long Register Instructions                       A-5 
-
-        APPENDIX B  AS6801 ASSEMBLER                                 B-1 
-          B.1     .hd6303 DIRECTIVE                                  B-1 
-          B.2     6801 REGISTER SET                                  B-1 
-          B.3     6801 INSTRUCTION SET                               B-1 
-          B.3.1     Inherent Instructions                            B-2 
-          B.3.2     Branch Instructions                              B-2 
-          B.3.3     Single Operand Instructions                      B-3 
-          B.3.4     Double Operand Instructions                      B-4 
-          B.3.5     Jump and Jump to Subroutine Instructions         B-5 
-          B.3.6     Long Register Instructions                       B-5 
-          B.3.7     6303 Specific Instructions                       B-5 
-
-        APPENDIX C  AS6804 ASSEMBLER                                 C-1 
-          C.1     6804 REGISTER SET                                  C-1 
-          C.2     6804 INSTRUCTION SET                               C-1 
-          C.2.1     Inherent Instructions                            C-2 
-          C.2.2     Branch Instructions                              C-2 
-          C.2.3     Single Operand Instructions                      C-2 
-          C.2.4     Jump and Jump to Subroutine Instructions         C-2 
-          C.2.5     Bit Test Instructions                            C-2 
-          C.2.6     Load Immediate data Instruction                  C-3 
-          C.2.7     6804 Derived Instructions                        C-3 
-
-        APPENDIX D  AS6805 ASSEMBLER                                 D-1 
-          D.1     6805 REGISTER SET                                  D-1 
-          D.2     6805 INSTRUCTION SET                               D-1 
-          D.2.1     Control Instructions                             D-2 
-          D.2.2     Bit Manipulation Instructions                    D-2 
-          D.2.3     Branch Instructions                              D-2 
-          D.2.4     Read-Modify-Write Instructions                   D-3 
-          D.2.5     Register\Memory Instructions                     D-3 
-
-
-                                                                Page iii
-        
-
-
-          D.2.6     Jump and Jump to Subroutine Instructions         D-4 
-
-        APPENDIX E  AS6808 ASSEMBLER                                 E-1 
-          E.1     68HC08 REGISTER SET                                E-1 
-          E.2     68HC08 INSTRUCTION SET                             E-1 
-          E.2.1     Control Instructions                             E-2 
-          E.2.2     Bit Manipulation Instructions                    E-2 
-          E.2.3     Branch Instructions                              E-3 
-          E.2.4     Complex Branch Instructions                      E-3 
-          E.2.5     Read-Modify-Write Instructions                   E-4 
-          E.2.6     Register\Memory Instructions                     E-5 
-          E.2.7     Double Operand Move Instruction                  E-5 
-          E.2.8     16-Bit <H:X> Index Register Instructions         E-5 
-          E.2.9     Jump and Jump to Subroutine Instructions         E-5 
-
-        APPENDIX F  AS6809 ASSEMBLER                                 F-1 
-          F.1     6809 REGISTER SET                                  F-1 
-          F.2     6809 INSTRUCTION SET                               F-1 
-          F.2.1     Inherent Instructions                            F-3 
-          F.2.2     Short Branch Instructions                        F-3 
-          F.2.3     Long Branch Instructions                         F-3 
-          F.2.4     Single Operand Instructions                      F-4 
-          F.2.5     Double Operand Instructions                      F-5 
-          F.2.6     D-register Instructions                          F-5 
-          F.2.7     Index/Stack Register Instructions                F-5 
-          F.2.8     Jump and Jump to Subroutine Instructions         F-6 
-          F.2.9     Register - Register Instructions                 F-6 
-          F.2.10    Condition Code Register Instructions             F-6 
-          F.2.11    6800 Compatibility Instructions                  F-6 
-
-        APPENDIX G  AS6811 ASSEMBLER                                 G-1 
-          G.1     68HC11 REGISTER SET                                G-1 
-          G.2     68HC11 INSTRUCTION SET                             G-1 
-          G.2.1     Inherent Instructions                            G-2 
-          G.2.2     Branch Instructions                              G-2 
-          G.2.3     Single Operand Instructions                      G-3 
-          G.2.4     Double Operand Instructions                      G-4 
-          G.2.5     Bit Manupulation Instructions                    G-4 
-          G.2.6     Jump and Jump to Subroutine Instructions         G-5 
-          G.2.7     Long Register Instructions                       G-5 
-
-        APPENDIX H  AS6812 ASSEMBLER                                 H-1 
-          H.1     68HC12 REGISTER SET                                H-1 
-          H.2     68HC12 INSTRUCTION SET                             H-1 
-          H.2.1     Inherent Instructions                            H-3 
-          H.2.2     Short Branch Instructions                        H-3 
-          H.2.3     Long Branch Instructions                         H-3 
-          H.2.4     Branch on Decrement, Test, or Increment          H-4 
-          H.2.5     Bit Clear and Set Instructions                   H-4 
-          H.2.6     Branch on Bit Clear or Set                       H-4 
-          H.2.7     Single Operand Instructions                      H-5 
-          H.2.8     Double Operand Instructions                      H-6 
-
-
-                                                                 Page iv
-        
-
-
-          H.2.9     Move Instructions                                H-6 
-          H.2.10    D-register Instructions                          H-6 
-          H.2.11    Index/Stack Register Instructions                H-7 
-          H.2.12    Jump and Jump/Call to Subroutine
-                    Instructions                                     H-7 
-          H.2.13    Other Special Instructions                       H-7 
-          H.2.14    Register - Register Instructions                 H-7 
-          H.2.15    Condition Code Register Instructions             H-7 
-          H.2.16    M68HC11 Compatibility Mode Instructions          H-8 
-
-        APPENDIX I  AS6816 ASSEMBLER                                 I-1 
-          I.1     68HC16 REGISTER SET                                I-1 
-          I.2     68HC16 INSTRUCTION SET                             I-1 
-          I.2.1     Inherent Instructions                            I-2 
-          I.2.2     Push/Pull Multiple Register Instructions         I-3 
-          I.2.3     Short Branch Instructions                        I-3 
-          I.2.4     Long Branch Instructions                         I-3 
-          I.2.5     Bit Manipulation Instructions                    I-3 
-          I.2.6     Single Operand Instructions                      I-4 
-          I.2.7     Double Operand Instructions                      I-5 
-          I.2.8     Index/Stack Register Instructions                I-5 
-          I.2.9     Jump and Jump to Subroutine Instructions         I-6 
-          I.2.10    Condition Code Register Instructions             I-6 
-          I.2.11    Multiply and Accumulate Instructions             I-6 
-
-        APPENDIX J  ASH8 ASSEMBLER                                   J-1 
-          J.1     H8/3XX REGISTER SET                                J-1 
-          J.2     H8/3XX INSTRUCTION SET                             J-1 
-          J.2.1     Inherent Instructions                            J-2 
-          J.2.2     Branch Instructions                              J-2 
-          J.2.3     Single Operand Instructions                      J-3 
-          J.2.4     Double Operand Instructions                      J-4 
-          J.2.5     Mov Instructions                                 J-5 
-          J.2.6     Bit Manipulation Instructions                    J-6 
-          J.2.7     Extended Bit Manipulation Instructions           J-7 
-          J.2.8     Condition Code Instructions                      J-7 
-          J.2.9     Other Instructions                               J-8 
-          J.2.10    Jump and Jump to Subroutine Instructions         J-8 
-
-        APPENDIX K  AS8051 ASSEMBLER                                 K-1 
-          K.1     ACKNOWLEDGMENT                                     K-1 
-          K.2     8051 REGISTER SET                                  K-1 
-          K.3     8051 INSTRUCTION SET                               K-2 
-          K.3.1     Inherent Instructions                            K-2 
-          K.3.2     Move Instructions                                K-3 
-          K.3.3     Single Operand Instructions                      K-3 
-          K.3.4     Two Operand Instructions                         K-4 
-          K.3.5     Call and Return Instructions                     K-4 
-          K.3.6     Jump Instructions                                K-4 
-          K.3.7     Predefined Symbols:  SFR Map                     K-5 
-          K.3.8     Predefined Symbols:  SFR Bit Addresses           K-6 
-          K.3.9     Predefined Symbols:  Control Bits                K-7 
-
-
-                                                                  Page v
-        
-
-
-        APPENDIX L  AS8085 ASSEMBLER                                 L-1 
-          L.1     8085 REGISTER SET                                  L-1 
-          L.2     8085 INSTRUCTION SET                               L-1 
-          L.2.1     Inherent Instructions                            L-2 
-          L.2.2     Register/Memory/Immediate Instructions           L-2 
-          L.2.3     Call and Return Instructions                     L-2 
-          L.2.4     Jump Instructions                                L-2 
-          L.2.5     Input/Output/Reset Instructions                  L-3 
-          L.2.6     Move Instructions                                L-3 
-          L.2.7     Other Instructions                               L-3 
-
-        APPENDIX M  ASZ80 ASSEMBLER                                  M-1 
-          M.1     .hd64 DIRECTIVE                                    M-1 
-          M.2     Z80 REGISTER SET AND CONDITIONS                    M-1 
-          M.3     Z80 INSTRUCTION SET                                M-2 
-          M.3.1     Inherent Instructions                            M-3 
-          M.3.2     Implicit Operand Instructions                    M-3 
-          M.3.3     Load Instruction                                 M-4 
-          M.3.4     Call/Return Instructions                         M-4 
-          M.3.5     Jump and Jump to Subroutine Instructions         M-4 
-          M.3.6     Bit Manipulation Instructions                    M-5 
-          M.3.7     Interrupt Mode and Reset Instructions            M-5 
-          M.3.8     Input and Output Instructions                    M-5 
-          M.3.9     Register Pair Instructions                       M-5 
-          M.3.10    HD64180 Specific Instructions                    M-6 
-
-        APPENDIX N  AS6500 ASSEMBLER                                 N-1 
-          N.1     ACKNOWLEDGMENT                                     N-1 
-          N.2     6500 REGISTER SET                                  N-2 
-          N.3     6500 INSTRUCTION SET                               N-2 
-          N.3.1     Processor Specific Directives                    N-3 
-          N.3.2     65xx Core Inherent Instructions                  N-3 
-          N.3.3     65xx Core Branch Instructions                    N-3 
-          N.3.4     65xx Core Single Operand Instructions            N-3 
-          N.3.5     65xx Core Double Operand Instructions            N-4 
-          N.3.6     65xx Core Jump and Jump to Subroutine
-                    Instructions                                     N-4 
-          N.3.7     65xx Core Miscellaneous X and Y Register
-                    Instructions                                     N-4 
-          N.3.8     65F11 and 65F12 Specific Instructions            N-5 
-          N.3.9     65C00/21 and 65C29 Specific Instructions         N-5 
-          N.3.10    65C02, 65C102, and 65C112 Specific
-                    Instructions                                     N-6 
 
 
                                                                   Page 2
@@ -434,13 +153,29 @@
         
 
 
-        ASxxxx Cross Assemblers, Version 2.30, April 2000 
+
+
+
+
+
+           Thanks to Bill McKinnon for his contributions to the AS8XCXXX
+        cross assembler for the DS8XCXXX series of microprocessors.  
+
+                Bill McKinnon
+                w_mckinnon@conknet.com
+
+
+                                                                  Page 5
+        
+
+
+        ASxxxx Cross Assemblers, Version 3.00, April 2000 
 
         Submitted by Alan R.  Baldwin, 
         Kent State University, Kent, Ohio 
 
-        Operating System: TSX+, RT-11, MS-DOS, Windows 3.x/95/98, DJGPP, 
-        Linux or other supporting K&R C.  
+        Operating System:  MS-DOS, Windows 3.x/95/98, Linux 
+        or other supporting K&R C.  
 
         Source Langauge:  C 
 
@@ -450,13 +185,13 @@
         blers written in the C programming  language.   This  collection
         contains cross assemblers for the 6800(6802/6808), 6801(hd6303),
         6804,  6805,  68HC08,  6809,  68HC11,  68HC12,   68HC16,   8051,
-        8085(8080),  z80(hd64180),  H8/3xx, and 6500 series microproces-
-        sors.  Each  assembler  has  a  device  specific  section  which
-        includes:   (1)  device description, byte order, and file exten-
-        sion information, (2) a table of assembler  general  directives,
-        special directives, assembler mnemonics and associated operation
-        codes, (3) machine  specific  code  for  processing  the  device
-        mnemonics, addressing modes, and special directives.  
+        8085(8080),  z80(hd64180),  H8/3xx,  DS8xCxxx  and  6500  series
+        microprocessors.  Each assembler has a device  specific  section
+        which  includes:   (1)  device description, byte order, and file
+        extension information, (2) a table of assembler  general  direc-
+        tives,  special  directives,  assembler mnemonics and associated
+        operation codes, (3) machine specific code  for  processing  the
+        device mnemonics, addressing modes, and special directives.  
 
            The assemblers have a common device independent section which
         handles the details of file input/output, symbol  table  genera-
@@ -478,20 +213,365 @@
         (5)  perform  byte and word program-counter relative (pc or pcr)
         addressing calculations, (6) define absolute  symbol  values  at
         link  time, (7) define absolute area base address values at link
-        time, (8) produce Intel Hex or Motorola  S19  output  file,  (9)
-        produce  a  map  of the linked memory image, and (10) update the
-        ASxxxx assembler listing files  with  the  absolute  linked  ad-
+        time, (8) produce Intel Hex or Motorola S  record  output  file,
+        (9)  produce  a  map of the linked memory image, and (10) update
+        the ASxxxx assembler listing files with the absolute linked  ad-
         dresses and data.  
 
-           The assemblers and linker have been tested using DECUS C with
-        TSX+ and RT-11, GCC 2.7.2 with LINUX, Symantec  C/C++ V6.1/V7.2,
-        DJGPP(GCC 2.8.1) and VC6 with MS-DOS/Windows 3.x/95/98. Complete
-        source code and documentation for the assemblers and  linker  is
-        included  with  the  distribution.   Additionally, test code for
-        each assembler and several microprocessor  monitors  (  ASSIST05
-        for  the 6805, MONDEB and ASSIST09 for the 6809, and BUFFALO 2.5
-        for the 6811) are included as working examples of use  of  these
-        assemblers.  
+           The  assemblers  and  linker have been tested using GCC 2.7.2
+        with LINUX, Symantec C/C++ V6.1/V7.2, DJGPP (GCC 2.8.1) and  VC6
+        with  MS-DOS/Windows  3.x/95/98.   Complete  source code and do-
+        cumentation for the assemblers and linker is included  with  the
+        distribution.   Additionally,  test  code for each assembler and
+        several microprocessor monitors ( ASSIST05 for the 6805,  MONDEB
+        and ASSIST09 for the 6809, and BUFFALO 2.5 for the 6811) are in-
+        cluded as working examples of use of these assemblers.  
+
+
+        CHAPTER 1  THE ASSEMBLER                                     1-1 
+          1.1     THE ASXXXX ASSEMBLERS                              1-1 
+          1.1.1     Assembly Pass 1                                  1-2 
+          1.1.2     Assembly Pass 2                                  1-2 
+          1.1.3     Assembly Pass 3                                  1-2 
+          1.2     SOURCE PROGRAM FORMAT                              1-3 
+          1.2.1     Statement Format                                 1-3 
+          1.2.1.1     Label Field                                    1-3 
+          1.2.1.2     Operator Field                                 1-5 
+          1.2.1.3     Operand Field                                  1-5 
+          1.2.1.4     Comment Field                                  1-6 
+          1.3     SYMBOLS AND EXPRESSIONS                            1-6 
+          1.3.1     Character Set                                    1-6 
+          1.3.2     User-Defined Symbols                            1-10 
+          1.3.3     Local Symbols                                   1-10 
+          1.3.4     Current Location Counter                        1-12 
+          1.3.5     Numbers                                         1-13 
+          1.3.6     Terms                                           1-14 
+          1.3.7     Expressions                                     1-14 
+          1.4     GENERAL ASSEMBLER DIRECTIVES                      1-16 
+          1.4.1     .module Directive                               1-16 
+          1.4.2     .title Directive                                1-16 
+          1.4.3     .sbttl Directive                                1-17 
+          1.4.4     .page Directive                                 1-17 
+          1.4.5     .error Directive                                1-17 
+          1.4.6     .byte and .db Directives                        1-18 
+          1.4.7     .word and .dw Directives                        1-18 
+          1.4.8     .3byte Directive                                1-19 
+          1.4.9     .4byte or .quad Directive                       1-19 
+          1.4.10    .blkb, .blkw, .ds, .blk3, and .blk4
+                    Directives                                      1-20 
+          1.4.11    .ascii Directive                                1-20 
+          1.4.12    .ascis Directive                                1-20 
+          1.4.13    .asciz Directive                                1-21 
+          1.4.14    .assume Directive                               1-21 
+          1.4.15    .radix Directive                                1-22 
+          1.4.16    .even Directive                                 1-22 
+          1.4.17    .odd Directive                                  1-22 
+          1.4.18    .area Directive                                 1-23 
+          1.4.19    .org Directive                                  1-24 
+          1.4.20    .globl Directive                                1-25 
+          1.4.21    .if, .else, and .endif Directives               1-25 
+          1.4.22    .include Directive                              1-26 
+          1.4.23    .setdp Directive                                1-27 
+          1.4.24    .16bit, .24bit, and .32bit Directives           1-29 
+          1.5     INVOKING ASXXXX                                   1-30 
+          1.6     ERRORS                                            1-31 
+          1.7     LISTING FILE                                      1-32 
+          1.8     SYMBOL TABLE FILE                                 1-34 
+          1.9     OBJECT FILE                                       1-35 
+
+        CHAPTER 2  THE LINKER                                        2-1 
+          2.1     ASLINK RELOCATING LINKER                           2-1 
+          2.2     INVOKING ASLINK                                    2-2 
+          2.3     LIBRARY PATH(S) AND FILE(S)                        2-3 
+          2.4     ASLINK PROCESSING                                  2-4 
+
+
+                                                                 Page ii
+        
+
+
+          2.5     LINKER INPUT FORMAT                                2-6 
+          2.5.1     Object Module Format                             2-7 
+          2.5.2     Header Line                                      2-7 
+          2.5.3     Module Line                                      2-7 
+          2.5.4     Symbol Line                                      2-7 
+          2.5.5     Area Line                                        2-8 
+          2.5.6     T Line                                           2-8 
+          2.5.7     R Line                                           2-8 
+          2.5.8     P Line                                           2-9 
+          2.5.9     24-Bit and 32-Bit Addressing                     2-9 
+          2.6     LINKER ERROR MESSAGES                             2-10 
+          2.7     INTEL IHX OUTPUT FORMAT (16-BIT)                  2-12 
+          2.8     INTEL I86 OUTPUT FORMAT (24 OR 32-BIT)            2-13 
+          2.9     MOTORLA S1-S9 OUTPUT FORMAT (16-BIT)              2-14 
+          2.10    MOTORLA S2-S8 OUTPUT FORMAT (24-BIT)              2-15 
+          2.11    MOTORLA S3-S7 OUTPUT FORMAT (32-BIT)              2-16 
+
+        CHAPTER 3  BUILDING ASXXXX AND ASLINK                        3-1 
+          3.1     BUILDING AN ASSEMBLER                              3-1 
+          3.2     BUILDING ASLINK                                    3-2 
+
+        APPENDIX A  AS6800 ASSEMBLER                                 A-1 
+          A.1     6800 REGISTER SET                                  A-1 
+          A.2     6800 INSTRUCTION SET                               A-1 
+          A.2.1     Inherent Instructions                            A-2 
+          A.2.2     Branch Instructions                              A-2 
+          A.2.3     Single Operand Instructions                      A-3 
+          A.2.4     Double Operand Instructions                      A-4 
+          A.2.5     Jump and Jump to Subroutine Instructions         A-4 
+          A.2.6     Long Register Instructions                       A-5 
+
+        APPENDIX B  AS6801 ASSEMBLER                                 B-1 
+          B.1     .hd6303 DIRECTIVE                                  B-1 
+          B.2     6801 REGISTER SET                                  B-1 
+          B.3     6801 INSTRUCTION SET                               B-1 
+          B.3.1     Inherent Instructions                            B-2 
+          B.3.2     Branch Instructions                              B-2 
+          B.3.3     Single Operand Instructions                      B-3 
+          B.3.4     Double Operand Instructions                      B-4 
+          B.3.5     Jump and Jump to Subroutine Instructions         B-5 
+          B.3.6     Long Register Instructions                       B-5 
+          B.3.7     6303 Specific Instructions                       B-5 
+
+        APPENDIX C  AS6804 ASSEMBLER                                 C-1 
+          C.1     6804 REGISTER SET                                  C-1 
+          C.2     6804 INSTRUCTION SET                               C-1 
+          C.2.1     Inherent Instructions                            C-2 
+          C.2.2     Branch Instructions                              C-2 
+          C.2.3     Single Operand Instructions                      C-2 
+          C.2.4     Jump and Jump to Subroutine Instructions         C-2 
+          C.2.5     Bit Test Instructions                            C-2 
+          C.2.6     Load Immediate data Instruction                  C-3 
+
+
+                                                                Page iii
+        
+
+
+          C.2.7     6804 Derived Instructions                        C-3 
+
+        APPENDIX D  AS6805 ASSEMBLER                                 D-1 
+          D.1     6805 REGISTER SET                                  D-1 
+          D.2     6805 INSTRUCTION SET                               D-1 
+          D.2.1     Control Instructions                             D-2 
+          D.2.2     Bit Manipulation Instructions                    D-2 
+          D.2.3     Branch Instructions                              D-2 
+          D.2.4     Read-Modify-Write Instructions                   D-3 
+          D.2.5     Register\Memory Instructions                     D-3 
+          D.2.6     Jump and Jump to Subroutine Instructions         D-4 
+
+        APPENDIX E  AS6808 ASSEMBLER                                 E-1 
+          E.1     68HC08 REGISTER SET                                E-1 
+          E.2     68HC08 INSTRUCTION SET                             E-1 
+          E.2.1     Control Instructions                             E-2 
+          E.2.2     Bit Manipulation Instructions                    E-2 
+          E.2.3     Branch Instructions                              E-3 
+          E.2.4     Complex Branch Instructions                      E-3 
+          E.2.5     Read-Modify-Write Instructions                   E-4 
+          E.2.6     Register\Memory Instructions                     E-5 
+          E.2.7     Double Operand Move Instruction                  E-5 
+          E.2.8     16-Bit <H:X> Index Register Instructions         E-5 
+          E.2.9     Jump and Jump to Subroutine Instructions         E-5 
+
+        APPENDIX F  AS6809 ASSEMBLER                                 F-1 
+          F.1     6809 REGISTER SET                                  F-1 
+          F.2     6809 INSTRUCTION SET                               F-1 
+          F.2.1     Inherent Instructions                            F-3 
+          F.2.2     Short Branch Instructions                        F-3 
+          F.2.3     Long Branch Instructions                         F-3 
+          F.2.4     Single Operand Instructions                      F-4 
+          F.2.5     Double Operand Instructions                      F-5 
+          F.2.6     D-register Instructions                          F-5 
+          F.2.7     Index/Stack Register Instructions                F-5 
+          F.2.8     Jump and Jump to Subroutine Instructions         F-6 
+          F.2.9     Register - Register Instructions                 F-6 
+          F.2.10    Condition Code Register Instructions             F-6 
+          F.2.11    6800 Compatibility Instructions                  F-6 
+
+        APPENDIX G  AS6811 ASSEMBLER                                 G-1 
+          G.1     68HC11 REGISTER SET                                G-1 
+          G.2     68HC11 INSTRUCTION SET                             G-1 
+          G.2.1     Inherent Instructions                            G-2 
+          G.2.2     Branch Instructions                              G-2 
+          G.2.3     Single Operand Instructions                      G-3 
+          G.2.4     Double Operand Instructions                      G-4 
+          G.2.5     Bit Manupulation Instructions                    G-4 
+          G.2.6     Jump and Jump to Subroutine Instructions         G-5 
+          G.2.7     Long Register Instructions                       G-5 
+
+
+
+                                                                 Page iv
+        
+
+
+        APPENDIX H  AS6812 ASSEMBLER                                 H-1 
+          H.1     68HC12 REGISTER SET                                H-1 
+          H.2     68HC12 INSTRUCTION SET                             H-1 
+          H.2.1     Inherent Instructions                            H-3 
+          H.2.2     Short Branch Instructions                        H-3 
+          H.2.3     Long Branch Instructions                         H-3 
+          H.2.4     Branch on Decrement, Test, or Increment          H-4 
+          H.2.5     Bit Clear and Set Instructions                   H-4 
+          H.2.6     Branch on Bit Clear or Set                       H-4 
+          H.2.7     Single Operand Instructions                      H-5 
+          H.2.8     Double Operand Instructions                      H-6 
+          H.2.9     Move Instructions                                H-6 
+          H.2.10    D-register Instructions                          H-6 
+          H.2.11    Index/Stack Register Instructions                H-7 
+          H.2.12    Jump and Jump/Call to Subroutine
+                    Instructions                                     H-7 
+          H.2.13    Other Special Instructions                       H-7 
+          H.2.14    Register - Register Instructions                 H-7 
+          H.2.15    Condition Code Register Instructions             H-7 
+          H.2.16    M68HC11 Compatibility Mode Instructions          H-8 
+
+        APPENDIX I  AS6816 ASSEMBLER                                 I-1 
+          I.1     68HC16 REGISTER SET                                I-1 
+          I.2     68HC16 INSTRUCTION SET                             I-1 
+          I.2.1     Inherent Instructions                            I-2 
+          I.2.2     Push/Pull Multiple Register Instructions         I-3 
+          I.2.3     Short Branch Instructions                        I-3 
+          I.2.4     Long Branch Instructions                         I-3 
+          I.2.5     Bit Manipulation Instructions                    I-3 
+          I.2.6     Single Operand Instructions                      I-4 
+          I.2.7     Double Operand Instructions                      I-5 
+          I.2.8     Index/Stack Register Instructions                I-5 
+          I.2.9     Jump and Jump to Subroutine Instructions         I-6 
+          I.2.10    Condition Code Register Instructions             I-6 
+          I.2.11    Multiply and Accumulate Instructions             I-6 
+
+        APPENDIX J  ASH8 ASSEMBLER                                   J-1 
+          J.1     H8/3XX REGISTER SET                                J-1 
+          J.2     H8/3XX INSTRUCTION SET                             J-1 
+          J.2.1     Inherent Instructions                            J-2 
+          J.2.2     Branch Instructions                              J-2 
+          J.2.3     Single Operand Instructions                      J-3 
+          J.2.4     Double Operand Instructions                      J-4 
+          J.2.5     Mov Instructions                                 J-5 
+          J.2.6     Bit Manipulation Instructions                    J-6 
+          J.2.7     Extended Bit Manipulation Instructions           J-7 
+          J.2.8     Condition Code Instructions                      J-7 
+          J.2.9     Other Instructions                               J-8 
+          J.2.10    Jump and Jump to Subroutine Instructions         J-8 
+
+        APPENDIX K  AS8051 ASSEMBLER                                 K-1 
+          K.1     ACKNOWLEDGMENT                                     K-1 
+
+
+                                                                  Page v
+        
+
+
+          K.2     8051 REGISTER SET                                  K-1 
+          K.3     8051 INSTRUCTION SET                               K-2 
+          K.3.1     Inherent Instructions                            K-2 
+          K.3.2     Move Instructions                                K-3 
+          K.3.3     Single Operand Instructions                      K-3 
+          K.3.4     Two Operand Instructions                         K-4 
+          K.3.5     Call and Return Instructions                     K-4 
+          K.3.6     Jump Instructions                                K-4 
+          K.3.7     Predefined Symbols:  SFR Map                     K-5 
+          K.3.8     Predefined Symbols:  SFR Bit Addresses           K-6 
+          K.3.9     Predefined Symbols:  Control Bits                K-7 
+
+        APPENDIX L  AS8085 ASSEMBLER                                 L-1 
+          L.1     8085 REGISTER SET                                  L-1 
+          L.2     8085 INSTRUCTION SET                               L-1 
+          L.2.1     Inherent Instructions                            L-2 
+          L.2.2     Register/Memory/Immediate Instructions           L-2 
+          L.2.3     Call and Return Instructions                     L-2 
+          L.2.4     Jump Instructions                                L-2 
+          L.2.5     Input/Output/Reset Instructions                  L-3 
+          L.2.6     Move Instructions                                L-3 
+          L.2.7     Other Instructions                               L-3 
+
+        APPENDIX M  AS8XCXXX ASSEMBLER                               M-1 
+          M.1     ACKNOWLEDGMENTS                                    M-1 
+          M.2     DS8XCXXX ASSEMBLER DIRECTIVES                      M-1 
+          M.2.1     DS80C390 Addressing Mode Directive               M-2 
+          M.3     DS8XCXXX REGISTER SET                              M-3 
+          M.4     DS8XCXXX INSTRUCTION SET                           M-3 
+          M.4.1     Inherent Instructions                            M-4 
+          M.4.2     Move Instructions                                M-4 
+          M.4.3     Single Operand Instructions                      M-4 
+          M.4.4     Two Operand Instructions                         M-5 
+          M.4.5     Call and Return Instructions                     M-5 
+          M.4.6     Jump Instructions                                M-5 
+          M.5     DS8XCXXX SPECIAL FUNCTION REGISTERS                M-6 
+          M.5.1     SFR Map                                          M-6 
+          M.5.2     Bit Addressable Registers:  Generic              M-7 
+          M.5.3     Bit Addressable Registers:  Specific             M-8 
+          M.5.4     Optional Symbols:  Control Bits                  M-9 
+          M.6     DS80C310 SPECIAL FUNCTION REGISTERS               M-10 
+          M.6.1     SFR Map                                         M-10 
+          M.6.2     Bit Addressable Registers:  Generic             M-11 
+          M.6.3     Bit Addressable Registers:  Specific            M-12 
+          M.6.4     Optional Symbols:  Control Bits                 M-13 
+          M.7     DS80C320/DS80C323 SPECIAL FUNCTION REGISTERS      M-14 
+          M.7.1     SFR Map                                         M-14 
+          M.7.2     Bit Addressable Registers:  Generic             M-15 
+          M.7.3     Bit Addressable Registers:  Specific            M-16 
+          M.7.4     Optional Symbols:  Control Bits                 M-17 
+          M.8     DS80C390 SPECIAL FUNCTION REGISTERS               M-18 
+          M.8.1     SFR Map                                         M-18 
+
+
+                                                                 Page vi
+        
+
+
+          M.8.2     Bit Addressable Registers:  Generic             M-19 
+          M.8.3     Bit Addressable Registers:  Specific            M-20 
+          M.8.4     Optional Symbols:  Control Bits                 M-21 
+          M.9     DS83C520/DS87C520 SPECIAL FUNCTION REGISTERS      M-23 
+          M.9.1     SFR Map                                         M-23 
+          M.9.2     Bit Addressable Registers:  Generic             M-24 
+          M.9.3     Bit Addressable Registers:  Specific            M-25 
+          M.9.4     Optional Symbols:  Control Bits                 M-26 
+          M.10    DS83C530/DS87C530 SPECIAL FUNCTION REGISTERS      M-27 
+          M.10.1    SFR Map                                         M-27 
+          M.10.2    Bit Addressable Registers:  Generic             M-28 
+          M.10.3    Bit Addressable Registers:  Specific            M-29 
+          M.10.4    Optional Symbols:  Control Bits                 M-30 
+          M.11    DS83C550/DS87C550 SPECIAL FUNCTION REGISTERS      M-31 
+          M.11.1    SFR Map                                         M-31 
+          M.11.2    Bit Addressable Registers:  Generic             M-33 
+          M.11.3    Bit Addressable Registers:  Specific            M-34 
+          M.11.4    Optional Symbols:  Control Bits                 M-36 
+
+        APPENDIX N  ASZ80 ASSEMBLER                                  N-1 
+          N.1     .hd64 DIRECTIVE                                    N-1 
+          N.2     Z80 REGISTER SET AND CONDITIONS                    N-1 
+          N.3     Z80 INSTRUCTION SET                                N-2 
+          N.3.1     Inherent Instructions                            N-3 
+          N.3.2     Implicit Operand Instructions                    N-3 
+          N.3.3     Load Instruction                                 N-4 
+          N.3.4     Call/Return Instructions                         N-4 
+          N.3.5     Jump and Jump to Subroutine Instructions         N-4 
+          N.3.6     Bit Manipulation Instructions                    N-5 
+          N.3.7     Interrupt Mode and Reset Instructions            N-5 
+          N.3.8     Input and Output Instructions                    N-5 
+          N.3.9     Register Pair Instructions                       N-5 
+          N.3.10    HD64180 Specific Instructions                    N-6 
+
+        APPENDIX O  AS6500 ASSEMBLER                                 O-1 
+          O.1     ACKNOWLEDGMENT                                     O-1 
+          O.2     6500 REGISTER SET                                  O-2 
+          O.3     6500 INSTRUCTION SET                               O-2 
+          O.3.1     Processor Specific Directives                    O-3 
+          O.3.2     65xx Core Inherent Instructions                  O-3 
+          O.3.3     65xx Core Branch Instructions                    O-3 
+          O.3.4     65xx Core Single Operand Instructions            O-3 
+          O.3.5     65xx Core Double Operand Instructions            O-4 
+          O.3.6     65xx Core Jump and Jump to Subroutine
+                    Instructions                                     O-4 
+          O.3.7     65xx Core Miscellaneous X and Y Register
+                    Instructions                                     O-4 
+          O.3.8     65F11 and 65F12 Specific Instructions            O-5 
+          O.3.9     65C00/21 and 65C29 Specific Instructions         O-5 
+          O.3.10    65C02, 65C102, and 65C112 Specific
+                    Instructions                                     O-6 
 
 
 
@@ -959,19 +1039,16 @@
                                                 operator.  
 
                 *   Asterisk        A * B       Arithmetic   Multiplica-
-                                                tion operator.   (signed
-                                                16-bit) 
+                                                tion operator.  
 
                 /   Slash           A / B       Arithmetic      Division
-                                                operator.        (signed
-                                                16-bit quotient) 
+                                                operator.  
 
                 &   Ampersand       A & B       Logical AND operator.  
 
                 |   Bar             A | B       Logical OR operator.  
 
                 %   Percent sign    A % B       Modulus operator.  
-                                                (16-bit value) 
 
                 ^   Up arrow or     A ^ B       EXCLUSIVE OR operator.  
                     circumflex 
@@ -980,12 +1057,6 @@
 
 
 
-
-
-
-
-        THE ASSEMBLER                                          PAGE 1-10
-        SYMBOLS AND EXPRESSIONS
 
 
         Table 6         Temporary Radix Operators 
@@ -1001,8 +1072,14 @@
 
 
                 Potential  ambiguities arising from the use of 0b and 0d
-                as temporary radix operators may be circumvented by pre-
-                ceding  all  non-prefixed  hexidecimal  numbers with 00.
+                as temporary radix  operators  may  be  circumvented  by
+
+
+        THE ASSEMBLER                                          PAGE 1-10
+        SYMBOLS AND EXPRESSIONS
+
+
+                preceding  all non-prefixed hexidecimal numbers with 00.
                 Leading 0's are required in any  case  where  the  first
                 hexidecimal  digit is abcdef as the assembler will treat
                 the letter sequence as a label.  
@@ -1040,11 +1117,6 @@
              4.  Spaces and Tabs must not be embedded within a symbol.  
 
 
-
-
-        THE ASSEMBLER                                          PAGE 1-11
-        SYMBOLS AND EXPRESSIONS
-
 
         1.3.3  Local Symbols 
 
@@ -1059,6 +1131,11 @@
               27$ 
               138$ 
               244$ 
+
+
+        THE ASSEMBLER                                          PAGE 1-11
+        SYMBOLS AND EXPRESSIONS
+
 
            The  range  of  a local symbol block consists of those state-
         ments between two normally constructed  symbolic  labels.   Note
@@ -1085,11 +1162,6 @@
 
            The  use of the same local symbol within a local symbol block
         will generate one or both of the m or p errors.  
-
-
-        THE ASSEMBLER                                          PAGE 1-12
-        SYMBOLS AND EXPRESSIONS
-
 
         Example of local symbols:  
 
@@ -1104,6 +1176,12 @@
                 1$:     clr     ,x+     ;clear
                         deca
                         bne     1$
+
+
+
+
+        THE ASSEMBLER                                          PAGE 1-12
+        SYMBOLS AND EXPRESSIONS
 
 
         1.3.4  Current Location Counter 
@@ -1143,12 +1221,6 @@
         value of the location counter can be changed  through  a  direct
         assignment statement of the following form:  
 
-
-
-        THE ASSEMBLER                                          PAGE 1-13
-        SYMBOLS AND EXPRESSIONS
-
-
               . = . + expression 
 
 
@@ -1164,6 +1236,12 @@
 
                 .area   CODE1   (ABS)   ;program area CODE1
                                         ;is ABSOLUTE
+
+
+        THE ASSEMBLER                                          PAGE 1-13
+        SYMBOLS AND EXPRESSIONS
+
+
         
                 .org    0H100           ;set location to
                                         ;0H100 absolute
@@ -1201,11 +1279,6 @@
            The  .blkb  and .blkw directives are the preferred methods of
         allocating space.  
 
-
-
-        THE ASSEMBLER                                          PAGE 1-14
-        SYMBOLS AND EXPRESSIONS
-
 
         1.3.5  Numbers 
 
@@ -1220,6 +1293,12 @@
            Negative  numbers  must be preceeded by a minus sign;  ASxxxx
         translates such numbers into two's  complement  form.   Positive
         numbers may (but need not) be preceeded by a plus sign.  
+
+
+
+        THE ASSEMBLER                                          PAGE 1-14
+        SYMBOLS AND EXPRESSIONS
+
 
            Numbers are always considered to be absolute values, therefor
         they are never relocatable.  
@@ -1257,21 +1336,21 @@
 
 
 
+        1.3.7  Expressions 
+
+
+           Expressions  are  combinations  of  terms  joined together by
+        binary operators.  Expressions reduce to a value.   The  evalua-
+        tion  of  an expression includes the determination of its attri-
+        butes.  A resultant expression value may be one of  three  types
+        (as  described  later  in this section):  relocatable, absolute,
+        and external.  
+
 
 
         THE ASSEMBLER                                          PAGE 1-15
         SYMBOLS AND EXPRESSIONS
 
-
-        1.3.7  Expressions 
-
-
-           Expressions  are  combinations  of  terms  joined together by
-        binary operators.  Expressions reduce to a  16-bit  value.   The
-        evaluation  of  an  expression includes the determination of its
-        attributes.  A resultant expression value may be  one  of  three
-        types  (as  described  later in this section):  relocatable, ab-
-        solute, and external.  
 
         Expressions are evaluate with an operand hierarchy as follows:  
 
@@ -1314,14 +1393,8 @@
                  lative to the base address of the program area in which
                  it appears;  it will have an offset value added at link
                  time.  Terms that contain labels defined in relocatable
-                 program   areas   will   have   a   relocatable  value;
-
-
-        THE ASSEMBLER                                          PAGE 1-16
-        SYMBOLS AND EXPRESSIONS
-
-
-                 similarly, a period (.) in a relocatable program  area,
+                 program  areas  will  have  a relocatable value;  simi-
+                 larly, a period (.)  in  a  relocatable  program  area,
                  representing  the value of the current program location
                  counter, will also have a relocatable value.  
 
@@ -1331,6 +1404,12 @@
                  pression or term minus a relocatable term,  where  both
                  elements  being  evaluated  belong  to the same program
                  area, is an absolute expression.  This is because every
+
+
+        THE ASSEMBLER                                          PAGE 1-16
+        SYMBOLS AND EXPRESSIONS
+
+
                  term  in  a  program area has the same relocation bias.
                  When one term is subtracted from the other the  reloca-
                  tion bias is zero.  
@@ -1369,12 +1448,6 @@
         listed.  
 
 
-
-
-        THE ASSEMBLER                                          PAGE 1-17
-        GENERAL ASSEMBLER DIRECTIVES
-
-
         1.4.2  .title Directive 
 
         Format:  
@@ -1383,6 +1456,12 @@
 
            The .title directive provides a character string to be placed
         on the second line of each page during listing.  
+
+
+
+
+        THE ASSEMBLER                                          PAGE 1-17
+        GENERAL ASSEMBLER DIRECTIVES
 
 
         1.4.3  .sbttl Directive 
@@ -1409,7 +1488,31 @@
         disabled by invoking the -p directive.  
 
 
-        1.4.5  .byte and .db Directives 
+        1.4.5  .error Directive 
+
+        Format:  
+
+                .error exp 
+
+        where:  exp     represents   an  absolute  expression.   If  the
+                        evaluation of the expression results  in  a  non
+                        zero value then an 'e' error is reported and the
+                        text line is listed in the generated error.  
+
+
+           The  .error  directive  is  useful to report configuration or
+        value errors during the assembly process.  (The .error directive
+        is  identical in function to the .assume directive, just perhaps
+        more descriptive.) 
+
+
+
+
+        THE ASSEMBLER                                          PAGE 1-18
+        GENERAL ASSEMBLER DIRECTIVES
+
+
+        1.4.6  .byte and .db Directives 
 
         Format:  
 
@@ -1423,23 +1526,16 @@
         
         where:  exp,    represent expressions that will be
                 exp1,   truncated to 8-bits of data.
-                .       Each expression will be calculated
-                .       as a 16-bit word expression,
+                .       Each expression will be calculated,
                 .       the high-order byte will be truncated.
                 .       Multiple expressions must be
-
-
-        THE ASSEMBLER                                          PAGE 1-18
-        GENERAL ASSEMBLER DIRECTIVES
-
-
                 expn    separated by commas.
 
            The  .byte  or .db directives are used to generate successive
         bytes of binary data in the object module.  
 
 
-        1.4.6  .word and .dw Directives 
+        1.4.7  .word and .dw Directives 
 
         Format:  
 
@@ -1461,19 +1557,84 @@
         words of binary data in the object module.  
 
 
-        1.4.7  .blkb, .blkw, and .ds Directives 
+
+
+        THE ASSEMBLER                                          PAGE 1-19
+        GENERAL ASSEMBLER DIRECTIVES
+
+
+        1.4.8  .3byte Directive 
+
+        Format:  
+
+                .3byte  exp             ;Stores the binary value
+                                        ;of the expression in
+                                        ;the next triple (3 bytes).
+        
+                .3byte  exp1,exp2,expn  ;Stores the binary values
+                                        ;of the list of expressions
+                                        ;in successive triples
+                                        ;(3 bytes).
+        
+        where:  exp,    represent expressions that will occupy three
+                exp1,   bytes of data. Each expression will be
+                .       calculated as a 24-bit word expression.
+                .       Multiple expressions must be
+                expn    separated by commas.
+
+           The  .3byte  directive is used to generate successive triples
+        of binary data in the object module.  (This  directive  is  only
+        available in assemblers supporting 24-bit addressing.) 
+
+
+        1.4.9  .4byte or .quad Directive 
+
+        Format:  
+
+                .4byte  exp             ;Stores the binary value
+                .quad   exp             ;of the expression in
+                                        ;the next quad (4 bytes).
+        
+                .4byte  exp1,exp2,expn  ;Stores the binary values
+                .quad   exp1,exp2,expn  ;of the list of expressions
+                                        ;in successive quads
+                                        ;(4 bytes).
+        
+        where:  exp,    represent expressions that will occupy three
+                exp1,   bytes of data. Each expression will be
+                .       calculated as a 32-bit word expression.
+                .       Multiple expressions must be
+                expn    separated by commas.
+
+           The  .4byte or .quad directive is used to generate successive
+        quads of binary data in the object module.  (This  directive  is
+        only available in assemblers supporting 32-bit addressing.) 
+
+
+
+
+        THE ASSEMBLER                                          PAGE 1-20
+        GENERAL ASSEMBLER DIRECTIVES
+
+
+        1.4.10  .blkb, .blkw, .ds, .blk3, and .blk4 Directives 
 
         Format:  
 
                 .blkb   N       ;reserve N bytes of space
                 .blkw   N       ;reserve N words of space
                 .ds     N       ;reserve N bytes of space
+                .blk3   N       ;reserve N triples of space
+                .blk4   N       ;reserve N quads of space
 
            The  .blkb  and .ds directives reserve byte blocks in the ob-
-        ject module;  the .blkw directive reserves word blocks.  
+        ject module;  the .blkw directive  reserves  word  blocks;   the
+        .blk3  reserves  3 byte blocks(available in assembles supporting
+        24-bit addressing);  the .blk4 reserves 4 byte blocks (available
+        in assemblers supporting 32-bit addressing).  
 
 
-        1.4.8  .ascii Directive 
+        1.4.11  .ascii Directive 
 
         Format:  
 
@@ -1485,12 +1646,6 @@
                         delimiters   may   be   any   paired    printing
                         characters,  as  long  as the characters are not
                         contained within  the  string  itself.   If  the
-
-
-        THE ASSEMBLER                                          PAGE 1-19
-        GENERAL ASSEMBLER DIRECTIVES
-
-
                         delimiting  characters  do not match, the .ascii
                         directive will give the (q) error.  
 
@@ -1498,7 +1653,7 @@
         character in the string into the object module.  
 
 
-        1.4.9  .ascis Directive 
+        1.4.12  .ascis Directive 
 
         Format:  
 
@@ -1514,11 +1669,17 @@
                         directive will give the (q) error.  
 
         The  .ascis  directive  places  one binary byte of data for each
+
+
+        THE ASSEMBLER                                          PAGE 1-21
+        GENERAL ASSEMBLER DIRECTIVES
+
+
         character in the  string  into  the  object  module.   The  last
         character in the string will have the high order bit set.  
 
 
-        1.4.10  .asciz Directive 
+        1.4.13  .asciz Directive 
 
         Format:  
 
@@ -1539,21 +1700,38 @@
         character string.  
 
 
+        1.4.14  .assume Directive 
+
+        Format:  
+
+                .assume exp 
+
+        where:  exp     represents   an  absolute  expression.   If  the
+                        evaluation of the expression results  in  a  non
+                        zero value then an 'e' error is reported and the
+                        text line is listed in the generated error.  
+
+
+           The  .assume  directive  is useful to check assumptions about
+        assembler values.  (The .assume directive is identical in  func-
+        tion to the .error directive, just perhaps more descriptive.) 
+
+
 
 
-        THE ASSEMBLER                                          PAGE 1-20
+        THE ASSEMBLER                                          PAGE 1-22
         GENERAL ASSEMBLER DIRECTIVES
 
 
-        1.4.11  .radix Directive 
+        1.4.15  .radix Directive 
 
         Format:  
 
                 .radix  character 
 
         where:  character  represents  a single character specifying the
-                        default radix to be used for succeeding numbers.
-                        The character may be any one of the following:  
+                default radix to be used for  succeeding  numbers.   The
+                character may be any one of the following:  
 
                         B,b     Binary
         
@@ -1567,7 +1745,7 @@
                         X,x
 
 
-        1.4.12  .even Directive 
+        1.4.16  .even Directive 
 
         Format:  
 
@@ -1578,7 +1756,7 @@
         tion is odd.  
 
 
-        1.4.13  .odd Directive 
+        1.4.17  .odd Directive 
 
         Format:  
 
@@ -1591,11 +1769,11 @@
 
 
 
-        THE ASSEMBLER                                          PAGE 1-21
+        THE ASSEMBLER                                          PAGE 1-23
         GENERAL ASSEMBLER DIRECTIVES
 
 
-        1.4.14  .area Directive 
+        1.4.18  .area Directive 
 
         Format:  
 
@@ -1648,7 +1826,7 @@
 
 
 
-        THE ASSEMBLER                                          PAGE 1-22
+        THE ASSEMBLER                                          PAGE 1-24
         GENERAL ASSEMBLER DIRECTIVES
 
 
@@ -1684,7 +1862,7 @@
         The .area names and options are never case sensitive.  
 
 
-        1.4.15  .org Directive 
+        1.4.19  .org Directive 
 
         Format:  
 
@@ -1701,11 +1879,11 @@
 
 
 
-        THE ASSEMBLER                                          PAGE 1-23
+        THE ASSEMBLER                                          PAGE 1-25
         GENERAL ASSEMBLER DIRECTIVES
 
 
-        1.4.16  .globl Directive 
+        1.4.20  .globl Directive 
 
         Format:  
 
@@ -1733,7 +1911,7 @@
         end of pass 1.  
 
 
-        1.4.17  .if, .else, and .endif Directives 
+        1.4.21  .if, .else, and .endif Directives 
 
         Format:  
 
@@ -1759,7 +1937,7 @@
         all valid .if/.else/.endif constructions:  
 
 
-        THE ASSEMBLER                                          PAGE 1-24
+        THE ASSEMBLER                                          PAGE 1-26
         GENERAL ASSEMBLER DIRECTIVES
 
 
@@ -1799,7 +1977,7 @@
                 .endif
 
 
-        1.4.18  .include Directive 
+        1.4.22  .include Directive 
 
         Format:  
 
@@ -1817,7 +1995,7 @@
         .include directive is five.  
 
 
-        THE ASSEMBLER                                          PAGE 1-25
+        THE ASSEMBLER                                          PAGE 1-27
         GENERAL ASSEMBLER DIRECTIVES
 
 
@@ -1832,7 +2010,7 @@
         D:\proj\include1.asm is opened.  
 
 
-        1.4.19  .setdp Directive 
+        1.4.23  .setdp Directive 
 
         Format:  
 
@@ -1874,7 +2052,7 @@
         page to be on any 256 byte boundary by loading  the  appropriate
 
 
-        THE ASSEMBLER                                          PAGE 1-26
+        THE ASSEMBLER                                          PAGE 1-28
         GENERAL ASSEMBLER DIRECTIVES
 
 
@@ -1932,7 +2110,7 @@
         dumby page is used only to define  the  variable  labels.   Then
 
 
-        THE ASSEMBLER                                          PAGE 1-27
+        THE ASSEMBLER                                          PAGE 1-29
         GENERAL ASSEMBLER DIRECTIVES
 
 
@@ -1940,6 +2118,25 @@
         .setdp directive.  This method is equivalent to indexed address-
         ing,  where the dp register is the index register and the direct
         addressing is the offset.  
+
+
+        1.4.24  .16bit, .24bit, and .32bit Directives 
+
+        Format:  
+
+                .16bit          ;specify 16-bit addressing
+                .24bit          ;specify 24-bit addressing
+                .32bit          ;specify 32-bit addressing
+
+
+           The  .16bit, .24bit, and .32bit directives are special direc-
+        tives for assembler configuration when default  values  are  not
+        used.  (Currently only the as8xCxxx assembler can use the .16bit
+        and .24bit directives in special mode.) 
+
+
+        THE ASSEMBLER                                          PAGE 1-30
+        GENERAL ASSEMBLER DIRECTIVES
 
 
         1.5  INVOKING ASXXXX 
@@ -1988,15 +2185,15 @@
            The file name for the .lst, .rel, and .sym files is the first
         file name specified in the command line.  All output  files  are
         ascii  text  files which may be edited, copied, etc.  The output
-
-
-        THE ASSEMBLER                                          PAGE 1-28
-        INVOKING ASXXXX
-
-
         files are the concatenation of all the input files, if files are
         to  be  assembled  independently  invoke  the assembler for each
         file.  
+
+
+
+        THE ASSEMBLER                                          PAGE 1-31
+        INVOKING ASXXXX
+
 
            The  .rel  file contains a radix directive so that the linker
         will use the proper conversion for this file.  Linked files  may
@@ -2036,6 +2233,8 @@
 
               (d)   Indicates a direct page addressing error.  
 
+              (e)   Caused by a .error or .assume directive.  
+
               (i)   Caused  by  an  .include file error or an .if/.endif
                     mismatch.  
 
@@ -2046,14 +2245,14 @@
               (o)   Directive  or  mnemonic error or the use of the .org
                     directive in a relocatable area.  
 
+              (p)   Phase error:  label location changing between passes
+                    2 and 3.  Normally caused by having  more  than  one
 
 
-        THE ASSEMBLER                                          PAGE 1-29
+        THE ASSEMBLER                                          PAGE 1-32
         ERRORS
 
 
-              (p)   Phase error:  label location changing between passes
-                    2 and 3.  Normally caused by having  more  than  one
                     level of forward referencing.  
 
               (q)   Questionable syntax:  missing or improper operators,
@@ -2073,16 +2272,18 @@
 
 
            The  (-l) option produces an ascii output listing file.  Each
-        page of output contains a four line header:  
+        page of output contains a five line header:  
 
 
              1.  The ASxxxx program name and page number 
 
-             2.  Title from a .title directive (if any) 
+             2.  Assembler Radix and Address Bits 
 
-             3.  Subtitle from a .sbttl directive (if any) 
+             3.  Title from a .title directive (if any) 
 
-             4.  Blank line 
+             4.  Subtitle from a .sbttl directive (if any) 
+
+             5.  Blank line 
 
 
 
@@ -2105,12 +2306,13 @@
 
 
 
-        THE ASSEMBLER                                          PAGE 1-30
+        THE ASSEMBLER                                          PAGE 1-33
         LISTING FILE
 
 
-           The  current  location counter field displays the 16-bit pro-
-        gram position.  This field will be in the selected radix.  
+           The  current  location  counter  field  displays  the 16-bit,
+        24-bit, or 32-bit program position.  This field will be  in  the
+        selected radix.  
 
            The generated code follows the program location.  The listing
         radix determines the number of bytes that will be  displayed  in
@@ -2154,11 +2356,41 @@
              7.  s   high byte relocation 
 
 
+           Assemblers  which  use 24-bit or 32-bit addressing use an ex-
+        tended flagging mode:  
+
+             1.  *   paged relocation 
 
 
 
-        THE ASSEMBLER                                          PAGE 1-31
-        SYMBOL TABLE FILE
+        THE ASSEMBLER                                          PAGE 1-34
+        LISTING FILE
+
+
+             2.  u   1st  byte of unsigned value 
+
+             3.  v   2nd  byte of unsigned value 
+
+             4.  U   3rd  byte of unsigned value 
+
+             5.  V   4th  byte of unsigned value 
+
+             6.  p   PCR 1st  byte of relocation value or PCR byte 
+
+             7.  q   PCR 2nd  byte of relocation value 
+
+             8.  P   PCR 3rd  byte of relocation value 
+
+             9.  Q   PCR 4th  byte of relocation value 
+
+            10.  r   1st  byte of relocation value or byte relocation 
+
+            11.  s   2nd  byte of relocation value 
+
+            12.  R   3rd  byte of relocation value 
+
+            13.  S   4th  byte of relocation value 
+
 
 
         1.8  SYMBOL TABLE FILE 
@@ -2187,6 +2419,12 @@
                  the program area base address (=0), or a ****  indicat-
                  ing the symbol or label is undefined.  
 
+
+
+        THE ASSEMBLER                                          PAGE 1-35
+        SYMBOL TABLE FILE
+
+
              5.  The  characters:   G - global, R - relocatable, and X -
                  external.  
 
@@ -2204,7 +2442,7 @@
         plete  loadable  memory  image.   The object module contains the
         following designators:  
 
-                [XDQ][HL]
+                [XDQ][HL][234]
                         X       Hexidecimal radix
                         D       Decimal radix
                         Q       Octal radix
@@ -2212,13 +2450,11 @@
                         H       Most significant byte first
                         L       Least significant byte first
         
+                        2       16-Bit Addressing
+                        3       24-Bit Addressing
+                        4       32-Bit Addressing
+        
                 H       Header 
-
-
-        THE ASSEMBLER                                          PAGE 1-32
-        OBJECT FILE
-
-
                 M       Module
                 A       Area
                 S       Symbol
@@ -2276,7 +2512,7 @@
 
              7.  Define absolute area base address values at link time 
 
-             8.  Produce Intel Hex or Motorola S19 output file 
+             8.  Produce Intel Hex or Motorola S output files 
 
              9.  Produce a map of the linked memory image 
 
@@ -2321,7 +2557,7 @@
 
              3.  -p/-n   enable/disable echoing commands to stdout.  
 
-             4.  -i/-s   Intel Hex (file.ihx) or Motorola S19 (file.s19)
+             4.  -i/-s   Intel  Hex  (file.i--) or Motorola S (file.s--)
                  image output file.  
 
              5.  -o/-v   Specifies      that      subsequent      linked
@@ -2548,13 +2784,17 @@
 
         The object module contains the following designators:  
 
-                [XDQ][HL]
+                [XDQ][HL][234]
                         X       Hexidecimal radix
                         D       Decimal radix
                         Q       Octal radix
         
                         H       Most significant byte first
                         L       Least significant byte first
+        
+                        2       16-Bit Addressing
+                        3       24-Bit Addressing
+                        4       32-Bit Addressing
         
                 H       Header 
                 M       Module
@@ -2574,9 +2814,10 @@
         2.5.1  Object Module Format 
 
 
-           The  first  line  of  an object module contains the [XDQ][HL]
-        format specifier (i.e.  XH indicates  a  hexidecimal  file  with
-        most significant byte first) for the following designators.  
+           The   first   line   of   an   object   module  contains  the
+        [XDQ][HL][234] format specifier  (i.e.   XH2  indicates  a  hex-
+        idecimal  file  with  most significant byte first and 16-bit ad-
+        dressing) for the following designators.  
 
 
         2.5.2  Header Line 
@@ -2663,8 +2904,7 @@
                  5.  bit 4  signed(0x00)/unsigned(0x10) byte data 
                  6.  bit 5  normal(0x00)/page '0'(0x20) reference 
                  7.  bit 6  normal(0x00)/page 'nnn'(0x40) reference 
-                 8.  bit 7  LSB  byte(0x00)/MSB  byte(0x80)  with 2-byte
-                     mode 
+                 8.  bit 7  LSB  byte(0x00)/2nd  byte(0x80)
 
              2.  n2  is  a byte index into the corresponding (i.e.  pre-
                  ceeding) T line data (i.e.  a pointer to the data to be
@@ -2708,6 +2948,32 @@
         specify the _CODE area first, making this the default page area. 
 
 
+        2.5.9  24-Bit and 32-Bit Addressing 
+
+
+           When  24-bit  or  32-bit  addressing is specified in the file
+        format line [XDQ][HL][234] then the S and T Lines have  modified
+        formats:  
+                S string Defnnnnnn                      (24-bit)
+                S string Refnnnnnn                      (24-bit)
+                T xx xx xx nn nn nn nn nn ...           (24-bit)
+        
+                S string Defnnnnnnnn                    (32-bit)
+                S string Refnnnnnnnn                    (32-bit)
+                T xx xx xx xx nn nn nn nn nn ...        (32-bit)
+
+           The  multibyte  formats for byte data replace the 2-byte form
+        for 16-bit data with 3-byte or 4-byte data for 24-bit or  32-bit
+        data  respectively.  The 2nd byte format (also named MSB) always
+        uses the second byte of the 2, 3, or 4-byte data.  
+
+
+
+
+        THE LINKER                                             PAGE 2-10
+        LINKER ERROR MESSAGES
+
+
         2.6  LINKER ERROR MESSAGES 
 
 
@@ -2727,12 +2993,6 @@
            During  Pass  two the linker reads the T, R, and P lines per-
         forming the necessary relocations and  outputting  the  absolute
         code.  Various errors may be reported during this process 
-
-
-        THE LINKER                                             PAGE 2-10
-        LINKER ERROR MESSAGES
-
-
         The P line processing can produce only one possible error:  
 
         ?ASlink-Warning-Page Definition Boundary Error
@@ -2765,18 +3025,33 @@
                  file        module      area        offset
           Refby  t6809l      t6809l      DIRECT      0005
           Defin  tconst      tconst      .  .ABS.    0100
+
+
+        THE LINKER                                             PAGE 2-11
+        LINKER ERROR MESSAGES
+
 
         ?ASlink-Warning-Page Mode relocation error
                  file        module      area        offset
           Refby  t           Pagetest    PROGRAM     0006
           Defin  t           Pagetest    DIRECT      0100
 
+        ?ASlink-Warning-2K Page relocation error
+                 file        module      area        offset
+          Refby  t           Pagetest    A           0000
+          Defin  t           Pagetest    A           0800
+
+        ?ASlink-Warning-512K Page relocation error
+                 file        module      area        offset
+          Refby  t           Pagetest    A           000000
+          Defin  t           Pagetest    A           080000
+
         These  error messages specify the file, module, area, and offset
         within the area of the code  referencing  (Refby)  and  defining
         (Defin) the symbol.  If the symbol is defined in the same module
         as the reference the linker is unable to report the symbol name.
         The  assembler  listing file(s) should be examined at the offset
-        from the specified area to located the offending code.  
+        from the specified area to locate the offending code.  
 
            The errors are:  
 
@@ -2785,11 +3060,6 @@
 
              2.  The Unsigned byte error indicates an indexing value was
                  negative or larger than 255.  
-
-
-        THE LINKER                                             PAGE 2-11
-        LINKER ERROR MESSAGES
-
 
              3.  The  Page0  error is generated if the direct page vari-
                  able is not in the page0 range of 0 to 255.  
@@ -2797,13 +3067,21 @@
              4.  The page mode error is generated if the direct variable
                  is not within the current direct page (6809).  
 
+             5.  The  2K  Page  relocation  error  is  generated  if the
+                 destination is not within the current  2K  page  (8051,
+                 DS8xCxxx).  
+
+             6.  The  512K  Page  relocation  error  is generated if the
+                 destination  is  not  within  the  current  512K   page
+                 (DS80C390).  
+
 
 
         THE LINKER                                             Page 2-12
-        INTEL HEX OUTPUT FORMAT
+        INTEL IHX OUTPUT FORMAT
 
 
-        2.7  INTEL HEX OUTPUT FORMAT 
+        2.7  INTEL IHX OUTPUT FORMAT (16-BIT) 
 
         Record Mark Field    -  This  field  signifies  the  start  of a
                                 record, and consists of an  ascii  colon
@@ -2856,10 +3134,67 @@
 
 
         THE LINKER                                             Page 2-13
+        INTEL I86 OUTPUT FORMAT
+
+
+        2.8  INTEL I86 OUTPUT FORMAT (24 OR 32-BIT) 
+
+        Record Mark Field    -  This  field  signifies  the  start  of a
+                                record, and consists of an  ascii  colon
+                                (:).  
+
+        Record Length Field  -  This   field   consists   of  two  ascii
+                                characters which indicate the number  of
+                                data   bytes   in   this   record.   The
+                                characters are the result of  converting
+                                the  number  of  bytes  in binary to two
+                                ascii characters, high digit first.   An
+                                End  of  File  record contains two ascii
+                                zeros in this field.  
+
+        Load Address Field   -  This  field  consists  of the four ascii
+                                characters which result from  converting
+                                the  the  binary value of the address in
+                                which to begin loading this record.  The
+                                order is as follows:  
+
+                                    High digit of high byte of address. 
+                                    Low digit of high byte of address.  
+                                    High digit of low byte of address.  
+                                    Low digit of low byte of address.  
+
+                                In an End of File record this field con-
+                                sists of either four ascii zeros or  the
+                                program  entry  address.   Currently the
+                                entry address option is not supported.  
+
+        Record Type Field    -  This  field  identifies the record type,
+                                which is either 0 for  data  records,  1
+                                for  an  End  of File record, or 4 for a
+                                segment  record.   It  consists  of  two
+                                ascii characters, with the high digit of
+                                the record type first, followed  by  the
+                                low digit of the record type.  
+
+        Data Field           -  This  field consists of the actual data,
+                                converted to two ascii characters,  high
+                                digit first.  There are no data bytes in
+                                the End of File record.  
+
+        Checksum Field       -  The  checksum  field is the 8 bit binary
+                                sum of the record length field, the load
+                                address  field,  the  record type field,
+                                and the data field.  This  sum  is  then
+                                negated  (2's  complement) and converted
+                                to  two  ascii  characters,  high  digit
+                                first.  
+
+
+        THE LINKER                                             Page 2-14
         MOTOROLA S1-S9 OUTPUT FORMAT
 
 
-        2.8  MOTORLA S1-S9 OUTPUT FORMAT 
+        2.9  MOTORLA S1-S9 OUTPUT FORMAT (16-BIT) 
 
         Record Type Field    -  This  field  signifies  the  start  of a
                                 record and  identifies  the  the  record
@@ -2903,6 +3238,108 @@
                                 characters, high digit first.  
 
 
+        THE LINKER                                             Page 2-15
+        MOTOROLA S2-S8 OUTPUT FORMAT
+
+
+        2.10  MOTORLA S2-S8 OUTPUT FORMAT (24-BIT) 
+
+        Record Type Field    -  This  field  signifies  the  start  of a
+                                record and  identifies  the  the  record
+                                type as follows:  
+
+                                    Ascii S2 - Data Record 
+                                    Ascii S8 - End of File Record 
+
+        Record Length Field  -  This  field  specifies the record length
+                                which includes the  address,  data,  and
+                                checksum   fields.   The  8  bit  record
+                                length value is converted to  two  ascii
+                                characters, high digit first.  
+
+        Load Address Field   -  This  field  consists  of  the six ascii
+                                characters which result from  converting
+                                the  the  binary value of the address in
+                                which to begin loading this record.  The
+                                order is as follows:  
+
+                                    High digit of 3rd byte of address.  
+                                    Low digit of 3rd byte of address.  
+                                    High digit of high byte of address. 
+                                    Low digit of high byte of address.  
+                                    High digit of low byte of address.  
+                                    Low digit of low byte of address.  
+
+                                In an End of File record this field con-
+                                sists of either six ascii zeros  or  the
+                                program  entry  address.   Currently the
+                                entry address option is not supported.  
+
+        Data Field           -  This  field consists of the actual data,
+                                converted to two ascii characters,  high
+                                digit first.  There are no data bytes in
+                                the End of File record.  
+
+        Checksum Field       -  The  checksum  field is the 8 bit binary
+                                sum of the record length field, the load
+                                address field, and the data field.  This
+                                sum is then  complemented  (1's  comple-
+                                ment)   and   converted   to  two  ascii
+                                characters, high digit first.  
+
+
+        THE LINKER                                             Page 2-16
+        MOTOROLA S3-S7 OUTPUT FORMAT
+
+
+        2.11  MOTORLA S3-S7 OUTPUT FORMAT (32-BIT) 
+
+        Record Type Field    -  This  field  signifies  the  start  of a
+                                record and  identifies  the  the  record
+                                type as follows:  
+
+                                    Ascii S3 - Data Record 
+                                    Ascii S7 - End of File Record 
+
+        Record Length Field  -  This  field  specifies the record length
+                                which includes the  address,  data,  and
+                                checksum   fields.   The  8  bit  record
+                                length value is converted to  two  ascii
+                                characters, high digit first.  
+
+        Load Address Field   -  This  field  consists of the eight ascii
+                                characters which result from  converting
+                                the  the  binary value of the address in
+                                which to begin loading this record.  The
+                                order is as follows:  
+
+                                    High digit of 4th byte of address.  
+                                    Low digit of 4th byte of address.  
+                                    High digit of 3rd byte of address.  
+                                    Low digit of 3rd byte of address.  
+                                    High digit of high byte of address. 
+                                    Low digit of high byte of address.  
+                                    High digit of low byte of address.  
+                                    Low digit of low byte of address.  
+
+                                In an End of File record this field con-
+                                sists of either eight ascii zeros or the
+                                program  entry  address.   Currently the
+                                entry address option is not supported.  
+
+        Data Field           -  This  field consists of the actual data,
+                                converted to two ascii characters,  high
+                                digit first.  There are no data bytes in
+                                the End of File record.  
+
+        Checksum Field       -  The  checksum  field is the 8 bit binary
+                                sum of the record length field, the load
+                                address field, and the data field.  This
+                                sum is then  complemented  (1's  comple-
+                                ment)   and   converted   to  two  ascii
+                                characters, high digit first.  
+
+
 
 
 
@@ -2923,16 +3360,11 @@
 
 
            The assemblers and linker have been successfully compiled us-
-        ing  the  DECUS C  (PDP-11)  compiler  (patch  level   9)   with
-        RT-11/TSX+,  GCC  2.7.2 with Linux, Symantec C/C++ V6.1/V7.2 and
-        DJGPP (GCC 2.8.2) with MS-DOS and Windows 3.x/95/98.  
-
-           The  device  specific  header  file  (i.e.  m6800.h, m6801.h,
-        etc.) contains the DECUS C 'BUILD' directives for  generating  a
-        command  file to compile, assemble, and link the necessary files
-        to prepare an executable image for a  particular  assembler.   A
-        Linux makefile and DJGPP makefile are available to build all the
-        assemblers and the linker.  
+        ing GCC 2.7.2 with Linux, Symantec C/C++ V6.1/V7.2,  DJGPP  (GCC
+        2.8.2)  and  VC6  with  MS-DOS  and  Windows 3.x/95/98.  A Linux
+        makefile, DJGPP makefile, Symantec project files, and  VC6  pro-
+        ject  files  are  available  to build all the assemblers and the
+        linker.  
 
 
         3.1  BUILDING AN ASSEMBLER 
@@ -2959,17 +3391,16 @@
 
            The  first  five  files are the 6809 processor dependent sec-
         tions which contain the following:  
-
-
-        BUILDING ASXXXX AND ASLINK                              PAGE 3-2
-        BUILDING AN ASSEMBLER
-
-
 
 
              1.  m6809.h -  header  file containing the machine specific
                  definitions of constants,  variables,  structures,  and
                  types 
+
+
+        BUILDING ASXXXX AND ASLINK                              PAGE 3-2
+        BUILDING AN ASSEMBLER
+
 
              2.  m09ext -  device  description, byte order, and file ex-
                  tension information 
@@ -6003,13 +6434,1683 @@
 
                                    APPENDIX M
 
+                               AS8XCXXX ASSEMBLER
+
+
+
+
+
+        M.1  ACKNOWLEDGMENTS 
+
+
+           Thanks to Bill McKinnon for his contributions to the AS8XCXXX
+        cross assembler.  
+
+                Bill McKinnon
+                w_mckinnon@conknet.com
+
+           This  assembler  was  derived from the AS8051 cross assembler
+        contributed by John Hartman.  
+
+                John L. Hartman
+                jhartman@compuserve.com
+
+
+        M.2  DS8XCXXX ASSEMBLER DIRECTIVES 
+
+
+           The  AS8XCXXX  assembler  contains  directives to specify the
+        particular SFR (Special Function Registers) to be enabled during
+        the assembly process.  The following directives are supported:  
+
+                .DS8XCXXX               ;80C32 core
+                .DS80C310               ;Dallas Semiconductor
+                .DS80C320               ;Microprocessors
+                .DS80C323
+                .DS80C390
+                .DS83C520
+                .DS83C530
+                .DS83C550
+                .DS87C520
+                .DS87C530
+                .DS87C550
+
+        If  the  microprocessor  selector  directive  is  followed  by a
+
+
+        AS8XCXXX ASSEMBLER                                      PAGE M-2
+        DS8XCXXX ASSEMBLER DIRECTIVES
+
+
+        non-zero argument then the SFR register bit values will also  be
+        defined.  
+
+           If  a microprocessor selector directive is not specified then
+        no SFR or SFR register bit values will be  defined.   This  mode
+        allows  the  SFR  to  be  defined by an external assembly source
+        file.  The file DS8XCXXX.SFR contains the SFR and  SFR  register
+        bit values for all the microprocessor selector directives.  This
+        file may be modified to create a new SFR for other  microproces-
+        sor types.  
+
+           Also, if a microprocessor selector directive is not specified
+        then the  following  address  length  assembler  directives  are
+        accepted:  
+
+                .16bit                  ;16-Bit Addressing
+                .24bit                  ;24-Bit Addressing
+                .32bit                  ;32-Bit Addressing
+
+        These  directives specify the assembler addressing space and ef-
+        fect the output format for the .lst, .sym, and .rel files.  
+
+           The  default  addressing space for defined microprocessors is
+        16-Bit except for the DS80C390 microprocessor which is 24-Bit.  
+
+
+        M.2.1  DS80C390 Addressing Mode Directive 
+
+
+           The  DS80C390  microprocessor  supports 16-Bit and 24-Bit ad-
+        dressing modes.   The  .amode  assembler  directive  provides  a
+        method  to  select  the addressing mode used by the ajmp, acall,
+        ljmp, and lcall instructions.  These four  instructions  support
+        16  and  24 bit addressing modes selected by bits AM0 and AM1 in
+        the ACON register.  The assembler is 'informed'  about  the  ad-
+        dressing mode selected by using the .amode directive:  
+
+                .amode  2       ;mode 2 is 24-bit addressing
+
+        If  a  second  argument  is specified and its value is non-zero,
+        then a three instruction sequence is inserted at the .amode  lo-
+        cation loading the mode bits into the ACON register:  
+
+                .amode  2,1     ;mode 2 is 24-bit addressing, load ACON
+                ;mov    ta,#0xAA
+                ;mov    ta,#0x55
+                ;mov    acon,#amode
+
+
+
+        AS8XCXXX ASSEMBLER                                      PAGE M-3
+        DS8XCXXX ASSEMBLER DIRECTIVES
+
+
+        M.3  DS8XCXXX REGISTER SET 
+
+        The  AS8XCXXX  cross assembler supports the Dallas Semiconductor
+        DS8XCXXX series of 8051-compatible devices.  These  microproces-
+        sors  retain  instruction set and object code compatability with
+        the 8051 microprocessor.  The DS8XCXXX family  is  updated  with
+        several   new  peripherals  while  providing  all  the  standard
+        features of the 80C32 microprocessor.  
+
+           The following is a list of the registers used by AS8XCXXX:  
+
+                a,b             -       8-bit accumulators
+                r0,r1,r2,r3     -       8-bit registers
+                r4,r5,r6,r7
+                dptr            -       data pointer
+                sp              -       stack pointer
+                pc              -       program counter
+                psw             -       status word
+                c               -       carry (bit in status word)
+
+
+        M.4  DS8XCXXX INSTRUCTION SET 
+
+
+           The  following  tables list all DS8XCXXX mnemonics recognized
+        by the AS8XCXXX assembler.  The  following  list  specifies  the
+        format for each addressing mode supported by AS8XCXXX:  
+
+                #data           immediate data
+                                byte or word data
+        
+                r,r1,r2         register r0,r1,r2,r3,r4,r5,r6, or r7
+        
+                @r              indirect on register r0 or r1
+                @dptr           indirect on data pointer
+                @a+dptr         indirect on accumulator
+                                plus data pointer
+                @a+pc           indirect on accumulator
+                                plus program counter
+        
+                addr            direct memory address
+        
+                bitaddr         bit address
+        
+                label           call or jump label
+
+        The terms data, addr, bitaddr, and label may all be expressions. 
+
+           Note  that  not all addressing modes are valid with every in-
+        struction.  Refer to  the  DS8XCXXX  technical  data  for  valid
+        modes.  
+
+
+        AS8XCXXX ASSEMBLER                                      PAGE M-4
+        DS8XCXXX INSTRUCTION SET
+
+
+        M.4.1  Inherent Instructions 
+
+                nop
+
+
+        M.4.2  Move Instructions 
+
+                mov     a,#data         mov     a,addr
+                mov     a,r             mov     a,@r
+        
+                mov     r,#data         mov     r,addr
+                mov     r,a
+        
+                mov     addr,a          mov     addr,#data
+                mov     addr,r          mov     addr,@r
+                mov     addr1,addr2     mov     bitaddr,c
+        
+                mov     @r,#data        mov     @r,addr
+                mov     @r,a
+        
+                mov     c,bitaddr
+                mov     dptr,#data
+        
+                movc    a,@a+dptr       movc    a,@a+pc
+                movx    a,@dptr         movx    a,@r
+                movx    @dptr,a         movx    @r,a
+
+
+        M.4.3  Single Operand Instructions 
+
+                clr     a               clr     c
+                clr     bitaddr
+                cpl     a               cpl     c
+                cpl     bitaddr
+                setb    c               setb    bitaddr
+        
+                da      a               
+                rr      a               rrc     a
+                rl      a               rlc     a
+                swap    a
+        
+                dec     a               dec     r
+                dec     @r
+                inc     a               inc     r
+                inc     dptr            inc     @r
+        
+                div     ab              mul     ab
+        
+                pop     addr            push    addr
+
+
+        AS8XCXXX ASSEMBLER                                      PAGE M-5
+        DS8XCXXX INSTRUCTION SET
+
+
+        M.4.4  Two Operand Instructions 
+
+                add     a,#data         add     a,addr
+                add     a,r             add     a,@r
+                addc    a,#data         addc    a,addr
+                addc    a,r             addc    a,@r
+                subb    a,#data         subb    a,addr
+                subb    a,r             subb    a,@r
+                orl     a,#data         orl     a,addr
+                orl     a,r             orl     a,@r
+                orl     addr,a          orl     addr,#data
+                orl     c,bitaddr       orl     c,/bitaddr
+                anl     a,#data         anl     a,addr
+                anl     a,r             anl     a,@r
+                anl     addr,a          anl     addr,#data
+                anl     c,bitaddr       anl     c,/bitaddr
+                xrl     a,#data         xrl     a,addr
+                xrl     a,r             xrl     a,@r
+                xrl     addr,a          xrl     addr,#data
+                xrl     c,bitaddr       xrl     c,/bitaddr
+                xch     a,addr          xch     a,r
+                xch     a,@r            xchd    a,@r
+
+
+        M.4.5  Call and Return Instructions 
+
+                acall   label           lcall   label
+                ret                     reti
+                in      data
+                out     data
+                rst     data
+
+
+        M.4.6  Jump Instructions 
+
+                ajmp    label
+                cjne    a,#data,label   cjne    a,addr,label
+                cjne    r,#data,label   cjne    @r,#data,label
+                djnz    r,label         djnz    addr,label
+                jbc     bitadr,label
+                jb      bitadr,label    jnb     bitadr,label
+                jc      label           jnc     label
+                jz      label           jnz     label
+                jmp     @a+dptr
+                ljmp    label           sjmp    label
+
+
+        AS8XCXXX ASSEMBLER                                      PAGE M-6
+        DS8XCXXX INSTRUCTION SET
+
+
+        M.5  DS8XCXXX SPECIAL FUNCTION REGISTERS 
+
+
+           The  80C32 core Special Function Registers are selected using
+        the .DS8xCxxx assembler directive.  
+
+
+        M.5.1  SFR Map 
+
+                        --------- 4 Bytes ----------
+                        ----    ----    ----    ----
+                80              SP      DPL     DPH         83
+                84                              PCON        87
+                88      TCON    TMOD    TL0     TL1         8B
+                8C      TH0     TH1                         8F
+                90      P1                                  93
+                94                                          97
+                98      SCON    SBUF                        9B
+                9C                                          9F
+                A0      P2                                  A3
+                A4                                          A7
+                A8      IE      SADDR0                      AB
+                AC                                          AF
+                B0      P3                                  B3
+                B4                                          B7
+                B8      IP      SADEN0                      BB
+                BC                                          BF
+                C0                                          C3
+                C4              STATUS                      C7
+                C8      T2CON   T2MOD   RCAP2L  RCAP2H      CB
+                CC      TL2     TH2                         CF
+                D0      PSW                                 D3
+                D4                                          D7
+                D8                                          DB
+                DC                                          DF
+                E0      ACC                                 E3
+                E4                                          E7
+                E8                                          EB
+                EC                                          EF
+                F0      B                                   F3
+                F4                                          F7
+                F8                                          FB
+                FC                                          FF
+
+
+        AS8XCXXX ASSEMBLER                                      PAGE M-7
+        DS8XCXXX SPECIAL FUNCTION REGISTERS
+
+
+        M.5.2  Bit Addressable Registers:  Generic 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                80                                          83
+                84                                          87
+        TCON    88      TCON.0  TCON.1  TCON.2  TCON.3      8B
+                8C      TCON.4  TCON.5  TCON.6  TCON.7      8F
+        P1      90      P1.0    P1.1    P1.2    P1.3        93
+                94      P1.4    P1.5    P1.6    P1.7        97
+        SCON    98      SCON.0  SCON.1  SCON.2  SCON.3      9B
+                9C      SCON.4  SCON.5  SCON.6  SCON.7      9F
+        P2      A0      P2.0    P2.1    P2.2    P2.3        A3
+                A4      P2.4    P2.5    P2.6    P2.7        A7
+        IE      A8      IE.0    IE.1    IE.2    IE.3        AB
+                AC      IE.4    IE.5    EI.6    IE.7        AF
+        P3      B0      P3.0    P3.1    P3.2    P3.3        B3
+                B4      P3.4    P3.5    P3.6    P3.7        B7
+        IP      B8      IP.0    IP.1    IP.2    IP.3        BB
+                BC      IP.4    IP.5    IP.6    IP.7        BF
+                C0                                          C3
+                C4                                          C7
+        T2CON   C8      T2CON.0 T2CON.1 T2CON.2 T2CON.3     CB
+                CC      T2CON.4 T2CON.5 T2CON.6 T2CON.7     CF
+        PSW     D0      PSW.0   PSW.1   PSW.2   PSW.3       D3
+                D4      PSW.4   PSW.5   PSW.6   PSW.7       D7
+                D8                                          DB
+                DC                                          DF
+        ACC     E0      ACC.0   ACC.1   ACC.2   ACC.3       E3
+                E4      ACC.4   ACC.5   ACC.6   ACC.7       E7
+                E8                                          EB
+                EC                                          EF
+        B       F0      B.0     B.1     B.2     B.3         F3
+                F4      B.4     B.5     B.6     B.7         F7
+                F8                                          FB
+                FC                                          FF
+
+
+        AS8XCXXX ASSEMBLER                                      PAGE M-8
+        DS8XCXXX SPECIAL FUNCTION REGISTERS
+
+
+        M.5.3  Bit Addressable Registers:  Specific 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                80                                          83
+                84                                          87
+        TCON    88      IT0     IE0     IT1     IE1         8B
+                8C      TR0     TF0     TR1     TF1         8F
+                90                                          93
+                94                                          97
+        SCON    98      RI      TI      RB8     TB8         9B
+                9C      REN     SM2     SM1     SMO         9F
+                A0                                          A3
+                A4                                          A7
+        IE      A8      EX0     ET0     EX1     ET1         AB
+                AC      ES0     ET2             EA          AF
+                B0                                          B3
+                B4                                          B7
+        IP      B8      PX0     PT0     PX1     PT1         BB
+                BC      PS0     PT2                         BF
+                C0                                          C3
+                C4                                          C7
+        T2CON   C8      CPRL2   CT2     TR2     EXEN2       CB
+                CC      TCLK    RCLK    EXF2    TF2         CF
+        PSW     D0      P       FL      OV      RS0         D3
+                D4      RS1     F0      AC      CY          D7
+                D8                                          DB
+                DC                                          DF
+                E0                                          E3
+                E4                                          E7
+                E8                                          EB
+                EC                                          EF
+                F0                                          F3
+                F4                                          F7
+                F8                                          FB
+                FC                                          FF
+        
+                Alternates:
+        
+        SCON    98                                          9B
+                9C                              FE          9F
+        T2CON   C8      CP_RL2  C_T2                        CB
+                CC                                          CF
+
+
+        AS8XCXXX ASSEMBLER                                      PAGE M-9
+        DS8XCXXX SPECIAL FUNCTION REGISTERS
+
+
+        M.5.4  Optional Symbols:  Control Bits 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                        0x80    0x40    0x20    0x10
+                        0x08    0x04    0x02    0x10
+                        ----    ----    ----    ----
+        PCON    0x80    SMOD    SMOD0                       0x10
+                0x08    GF1     GF0     STOP    IDLE        0x01
+        TMOD    0x80    T1GATE  T1C_T   T1M1    T1M0        0x10
+                0x08    T0GATE  T0C_T   T0M1    T0M0        0x01
+        STATUS  0x80            HIP     LIP                 0x10
+                0x08                                        0x01
+        T2MOD   0x80                                        0x10
+                0x08                    T2OE    DCEN        0x01
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-10
+        DS8XCXXX SPECIAL FUNCTION REGISTERS
+
+
+        M.6  DS80C310 SPECIAL FUNCTION REGISTERS 
+
+
+           The  DS80C310  Special  Function Registers are selected using
+        the .DS80C310 assembler directive.  
+
+
+        M.6.1  SFR Map 
+
+                        --------- 4 Bytes ----------
+                        ----    ----    ----    ----
+                80              SP      DPL     DPH         83
+                84      DPL1    DPH1    DPS     PCON        87
+                88      TCON    TMOD    TL0     TL1         8B
+                8C      TH0     TH1     CKCON               8F
+                90      P1      EXIF                        93
+                94                                          97
+                98      SCON    SBUF                        9B
+                9C                                          9F
+                A0      P2                                  A3
+                A4                                          A7
+                A8      IE      SADDR0                      AB
+                AC                                          AF
+                B0      P3                                  B3
+                B4                                          B7
+                B8      IP      SADEN0                      BB
+                BC                                          BF
+                C0                                          C3
+                C4              STATUS                      C7
+                C8      T2CON   T2MOD   RCAP2L  RCAP2H      CB
+                CC      TL2     TH2                         CF
+                D0      PSW                                 D3
+                D4                                          D7
+                D8      WDCON                               DB
+                DC                                          DF
+                E0      ACC                                 E3
+                E4                                          E7
+                E8      EIE                                 EB
+                EC                                          EF
+                F0      B                                   F3
+                F4                                          F7
+                F8      EIP                                 FB
+                FC                                          FF
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-11
+        DS80C310 SPECIAL FUNCTION REGISTERS
+
+
+        M.6.2  Bit Addressable Registers:  Generic 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                80                                          83
+                84                                          87
+        TCON    88      TCON.0  TCON.1  TCON.2  TCON.3      8B
+                8C      TCON.4  TCON.5  TCON.6  TCON.7      8F
+        P1      90      P1.0    P1.1    P1.2    P1.3        93
+                94      P1.4    P1.5    P1.6    P1.7        97
+        SCON    98      SCON.0  SCON.1  SCON.2  SCON.3      9B
+                9C      SCON.4  SCON.5  SCON.6  SCON.7      9F
+        P2      A0      P2.0    P2.1    P2.2    P2.3        A3
+                A4      P2.4    P2.5    P2.6    P2.7        A7
+        IE      A8      IE.0    IE.1    IE.2    IE.3        AB
+                AC      IE.4    IE.5    EI.6    IE.7        AF
+        P3      B0      P3.0    P3.1    P3.2    P3.3        B3
+                B4      P3.4    P3.5    P3.6    P3.7        B7
+        IP      B8      IP.0    IP.1    IP.2    IP.3        BB
+                BC      IP.4    IP.5    IP.6    IP.7        BF
+                C0                                          C3
+                C4                                          C7
+        T2CON   C8      T2CON.0 T2CON.1 T2CON.2 T2CON.3     CB
+                CC      T2CON.4 T2CON.5 T2CON.6 T2CON.7     CF
+        PSW     D0      PSW.0   PSW.1   PSW.2   PSW.3       D3
+                D4      PSW.4   PSW.5   PSW.6   PSW.7       D7
+        WDCON   D8      WDCON.0 WDCON.1 WDCON.2 WDCON.3     DB
+                DC      WDCON.4 WDCON.5 WDCON.6 WDCON.7     DF
+        ACC     E0      ACC.0   ACC.1   ACC.2   ACC.3       E3
+                E4      ACC.4   ACC.5   ACC.6   ACC.7       E7
+        EIE     E8      EIE.0   EIE.1   EIE.2   EIE.3       EB
+                EC      EIE.4   EIE.5   EIE.6   EIE.7       EF
+        B       F0      B.0     B.1     B.2     B.3         F3
+                F4      B.4     B.5     B.6     B.7         F7
+        EIP     F8      EIP.0   EIP.1   EIP.2   EIP.3       FB
+                FC      EIP.4   EIP.5   EIP.6   EIP.7       FF
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-12
+        DS80C310 SPECIAL FUNCTION REGISTERS
+
+
+        M.6.3  Bit Addressable Registers:  Specific 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                80                                          83
+                84                                          87
+        TCON    88      IT0     IE0     IT1     IE1         8B
+                8C      TR0     TF0     TR1     TF1         8F
+                90                                          93
+                94                                          97
+        SCON    98      RI      TI      RB8     TB8         9B
+                9C      REN     SM2     SM1     SMO         9F
+                A0                                          A3
+                A4                                          A7
+        IE      A8      EX0     ET0     EX1     ET1         AB
+                AC      ES0     ET2             EA          AF
+                B0                                          B3
+                B4                                          B7
+        IP      B8      PX0     PT0     PX1     PT1         BB
+                BC      PS0     PT2                         BF
+                C0                                          C3
+                C4                                          C7
+        T2CON   C8      CPRL2   CT2     TR2     EXEN2       CB
+                CC      TCLK    RCLK    EXF2    TF2         CF
+        PSW     D0      P       FL      OV      RS0         D3
+                D4      RS1     F0      AC      CY          D7
+        WDCON   D8                                          DB
+                DC                      POR                 DF
+                E0                                          E3
+                E4                                          E7
+        EIE     E8      EX2     EX3     EX4     EX5         EB
+                EC                                          EF
+                F0                                          F3
+                F4                                          F7
+        EIP     F8      PX2     PX3     PX4     PX5         FB
+                FC                                          FF
+        
+                Alternates:
+        
+        SCON    98                                          9B
+                9C                              FE          9F
+        T2CON   C8      CP_RL2  C_T2                        CB
+                CC                                          CF
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-13
+        DS80C310 SPECIAL FUNCTION REGISTERS
+
+
+        M.6.4  Optional Symbols:  Control Bits 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                        0x80    0x40    0x20    0x10
+                        0x08    0x04    0x02    0x10
+                        ----    ----    ----    ----
+        DPS     0x80                                        0x10
+                0x08                            SEL         0x01
+        PCON    0x80    SMOD    SMOD0                       0x10
+                0x08    GF1     GF0     STOP    IDLE        0x01
+        TMOD    0x80    T1GATE  T1C_T   T1M1    T1M0        0x10
+                0x08    T0GATE  T0C_T   T0M1    T0M0        0x01
+        CKCON   0x80                    T2M     T1M         0x10
+                0x08    T0M     MD2     MD1     MD0         0x01
+        EXIF    0x80    IE5     IE4     IE3     IE2         0x10
+                0x08                                        0x01
+        STATUS  0x80            HIP     LIP                 0x10
+                0x08                                        0x01
+        T2MOD   0x80                                        0x10
+                0x08                    T2OE    DCEN        0x01
+        
+                Alternates:
+        
+        PCON    0x80    SMOD_0                              0x10
+                0x08                                        0x01
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-14
+        DS80C310 SPECIAL FUNCTION REGISTERS
+
+
+        M.7  DS80C320/DS80C323 SPECIAL FUNCTION REGISTERS 
+
+
+           The DS80C320/DS80C323 Special Function Registers are selected
+        using the .DS80C320 or DS80C323 assembler directives.  
+
+
+        M.7.1  SFR Map 
+
+                        --------- 4 Bytes ----------
+                        ----    ----    ----    ----
+                80              SP      DPL     DPH         83
+                84      DPL1    DPH1    DPS     PCON        87
+                88      TCON    TMOD    TL0     TL1         8B
+                8C      TH0     TH1     CKCON               8F
+                90      P1      EXIF                        93
+                94                                          97
+                98      SCON0   SBUF0                       9B
+                9C                                          9F
+                A0      P2                                  A3
+                A4                                          A7
+                A8      IE      SADDR0                      AB
+                AC                                          AF
+                B0      P3                                  B3
+                B4                                          B7
+                B8      IP      SADEN0                      BB
+                BC                                          BF
+                C0      SCON1   SBUF1                       C3
+                C4              STATUS          TA          C7
+                C8      T2CON   T2MOD   RCAP2L  RCAP2H      CB
+                CC      TL2     TH2                         CF
+                D0      PSW                                 D3
+                D4                                          D7
+                D8      WDCON                               DB
+                DC                                          DF
+                E0      ACC                                 E3
+                E4                                          E7
+                E8      EIE                                 EB
+                EC                                          EF
+                F0      B                                   F3
+                F4                                          F7
+                F8      EIP                                 FB
+                FC                                          FF
+        
+                Alternates:
+        
+                98      SCON    SBUF                        9B
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-15
+        DS80C320/DS80C323 SPECIAL FUNCTION REGISTERS
+
+
+        M.7.2  Bit Addressable Registers:  Generic 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                80                                          83
+                84                                          87
+        TCON    88      TCON.0  TCON.1  TCON.2  TCON.3      8B
+                8C      TCON.4  TCON.5  TCON.6  TCON.7      8F
+        P1      90      P1.0    P1.1    P1.2    P1.3        93
+                94      P1.4    P1.5    P1.6    P1.7        97
+        SCON0   98      SCON0.0 SCON0.1 SCON0.2 SCON0.3     9B
+                9C      SCON0.4 SCON0.5 SCON0.6 SCON0.7     9F
+        P2      A0      P2.0    P2.1    P2.2    P2.3        A3
+                A4      P2.4    P2.5    P2.6    P2.7        A7
+        IE      A8      IE.0    IE.1    IE.2    IE.3        AB
+                AC      IE.4    IE.5    EI.6    IE.7        AF
+        P3      B0      P3.0    P3.1    P3.2    P3.3        B3
+                B4      P3.4    P3.5    P3.6    P3.7        B7
+        IP      B8      IP.0    IP.1    IP.2    IP.3        BB
+                BC      IP.4    IP.5    IP.6    IP.7        BF
+        SCON1   C0      SCON1.0 SCON1.1 SCON1.2 SCON1.3     C3
+                C4      SCON1.4 SCON1.5 SCON1.6 SCON1.7     C7
+        T2CON   C8      T2CON.0 T2CON.1 T2CON.2 T2CON.3     CB
+                CC      T2CON.4 T2CON.5 T2CON.6 T2CON.7     CF
+        PSW     D0      PSW.0   PSW.1   PSW.2   PSW.3       D3
+                D4      PSW.4   PSW.5   PSW.6   PSW.7       D7
+        WDCON   D8      WDCON.0 WDCON.1 WDCON.2 WDCON.3     DB
+                DC      WDCON.4 WDCON.5 WDCON.6 WDCON.7     DF
+        ACC     E0      ACC.0   ACC.1   ACC.2   ACC.3       E3
+                E4      ACC.4   ACC.5   ACC.6   ACC.7       E7
+        EIE     E8      EIE.0   EIE.1   EIE.2   EIE.3       EB
+                EC      EIE.4   EIE.5   EIE.6   EIE.7       EF
+        B       F0      B.0     B.1     B.2     B.3         F3
+                F4      B.4     B.5     B.6     B.7         F7
+        EIP     F8      EIP.0   EIP.1   EIP.2   EIP.3       FB
+                FC      EIP.4   EIP.5   EIP.6   EIP.7       FF
+        
+                        Alternates:
+        
+        SCON    98      SCON.0  SCON.1  SCON.2  SCON.3      9B
+                9C      SCON.4  SCON.5  SCON.6  SCON.7      9F
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-16
+        DS80C320/DS80C323 SPECIAL FUNCTION REGISTERS
+
+
+        M.7.3  Bit Addressable Registers:  Specific 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                80                                          83
+                84                                          87
+        TCON    88      IT0     IE0     IT1     IE1         8B
+                8C      TR0     TF0     TR1     TF1         8F
+                90                                          93
+                94                                          97
+        SCON0   98      RI_0    TI_0    RB8_0   TB8_0       9B
+                9C      REN_0   SM2_0   SM1_0   SMO_0       9F
+                A0                                          A3
+                A4                                          A7
+        IE      A8      EX0     ET0     EX1     ET1         AB
+                AC      ES0     ET2             EA          AF
+                B0                                          B3
+                B4                                          B7
+        IP      B8      PX0     PT0     PX1     PT1         BB
+                BC      PS0     PT2                         BF
+        SCON1   C0      RI_1    TI_1    RB8_1   TB8_1       C3
+                C4      REN_1   SM2_1   SM1_1   SMO_1       C7
+        T2CON   C8      CPRL2   CT2     TR2     EXEN2       CB
+                CC      TCLK    RCLK    EXF2    TF2         CF
+        PSW     D0      P       FL      OV      RS0         D3
+                D4      RS1     F0      AC      CY          D7
+        WDCON   D8      RWT     EWT     WTRF    WDIF        DB
+                DC      PFI     EPFI    POR     SMOD_1      DF
+                E0                                          E3
+                E4                                          E7
+        EIE     E8      EX2     EX3     EX4     EX5         EB
+                EC      EWDI                                EF
+                F0                                          F3
+                F4                                          F7
+        EIP     F8      PX2     PX3     PX4     PX5         FB
+                FC      PWDI                                FF
+        
+                Alternates:
+        
+        SCON    98      RI      TI      RB8     TB8         9B
+                9C      REN     SM2     SM1     SMO         9F
+        SCON    98                                          9B
+                9C                              FE          9F
+        SCON0   98                                          9B
+                9C                              FE_0        9F
+        SCON1   C0                                          C3
+                C4                              FE_1        C7
+        T2CON   C8      CP_RL2  C_T2                        CB
+                CC                                          CF
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-17
+        DS80C320/DS80C323 SPECIAL FUNCTION REGISTERS
+
+
+        M.7.4  Optional Symbols:  Control Bits 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                        0x80    0x40    0x20    0x10
+                        0x08    0x04    0x02    0x10
+                        ----    ----    ----    ----
+        DPS     0x80                                        0x10
+                0x08                            SEL         0x01
+        PCON    0x80    SMOD_0  SMOD0                       0x10
+                0x08    GF1     GF0     STOP    IDLE        0x01
+        TMOD    0x80    T1GATE  T1C_T   T1M1    T1M0        0x10
+                0x08    T0GATE  T0C_T   T0M1    T0M0        0x01
+        CKCON   0x80    WD1     WD0     T2M     T1M         0x10
+                0x08    T0M     MD2     MD1     MD0         0x01
+        EXIF    0x80    IE5     IE4     IE3     IE2         0x10
+                0x08            RGMD    RGSL    BGS         0x01
+        STATUS  0x80    PIP     HIP     LIP                 0x10
+                0x08                                        0x01
+        T2MOD   0x80                                        0x10
+                0x08                    T2OE    DCEN        0x01
+        
+                Alternates:
+        
+        PCON    0x80    SMOD                                0x10
+                0x08                                        0x01
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-18
+        DS80C320/DS80C323 SPECIAL FUNCTION REGISTERS
+
+
+        M.8  DS80C390 SPECIAL FUNCTION REGISTERS 
+
+
+           The  DS80C390  Special  Function Registers are selected using
+        the .DS80C390 assembler directive.  
+
+
+        M.8.1  SFR Map 
+
+                        --------- 4 Bytes ----------
+                        ----    ----    ----    ----
+                80      P4      SP      DPL     DPH         83
+                84      DPL1    DPH1    DPS     PCON        87
+                88      TCON    TMOD    TL0     TL1         8B
+                8C      TH0     TH1     CKCON               8F
+                90      P1      EXIF    P4CNT   DPX         93
+                94              DPX1    C0RMS0  C0RMS1      97
+                98      SCON0   SBUF0           ESP         9B
+                9C      AP      ACON    C0TMA0  C0TMA1      9F
+                A0      P2      P5      P5CNT   C0C         A3
+                A4      C0S     C0IR    C0TE    C0RE        A7
+                A8      IE      SADDR0  SADDR1  C0M1C       AB
+                AC      C0M2C   C0M3C   C0M4C   C0M5C       AF
+                B0      P3                      C0M6C       B3
+                B4      C0M7C   C0M8C   C0M9C   C0M10C      B7
+                B8      IP      SADEN0  SADEN1  C0M11C      BB
+                BC      C0M12C  C0M13C  C0M14C  C0M15C      BF
+                C0      SCON1   SBUF1                       C3
+                C4      PMR     STATUS  MCON    TA          C7
+                C8      T2CON   T2MOD   RCAP2L  RCAP2H      CB
+                CC      TL2     TH2     COR                 CF
+                D0      PSW     MCNT0   MCNT1   MA          D3
+                D4      MB      MC      C1RMS0  C1RMS1      D7
+                D8      WDCON                               DB
+                DC                      C1TMA0  C1TMA1      DF
+                E0      ACC                     C1C         E3
+                E4      C1S     C1IR    C1TE    C1RE        E7
+                E8      EIE             MXAX    C1M1C       EB
+                EC      C1M2C   C1M3C   C1M4C   C1M5C       EF
+                F0      B                       C1M6C       F3
+                F4      C1M7C   C1M8C   C1M9C   C1M10C      F7
+                F8      EIP                     C1M11C      FB
+                FC      C1M12C  C1M13C  C1M14C  C1M15C      FF
+        
+                Alternates:
+        
+                98      SCON    SBUF                        9B
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-19
+        DS80C390 SPECIAL FUNCTION REGISTERS
+
+
+        M.8.2  Bit Addressable Registers:  Generic 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+        P4      80      P4.0    P4.1    P4.2    P4.3        83
+                84      P4.4    P4.5    P4.6    P4.7        87
+        TCON    88      TCON.0  TCON.1  TCON.2  TCON.3      8B
+                8C      TCON.4  TCON.5  TCON.6  TCON.7      8F
+        P1      90      P1.0    P1.1    P1.2    P1.3        93
+                94      P1.4    P1.5    P1.6    P1.7        97
+        SCON0   98      SCON0.0 SCON0.1 SCON0.2 SCON0.3     9B
+                9C      SCON0.4 SCON0.5 SCON0.6 SCON0.7     9F
+        P2      A0      P2.0    P2.1    P2.2    P2.3        A3
+                A4      P2.4    P2.5    P2.6    P2.7        A7
+        IE      A8      IE.0    IE.1    IE.2    IE.3        AB
+                AC      IE.4    IE.5    EI.6    IE.7        AF
+        P3      B0      P3.0    P3.1    P3.2    P3.3        B3
+                B4      P3.4    P3.5    P3.6    P3.7        B7
+        IP      B8      IP.0    IP.1    IP.2    IP.3        BB
+                BC      IP.4    IP.5    IP.6    IP.7        BF
+        SCON1   C0      SCON1.0 SCON1.1 SCON1.2 SCON1.3     C3
+                C4      SCON1.4 SCON1.5 SCON1.6 SCON1.7     C7
+        T2CON   C8      T2CON.0 T2CON.1 T2CON.2 T2CON.3     CB
+                CC      T2CON.4 T2CON.5 T2CON.6 T2CON.7     CF
+        PSW     D0      PSW.0   PSW.1   PSW.2   PSW.3       D3
+                D4      PSW.4   PSW.5   PSW.6   PSW.7       D7
+        WDCON   D8      WDCON.0 WDCON.1 WDCON.2 WDCON.3     DB
+                DC      WDCON.4 WDCON.5 WDCON.6 WDCON.7     DF
+        ACC     E0      ACC.0   ACC.1   ACC.2   ACC.3       E3
+                E4      ACC.4   ACC.5   ACC.6   ACC.7       E7
+        EIE     E8      EIE.0   EIE.1   EIE.2   EIE.3       EB
+                EC      EIE.4   EIE.5   EIE.6   EIE.7       EF
+        B       F0      B.0     B.1     B.2     B.3         F3
+                F4      B.4     B.5     B.6     B.7         F7
+        EIP     F8      EIP.0   EIP.1   EIP.2   EIP.3       FB
+                FC      EIP.4   EIP.5   EIP.6   EIP.7       FF
+        
+                        Alternates:
+        
+        SCON    98      SCON.0  SCON.1  SCON.2  SCON.3      9B
+                9C      SCON.4  SCON.5  SCON.6  SCON.7      9F
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-20
+        DS80C390 SPECIAL FUNCTION REGISTERS
+
+
+        M.8.3  Bit Addressable Registers:  Specific 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                80                                          83
+                84                                          87
+        TCON    88      IT0     IE0     IT1     IE1         8B
+                8C      TR0     TF0     TR1     TF1         8F
+        P1      90      T2      T2EX    RXD1    TXD1        93
+                94      INT2    INT3    INT4    INT5        97
+        SCON0   98      RI_0    TI_0    RB8_0   TB8_0       9B
+                9C      REN_0   SM2_0   SM1_0   SMO_0       9F
+                A0                                          A3
+                A4                                          A7
+        IE      A8      EX0     ET0     EX1     ET1         AB
+                AC      ES0     ET2     ES1     EA          AF
+        P3      B0      RXD0    TXD0    INT0    INT1        B3
+                B4      T0      T1                          B7
+        IP      B8      PX0     PT0     PX1     PT1         BB
+                BC      PS0     PT2     PS1                 BF
+        SCON1   C0      RI_1    TI_1    RB8_1   TB8_1       C3
+                C4      REN_1   SM2_1   SM1_1   SMO_1       C7
+        T2CON   C8      CPRL2   CT2     TR2     EXEN2       CB
+                CC      TCLK    RCLK    EXF2    TF2         CF
+        PSW     D0      P       FL      OV      RS0         D3
+                D4      RS1     F0      AC      CY          D7
+        WDCON   D8      RWT     EWT     WTRF    WDIF        DB
+                DC      PFI     EPFI    POR     SMOD_1      DF
+                E0                                          E3
+                E4                                          E7
+        EIE     E8      EX2     EX3     EX4     EX5         EB
+                EC      EWDI    C1IE    C0IE    CANBIE      EF
+                F0                                          F3
+                F4                                          F7
+        EIP     F8      PX2     PX3     PX4     PX5         FB
+                FC      PWDI    C1IP    C0IP    CANBIP      FF
+        
+                Alternates:
+        
+        SCON    98      RI      TI      RB8     TB8         9B
+                9C      REN     SM2     SM1     SMO         9F
+        SCON    98                                          9B
+                9C                              FE          9F
+        SCON0   98                                          9B
+                9C                              FE_0        9F
+        SCON1   C0                                          C3
+                C4                              FE_1        C7
+        T2CON   C8      CP_RL2  C_T2                        CB
+                CC                                          CF
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-21
+        DS80C390 SPECIAL FUNCTION REGISTERS
+
+
+        M.8.4  Optional Symbols:  Control Bits 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                        0x80    0x40    0x20    0x10
+                        0x08    0x04    0x02    0x10
+                        ----    ----    ----    ----
+        DPS     0x80    ID1     ID0     TSL                 0x10
+                0x08                            SEL         0x01
+        PCON    0x80    SMOD_0  SMOD0   OFDF    OFDE        0x10
+                0x08    GF1     GF0     STOP    IDLE        0x01
+        TMOD    0x80    T1GATE  T1C_T   T1M1    T1M0        0x10
+                0x08    T0GATE  T0C_T   T0M1    T0M0        0x01
+        CKCON   0x80    WD1     WD0     T2M     T1M         0x10
+                0x08    T0M     MD2     MD1     MD0         0x01
+        EXIF    0x80    IE5     IE4     IE3     IE2         0x10
+                0x08    CKRY    RGMD    RGSL    BGS         0x01
+        P4CNT   0x80            SBCAN                       0x10
+                0x08                                        0x01
+        ESP     0x80                                        0x10
+                0x08                    ESP.1   ESP.0       0x01
+        ACON    0x80                                        0x10
+                0x08            SA      AM1     AM0         0x01
+        P5      0x80    P5.7    P5.6    P5.5    P5.4        0x10
+                0x08    P5.3    P5.2    P5.1    P5.0        0x01
+        P5CNT   0x80    CAN1BA  CAN0BA  SP1EC   C1_IO       0x10
+                0x08    C0_IO   P5CNT.2 P5CNT.1 P5CNT.0     0x01
+        CxC     0x80    ERIE    STIE    PDE     SIESTA      0x10
+                0x08    CRST    AUTOB   ERCS    SWINT       0x01
+        CxS     0x80    BSS   EC96_128  WKS     RXS         0x10
+                0x08    TXS     ER2     ER1     ER0         0x01
+        CxIR    0x80    INTIN7  INTIN6  INTIN5  INTIN4      0x10
+                0x08    INTIN3  INTIN2  INTIN1  INTIN0      0x01
+        CxCxxC  0x80    MSRDY   ET1     ER1     INTRQ       0x10
+                0x08    EXTRQ   MTRQ    ROW_TIH DTUP        0x01
+        PMR     0x80    CD1     CD0     SWB     CTM         0x10
+                0x08    4X_2X   ALEOFF                      0x01
+        STATUS  0x80    PIP     HIP     LIP                 0x10
+                0x08    SPTA1   SPRA1   SPTA0   SPRA0       0x01
+        MCON    0x80    IDM1    IDM0    CMA                 0x10
+                0x08    PDCE3   PDCE2   PDCE1   PDCE0       0x01
+        T2MOD   0x80                            D13T1       0x10
+                0x08    D13T2           T2OE    DCEN        0x01
+        COR     0x80    IRDACK  C1BPR7  C1BPR6  C0BPR7      0x10
+                0x08    C0BPR6  COD1    COD0    CLKOE       0x01
+        MCNT0   0x80    _LSHIFT CSE     SCB     MAS4        0x10
+                0x08    MAS3    MAS2    MAS1    MAS0        0x01
+        MCNT1   0x80    MST     MOF             CLM         0x10
+                0x08                                        0x01
+        
+                Alternates:
+        
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-22
+        DS80C390 SPECIAL FUNCTION REGISTERS
+
+
+        PCON    0x80    SMOD                                0x10
+                0x08                                        0x01
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-23
+        DS80C390 SPECIAL FUNCTION REGISTERS
+
+
+        M.9  DS83C520/DS87C520 SPECIAL FUNCTION REGISTERS 
+
+
+           The DS83C520/DS87C520 Special Function Registers are selected
+        using the .DS83C520 or DS87C520 assembler directives.  
+
+
+        M.9.1  SFR Map 
+
+                        --------- 4 Bytes ----------
+                        ----    ----    ----    ----
+                80      P0      SP      DPL     DPH         83
+                84      DPL1    DPH1    DPS     PCON        87
+                88      TCON    TMOD    TL0     TL1         8B
+                8C      TH0     TH1     CKCON               8F
+                90      PORT1   EXIF                        93
+                94                                          97
+                98      SCON0   SBUF0                       9B
+                9C                                          9F
+                A0      P2                                  A3
+                A4                                          A7
+                A8      IE      SADDR0  SADDR1              AB
+                AC                                          AF
+                B0      P3                                  B3
+                B4                                          B7
+                B8      IP      SADEN0  SADEN1              BB
+                BC                                          BF
+                C0      SCON1   SBUF1   ROMSIZE             C3
+                C4      PMR     STATUS          TA          C7
+                C8      T2CON   T2MOD   RCAP2L  RCAP2H      CB
+                CC      TL2     TH2                         CF
+                D0      PSW                                 D3
+                D4                                          D7
+                D8      WDCON                               DB
+                DC                                          DF
+                E0      ACC                                 E3
+                E4                                          E7
+                E8      EIE                                 EB
+                EC                                          EF
+                F0      B                                   F3
+                F4                                          F7
+                F8      EIP                                 FB
+                FC                                          FF
+        
+                Alternates:
+        
+                98      SCON    SBUF                        9B
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-24
+        DS83C520/DS87C520 SPECIAL FUNCTION REGISTERS
+
+
+        M.9.2  Bit Addressable Registers:  Generic 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+        P0      80      P0.7    P0.6    P0.5    P0.4        83
+                84      P0.3    P0.2    P0.1    P0.0        87
+        TCON    88      TCON.0  TCON.1  TCON.2  TCON.3      8B
+                8C      TCON.4  TCON.5  TCON.6  TCON.7      8F
+        PORT1   90      P1.0    P1.1    P1.2    P1.3        93
+                94      P1.4    P1.5    P1.6    P1.7        97
+        SCON0   98      SCON0.0 SCON0.1 SCON0.2 SCON0.3     9B
+                9C      SCON0.4 SCON0.5 SCON0.6 SCON0.7     9F
+        P2      A0      P2.0    P2.1    P2.2    P2.3        A3
+                A4      P2.4    P2.5    P2.6    P2.7        A7
+        IE      A8      IE.0    IE.1    IE.2    IE.3        AB
+                AC      IE.4    IE.5    EI.6    IE.7        AF
+        P3      B0      P3.0    P3.1    P3.2    P3.3        B3
+                B4      P3.4    P3.5    P3.6    P3.7        B7
+        IP      B8      IP.0    IP.1    IP.2    IP.3        BB
+                BC      IP.4    IP.5    IP.6    IP.7        BF
+        SCON1   C0      SCON1.0 SCON1.1 SCON1.2 SCON1.3     C3
+                C4      SCON1.4 SCON1.5 SCON1.6 SCON1.7     C7
+        T2CON   C8      T2CON.0 T2CON.1 T2CON.2 T2CON.3     CB
+                CC      T2CON.4 T2CON.5 T2CON.6 T2CON.7     CF
+        PSW     D0      PSW.0   PSW.1   PSW.2   PSW.3       D3
+                D4      PSW.4   PSW.5   PSW.6   PSW.7       D7
+        WDCON   D8      WDCON.0 WDCON.1 WDCON.2 WDCON.3     DB
+                DC      WDCON.4 WDCON.5 WDCON.6 WDCON.7     DF
+        ACC     E0      ACC.0   ACC.1   ACC.2   ACC.3       E3
+                E4      ACC.4   ACC.5   ACC.6   ACC.7       E7
+        EIE     E8      EIE.0   EIE.1   EIE.2   EIE.3       EB
+                EC      EIE.4   EIE.5   EIE.6   EIE.7       EF
+        B       F0      B.0     B.1     B.2     B.3         F3
+                F4      B.4     B.5     B.6     B.7         F7
+        EIP     F8      EIP.0   EIP.1   EIP.2   EIP.3       FB
+                FC      EIP.4   EIP.5   EIP.6   EIP.7       FF
+        
+                        Alternates:
+        
+        PORT1   90      PORT1.0 PORT1.1 PORT1.2 PORT1.3     93
+                94      PORT1.4 PORT1.5 PORT1.6 PORT1.7     97
+        SCON    98      SCON.0  SCON.1  SCON.2  SCON.3      9B
+                9C      SCON.4  SCON.5  SCON.6  SCON.7      9F
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-25
+        DS83C520/DS87C520 SPECIAL FUNCTION REGISTERS
+
+
+        M.9.3  Bit Addressable Registers:  Specific 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                80                                          83
+                84                                          87
+        TCON    88      IT0     IE0     IT1     IE1         8B
+                8C      TR0     TF0     TR1     TF1         8F
+                90                                          93
+                94                                          97
+        SCON0   98      RI_0    TI_0    RB8_0   TB8_0       9B
+                9C      REN_0   SM2_0   SM1_0   SMO_0       9F
+                A0                                          A3
+                A4                                          A7
+        IE      A8      EX0     ET0     EX1     ET1         AB
+                AC      ES0     ET2     ES1     EA          AF
+                B0                                          B3
+                B4                                          B7
+        IP      B8      PX0     PT0     PX1     PT1         BB
+                BC      PS0     PT2     PS1                 BF
+        SCON1   C0      RI_1    TI_1    RB8_1   TB8_1       C3
+                C4      REN_1   SM2_1   SM1_1   SMO_1       C7
+        T2CON   C8      CPRL2   CT2     TR2     EXEN2       CB
+                CC      TCLK    RCLK    EXF2    TF2         CF
+        PSW     D0      P       FL      OV      RS0         D3
+                D4      RS1     F0      AC      CY          D7
+        WDCON   D8      RWT     EWT     WTRF    WDIF        DB
+                DC      PFI     EPFI    POR     SMOD_1      DF
+                E0                                          E3
+                E4                                          E7
+        EIE     E8      EX2     EX3     EX4     EX5         EB
+                EC      EWDI                                EF
+                F0                                          F3
+                F4                                          F7
+        EIP     F8      PX2     PX3     PX4     PX5         FB
+                FC      PWDI                                FF
+        
+                Alternates:
+        
+        SCON    98      RI      TI      RB8     TB8         9B
+                9C      REN     SM2     SM1     SMO         9F
+        SCON    98                                          9B
+                9C                              FE          9F
+        SCON0   98                                          9B
+                9C                              FE_0        9F
+        SCON1   C0                                          C3
+                C4                              FE_1        C7
+        T2CON   C8      CP_RL2  C_T2                        CB
+                CC                                          CF
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-26
+        DS83C520/DS87C520 SPECIAL FUNCTION REGISTERS
+
+
+        M.9.4  Optional Symbols:  Control Bits 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                        0x80    0x40    0x20    0x10
+                        0x08    0x04    0x02    0x10
+                        ----    ----    ----    ----
+        DPS     0x80                                        0x10
+                0x08                            SEL         0x01
+        PCON    0x80    SMOD_0  SMOD0                       0x10
+                0x08    GF1     GF0     STOP    IDLE        0x01
+        TMOD    0x80    T1GATE  T1C_T   T1M1    T1M0        0x10
+                0x08    T0GATE  T0C_T   T0M1    T0M0        0x01
+        CKCON   0x80    WD1     WD0     T2M     T1M         0x10
+                0x08    T0M     MD2     MD1     MD0         0x01
+        EXIF    0x80    IE5     IE4     IE3     IE          0x10
+                0x08    XT_RG   RGMD    RGSL    BGS         0x01
+        SBUF1   0x80    SB7     SB6     SB5     SB4         0x10
+                0x08    SB3     SB2     SB1     SB0         0x01
+        ROMSIZE 0x80                                        0x10
+                0x08            RMS2    RMS1    RMS0        0x01
+        PMR     0x80    CD1     CD0     SWB                 0x10
+                0x08    XTOFF   ALEOFF  DME1    DME0        0x01
+        STATUS  0x80    PIP     HIP     LIP     XTUP        0x10
+                0x08    SPTA1   SPRA1   SPTA0   SPRA0       0x01
+        T2MOD   0x80                                        0x10
+                0x08                    T2OE    DCEN        0x01
+        
+                Alternates:
+        
+        PCON    0x80    SMOD                                0x10
+                0x08                                        0x01
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-27
+        DS83C520/DS87C520 SPECIAL FUNCTION REGISTERS
+
+
+        M.10  DS83C530/DS87C530 SPECIAL FUNCTION REGISTERS 
+
+
+           The DS83C530/DS87C530 Special Function Registers are selected
+        using the .DS83C530 or DS87C530 assembler directives.  
+
+
+        M.10.1  SFR Map 
+
+                        --------- 4 Bytes ----------
+                        ----    ----    ----    ----
+                80      P0      SP      DPL     DPH         83
+                84      DPL1    DPH1    DPS     PCON        87
+                88      TCON    TMOD    TL0     TL1         8B
+                8C      TH0     TH1     CKCON               8F
+                90      P1      EXIF                        93
+                94                      TRIM                97
+                98      SCON0   SBUF0                       9B
+                9C                                          9F
+                A0      P2                                  A3
+                A4                                          A7
+                A8      IE      SADDR0  SADDR1              AB
+                AC                                          AF
+                B0      P3                                  B3
+                B4                                          B7
+                B8      IP      SADEN0  SADEN1              BB
+                BC                                          BF
+                C0      SCON1   SBUF1   ROMSIZE             C3
+                C4      PMR     STATUS          TA          C7
+                C8      T2CON   T2MOD   RCAP2L  RCAP2H      CB
+                CC      TL2     TH2                         CF
+                D0      PSW                                 D3
+                D4                                          D7
+                D8      WDCON                               DB
+                DC                                          DF
+                E0      ACC                                 E3
+                E4                                          E7
+                E8      EIE                                 EB
+                EC                                          EF
+                F0      B               RTASS   RTAS        F3
+                F4      RTAM    RTAH                        F7
+                F8      EIP     RTCC    RTCSS   RTCS        FB
+                FC      RTCM    RTCH    RTCD0   RTCD1       FF
+        
+                Alternates:
+        
+                98      SCON    SBUF                        9B
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-28
+        DS83C530/DS87C530 SPECIAL FUNCTION REGISTERS
+
+
+        M.10.2  Bit Addressable Registers:  Generic 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+        P0      80      P0.7    P0.6    P0.5    P0.4        83
+                84      P0.3    P0.2    P0.1    P0.0        87
+        TCON    88      TCON.0  TCON.1  TCON.2  TCON.3      8B
+                8C      TCON.4  TCON.5  TCON.6  TCON.7      8F
+        P1      90      P1.0    P1.1    P1.2    P1.3        93
+                94      P1.4    P1.5    P1.6    P1.7        97
+        SCON0   98      SCON0.0 SCON0.1 SCON0.2 SCON0.3     9B
+                9C      SCON0.4 SCON0.5 SCON0.6 SCON0.7     9F
+        P2      A0      P2.0    P2.1    P2.2    P2.3        A3
+                A4      P2.4    P2.5    P2.6    P2.7        A7
+        IE      A8      IE.0    IE.1    IE.2    IE.3        AB
+                AC      IE.4    IE.5    EI.6    IE.7        AF
+        P3      B0      P3.0    P3.1    P3.2    P3.3        B3
+                B4      P3.4    P3.5    P3.6    P3.7        B7
+        IP      B8      IP.0    IP.1    IP.2    IP.3        BB
+                BC      IP.4    IP.5    IP.6    IP.7        BF
+        SCON1   C0      SCON1.0 SCON1.1 SCON1.2 SCON1.3     C3
+                C4      SCON1.4 SCON1.5 SCON1.6 SCON1.7     C7
+        T2CON   C8      T2CON.0 T2CON.1 T2CON.2 T2CON.3     CB
+                CC      T2CON.4 T2CON.5 T2CON.6 T2CON.7     CF
+        PSW     D0      PSW.0   PSW.1   PSW.2   PSW.3       D3
+                D4      PSW.4   PSW.5   PSW.6   PSW.7       D7
+        WDCON   D8      WDCON.0 WDCON.1 WDCON.2 WDCON.3     DB
+                DC      WDCON.4 WDCON.5 WDCON.6 WDCON.7     DF
+        ACC     E0      ACC.0   ACC.1   ACC.2   ACC.3       E3
+                E4      ACC.4   ACC.5   ACC.6   ACC.7       E7
+        EIE     E8      EIE.0   EIE.1   EIE.2   EIE.3       EB
+                EC      EIE.4   EIE.5   EIE.6   EIE.7       EF
+        B       F0      B.0     B.1     B.2     B.3         F3
+                F4      B.4     B.5     B.6     B.7         F7
+        EIP     F8      EIP.0   EIP.1   EIP.2   EIP.3       FB
+                FC      EIP.4   EIP.5   EIP.6   EIP.7       FF
+        
+                        Alternates:
+        
+        SCON    98      SCON.0  SCON.1  SCON.2  SCON.3      9B
+                9C      SCON.4  SCON.5  SCON.6  SCON.7      9F
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-29
+        DS83C530/DS87C530 SPECIAL FUNCTION REGISTERS
+
+
+        M.10.3  Bit Addressable Registers:  Specific 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                80                                          83
+                84                                          87
+        TCON    88      IT0     IE0     IT1     IE1         8B
+                8C      TR0     TF0     TR1     TF1         8F
+                90                                          93
+                94                                          97
+        SCON0   98      RI_0    TI_0    RB8_0   TB8_0       9B
+                9C      REN_0   SM2_0   SM1_0   SMO_0       9F
+                A0                                          A3
+                A4                                          A7
+        IE      A8      EX0     ET0     EX1     ET1         AB
+                AC      ES0     ET2     ES1     EA          AF
+                B0                                          B3
+                B4                                          B7
+        IP      B8      PX0     PT0     PX1     PT1         BB
+                BC      PS0     PT2     PS1                 BF
+        SCON1   C0      RI_1    TI_1    RB8_1   TB8_1       C3
+                C4      REN_1   SM2_1   SM1_1   SMO_1       C7
+        T2CON   C8      CPRL2   CT2     TR2     EXEN2       CB
+                CC      TCLK    RCLK    EXF2    TF2         CF
+        PSW     D0      P       FL      OV      RS0         D3
+                D4      RS1     F0      AC      CY          D7
+        WDCON   D8      RWT     EWT     WTRF    WDIF        DB
+                DC      PFI     EPFI    POR     SMOD_1      DF
+                E0                                          E3
+                E4                                          E7
+        EIE     E8      EX2     EX3     EX4     EX5         EB
+                EC      EWDI    ERTCI                       EF
+                F0                                          F3
+                F4                                          F7
+        EIP     F8      PX2     PX3     PX4     PX5         FB
+                FC      PWDI    PRTCI                       FF
+        
+                Alternates:
+        
+        SCON    98      RI      TI      RB8     TB8         9B
+                9C      REN     SM2     SM1     SMO         9F
+        SCON    98                                          9B
+                9C                              FE          9F
+        SCON0   98                                          9B
+                9C                              FE_0        9F
+        SCON1   C0                                          C3
+                C4                              FE_1        C7
+        T2CON   C8      CP_RL2  C_T2                        CB
+                CC                                          CF
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-30
+        DS83C530/DS87C530 SPECIAL FUNCTION REGISTERS
+
+
+        M.10.4  Optional Symbols:  Control Bits 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                        0x80    0x40    0x20    0x10
+                        0x08    0x04    0x02    0x10
+                        ----    ----    ----    ----
+        DPS     0x80                                        0x10
+                0x08                            SEL         0x01
+        PCON    0x80    SMOD_0  SMOD0                       0x10
+                0x08    GF1     GF0     STOP    IDLE        0x01
+        TMOD    0x80    T1GATE  T1C_T   T1M1    T1M0        0x10
+                0x08    T0GATE  T0C_T   T0M1    T0M0        0x01
+        CKCON   0x80    WD1     WD0     T2M     T1M         0x10
+                0x08    T0M     MD2     MD1     MD0         0x01
+        EXIF    0x80    IE5     IE4     IE3     IE          0x10
+                0x08    XT_RG   RGMD    RGSL    BGS         0x01
+        TRIM    0x80    E4K     X12_6   TRM2    _TRM2       0x10
+                0x08    TRM1    _TRM1   TRM0    _TRM0       0x01
+        SBUF1   0x80    SB7     SB6     SB5     SB4         0x10
+                0x08    SB3     SB2     SB1     SB0         0x01
+        ROMSIZE 0x80                                        0x10
+                0x08            RMS2    RMS1    RMS0        0x01
+        PMR     0x80    CD1     CD0     SWB                 0x10
+                0x08    XTOFF   ALEOFF  DME1    DME0        0x01
+        STATUS  0x80    PIP     HIP     LIP     XTUP        0x10
+                0x08    SPTA1   SPRA1   SPTA0   SPRA0       0x01
+        T2MOD   0x80                                        0x10
+                0x08                    T2OE    DCEN        0x01
+        RTCC    0x80    SSCE    SCE     MCE     HCE         0x10
+                0x08    RTCRE   RTCWE   RTCIF   RTCE        0x01
+        
+                Alternates:
+        
+        PCON    0x80    SMOD                                0x10
+                0x08                                        0x01
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-31
+        DS83C530/DS87C530 SPECIAL FUNCTION REGISTERS
+
+
+        M.11  DS83C550/DS87C550 SPECIAL FUNCTION REGISTERS 
+
+
+           The DS83C550/DS87C550 Special Function Registers are selected
+        using the .DS83C550 or DS87C550 assembler directives.  
+
+
+        M.11.1  SFR Map 
+
+                        --------- 4 Bytes ----------
+                        ----    ----    ----    ----
+                80      PORT0   SP      DPL     DPH         83
+                84      DPL1    DPH1    DPS     PCON        87
+                88      TCON    TMOD    TL0     TL1         8B
+                8C      TH0     TH1     CKCON               8F
+                90      PORT1   RCON                        93
+                94                                          97
+                98      SCON0   SBUF0                       9B
+                9C                              PMR         9F
+                A0      PORT2   SADDR0  SADDR1              A3
+                A4                                          A7
+                A8      IE      CMPL0   CMPL1   CMPL2       AB
+                AC      CPTL0   CPTL1   CPTL2   CPTL3       AF
+                B0      PORT3           ADCON1  ADCON2      B3
+                B4      ADMSB   ADLSD   WINHI   WINLO       B7
+                B8      IP      SADEN0  SADEN1              BB
+                BC                      T2CON   T2MOD       BF
+                C0      PORT4           ROMSIZE             C3
+                C4      PORT5   STATUS          TA          C7
+                C8      T2IR    CMPH0   CMPH1   CMPH2       CB
+                CC      CPTH0   CPTH1   CPTH2   CPTH3       CF
+                D0      PSW             PW0FG   PW1FG       D3
+                D4      PW2FG   PW3FG   PWMADR              D7
+                D8      SCON1   SBUF1                       DB
+                DC      PWM0    PWM1    PWM2    PWM3        DF
+                E0      ACC     PW01CS  PW23CS  PW01CON     E3
+                E4      PW23CON         RLOADL  RLOADH      E7
+                E8      EIE             T2SEL   CTCON       EB
+                EC      TL2     TH2     SETR    RSTR        EF
+                F0      B       PORT6                       F3
+                F4                                          F7
+                F8      EIP                                 FB
+                FC                              WDCON       FF
+        
+                Alternates:
+        
+                80      P0                                  83
+                90      P1                                  93
+                98      SCON    SBUF                        9B
+                A0      P2                                  A3
+                B0      P3                                  B3
+                C0      P4                                  C3
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-32
+        DS83C550/DS87C550 SPECIAL FUNCTION REGISTERS
+
+
+                C4      P5                                  C7
+                F0              PORT6                       F3
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-33
+        DS83C550/DS87C550 SPECIAL FUNCTION REGISTERS
+
+
+        M.11.2  Bit Addressable Registers:  Generic 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+        PORT0   80      P0.7    P0.6    P0.5    P0.4        83
+                84      P0.3    P0.2    P0.1    P0.0        87
+        TCON    88      TCON.0  TCON.1  TCON.2  TCON.3      8B
+                8C      TCON.4  TCON.5  TCON.6  TCON.7      8F
+        PORT1   90      P1.0    P1.1    P1.2    P1.3        93
+                94      P1.4    P1.5    P1.6    P1.7        97
+        SCON0   98      SCON0.0 SCON0.1 SCON0.2 SCON0.3     9B
+                9C      SCON0.4 SCON0.5 SCON0.6 SCON0.7     9F
+        PORT2   A0      P2.0    P2.1    P2.2    P2.3        A3
+                A4      P2.4    P2.5    P2.6    P2.7        A7
+        IE      A8      IE.0    IE.1    IE.2    IE.3        AB
+                AC      IE.4    IE.5    EI.6    IE.7        AF
+        PORT3   B0      P3.0    P3.1    P3.2    P3.3        B3
+                B4      P3.4    P3.5    P3.6    P3.7        B7
+        IP      B8      IP.0    IP.1    IP.2    IP.3        BB
+                BC      IP.4    IP.5    IP.6    IP.7        BF
+        PORT4   C0      P4.0    P4.1    P4.2    P4.3        C3
+                C4      P4.4    P4.5    P4.6    P4.7        C7
+        T2IR    C8      T2IR.0  T2IR.1  T2IR.2  T2IR.3      CB
+                CC      T2IR.4  T2IR.5  T2IR.6  T2IR.7      CF
+        PSW     D0      PSW.0   PSW.1   PSW.2   PSW.3       D3
+                D4      PSW.4   PSW.5   PSW.6   PSW.7       D7
+        SCON1   D8      SCON1.0 SCON1.1 SCON1.2 SCON1.3     DB
+                DC      SCON1.4 SCON1.5 SCON1.6 SCON1.7     DF
+        ACC     E0      ACC.0   ACC.1   ACC.2   ACC.3       E3
+                E4      ACC.4   ACC.5   ACC.6   ACC.7       E7
+        EIE     E8      EIE.0   EIE.1   EIE.2   EIE.3       EB
+                EC      EIE.4   EIE.5   EIE.6   EIE.7       EF
+        B       F0      B.0     B.1     B.2     B.3         F3
+                F4      B.4     B.5     B.6     B.7         F7
+        EIP     F8      EIP.0   EIP.1   EIP.2   EIP.3       FB
+                FC      EIP.4   EIP.5   EIP.6   EIP.7       FF
+        
+                        Alternates:
+        
+        PORT0   80      PORT0.7 PORT0.6 PORT0.5 PORT0.4     83
+                84      PORT0.3 PORT0.2 PORT0.1 PORT0.0     87
+        PORT1   90      PORT1.0 PORT1.1 PORT1.2 PORT1.3     93
+                94      PORT1.4 PORT1.5 PORT1.6 PORT1.7     97
+        SCON    98      SCON.0  SCON.1  SCON.2  SCON.3      9B
+                9C      SCON.4  SCON.5  SCON.6  SCON.7      9F
+        PORT2   A0      PORT2.0 PORT2.1 PORT2.2 PORT2.3     A3
+                A4      PORT2.4 PORT2.5 PORT2.6 PORT2.7     A7
+        PORT3   B0      PORT3.0 PORT3.1 PORT3.2 PORT3.3     B3
+                B4      PORT3.4 PORT3.5 PORT3.6 PORT3.7     B7
+        PORT4   C0      PORT4.0 PORT4.1 PORT4.2 PORT4.3     C3
+                C4      PORT4.4 PORT4.5 PORT4.6 PORT4.7     C7
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-34
+        DS83C550/DS87C550 SPECIAL FUNCTION REGISTERS
+
+
+        M.11.3  Bit Addressable Registers:  Specific 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                80                                          83
+                84                                          87
+        TCON    88      IT0     IE0     IT1     IE1         8B
+                8C      TR0     TF0     TR1     TF1         8F
+                90                                          93
+                94                                          97
+        SCON0   98      RI_0    TI_0    RB8_0   TB8_0       9B
+                9C      REN_0   SM2_0   SM1_0   SMO_0       9F
+                A0                                          A3
+                A4                                          A7
+        IE      A8      EX0     ET0     EX1     ET1         AB
+                AC      ES0     ET2     ES1     EA          AF
+                B0                                          B3
+                B4                                          B7
+        IP      B8      PX0     PT0     PX1     PT1         BB
+                BC      PS0     PS1     PAD                 BF
+        PORT4   C0      CMSR0   CMSR1   CMSR2   CMSR3       C3
+                C4      CMSR4   CMSR5   CMT0    CMT1        C7
+        T2IR    C8      CF0     CF1     CF2     CF3         CB
+                CC      CM0F    CM1F    CM2F                CF
+        PSW     D0      P       FL      OV      RS0         D3
+                D4      RS1     F0      AC      CY          D7
+        SCON1   D8      RI_1    TI_1    RB8_1   TB8_1       DB
+                DC      REN_1   SM2_1   SM1_1   SMO_1       DF
+                E0                                          E3
+                E4                                          E7
+        EIE     E8      EX2     EX3     EX4     EX5         EB
+                EC      ECM0    ECM1    ECM2    ET2         EF
+                F0                                          F3
+                F4                                          F7
+        EIP     F8      PX2     PX3     PX4     PX5         FB
+                FC      PCM0    PCM1    PCM2    PT2         FF
+        
+                Alternates:
+        
+        SCON    98      RI      TI      RB8     TB8         9B
+                9C      REN     SM2     SM1     SMO         9F
+        SCON    98                                          9B
+                9C                              FE          9F
+        SCON0   98                                          9B
+                9C                              FE_0        9F
+        T2IR    C8      IE2     IE3     IE4     IE5         CB
+                CC                                          CF
+        SCON1   D8                                          DB
+                DC                              FE_1        DF
+        EIE     E8      EC0     EC1     EC2     EC3         EB
+                EC                                          EF
+        EIP     F8      PC0     PC1     PC2     PC3         FB
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-35
+        DS83C550/DS87C550 SPECIAL FUNCTION REGISTERS
+
+
+                FC                                          FF
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-36
+        DS83C550/DS87C550 SPECIAL FUNCTION REGISTERS
+
+
+        M.11.4  Optional Symbols:  Control Bits 
+
+                        ---------- 4 BITS ----------
+                        ----    ----    ----    ----
+                        0x80    0x40    0x20    0x10
+                        0x08    0x04    0x02    0x10
+                        ----    ----    ----    ----
+        DPS     0x80    ID1     ID0     TSL                 0x10
+                0x08                            SEL         0x01
+        PCON    0x80    SMOD_0  SMOD0                       0x10
+                0x08    GF1     GF0     STOP    IDLE        0x01
+        TMOD    0x80    T1GATE  T1C_T   T1M1    T1M0        0x10
+                0x08    T0GATE  T0C_T   T0M1    T0M0        0x01
+        CKCON   0x80    WD1     WD0     T2M     T1M         0x10
+                0x08    T0M     MD2     MD1     MD0         0x01
+        RCON    0x80                                        0x10
+                0x08    CKRDY   RGMD    RGSL    BGS         0x01
+        PMR     0x80    CD1     CD0     SWB     CTM         0x10
+                0x08    4X_2X   ALEOFF  DEM1    DEM0        0x01
+        ADCON1  0x80   STRT_BSY EOC     CONT_SS ADEX        0x10
+                0x08    WCQ     WCM     ADON    WCIO        0x01
+        ADCON2  0x80    OUTCF   MUX2    MUX1    MUX0        0x10
+                0x08    APS3    APS2    APS1    APS0        0x01
+        T2CON   0x80    TF2     EXF2    RCLK    TCLK        0x10
+                0x08    EXEN2   TR2     CT2     CPRL2       0x01
+        T2MOD   0x80                                        0x10
+                0x08                    T2OE    DCEN        0x01
+        PORT5   0x80    ADC7    ADC6    ADC5    ADC4        0x10
+                0x08    ADC3    ADC2    ADC1    ADC0        0x01
+        ROMSIZE 0x80                                        0x10
+                0x08            RMS2    RMS1    RMS0        0x01
+        STATUS  0x80    PIP     HIP     LIP     XTUP        0x10
+                0x08    SPTA1   SPRA1   SPTA0   SPRA0       0x01
+        PWMADR  0x80    ADRS                                0x10
+                0x08                    PWE1    PWE0        0x01
+        PW01CS  0x80    PW0S2   PW0S1   PW0S0   PW0EN       0x10
+                0x08    PW1S2   PW1S1   PW1S0   PW1EN       0x01
+        PW23CS  0x80    PW2S2   PW2S1   PW2S0   PW2EN       0x10
+                0x08    PW3S2   PW3S1   PW3S0   PW3EN       0x01
+        PW01CON 0x80    PW0F    PW0DC   PW0OE   PW0T_C      0x10
+                0x08    PW1F    PW1DC   PW1OE   PW1T_C      0x01
+        PW23CON 0x80    PW2F    PW2DC   PW2OE   PW2T_C      0x10
+                0x08    PW3F    PW3DC   PW3OE   PW3T_C      0x01
+        T2SEL   0x80    TF2S    TF2BS           TF2B        0x10
+                0x08                    T2P1    T2P0        0x01
+        CTCON   0x80    _CT3    CT3     _CT2    CT2         0x10
+                0x08    _CT1    CT1     _CT0    CT0         0x01
+        SETR    0x80    TGFF1   TGFF0   CMS5    CMS4       0x10
+                0x08    CMS3    CMS2    CMS1    CMS0        0x01
+        RSTR    0x80    CMTE1   CMTE0   CMR5    CMR4        0x10
+                0x08    CMR3    CMR2    CMR1    CMR0        0x01
+        PORT6   0x80    STADC           PWMC1   PWMC0       0x10
+
+
+        AS8XCXXX ASSEMBLER                                     PAGE M-37
+        DS83C550/DS87C550 SPECIAL FUNCTION REGISTERS
+
+
+                0x08    PWMO3   PWMO2   PWMO1   PWMO0       0x01
+        WDCON   0x80    SMOD_1  POR     EPF1    PF1         0x10
+                0x08    WDIF    WTRF    EWT     RWT         0x01
+        
+                Alternates:
+        
+        PCON    0x80    SMOD                                0x10
+                0x08                                        0x01
+        T2CON   0x80                                        0x10
+                0x08                    C_T2    _RL2        0x01
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   APPENDIX N
+
                                  ASZ80 ASSEMBLER
 
 
 
 
 
-        M.1  .hd64 DIRECTIVE 
+        N.1  .hd64 DIRECTIVE 
 
         Format:  
 
@@ -6021,7 +8122,7 @@
         flagged with an 'o' error.  
 
 
-        M.2  Z80 REGISTER SET AND CONDITIONS 
+        N.2  Z80 REGISTER SET AND CONDITIONS 
 
 
            The following is a complete list of register designations and
@@ -6043,11 +8144,11 @@
 
 
 
-        ASZ80 ASSEMBLER                                         PAGE M-2
+        ASZ80 ASSEMBLER                                         PAGE N-2
         Z80 INSTRUCTION SET
 
 
-        M.3  Z80 INSTRUCTION SET 
+        N.3  Z80 INSTRUCTION SET 
 
 
            The  following  tables  list all Z80/HD64180 mnemonics recog-
@@ -6085,11 +8186,11 @@
         modes.  
 
 
-        ASZ80 ASSEMBLER                                         PAGE M-3
+        ASZ80 ASSEMBLER                                         PAGE N-3
         Z80 INSTRUCTION SET
 
 
-        M.3.1  Inherent Instructions 
+        N.3.1  Inherent Instructions 
 
                 ccf             cpd
                 cpdr            cpi
@@ -6104,7 +8205,7 @@
                 rrd             scf
 
 
-        M.3.2  Implicit Operand Instructions 
+        N.3.2  Implicit Operand Instructions 
 
                 adc     a,[]            adc     []
                 add     a,[]            add     []
@@ -6125,11 +8226,11 @@
                 xor     a,[]            xor     []
 
 
-        ASZ80 ASSEMBLER                                         PAGE M-4
+        ASZ80 ASSEMBLER                                         PAGE N-4
         Z80 INSTRUCTION SET
 
 
-        M.3.3  Load Instruction 
+        N.3.3  Load Instruction 
 
                 ld      rg,[]           ld      [],rg
                 ld      (bc),a          ld      a,(bc)
@@ -6145,7 +8246,7 @@
                 ldi                     ldir
 
 
-        M.3.4  Call/Return Instructions 
+        N.3.4  Call/Return Instructions 
 
                 call    C,label         ret     C
                 call    M,label         ret     M
@@ -6158,7 +8259,7 @@
                 call    label           ret
 
 
-        M.3.5  Jump and Jump to Subroutine Instructions 
+        N.3.5  Jump and Jump to Subroutine Instructions 
 
                 jp      C,label         jp      M,label
                 jp      NC,label        jp      NZ,label
@@ -6175,18 +8276,18 @@
                 jr      label
 
 
-        ASZ80 ASSEMBLER                                         PAGE M-5
+        ASZ80 ASSEMBLER                                         PAGE N-5
         Z80 INSTRUCTION SET
 
 
-        M.3.6  Bit Manipulation Instructions 
+        N.3.6  Bit Manipulation Instructions 
 
                 bit     n,[]
                 res     n,[]
                 set     n,[]
 
 
-        M.3.7  Interrupt Mode and Reset Instructions 
+        N.3.7  Interrupt Mode and Reset Instructions 
 
                 im      n
                 im      n
@@ -6194,7 +8295,7 @@
                 rst     n
 
 
-        M.3.8  Input and Output Instructions 
+        N.3.8  Input and Output Instructions 
 
                 in      a,(n)           in      rg,(c)
                 ind                     indr
@@ -6205,7 +8306,7 @@
                 outi                    otir
 
 
-        M.3.9  Register Pair Instructions 
+        N.3.9  Register Pair Instructions 
 
                 add     hl,rp           add     ix,rp
                 add     iy,rp
@@ -6220,11 +8321,11 @@
                 push    rp              pop     rp
 
 
-        ASZ80 ASSEMBLER                                         PAGE M-6
+        ASZ80 ASSEMBLER                                         PAGE N-6
         Z80 INSTRUCTION SET
 
 
-        M.3.10  HD64180 Specific Instructions 
+        N.3.10  HD64180 Specific Instructions 
 
                 in0     rg,(n)
                 out0    (n),rg
@@ -6253,7 +8354,7 @@
 
 
 
-                                   APPENDIX N
+                                   APPENDIX O
 
                                 AS6500 ASSEMBLER
 
@@ -6261,7 +8362,7 @@
 
 
 
-        N.1  ACKNOWLEDGMENT 
+        O.1  ACKNOWLEDGMENT 
 
 
            Thanks  to  Marko  Makela  for his contribution of the AS6500
@@ -6290,11 +8391,11 @@
 
 
 
-        AS6500 ASSEMBLER                                        PAGE N-2
+        AS6500 ASSEMBLER                                        PAGE O-2
         6500 REGISTER SET
 
 
-        N.2  6500 REGISTER SET 
+        O.2  6500 REGISTER SET 
 
         The following is a list of the 6500 registers used by AS6500:  
 
@@ -6302,7 +8403,7 @@
                 x,y     -       index registers
 
 
-        N.3  6500 INSTRUCTION SET 
+        O.3  6500 INSTRUCTION SET 
 
 
            The  following  tables  list all 6500 family mnemonics recog-
@@ -6347,11 +8448,11 @@
         struction, refer to the 65xx technical data for valid modes.  
 
 
-        AS6500 ASSEMBLER                                        PAGE N-3
+        AS6500 ASSEMBLER                                        PAGE O-3
         6500 INSTRUCTION SET
 
 
-        N.3.1  Processor Specific Directives 
+        O.3.1  Processor Specific Directives 
 
 
            The  AS6500  cross  assembler has four (4) processor specific
@@ -6364,7 +8465,7 @@
                 .r65c02         Core plus 65C02, 65C102, and 65C112
 
 
-        N.3.2  65xx Core Inherent Instructions 
+        O.3.2  65xx Core Inherent Instructions 
 
                 brk                     clc
                 cld                     cli
@@ -6381,7 +8482,7 @@
                 tya
 
 
-        N.3.3  65xx Core Branch Instructions 
+        O.3.3  65xx Core Branch Instructions 
 
                 bcc     label           bhs     label
                 bcs     label           blo     label
@@ -6390,7 +8491,7 @@
                 bvc     label           bvs     label
 
 
-        N.3.4  65xx Core Single Operand Instructions 
+        O.3.4  65xx Core Single Operand Instructions 
 
                 asl     []
                 dec     []
@@ -6400,11 +8501,11 @@
                 ror     []
 
 
-        AS6500 ASSEMBLER                                        PAGE N-4
+        AS6500 ASSEMBLER                                        PAGE O-4
         6500 INSTRUCTION SET
 
 
-        N.3.5  65xx Core Double Operand Instructions 
+        O.3.5  65xx Core Double Operand Instructions 
 
                 adc     []
                 and     []
@@ -6417,12 +8518,12 @@
                 sta     []
 
 
-        N.3.6  65xx Core Jump and Jump to Subroutine Instructions 
+        O.3.6  65xx Core Jump and Jump to Subroutine Instructions 
 
                 jmp     []              jsr     []
 
 
-        N.3.7  65xx Core Miscellaneous X and Y Register Instructions 
+        O.3.7  65xx Core Miscellaneous X and Y Register Instructions 
 
                 cpx     []
                 cpy     []
@@ -6432,11 +8533,11 @@
                 sty     []
 
 
-        AS6500 ASSEMBLER                                        PAGE N-5
+        AS6500 ASSEMBLER                                        PAGE O-5
         6500 INSTRUCTION SET
 
 
-        N.3.8  65F11 and 65F12 Specific Instructions 
+        O.3.8  65F11 and 65F12 Specific Instructions 
 
                 bbr0    [],label                bbr1    [],label
                 bbr2    [],label                bbr3    [],label
@@ -6459,7 +8560,7 @@
                 smb6    []                      smb7    []
 
 
-        N.3.9  65C00/21 and 65C29 Specific Instructions 
+        O.3.9  65C00/21 and 65C29 Specific Instructions 
 
                 bbr0    [],label                bbr1    [],label
                 bbr2    [],label                bbr3    [],label
@@ -6487,11 +8588,11 @@
                 smb6    []                      smb7    []
 
 
-        AS6500 ASSEMBLER                                        PAGE N-6
+        AS6500 ASSEMBLER                                        PAGE O-6
         6500 INSTRUCTION SET
 
 
-        N.3.10  65C02, 65C102, and 65C112 Specific Instructions 
+        O.3.10  65C02, 65C102, and 65C112 Specific Instructions 
 
                 bbr0    [],label                bbr1    [],label
                 bbr2    [],label                bbr3    [],label

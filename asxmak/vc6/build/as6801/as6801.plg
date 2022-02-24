@@ -6,20 +6,30 @@
 --------------------Configuration: as6801 - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\WINDOWS\TEMP\RSP222.TMP" with contents
+Creating temporary file "C:\WINDOWS\TEMP\RSP141.TMP" with contents
 [
 /nologo /ML /W3 /GX /O2 /I "c:\asxxxx\asxxsrc" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Release/as6801.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
-"C:\ASXXXX\asxxsrc\asdata.c"
-"C:\ASXXXX\as6801\m01adr.c"
-"C:\ASXXXX\as6801\m01ext.c"
-"C:\ASXXXX\as6801\m01mch.c"
-"C:\ASXXXX\as6801\m01pst.c"
+"C:\Asxxxx\as6801\m01ext.c"
+"C:\Asxxxx\as6801\m01mch.c"
+"C:\Asxxxx\as6801\m01pst.c"
+"C:\Asxxxx\as6801\m01adr.c"
+"C:\Asxxxx\asxxsrc\asexpr.c"
+"C:\Asxxxx\asxxsrc\aslex.c"
+"C:\Asxxxx\asxxsrc\aslist.c"
+"C:\Asxxxx\asxxsrc\asmain.c"
+"C:\Asxxxx\asxxsrc\asout.c"
+"C:\Asxxxx\asxxsrc\assubr.c"
+"C:\Asxxxx\asxxsrc\assym.c"
+"C:\Asxxxx\asxxsrc\asdata.c"
 ]
-Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP222.TMP" 
-Creating temporary file "C:\WINDOWS\TEMP\RSP0223.TMP" with contents
+Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP141.TMP" 
+Creating temporary file "C:\WINDOWS\TEMP\RSP0142.TMP" with contents
 [
-kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/as6801.pdb" /machine:I386 /out:"..\..\exe\as6801.exe" 
-.\Release\asdata.obj
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/as6801.pdb" /machine:I386 /out:"..\..\exe\as6801.exe" 
+.\Release\m01ext.obj
+.\Release\m01mch.obj
+.\Release\m01pst.obj
+.\Release\m01adr.obj
 .\Release\asexpr.obj
 .\Release\aslex.obj
 .\Release\aslist.obj
@@ -27,19 +37,23 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 .\Release\asout.obj
 .\Release\assubr.obj
 .\Release\assym.obj
-.\Release\m01adr.obj
-.\Release\m01ext.obj
-.\Release\m01mch.obj
-.\Release\m01pst.obj
+.\Release\asdata.obj
 ]
-Creating command line "link.exe @C:\WINDOWS\TEMP\RSP0223.TMP"
+Creating command line "link.exe @C:\WINDOWS\TEMP\RSP0142.TMP"
 <h3>Output Window</h3>
 Compiling...
-asdata.c
-m01adr.c
 m01ext.c
 m01mch.c
 m01pst.c
+m01adr.c
+asexpr.c
+aslex.c
+aslist.c
+asmain.c
+asout.c
+assubr.c
+assym.c
+asdata.c
 Linking...
 
 

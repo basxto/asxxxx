@@ -14,50 +14,6 @@ ASxxxx Cross Assembler Bugs, Fixes, ...
 
 <B><PRE>
 *---*---*---*---*
-8-Nov-1999:
-
-I have a problem with aslink (with the exe-file you supply with
-v2.2 as well as my own built aslink) under Linux OS.
-
-The files from the ExApp Project:
-	(from simpleRTJ - simple Real Time Java for the m68hc11,
-	http://members.xoom.com/simpleRTJ/Trials/Introduction.html)
-cause a segmentation fault.
-
-Under DOS the hole project is correctly built, also with the
-aslink-input files, that i build with as6811 under Linux !
-So problem seems to be aslink.
-
-Maybe you have a clue !?
-
-Sincerely, Ingo Beckmann [ingo.beckmann@FernUni-Hagen.de]
-
-
-Ingo,
-
-  There is a bug in ASLINK:
-	The Linux function 'fclose(sfp)' causes a segmentation
-	fault if the file (having a file handle sfp) has
-	already been closed.  (The file handle becomes
-	invalid after the file is closed, a subsequent
-	call to fclose(sfp) with the invalid file handle
-	causes the segmentation fault.)
-
-	The bug is that after I closed the input file
-	I did not set the file handle to NULL so that
-	the routine LKEXIT() would not try to close
-	the file a second time.
-
-	(The DOS libraries seem to have a method to verify if
-	the file handle is valid before using it.)
-
-  Version 2.3 fixes this problem.
-
-*---*---*---*---*
-</PRE></B>
-
-<B><PRE>
-*---*---*---*---*
 20-Nov-1998:
 
 I am in the process of developing a Freeware C compiler for
@@ -129,8 +85,15 @@ struct  tsym
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 
+<H4>
+<P><A HREF="asxxxx.htm#JUMP">
+<IMG width=32 height=32 border=0 SRC="spcshp.gif" ALIGN=bottom></A>
+<B>...  Return to the ASxxxx Assembler Index</B></A></P>
+
 <P><a href="../home.htm">
 <IMG width=32 height=32 border=0 SRC="home.gif" ALIGN=BOTTOM></a>
 <B>...  Home Page</B></P>
+</H4>
+
 </BODY>
 </HTML>

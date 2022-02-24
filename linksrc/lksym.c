@@ -164,7 +164,7 @@ newsym()
 			/*
 			 * Set value and area extension link.
 			 */
-			tsp->s_addr = i;
+			tsp->s_addr = (addr_t) i;
 			tsp->s_axp = axp;
 			tsp->s_type |= S_DEF;
 			tsp->m_id = hp->m_id;
@@ -464,7 +464,7 @@ int cflag;
  *	side effects:
  *		none
  */
- 
+
 int
 hash(p, cflag)
 register char *p;
@@ -517,14 +517,14 @@ register int cflag;
  *		Space allocated for string, string copied
  *		to space.  Out of Space terminates linker.
  */
- 
+
 char *
 strsto(str)
 char *str;
 {
 	int  l;
 	char *p;
-   
+
 	/*
 	 * What we need, including a null.
 	 */
@@ -596,7 +596,7 @@ char *str;
 #define	STR_MIN	16
 static	char *	pnext = NULL;
 static	int	bytes = 0;
-   
+
 char *
 new(n)
 unsigned int n;
@@ -674,7 +674,7 @@ unsigned int n;
  *		Space allocated for string, string copied
  *		to space.  Out of Space terminates assembler.
  */
- 
+
 /*
  * To avoid wasting memory headers on small allocations, we
  * allocate a big chunk and parcel it out as required.
@@ -684,14 +684,14 @@ unsigned int n;
 #define	STR_SPC	1024
 static	char *	pnext = NULL;
 static	int	bytes = 0;
-   
+
 char *
 strsto(str)
 char *str;
 {
 	int  l;
 	char *p;
-   
+
 	/*
 	 * What we need, including a null.
 	 */
