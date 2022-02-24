@@ -1,7 +1,7 @@
 /* lklist.c */
 
 /*
- * (C) Copyright 1989-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,7 +12,13 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#ifdef WIN32
+#include <stdlib.h>
+#else
 #include <alloc.h>
+#endif
+
 #include "aslink.h"
 
 /*)Module	lklist.c
@@ -82,46 +88,34 @@ register struct area *xp;
 		if (xflag == 2) {
 			fprintf(mfp, "Decimal\n\n");
 		}
-		if (wflag) {
-			fprintf(mfp,
-				"Area                               ");
-			fprintf(mfp,
-				"Addr   Size   Decimal Bytes (Attributes)\n");
-			fprintf(mfp,
-				"--------------------------------   ");
-			fprintf(mfp,
-				"----   ----   ------- ----- ------------\n");
-		} else {
-			fprintf(mfp,
-				"Area       Addr   Size");
-			fprintf(mfp,
-				"   Decimal Bytes (Attributes)\n");
-			fprintf(mfp,
-				"----       ----   ----");
-			fprintf(mfp,
-				"   ------- ----- ------------\n");
-		}
+		fprintf(mfp,
+			"Area                       Addr   ");
+		fprintf(mfp,
+			"     Size        Decimal Bytes (Attributes)\n");
+		fprintf(mfp,
+			"--------------------       ----   ");
+		fprintf(mfp,
+			"     ----        ------- ----- ------------\n");
+
+		ai = xp->a_addr & 0xFFFF;
+		aj = xp->a_size & 0xFFFF;
+
 		/*
 		 * Output Area Header
 		 */
 		ptr = &xp->a_id[0];
-		if (wflag) {
-			fprintf(mfp, "%-32.32s", ptr);
-		} else {
-			fprintf(mfp, "%-8.8s", ptr);
-		}
-		ai = xp->a_addr & 0xFFFF;
-		aj = xp->a_size & 0xFFFF;
+		fprintf(mfp, "%-19.19s", ptr);
 		if (xflag == 0) {
-			fprintf(mfp, "   %04X   %04X", ai, aj);
+			fprintf(mfp, "        %04X        %04X", ai, aj);
 		} else
 		if (xflag == 1) {
-			fprintf(mfp, " %06o %06o", ai, aj);
+			fprintf(mfp, "      %06o      %06o", ai, aj);
 		} else
 		if (xflag == 2) {
-			fprintf(mfp, "  %05u  %05u", ai, aj);
+			fprintf(mfp, "       %05u       %05u", ai, aj);
 		}
-		fprintf(mfp, " = %6u. bytes ", aj);
+		fprintf(mfp, " =      %6u. bytes ", aj);
+
 		if (xp->a_flag & A_ABS) {
 			fprintf(mfp, "(ABS");
 		} else {
@@ -150,20 +144,20 @@ register struct area *xp;
 		if (wflag) {
 			putc('\n', mfp);
 			fprintf(mfp,
-			"      Value  Global                           ");
+			"         Value  Global                          ");
 			fprintf(mfp,
 			"   Global Defined In Module\n");
 			fprintf(mfp,
-			"      -----  ---------------------------------");
+			"         -----  --------------------------------");
 			fprintf(mfp,
 			"   ------------------------\n");
 		} else {
 			putc('\n', mfp);
 			for(i=0;i<4;++i)
-				fprintf(mfp, "      Value  Global");
+				fprintf(mfp, "   Value  Global   ");
 			putc('\n', mfp);
 			for(i=0;i<4;++i)
-				fprintf(mfp, "      -----  ------");
+				fprintf(mfp, "   -----  ------   ");
 			putc('\n', mfp);
 		}
 
@@ -326,9 +320,13 @@ struct area *xp;
 	 */
 	i = 0;
 	while (i < nmsym) {
-		if (wflag || (i % 4 == 0)) {
+		if (wflag) {
 			slew(xp);
-			fprintf(mfp, "     ");
+			fprintf(mfp, "        ");
+		} else
+		if ((i % 4) == 0) {
+			slew(xp);
+			fprintf(mfp, "  ");
 		}
 		sp = p[i];
 		aj = (sp->s_addr + sp->s_axp->a_addr) & 0xFFFF;
@@ -343,7 +341,7 @@ struct area *xp;
 		}
 		ptr = &sp->s_id[0];
 		if (wflag) {
-			fprintf(mfp, "%-33.33s", ptr);
+			fprintf(mfp, "%-32.32s", ptr);
 			i++;
 			ptr = &sp->m_id[0];
 			if(ptr) {
@@ -454,7 +452,7 @@ int i;
 		if (gline == 0)
 			fprintf(rfp, "%s", rb);
 
-		while (fgets(rb, sizeof(rb), tfp) != 0) {
+		while (fgets(rb, sizeof(rb)-2, tfp) != 0) {
 			fprintf(rfp, "%s", rb);
 		}
 		fclose(tfp);
@@ -508,6 +506,19 @@ int i;
  *		updated to reflect the program relocation.
  */
 
+/* The Output Formats
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+   |    |               |     | |
+ee XXXX xx xx xx xx xx xx LLLLL *************	HEX(16)
+ee 000000 ooo ooo ooo ooo LLLLL *************	OCTAL(16)
+ee  DDDDD ddd ddd ddd ddd LLLLL *************	DECIMAL(16)
+                     XXXX
+		   OOOOOO
+		    DDDDD
+ */
+
 VOID
 lkalist(pc)
 addr_t pc;
@@ -544,7 +555,7 @@ loop:	if (tfp == NULL)
 	/*
 	 * Get next LST text line
 	 */
-	if (fgets(rb, sizeof(rb), tfp) == NULL) {
+	if (fgets(rb, sizeof(rb)-2, tfp) == NULL) {
 		fclose(tfp);
 		tfp = NULL;
 		fclose(rfp);
@@ -572,12 +583,12 @@ loop:	if (tfp == NULL)
 		strncpy(&rb[3], str, 4);
 	} else
 	if (radix == 10) {
-		if (!dgt(RAD10, &rb[3], 5)) {
+		if (!dgt(RAD10, &rb[4], 5)) {
 			fprintf(rfp, "%s", rb);
 			goto loop;
 		}
-		sprintf(str, "%05d", pc);
-		strncpy(&rb[3], str, 5);
+		sprintf(str, "%05u", pc);
+		strncpy(&rb[4], str, 5);
 	} else
 	if (radix == 8) {
 		if (!dgt(RAD8, &rb[3], 6)) {
@@ -640,6 +651,19 @@ loop:	if (tfp == NULL)
  *		with updated data values and code addresses.
  */
 
+/* The Output Formats
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+   |    |               |     | |
+ee XXXX xx xx xx xx xx xx LLLLL *************	HEX(16)
+ee 000000 ooo ooo ooo ooo LLLLL *************	OCTAL(16)
+ee  DDDDD ddd ddd ddd ddd LLLLL *************	DECIMAL(16)
+                     XXXX
+		   OOOOOO
+		    DDDDD
+ */
+
 VOID
 lkglist(pc,v)
 addr_t pc;
@@ -673,7 +697,7 @@ loop:	if (tfp == NULL)
 		/*
 		 * Get next LST text line
 		 */
-		if (fgets(rb, sizeof(rb), tfp) == NULL) {
+		if (fgets(rb, sizeof(rb)-2, tfp) == NULL) {
 			fclose(tfp);
 			tfp = NULL;
 			fclose(rfp);
@@ -748,9 +772,9 @@ loop:	if (tfp == NULL)
 		 * Data Byte Pointer
 		 */
 		if (gcntr == -1) {
-			rp = &rb[9];
+			rp = &rb[10];
 		} else {
-			rp = &rb[9 + (3 * gcntr)];
+			rp = &rb[10 + (4 * gcntr)];
 		}
 		/*
 		 * Number must be of proper radix
@@ -763,7 +787,7 @@ loop:	if (tfp == NULL)
 		/*
 		 * Output new data value, overwrite relocation codes
 		 */
-		sprintf(str, " %03d", v);
+		sprintf(str, " %03u", v);
 		strncpy(rp-1, str, 4);
 		if (gcntr == -1) {
 			gcntr = 0;
@@ -772,9 +796,9 @@ loop:	if (tfp == NULL)
 		 * Output relocated code address
 		 */
 		if (gcntr == 0) {
-			if (dgt(RAD10, &rb[3], 5)) {
-				sprintf(str, "%05d", pc);
-				strncpy(&rb[3], str, 5);
+			if (dgt(RAD10, &rb[4], 5)) {
+				sprintf(str, "%05u", pc);
+				strncpy(&rb[4], str, 5);
 			}
 		}
 		/*
@@ -796,7 +820,7 @@ loop:	if (tfp == NULL)
 		if (gcntr == -1) {
 			rp = &rb[10];
 		} else {
-			rp = &rb[10 + (3 * gcntr)];
+			rp = &rb[10 + (4 * gcntr)];
 		}
 		/*
 		 * Number must be of proper radix

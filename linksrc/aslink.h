@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- * (C) Copyright 1989-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,7 +14,7 @@
  *
  */
 
-#define	VERSION	"V02.22"
+#define	VERSION	"V02.30"
 
 /*)Module	aslink.h
  *
@@ -225,7 +225,7 @@ struct	head
  *	area definition found as the REL files are read.  The
  *	struct area contains the name of the area, a flag byte
  *	which contains the area attributes (REL/CON/OVR/ABS),
- *	an area subtype (not used in this assembler), and the
+ *	the area base address set flag byte (-b option), and the
  *	area base address and total size which will be filled
  *	in at the end of the first pass through the REL files.
  *	As A directives are read from the REL files a linked
@@ -238,7 +238,7 @@ struct	area
 	struct	areax	*a_axp;	/* Area extension link */
 	addr_t	a_addr;		/* Beginning address of area */
 	addr_t	a_size;		/* Total size of the area */
-	char	a_type;		/* Area subtype */
+	char	a_bset;		/* Area base address set */
 	char	a_flag;		/* Flag byte */
 	char *	a_id;		/* Name */
 };
@@ -464,16 +464,16 @@ extern	char	ctype[];	/*	array of character types, one per
 /*
  *	Character Type Definitions
  */
-#define	SPACE	0000
-#define ETC	0000
-#define	LETTER	0001
-#define	DIGIT	0002
-#define	BINOP	0004
-#define	RAD2	0010
-#define	RAD8	0020
-#define	RAD10	0040
-#define	RAD16	0100
-#define	ILL	0200
+#define	SPACE	'\000'
+#define ETC	'\000'
+#define	LETTER	'\001'
+#define	DIGIT	'\002'
+#define	BINOP	'\004'
+#define	RAD2	'\010'
+#define	RAD8	'\020'
+#define	RAD10	'\040'
+#define	RAD16	'\100'
+#define	ILL	'\200'
 
 #define	DGT2	DIGIT|RAD16|RAD10|RAD8|RAD2
 #define	DGT8	DIGIT|RAD16|RAD10|RAD8

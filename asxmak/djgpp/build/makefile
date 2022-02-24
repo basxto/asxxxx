@@ -3,7 +3,7 @@
 #		DJGPP Version
 #		=============
 #
-#  6 February 2000		Created for DJGPP gcc 2.8.1 / make /
+#  9 April 2000			Created for DJGPP gcc 2.8.1 / make /
 #
 ####################################################################
 
@@ -18,7 +18,6 @@ all:	as6500.sv as6800.sv as6801.sv as6804.sv	\
 
 clean:
 	rm -f *.new *.sv
-	rm -f $(ASXBIN)*.exe
 	rm -f *.o
 
 
@@ -53,7 +52,6 @@ LDFLAGS=	-Wall
 #  Set ASXBAS relative to this make file.
 
 ASXBAS=		../../../
-ASXBIN=		$(ASXBAS)bin/
 
 SRCASX=		$(ASXBAS)asxxsrc/
 SRCLNK=		$(ASXBAS)linksrc/
@@ -90,8 +88,7 @@ VPATH =		$(SRCASX);	$(SRCLNK);	$(SRCMISC);	\
 %.sv: %.new
 	strip $<
 	cp $< $@
-	cp *.exe $(DSTEXE)
-	mv *.exe $(ASXBIN)
+	mv *.exe $(DSTEXE)
 
 
 ASXX =		asmain.o asdata.o aslex.o asexpr.o	\

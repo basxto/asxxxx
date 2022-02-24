@@ -1,7 +1,7 @@
 /* lkmain.c */
 
 /*
- * (C) Copyright 1989-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,7 +11,13 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#ifdef WIN32
+#include <stdlib.h>
+#else
 #include <alloc.h>
+#endif
+
 #include "aslink.h"
 
 /*)Module	lkmain.c
@@ -953,6 +959,7 @@ setbas()
 				lkerr++;
 			} else {
 				ap->a_addr = v;
+				ap->a_bset = 1;
 			}
 		} else {
 			fprintf(stderr, "No '=' in base expression");

@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#  01/04/99	Alan Baldwin	Created for LINUX gcc 2.7.2.1 / make /
+#  10/04/00	Alan Baldwin	Created for LINUX gcc 2.7.2.1 / make /
 #
 ######################################################################
 
@@ -17,24 +17,24 @@ all:	as6500 as6800 as6801 as6804	\
 	asxcnv asxscn
 
 clean:
-	rm $(SRCASX)*.o
-	rm $(SRCLNK)*.o
-	rm $(SRCMISC)*.o
-	rm $(SRC6500)*.o
-	rm $(SRC6800)*.o
-	rm $(SRC6801)*.o
-	rm $(SRC6804)*.o
-	rm $(SRC6805)*.o
-	rm $(SRC6808)*.o
-	rm $(SRC6809)*.o
-	rm $(SRC6811)*.o
-	rm $(SRC6812)*.o
-	rm $(SRC6816)*.o
-	rm $(SRC8051)*.o
-	rm $(SRC8085)*.o
-	rm $(SRCH8)*.o
-	rm $(SRCZ80)*.o
-	rm *.new
+	rm -f $(SRCASX)*.o
+	rm -f $(SRCLNK)*.o
+	rm -f $(SRCMISC)*.o
+	rm -f $(SRC6500)*.o
+	rm -f $(SRC6800)*.o
+	rm -f $(SRC6801)*.o
+	rm -f $(SRC6804)*.o
+	rm -f $(SRC6805)*.o
+	rm -f $(SRC6808)*.o
+	rm -f $(SRC6809)*.o
+	rm -f $(SRC6811)*.o
+	rm -f $(SRC6812)*.o
+	rm -f $(SRC6816)*.o
+	rm -f $(SRC8051)*.o
+	rm -f $(SRC8085)*.o
+	rm -f $(SRCH8)*.o
+	rm -f $(SRCZ80)*.o
+	rm -f *.new
 
 
 CC=		gcc
@@ -47,7 +47,6 @@ LDFLAGS=	-Wall
 #  Set ASXBAS relative to this make file.
 
 ASXBAS:=	../../../
-ASXBIN:=	$(ASXBAS)bin/
 
 SRCASX:=	$(ASXBAS)asxxsrc/
 SRCLNK:=	$(ASXBAS)linksrc/
@@ -79,7 +78,6 @@ SRCZ80=		$(ASXBAS)asz80/
 	strip $<
 	cp $< $@
 	cp $< $(DSTEXE)$@
-	cp $< $(ASXBIN)$@
 
 
 ASXX =	asdata.o asexpr.o aslex.o aslist.o	\

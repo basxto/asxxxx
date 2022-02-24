@@ -1,7 +1,7 @@
 /* r65adr.c */
 
 /*
- * (C) Copyright 1995-1999
+ * (C) Copyright 1995-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin

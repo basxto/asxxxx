@@ -1,7 +1,7 @@
 /* lkeval.c */
 
 /*
- * (C) Copyright 1989-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,7 +11,13 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#ifdef WIN32
+#include <stdlib.h>
+#else
 #include <alloc.h>
+#endif
+
 #include "aslink.h"
 
 /*)Module	lkeval.c
@@ -265,7 +271,7 @@ term()
 		return(v);
 	}
 	if (c == '-') {
-		return(-expr(100));
+		return(~expr(100)+1);
 	}
 	if (c == '~') {
 		return(~expr(100));

@@ -1,7 +1,7 @@
 /* asxcnv.c */
 
 /*
- * (C) Copyright 1989-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,12 +13,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <setjmp.h>
+
+#ifdef WIN32
+#include <stdlib.h>
+#else
 #include <alloc.h>
+#endif
+
 #include "asxxxx.h"
 
 
 static int inpfil;		/* Input File Counter	*/
-static int xflag;		/* Radix Flag		*/
+static int radix;		/* Radix Flag		*/
 static int aserr;		/* Error Counter	*/
 
 static FILE *nfp;		/* Input File Handle	*/
@@ -32,22 +38,38 @@ static char scline[256];	/* Input text line	*/
  *	ASCII character
  */
 char	ctype[128] = {
-/*NUL*/	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,
-/*BS*/	ILL,	SPACE,	ILL,	ILL,	SPACE,	ILL,	ILL,	ILL,
-/*DLE*/	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,
-/*CAN*/	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,
-/*SPC*/	SPACE,	ETC,	ETC,	ETC,	LETTER,	BINOP,	BINOP,	ETC,
-/*(*/	ETC,	ETC,	BINOP,	BINOP,	ETC,	BINOP,	LETTER,	BINOP,
-/*0*/	DGT2,	DGT2,	DGT8,	DGT8,	DGT8,	DGT8,	DGT8,	DGT8,
-/*8*/	DGT10,	DGT10,	ETC,	ETC,	BINOP,	ETC,	BINOP,	ETC,
-/*@*/	ETC,	LTR16,	LTR16,	LTR16,	LTR16,	LTR16,	LTR16,	LETTER,
-/*H*/	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,
-/*P*/	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,
-/*X*/	LETTER,	LETTER,	LETTER,	ETC,	ETC,	ETC,	BINOP,	LETTER,
-/*`*/	ETC,	LTR16,	LTR16,	LTR16,	LTR16,	LTR16,	LTR16,	LETTER,
-/*h*/	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,
-/*p*/	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,	LETTER,
-/*x*/	LETTER,	LETTER,	LETTER,	ETC,	BINOP,	ETC,	ETC,	ETC
+/*NUL*/		ILL,		ILL,		ILL,		ILL,
+/*EOT*/		ILL,		ILL,		ILL,		ILL,
+/*BS*/		ILL,		SPACE,		ILL,		ILL,
+/*FF*/		SPACE,		ILL,		ILL,		ILL,
+/*DLE*/		ILL,		ILL,		ILL,		ILL,
+/*DC4*/		ILL,		ILL,		ILL,		ILL,
+/*CAN*/		ILL,		ILL,		ILL,		ILL,
+/*FS*/		ILL,		ILL,		ILL,		ILL,
+/*SPC*/		SPACE,		ETC,		ETC,		ETC,
+/*$*/		LETTER,		BINOP,		BINOP,		ETC,
+/*(*/		ETC,		ETC,		BINOP,		BINOP,
+/*,*/		ETC,		BINOP,		LETTER,		BINOP,
+/*0*/		DGT2,		DGT2,		DGT8,		DGT8,
+/*4*/		DGT8,		DGT8,		DGT8,		DGT8,
+/*8*/		DGT10,		DGT10,		ETC,		ETC,
+/*<*/		BINOP,		ETC,		BINOP,		ETC,
+/*@*/		ETC,		LTR16,		LTR16,		LTR16,
+/*D*/		LTR16,		LTR16,		LTR16,		LETTER,
+/*H*/		LETTER,		LETTER,		LETTER,		LETTER,
+/*L*/		LETTER,		LETTER,		LETTER,		LETTER,
+/*P*/		LETTER,		LETTER,		LETTER,		LETTER,
+/*T*/		LETTER,		LETTER,		LETTER,		LETTER,
+/*X*/		LETTER,		LETTER,		LETTER,		ETC,
+/*\*/		ETC,		ETC,		BINOP,		LETTER,
+/*`*/		ETC,		LTR16,		LTR16,		LTR16,
+/*d*/		LTR16,		LTR16,		LTR16,		LETTER,
+/*h*/		LETTER,		LETTER,		LETTER,		LETTER,
+/*l*/		LETTER,		LETTER,		LETTER,		LETTER,
+/*p*/		LETTER,		LETTER,		LETTER,		LETTER,
+/*t*/		LETTER,		LETTER,		LETTER,		LETTER,
+/*x*/		LETTER,		LETTER,		LETTER,		ETC,
+/*|*/		BINOP,		ETC,		ETC,		ETC
 };
 
 /*
@@ -55,22 +77,38 @@ char	ctype[128] = {
  *	perform the case translation function
  */
 char	ccase[128] = {
-/*NUL*/	'\000',	'\001',	'\002',	'\003',	'\004',	'\005',	'\006',	'\007',
-/*BS*/	'\010',	'\011',	'\012',	'\013',	'\014',	'\015',	'\016',	'\017',
-/*DLE*/	'\020',	'\021',	'\022',	'\023',	'\024',	'\025',	'\026',	'\027',
-/*CAN*/	'\030',	'\031',	'\032',	'\033',	'\034',	'\035',	'\036',	'\037',
-/*SPC*/	'\040',	'\041',	'\042',	'\043',	'\044',	'\045',	'\046',	'\047',
-/*(*/	'\050',	'\051',	'\052',	'\053',	'\054',	'\055',	'\056',	'\057',
-/*0*/	'\060',	'\061',	'\062',	'\063',	'\064',	'\065',	'\066',	'\067',
-/*8*/	'\070',	'\071',	'\072',	'\073',	'\074',	'\075',	'\076',	'\077',
-/*@*/	'\100',	'\141',	'\142',	'\143',	'\144',	'\145',	'\146',	'\147',
-/*H*/	'\150',	'\151',	'\152',	'\153',	'\154',	'\155',	'\156',	'\157',
-/*P*/	'\160',	'\161',	'\162',	'\163',	'\164',	'\165',	'\166',	'\167',
-/*X*/	'\170',	'\171',	'\172',	'\133',	'\134',	'\135',	'\136',	'\137',
-/*`*/	'\140',	'\141',	'\142',	'\143',	'\144',	'\145',	'\146',	'\147',
-/*h*/	'\150',	'\151',	'\152',	'\153',	'\154',	'\155',	'\156',	'\157',
-/*p*/	'\160',	'\161',	'\162',	'\163',	'\164',	'\165',	'\166',	'\167',
-/*x*/	'\170',	'\171',	'\172',	'\173',	'\174',	'\175',	'\176',	'\177'
+/*NUL*/		'\000',		'\001',		'\002',		'\003',
+/*EOT*/		'\004',		'\005',		'\006',		'\007',
+/*BS*/		'\010',		'\011',		'\012',		'\013',
+/*FF*/		'\014',		'\015',		'\016',		'\017',
+/*DLE*/		'\020',		'\021',		'\022',		'\023',
+/*DC4*/		'\024',		'\025',		'\026',		'\027',
+/*CAN*/		'\030',		'\031',		'\032',		'\033',
+/*FS*/		'\034',		'\035',		'\036',		'\037',
+/*SPC*/		'\040',		'\041',		'\042',		'\043',
+/*$*/		'\044',		'\045',		'\046',		'\047',
+/*(*/		'\050',		'\051',		'\052',		'\053',
+/*,*/		'\054',		'\055',		'\056',		'\057',
+/*0*/		'\060',		'\061',		'\062',		'\063',
+/*4*/		'\064',		'\065',		'\066',		'\067',
+/*8*/		'\070',		'\071',		'\072',		'\073',
+/*<*/		'\074',		'\075',		'\076',		'\077',
+/*@*/		'\100',		'\141',		'\142',		'\143',
+/*D*/		'\144',		'\145',		'\146',		'\147',
+/*H*/		'\150',		'\151',		'\152',		'\153',
+/*L*/		'\154',		'\155',		'\156',		'\157',
+/*P*/		'\160',		'\161',		'\162',		'\163',
+/*T*/		'\164',		'\165',		'\166',		'\167',
+/*X*/		'\170',		'\171',		'\172',		'\133',
+/*\*/		'\134',		'\135',		'\136',		'\137',
+/*`*/		'\140',		'\141',		'\142',		'\143',
+/*d*/		'\144',		'\145',		'\146',		'\147',
+/*h*/		'\150',		'\151',		'\152',		'\153',
+/*l*/		'\154',		'\155',		'\156',		'\157',
+/*p*/		'\160',		'\161',		'\162',		'\163',
+/*t*/		'\164',		'\165',		'\166',		'\167',
+/*x*/		'\170',		'\171',		'\172',		'\173',
+/*|*/		'\174',		'\175',		'\176',		'\177'
 };
 
 
@@ -94,12 +132,14 @@ int argc;
 char *argv[];
 {
 	register char *p, *q, *r, *s;
-	int c, i, j, l, m, n, pos, rdx;
+	int c, i, j, l, m, n;
+	int ldgt, pos, rdx;
+	unsigned int lcon;
 
 	/*
 	 * Set Defaults
 	 */
-	xflag = 0;
+	radix = 16;
 	inpfil = 0;
 	aserr = 0;
 
@@ -114,17 +154,17 @@ char *argv[];
 
 				case 'x':
 				case 'X':
-					xflag = 0;
-					break;
-
-				case 'q':
-				case 'Q':
-					xflag = 1;
+					radix = 16;
 					break;
 
 				case 'd':
 				case 'D':
-					xflag = 2;
+					radix = 10;
+					break;
+
+				case 'q':
+				case 'Q':
+					radix = 8;
 					break;
 
 				default:
@@ -150,7 +190,11 @@ char *argv[];
 	if (inpfil == 0)
 		usage(ER_WARNING);
 
-	printf("\r\nASxxxx Assembler Listing Converter %s\r\n\r\n", VERSION);
+	/* ldgt	Last Data Digit in Line		*/
+	/* lcon	Line Continuation Length	*/
+
+	ldgt = 25;
+	lcon = 32;
 
 	/*
 	 * Convert listing file to a source file
@@ -161,38 +205,40 @@ loop:
 		scline[strlen(scline)-1] = '\0';
 		p = scline;
 
-/*
- * A typical listing line with program counter
- * and data bytes for HEX, OCTAL, and DECIMAL.
- *
-          11111111112222222222333333333344444444445555555555666666666677777777
-012345678901234567890123456789012345678901234567890123456789012345678901234567
-   xxxx xx xx xx xx xx xx Line# 	mne	arg
-   xxxxxx xxx xxx xxx xxx Line# 	mne	arg
-    xxxxx xxx xxx xxx xxx Line# 	mne	arg
-*/
-		if (xflag == 0) {
+		/* The Output Format
+		| Tabs- |       |       |       |       |       |
+		          11111111112222222222333333333344444-----
+		012345678901234567890123456789012345678901234-----
+		   |    |               |     | |
+		ee XXXX xx xx xx xx xx xx LLLLL *************	HEX(16)
+		ee 000000 ooo ooo ooo ooo LLLLL *************	OCTAL(16)
+		ee  DDDDD ddd ddd ddd ddd LLLLL *************	DECIMAL(16)
+		                     XXXX
+				   OOOOOO
+				    DDDDD
+		*/
+
+		/* p	Starting position of program counter	*/
+		/* n	Number of digits in program ccounter	*/
+		/* l	Number of digits in byte data		*/
+		/* m	Number of bytes per line		*/
+
+		switch(radix) {
+		default:
+		case 16:
 			rdx = RAD16;
-			p += 3;	/* Starting position of program counter */
-			n = 4;	/* Number of digits in program ccounter */
-			l = 2;	/* Number of digits in byte data */
-			m = 6;	/* Number of bytes per line */
-		} else
-		if (xflag == 1) {
-			rdx = RAD8;
-			p += 3;
-			n = 6;
-			l = 3;
-			m = 4;
-		} else
-		if (xflag == 2) {
+			p += 3; n = 4; l = 2; m = 6;
+			break;
+
+		case 8:
 			rdx = RAD10;
-			p += 4;
-			n = 5;
-			l = 3;
-			m = 4;
-		} else {
-			goto loop;
+			p += 3; n = 6; l = 3; m = 4;
+			break;
+
+		case 10:
+			rdx = RAD10;
+			p += 4; n = 5; l = 3; m = 4;
+			break;
 		}
 
 		/*
@@ -231,7 +277,7 @@ loop:
 		r = p+1;
 		for (j=0; j<l; j++,r++) {
 			if ((ctype[*r & 0x007F] & rdx) != rdx) {
-				linout(scline);
+				linout(scline, lcon);
 				goto loop;
 			}
 		}
@@ -240,21 +286,21 @@ loop:
 		 * Scan for the last data digit.
 		 */
 		s = q = scline;
-		for (i=0; *s && i<25; i++) {
+		for (i=0; *s && i<ldgt; i++) {
 			if ((ctype[*s++ & 0x007F] & rdx) == rdx)
 				q = s;
 		}
 
-		if (strlen(scline) <= 31) {
+		if (strlen(scline) <= lcon) {
 			/*
 			 * Line must be data continuation
 			 */
-			linout(scline);
+			goto loop;
 		} else {
 			/*
 			 * Real source line
 			 */
-			s = scline+32;
+			s = scline + lcon;
 			/*
 			 * Remove any comment in line
 			 */
@@ -279,10 +325,10 @@ loop:
 				s++;
 			}
 			/*
-			 * Extend line to at least 40 characters
+			 * Extend line to at least 32 characters
 			 * before appending data.
 			 */
-			while (pos < 40) {
+			while (pos < 32) {
 				strcat(scline,"\t");
 				pos += 8;
 				pos = 8 * (pos/8);
@@ -294,7 +340,7 @@ loop:
 			 */
 			strcat(scline,";");
 			strncat(scline,p,q-p);
-			linout(scline);
+			linout(scline, lcon);
 		}
 	}
 	asexit(aserr ? ER_ERROR : ER_NONE);
@@ -332,9 +378,10 @@ int i;
 	exit(i);
 }
 
-/*)Function	VOID	lineout(str)
+/*)Function	VOID	lineout(str, n)
  *
  *		char *	str		pointer to string
+ *		int	n		minimun line length
  *
  *	The function lineout() outputs to a.out the string str
  *	if the line is longer than 32 characters.
@@ -354,11 +401,12 @@ int i;
  */
 
 VOID
-linout(str)
+linout(str, n)
 char * str;
+unsigned int n;
 {
-	if (strlen(str) >= 32) {
-		fprintf(dfp, "%s\n", str+32);
+	if (strlen(str) > n) {
+		fprintf(dfp, "%s\n", str + n);
 	}
 }
 

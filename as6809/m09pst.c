@@ -1,7 +1,7 @@
 /* M09PST:C */
 
 /*
- * (C) Copyright 1989-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -254,6 +254,8 @@ struct	mne	mne[] = {
     {	NULL,	"bsr",		S_BRA,		S_END,	0x8D	}
 };
 
+#ifdef	decus
+
 struct opdata mc6800[] = {
 
     {{	0x34, 0x04,	/*	pshs	b	;aba	*/
@@ -328,3 +330,82 @@ struct opdata mc6800[] = {
     {{	0x3c, 0xff,	/*	cwai	#0xFF	;wai	*/
 	0x00, 0x00	}}
 };
+
+#else
+
+struct opdata mc6800[] = {
+
+    {{	(char) 0x34, (char) 0x04,	/*	pshs	b	;aba	*/
+	(char) 0xab, (char) 0xe0	/*	adda	,s+	*/	}},
+
+    {{	(char) 0x34, (char) 0x04,	/*	pshs	b	;cba	*/
+	(char) 0xa1, (char) 0xe0	/*	cmpa	,s+	*/	}},
+
+    {{	(char) 0x1c, (char) 0xfe,	/*	andcc	#0xFE	;clc	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x1c, (char) 0xef,	/*	andcc	#0xEF	;cli	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x1c, (char) 0xfd,	/*	andcc	#0xFD	;clv	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x32, (char) 0x7f,	/*	leas	-1,s	;des	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x30, (char) 0x1f,	/*	leax	-1,x	;dex	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x32, (char) 0x61,	/*	leas	1,s	;ins	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x30, (char) 0x01,	/*	leax	1,x	;inx	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x34, (char) 0x02,	/*	pshs	a	;psha	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x34, (char) 0x04,	/*	pshs	b	;pshb	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x35, (char) 0x02,	/*	puls	a	;pula	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x35, (char) 0x04,	/*	puls	b	;pulb	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x34, (char) 0x04,	/*	pshs	b	;sba	*/
+	(char) 0xa0, (char) 0xe0	/*	suba	,s+	*/	}},
+
+    {{	(char) 0x1a, (char) 0x01,	/*	orcc	#0x01	;sec	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x1a, (char) 0x10,	/*	orcc	#0x10	;sei	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x1a, (char) 0x02,	/*	orcc	#0x02	;sev	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x1f, (char) 0x89,	/*	tfr	a,b	;tab	*/
+	(char) 0x4d, (char) 0x00	/*	tsta	*/	}},
+
+    {{	(char) 0x1f, (char) 0x8a,	/*	tfr	a,cc	;tap	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x1f, (char) 0x98,	/*	tfr	b,a	;tba	*/
+	(char) 0x5d, (char) 0x00	/*	tstb	*/	}},
+
+    {{	(char) 0x1f, (char) 0xa8,	/*	tfr	cc,a	;tpa	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x1f, (char) 0x41,	/*	tfr	s,x	;tsx	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x1f, (char) 0x14,	/*	tfr	x,s	;txs	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x3c, (char) 0xff,	/*	cwai	#0xFF	;wai	*/
+	(char) 0x00, (char) 0x00	}}
+};
+
+#endif

@@ -1,7 +1,7 @@
 /* h8mch.c */
 
 /*
- * (C) Copyright 1994-1999
+ * (C) Copyright 1994-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -784,7 +784,7 @@ int
 abstype(esp)
 register struct expr *esp;
 {
-	int espv;
+	addr_t espv;
 	struct area *espa;
 
 	espv = esp->e_addr;

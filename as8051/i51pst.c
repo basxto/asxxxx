@@ -1,7 +1,7 @@
 /* i51pst.c */
 
 /*
- * (C) Copyright 1998-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin

@@ -1,7 +1,7 @@
 /* asexpr.c */
 
 /*
- * (C) Copyright 1989-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,7 +12,13 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+
+#ifdef WIN32
+#include <stdlib.h>
+#else
 #include <alloc.h>
+#endif
+
 #include "asxxxx.h"
 
 /*)Module	asexpr.c
@@ -335,7 +341,7 @@ register struct expr *esp;
 	if (c == '-') {
 		expr(esp, 100);
 		abscheck(esp);
-		esp->e_addr = -esp->e_addr;
+		esp->e_addr = ~esp->e_addr + 1;
 		return;
 	}
 	if (c == '~') {

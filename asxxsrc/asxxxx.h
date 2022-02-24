@@ -1,7 +1,7 @@
 /* asxxxx.h */
 
 /*
- * (C) Copyright 1989-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,7 +14,7 @@
  *
  */
 
-#define	VERSION	"V02.22"
+#define	VERSION	"V02.30"
 
 /*)Module	asxxxx.h
  *
@@ -487,16 +487,16 @@ extern	char	ccase[128];	/*	an array of characters which
 /*
  * Definitions for Character Types
  */
-#define	SPACE	0000
-#define ETC	0000
-#define	LETTER	0001
-#define	DIGIT	0002
-#define	BINOP	0004
-#define	RAD2	0010
-#define	RAD8	0020
-#define	RAD10	0040
-#define	RAD16	0100
-#define	ILL	0200
+#define	SPACE	'\000'
+#define ETC	'\000'
+#define	LETTER	'\001'
+#define	DIGIT	'\002'
+#define	BINOP	'\004'
+#define	RAD2	'\010'
+#define	RAD8	'\020'
+#define	RAD10	'\040'
+#define	RAD16	'\100'
+#define	ILL	'\200'
 
 #define	DGT2	DIGIT|RAD16|RAD10|RAD8|RAD2
 #define	DGT8	DIGIT|RAD16|RAD10|RAD8
@@ -658,7 +658,7 @@ extern	int		main(int argc, char *argv[]);
 extern	char *		usetxt[];
 extern	VOID		usage(int n);
 */
-extern	VOID		linout(char *str);
+extern	VOID		linout(char *str, unsigned int n);
 
 /* asxscn.c */
 
@@ -668,6 +668,8 @@ extern	int		main(int argc, char *argv[]);
 extern	char *		usetxt[];
 extern	VOID		usage(int n);
 */
+
+extern	int		dgt(int rdx, char *str, int n);
 
 #else
 
@@ -784,6 +786,8 @@ extern	int		main();
 extern	char *		usetxt[];
 extern	VOID		usage();
 */
+
+extern	int		dgt();
 
 #endif
 

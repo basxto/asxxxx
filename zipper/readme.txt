@@ -1,12 +1,13 @@
-ASxxxx and ASlink V2.20 July 1999
+ASxxxx and ASlink V2.30 April 2000
 
-ASV2P2.ZIP	ASxxxx and ASlink V2.20 Zipped
+ASV2P3.ZIP	ASxxxx and ASlink V2.30 Zipped
 
 	MS-DOS:
-	DJGPP:		pkunzip -d asv2p2.zip
+	VC6:
+	DJGPP:		pkunzip -d asv2p3.zip
 			unzips and restores directory structure
 
-	Linux:		unzip -L -a asv2p2.zip
+	Linux:		unzip -L -a asv2p3.zip
 			unzips to lower-case names and converts ascii
 			files to \n from \r\n form.
 
@@ -14,6 +15,8 @@ ASV2P2.ZIP	ASxxxx and ASlink V2.20 Zipped
 Exectutables are in directories:
 
 	MS-DOS:		\asxxxx\asxmak\symantec\exe\
+
+	VC6:		\asxxxx\asxmak\vc6\exe\
 
 	Linux:		/asxxxx/asxmak/linux/exe/
 
@@ -25,6 +28,8 @@ Exectutables are in directories:
 Makefiles or Build command files are in directories:
 
 	MS-DOS:		\asxxxx\asxmak\symantec\build\
+
+	VC6:		\asxxxx\asxmak\vc6\build\
 
 	Linux:		/asxxxx/asxmak/linux/build/
 

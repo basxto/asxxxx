@@ -1,7 +1,7 @@
 /* m16adr.c */
 
 /*
- * (C) Copyright 1991-1999
+ * (C) Copyright 1991-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin

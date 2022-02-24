@@ -1,7 +1,7 @@
 /* lks19.c */
 
 /*
- * (C) Copyright 1989-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,7 +16,13 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#ifdef WIN32
+#include <stdlib.h>
+#else
 #include <alloc.h>
+#endif
+
 #include "aslink.h"
 
 /*)Module	lks19.c
@@ -124,6 +130,9 @@ s19(i)
 int i;
 {
 	register addr_t j;
+	register int k;
+
+	if (i && obj_flag) { return; }
 
 	if (i) {
 		if (hilo == 0) {
@@ -139,13 +148,11 @@ int i;
 			sflush();
 			rtadr0 = rtadr1 = rtadr2;
 		}
-		if (obj_flag == 0) {
-			for (j=2; j<rtcnt; j++) {
-				if (rtflg[j]) {
-					rtbuf[rtadr1++ - rtadr0] = rtval[j];
-					if (rtadr1 - rtadr0 == MAXBYTES) {
-						sflush();
-					}
+		for (k=2; k<rtcnt; k++) {
+			if (rtflg[k]) {
+				rtbuf[rtadr1++ - rtadr0] = rtval[k];
+				if (rtadr1 - rtadr0 == MAXBYTES) {
+					sflush();
 				}
 			}
 		}
@@ -220,6 +227,6 @@ sflush()
 	/*
 	 * 1's complement
 	 */
-	fprintf(ofp, "%02X\n", (-chksum-1) & 0x00ff);
+	fprintf(ofp, "%02X\n", (~chksum) & 0x00ff);
 	rtadr0 = rtadr1;
 }

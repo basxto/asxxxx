@@ -1,7 +1,7 @@
 /* i51adr.c */
 
 /*
- * (C) Copyright 1998-1999
+ * (C) Copyright 1998-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin

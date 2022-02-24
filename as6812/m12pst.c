@@ -1,7 +1,7 @@
 /* m12pst.c */
 
 /*
- * (C) Copyright 1989-1999
+ * (C) Copyright 1989-2000
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -433,6 +433,8 @@ struct	mne	mne[] = {
     {	NULL,	"psh",		S_PSH,		S_END,	0x30	},
 };
 
+#ifdef	decus
+
 struct opdata mc6811[] = {
 
     {{	0x1A, 0xE5,	/*	leax	b,x	;abx	*/
@@ -489,3 +491,64 @@ struct opdata mc6811[] = {
     {{	0xB7, 0xC6,	/*	exg	d,y	;xgdy	*/
 	0x00, 0x00	}}
 };
+
+#else
+
+struct opdata mc6811[] = {
+
+    {{	(char) 0x1A, (char) 0xE5,	/*	leax	b,x	;abx	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x19, (char) 0xED,	/*	leay	b,y	;aby	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x10, (char) 0xFE,	/*	andcc	#0xFE	;clc	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x10, (char) 0xEF,	/*	andcc	#0xEF	;cli	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x10, (char) 0xFD,	/*	andcc	#0xFD	;clv	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x1B, (char) 0x9F,	/*	leas	-1,s	;des	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x1B, (char) 0x81,	/*	leas	1,s	;ins	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x14, (char) 0x01,	/*	orcc	#0x01	;sec	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x14, (char) 0x10,	/*	orcc	#0x10	;sei	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0x14, (char) 0x02,	/*	orcc	#0x02	;sev	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0xB7, (char) 0x02,	/*	tfr	a,cc	;tap	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0xB7, (char) 0x20,	/*	tfr	cc,a	;tpa	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0xB7, (char) 0x75,	/*	tfr	s,x	;tsx	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0xB7, (char) 0x76,	/*	tfr	s,y	;tsy	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0xB7, (char) 0x57,	/*	tfr	x,s	;txs	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0xB7, (char) 0x67,	/*	tfr	y,s	;tys	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0xB7, (char) 0xC5,	/*	exg	d,x	;xgdx	*/
+	(char) 0x00, (char) 0x00	}},
+
+    {{	(char) 0xB7, (char) 0xC6,	/*	exg	d,y	;xgdy	*/
+	(char) 0x00, (char) 0x00	}}
+};
+
+#endif
