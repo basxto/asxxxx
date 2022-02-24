@@ -1,7 +1,7 @@
 /* lkmain.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,19 +14,129 @@
 #include <alloc.h>
 #include "aslink.h"
 
+/*)Module	lkmain.c
+ *
+ *	The module lkmain.c contains the functions which
+ *	(1) input the linker options, parameters, and specifications
+ *	(2) perform a two pass link
+ *	(3) produce the appropriate linked data output and/or
+ *	    link map file and/or relocated listing files.
+ *
+ *	lkmain.c contains the following functions:
+ *		FILE *	afile(fn,ft,wf)
+ *		VOID	bassav()
+ *		VOID	gblsav()
+  *		VOID	link()
+ *		VOID	lkexit()
+ *		VOID	main(argc,argv)
+ *		VOID	map()
+ *		int	parse()
+ *		VOID	setbas()
+ *		VOID	setgbl()
+ *		VOID	usage()
+ *
+ *	lkmain.c contains the following local variables:
+ *		char *	usetext[]	array of pointers to the
+ *					command option tect lines
+ *
+ */
+
+/*)Function	VOID	main(argc,argv)
+ *
+ *		int	argc		number of command line arguments + 1
+ *		char *	argv[]		array of pointers to the command line
+ *					arguments
+ *
+ *	The function main() evaluates the command line arguments to
+ *	determine if the linker parameters are to input through 'stdin'
+ *	or read from a command file.  The functiond getline() and parse()
+ *	are to input and evaluate the linker parameters.  The linking process
+ *	proceeds by making the first pass through each .rel file in the order
+ *	presented to the linker.  At the end of the first pass the setbase(),
+ *	lnkarea(), setgbl(), and symdef() functions are called to evaluate
+ *	the base address terms, link all areas, define global variables,
+ *	and look for undefined symbols.  Following these routines a linker
+ *	map file may be produced and the linker output files may be opened.
+ *	The second pass through the .rel files will output the linked data
+ *	in one of the four supported formats.
+ *
+ *	local variables:
+ *		char *	p		pointer to an argument string
+ *		int	c		character from argument string
+ *		int	i		loop counter
+ *
+ *	global variables:
+ *				 	text line in ib[]
+ *		lfile	*cfp		The pointer *cfp points to the
+ *				 	current lfile structure
+ *		char	ctype[]		array of character types, one per
+ *				 	ASCII character
+ *		lfile	*filep	 	The pointer *filep points to the
+ *				 	beginning of a linked list of
+ *				 	lfile structures.
+ *		head	*hp		Pointer to the current
+ *				 	head structure
+ *		char	ib[NINPUT]	.rel file text line
+ *		char	*ip		pointer into the .rel file
+ *		lfile	*linkp		pointer to first lfile structure
+ *				 	containing an input .rel file
+ *				 	specification
+ *		int	lkerr		error flag
+ *		int	mflag		Map output flag
+ *		int	oflag		Output file type flag
+ *		FILE	*ofp		Output file handle
+ *				 	for word formats
+ *		FILE	*ofph		Output file handle
+ *				 	for high byte format
+ *		FILE	*ofpl		Output file handle
+ *				 	for low byte format
+ *		int	pass		linker pass number
+ *		int	pflag		print linker command file flag
+ *		int	radix		current number conversion radix
+ *		FILE	*sfp		The file handle sfp points to the
+ *				 	currently open file
+ *		lfile	*startp		asmlnk startup file structure
+ *		FILE *	stdin		c_library
+ *		FILE *	stdout		c_library
+ *
+ *	functions called:
+ *		FILE *	afile()		lkmain.c
+ *		int	fclose()	c_library
+ *		int	fprintf()	c_library
+ *		int	getline()	lklex.c
+ *		VOID	library()	lklibr.c
+ *		VOID	link()		lkmain.c
+ *		VOID	lkexit()	lkmain.c
+ *		VOID	lnkarea()	lkarea.c
+ *		VOID	map()		lkmain.c
+ *		VOID	new()		lksym.c
+ *		int	parse()		lkmain.c
+ *		VOID	reloc()		lkreloc.c
+ *		VOID	search()	lklibr.c
+ *		VOID	setbas()	lkmain.c
+ *		VOID	setgbl()	lkmain.c
+ *		VOID	symdef()	lksym.c
+ *		VOID	usage()		lkmain.c
+ *
+ *	side effects:
+ *		Completion of main() completes the linking process
+ *		and may produce a map file (.map) and/or a linked
+ *		data files (.ihx or .s19) and/or one or more
+ *		relocated listing files (.rst).
+ */
+
 VOID
 main(argc, argv)
 char *argv[];
 {
 	register char *p;
 	register c, i;
-	FILE *afile();
 
 	fprintf(stdout, "\n");
 
-	pflag = 1;
 	startp = (struct lfile *) new (sizeof (struct lfile));
 
+	pflag = 1;
 	for (i=1; i<argc; ++i) {
 		p = argv[i];
 		if (*p == '-') {
@@ -98,6 +208,10 @@ char *argv[];
 		}
 		if (pass == 0) {
 			/*
+			 * Search libraries for global symbols
+			 */
+			search();
+			/*
 			 * Set area base addresses.
 			 */
 			setbas();
@@ -121,15 +235,96 @@ char *argv[];
 			/*
 			 * Open output file
 			 */
-			if (oflag == 1)
+			if (oflag == 1) {
 				ofp = afile(linkp->f_idp, "IHX", 1);
-			if (oflag == 2)
+				if (ofp == NULL) {
+					lkexit(1);
+				}
+			} else
+			if (oflag == 2) {
 				ofp = afile(linkp->f_idp, "S19", 1);
+				if (ofp == NULL) {
+					lkexit(1);
+				}
+			}
 		} else {
+			/*
+			 * Link in library files
+			 */
+			library();
 			reloc('E');
 		}
 	}
+	lkexit(lkerr);
 }
+
+/*)Function	VOID	lkexit(i)
+ *
+ *			int	i	exit code
+ *
+ *	The function lkexit() explicitly closes all open
+ *	files and then terminates the program.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		FILE *	mfp		file handle for .map
+ *		FILE *	ofp		file handle for .ihx/.s19
+ *		FILE *	rfp		file hanlde for .rst
+ *		FILE *	sfp		file handle for .rel
+ *		FILE *	tfp		file handle for .lst
+ *
+ *	functions called:
+ *		int	fclose()	c_library
+ *		VOID	exit()		c_library
+ *
+ *	side effects:
+ *		All files closed. Program terminates.
+ */
+
+VOID
+lkexit(i)
+int i;
+{
+	if (mfp != NULL) fclose(mfp);
+	if (ofp != NULL) fclose(ofp);
+	if (rfp != NULL) fclose(rfp);
+	if (sfp != NULL) fclose(sfp);
+	if (tfp != NULL) fclose(tfp);
+	exit(i);
+}
+
+/*)Function	link()
+ *
+ *	The function link() evaluates the directives for each line of
+ *	text read from the .rel file(s).  The valid directives processed
+ *	are:
+ *		X, D, Q, H, M, A, S, T, R, and P.
+ *
+ *	local variables:
+ *		int	c		first non blank character of a line
+ *
+ *	global variables:
+ *		head	*headp		The pointer to the first
+ *				 	head structure of a linked list
+ *		head	*hp		Pointer to the current
+ *				 	head structure
+ *		int	pass		linker pass number
+ *		int	radix		current number conversion radix
+ *
+ *	functions called:
+ *		char	endline()	lklex.c
+ *		VOID	module()	lkhead.c
+ *		VOID	newarea()	lkarea.c
+ *		VOID	newhead()	lkhead.c
+ *		sym *	newsym()	lksym.c
+ *		VOID	reloc()		lkreloc.c
+ *
+ *	side effects:
+ *		Head, area, and symbol structures are created and
+ *		the radix is set as the .rel file(s) are read.
+ */
 
 VOID
 link()
@@ -207,22 +402,81 @@ link()
 	}
 }
 
+/*)Function	VOID	map()
+ *
+ *	The function map() opens the output map file and calls the various
+ *	routines to
+ *	(1) output the variables in each area,
+ *	(2) list the files processed with module names,
+ *	(3) list the libraries file processed,
+ *	(4) list base address definitions,
+ *	(5) list global variable definitions, and
+ *	(6) list any undefined variables.
+ *
+ *	local variables:
+ *		int 	i		counter
+ *		head *	hdp		pointer to head structure
+ *		lbfile *lbfh		pointer to library file structure
+ *
+ *	global variables:
+ *		area	*ap		Pointer to the current
+ *				 	area structure
+ *		area	*areap		The pointer to the first
+ *				 	area structure of a linked list
+ *		base	*basep		The pointer to the first
+ *				 	base structure
+ *		base	*bsp		Pointer to the current
+ *				 	base structure
+ *		lfile	*filep	 	The pointer *filep points to the
+ *				 	beginning of a linked list of
+ *				 	lfile structures.
+ *		globl	*globlp		The pointer to the first
+ *				 	globl structure
+ *		globl	*gsp		Pointer to the current
+ *				 	globl structure
+ *		head	*headp		The pointer to the first
+ *				 	head structure of a linked list
+ *		lbfile	*lbfhead	The pointer to the first
+ *					lbfile structure of a linked list
+ *		lfile	*linkp		pointer to first lfile structure
+ *				 	containing an input REL file
+ *				 	specification
+ *		int	lop		current line number on page
+ *		FILE	*mfp		Map output file handle
+ *		int	page		current page number
+ *
+ *	functions called:
+ *		FILE *	afile()		lkmain.c
+ *		int	fprintf()	c_library
+ *		VOID	lkexit()	lkmain.c
+ *		VOID	lstarea()	lklist.c
+ *		VOID	newpag()	lklist.c
+ *		VOID	symdef()	lksym.c
+ *
+ *	side effects:
+ *		The map file is created.
+ */
+
 VOID
 map()
 {
 	register i;
 	register struct head *hdp;
+	register struct lbfile *lbfh;
 
 	/*
 	 * Open Map File
 	 */
 	mfp = afile(linkp->f_idp, "MAP", 1);
+	if (mfp == NULL) {
+		lkexit(1);
+	}
+
 	/*
 	 * Output Map Area Lists
 	 */
 	page = 0;
 	lop  = NLPP;
-	slew(mfp);
 	ap = areap;
 	while (ap) {
 		lstarea(ap);
@@ -238,7 +492,7 @@ map()
 	while (filep) {
 		fprintf(mfp, "%-16s", filep->f_idp);
 		i = 0;
-		while (hdp->h_lfile == filep) {
+		while ((hdp != NULL) && (hdp->h_lfile == filep)) {
 			if (i % 5) {
 			    fprintf(mfp, ", %8.8s", hdp->m_id);
 			} else {
@@ -255,6 +509,18 @@ map()
 			fprintf(mfp, " ]");
 		fprintf(mfp, "\n");
 		filep = filep->f_flp;
+	}
+	/*
+	 * List Linked Libraries
+	 */
+	if (lbfhead != NULL) {
+		fprintf(mfp,
+	"\nLibraries Linked                    [   object  file   ]\n\n");
+		for (lbfh=lbfhead; lbfh; lbfh=lbfh->next) {
+			fprintf(mfp, "%-32s    [ %16.16s ]\n",
+				lbfh->libspc, lbfh->relfil);
+		}
+		fprintf(mfp, "\n");
 	}
 	/*
 	 * List Base Address Definitions
@@ -284,6 +550,47 @@ map()
 	symdef(mfp);
 }
 
+/*)Function	int	parse()
+ *
+ *	The function parse() evaluates all command line or file input
+ *	linker directives and updates the appropriate variables.
+ *
+ *	local variables:
+ *		int	c		character value
+ *		char	fid[]		file id string
+ *
+ *	global variables:
+ *		char	ctype[]		array of character types, one per
+ *				 	ASCII character
+ *		lfile	*lfp		pointer to current lfile structure
+ *				 	being processed by parse()
+ *		lfile	*linkp		pointer to first lfile structure
+ *				 	containing an input REL file
+ *				 	specification
+ *		int	mflag		Map output flag
+ *		int	oflag		Output file type flag
+ *		int	pflag		print linker command file flag
+ *		FILE *	stderr		c_library
+ *		int	uflag		Relocated listing flag
+ *		int	xflag		Map file radix type flag
+ *
+ *	Functions called:
+ *		VOID	addlib()	lklibr.c
+ *		VOID	addpath()	lklibr.c
+ *		VOID	bassav()	lkmain.c
+ *		int	fprintf()	c_library
+ *		VOID	gblsav()	lkmain.c
+ *		VOID	getfid()	lklex.c
+ *		char	getnb()		lklex.c
+ *		VOID	lkexit()	lkmain.c
+ *		char *	strcpy()	c_library
+ *		int	strlen()	c_library
+ *
+ *	side effects:
+ *		Various linker flags are updated and the linked
+ *		structure lfile is created.
+ */
+
 int
 parse()
 {
@@ -308,6 +615,11 @@ parse()
 				case 'm':
 				case 'M':
 					++mflag;
+					break;
+
+				case 'u':
+				case 'U':
+					uflag = 1;
 					break;
 
 				case 'x':
@@ -349,13 +661,23 @@ parse()
 					gblsav();
 					return(0);
 
+				case 'k':
+				case 'K':
+					addpath();
+					return(0);
+
+				case 'l':
+				case 'L':
+					addlib();
+					return(0);
+
 				default:
 					fprintf(stderr, "Invalid option\n");
-					exit(1);
+					lkexit(1);
 				}
 			}
 		} else
-		if (ctype[c] & (LETTER|DIGIT)) {
+		if (ctype[c] != ILL) {
 			if (linkp == NULL) {
 				linkp = (struct lfile *)
 					new (sizeof (struct lfile));
@@ -369,23 +691,41 @@ parse()
 			lfp->f_idp = (char *) new (strlen(fid)+1);
 			strcpy(lfp->f_idp, fid);
 			lfp->f_type = F_REL;
-		} else
-		if (c == ';') {
-			return(0);
-		} else
-		if (c == ',') {
-			;
 		} else {
 			fprintf(stderr, "Invalid input");
-			exit(1);
+			lkexit(1);
 		}
 	}
 	return(0);
 }
 
-/*
- * Base string save
+/*)Function	VOID	bassav()
+ *
+ *	The function bassav() creates a linked structure containing
+ *	the base address strings input to the linker.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		base	*basep		The pointer to the first
+ *				 	base structure
+ *		base	*bsp		Pointer to the current
+ *				 	base structure
+ *		char	*ip		pointer into the REL file
+ *				 	text line in ib[]
+ *
+ *	 functions called:
+ *		char	getnb()		lklex.c
+ *		VOID *	new()		lksym.c
+ *		int	strlen()	c_library
+ *		char *	strcpy()	c_library
+ *		VOID	unget()		lklex.c
+ *
+ *	side effects:
+ *		The basep structure is created.
  */
+
 VOID
 bassav()
 {
@@ -403,6 +743,40 @@ bassav()
 	strcpy(bsp->b_strp, ip);
 }
 	
+/*)Function	VOID	setbas()
+ *
+ *	The function setbas() scans the base address lines in hte
+ *	basep structure, evaluates the arguments, and sets beginning
+ *	address of the specified areas.
+ *
+ *	local variables:
+ *		int	v		expression value
+ *		char	id[]		base id string
+ *
+ *	global variables:
+ *		area	*ap		Pointer to the current
+ *				 	area structure
+ *		area	*areap		The pointer to the first
+ *				 	area structure of a linked list
+ *		base	*basep		The pointer to the first
+ *				 	base structure
+ *		base	*bsp		Pointer to the current
+ *				 	base structure
+ *		char	*ip		pointer into the REL file
+ *				 	text line in ib[]
+ *		int	lkerr		error flag
+ *
+ *	 functions called:
+ *		addr_t	expr()		lkeval.c
+ *		int	fprintf()	c_library
+ *		VOID	getid()		lklex.c
+ *		char	getnb()		lklex.c
+ *		int	symeq()		lksym.c
+ *
+ *	side effects:
+ *		The base address of an area is set.
+ */
+
 VOID
 setbas()
 {
@@ -422,19 +796,46 @@ setbas()
 			if (ap == NULL) {
 				fprintf(stderr,
 				"No definition of area %s\n", id);
+				lkerr++;
 			} else {
 				ap->a_addr = v;
 			}
 		} else {
 			fprintf(stderr, "No '=' in base expression");
+			lkerr++;
 		}
 		bsp = bsp->b_base;
 	}
 }
 
-/*
- * Global string save
+/*)Function	VOID	gblsav()
+ *
+ *	The function gblsav() creates a linked structure containing
+ *	the global variable strings input to the linker.
+ *
+ *	local variable:
+ *		none
+ *
+ *	global variables:
+ *		globl	*globlp		The pointer to the first
+ *				 	globl structure
+ *		globl	*gsp		Pointer to the current
+ *				 	globl structure
+ *		char	*ip		pointer into the REL file
+ *				 	text line in ib[]
+ *		int	lkerr		error flag
+ *
+ *	functions called:
+ *		char	getnb()		lklex.c
+ *		VOID *	new()		lksym.c
+ *		int	strlen()	c_library
+ *		char *	strcpy()	c_library
+ *		VOID	unget()		lklex.c
+ *
+ *	side effects:
+ *		The globlp structure is created.
  */
+
 VOID
 gblsav()
 {
@@ -452,6 +853,38 @@ gblsav()
 	strcpy(gsp->g_strp, ip);
 }
 	
+/*)Function	VOID	setgbl()
+ *
+ *	The function setgbl() scans the global variable lines in hte
+ *	globlp structure, evaluates the arguments, and sets a variable
+ *	to this value.
+ *
+ *	local variables:
+ *		int	v		expression value
+ *		char	id[]		base id string
+ *		sym *	sp		pointer to a symbol structure
+ *
+ *	global variables:
+ *		char	*ip		pointer into the REL file
+ *				 	text line in ib[]
+ *		globl	*globlp		The pointer to the first
+ *				 	globl structure
+ *		globl	*gsp		Pointer to the current
+ *				 	globl structure
+ *		FILE *	stderr		c_library
+ *		int	lkerr		error flag
+ *
+ *	 functions called:
+ *		addr_t	expr()		lkeval.c
+ *		int	fprintf()	c_library
+ *		VOID	getid()		lklex.c
+ *		char	getnb()		lklex.c
+ *		sym *	lkpsym()	lksym.c
+ *
+ *	side effects:
+ *		The value of a variable is set.
+ */
+
 VOID
 setgbl()
 {
@@ -469,10 +902,12 @@ setgbl()
 			if (sp == NULL) {
 				fprintf(stderr,
 				"No definition of symbol %s\n", id);
+				lkerr++;
 			} else {
 				if (sp->s_flag & S_DEF) {
 					fprintf(stderr,
 					"Redefinition of symbol %s\n", id);
+					lkerr++;
 					sp->s_axp = NULL;
 				}
 				sp->s_addr = v;
@@ -480,10 +915,50 @@ setgbl()
 			}
 		} else {
 			fprintf(stderr, "No '=' in global expression");
+			lkerr++;
 		}
 		gsp = gsp->g_globl;
 	}
 }
+
+/*)Function	FILE *	afile(fn,, ft, wf)
+ *
+ *		char *	fn		file specification string
+ *		char *	ft		file type string
+ *		int	wf		read(0)/write(1) flag
+ *
+ *	The function afile() opens a file for reading or writing.
+ *		(1)	If the file type specification string ft
+ *			is not NULL then a file specification is
+ *			constructed with the file path\name in fn
+ *			and the extension in ft.
+ *		(2)	If the file type specification string ft
+ *			is NULL then the file specification is
+ *			constructed from fn.  If fn does not have
+ *			a file type then the default .rel file
+ *			type is appended to the file specification.
+ *
+ *	afile() returns a file handle for the opened file or aborts
+ *	the assembler on an open error.
+ *
+ *	local variables:
+ *		int	c		character value
+ *		char	fb[]		constructed file specification string
+ *		FILE *	fp		filehandle for opened file
+ *		char *	p1		pointer to filespec string fn
+ *		char *	p2		pointer to filespec string fb
+ *		char *	p3		pointer to filetype string ft
+ *
+ *	global variables:
+ *		int	lkerr		error flag
+ *
+ *	functions called:
+ *		FILE *	fopen()		c_library
+ *		int	fprintf()	c_library
+ *
+ *	side effects:
+ *		File is opened for read or write.
+ */
 
 FILE *
 afile(fn, ft, wf)
@@ -517,7 +992,7 @@ char *ft;
 	*p2++ = 0;
 	if ((fp = fopen(fb, wf?"w":"r")) == NULL) {
 		fprintf(stderr, "%s: cannot %s.\n", fb, wf?"create":"open");
-		exit(1);
+		lkerr++;
 	}
 	return (fp);
 }
@@ -526,9 +1001,12 @@ char *usetxt[] = {
 	"Startup:",
 	"  -c                           Command line input",
 	"  -f   file[LNK]               File input",
-	"Usage: [-Options] file [file ...]",
 	"  -p   Prompt and echo of file[LNK] to stdout (default)",
 	"  -n   No echo of file[LNK] to stdout",
+	"Usage: [-Options] file [file ...]",
+	"Librarys:",
+	"  -k	Library path specification, one per -k",
+	"  -l	Library file specification, one per -l",
 	"Relocation:",
 	"  -b   area base address = expression",
 	"  -g   global symbol = expression",
@@ -540,11 +1018,32 @@ char *usetxt[] = {
 	"Output:",
 	"  -i   Intel Hex as file[IHX]",
 	"  -s   Motorola S19 as file[S19]",
+	"List:",
+	"  -u	Update listing file(s) with link data as file(s)[.RST]",
 	"End:",
 	"  -e   or null line terminates input",
 	"",
 	0
 };
+
+/*)Function	VOID	usage()
+ *
+ *	The function usage() outputs to the stderr device the
+ *	assembler name and version and a list of valid assembler options.
+ *
+ *	local variables:
+ *		char **	dp		pointer to an array of
+ *					text string pointers.
+ *
+ *	global variables:
+ *		FILE *	stderr		c_library
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *
+ *	side effects:
+ *		none
+ */
 
 VOID
 usage()
@@ -554,5 +1053,5 @@ usage()
 	fprintf(stderr, "\nASxxxx Linker %s\n\n", VERSION);
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
-	exit(1);
+	lkexit(1);
 }

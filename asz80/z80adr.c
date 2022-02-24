@@ -1,7 +1,7 @@
 /* z80adr.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -58,8 +58,6 @@ register struct expr *esp;
 			esp->e_mode = S_INDM;
 		}
 		if (indx) {
-			esp->e_flag = 0;
-			esp->e_addr = 0;
 			esp->e_mode = mode + indx&0xFF;
 			esp->e_base.e_ap = NULL;
 		}
@@ -83,7 +81,6 @@ register struct expr *esp;
 			esp->e_mode = S_USER;
 		}
 		if (indx) {
-			esp->e_flag = 0;
 			esp->e_addr = indx&0xFF;
 			esp->e_mode = mode;
 			esp->e_base.e_ap = NULL;

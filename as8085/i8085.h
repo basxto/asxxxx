@@ -1,7 +1,7 @@
 /* i8085.h */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -70,7 +70,7 @@
 	/* machine dependent functions */
 
 	/* 85mch.c */
-extern	VOID		comma();
+extern	int		comma();
 extern	VOID		machin();
 extern	VOID		minit();
 extern	VOID		out3();

@@ -1,7 +1,7 @@
 /* m16adr.c */
 
 /*
- * (C) Copyright 1991
+ * (C) Copyright 1991-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -27,11 +27,6 @@ register struct expr *esp;
 		esp->e_mode = T_IMM;
 	} else
 	if (c == ',') {
-		esp->e_mode = 0;
-		esp->e_flag = 0;
-		esp->e_addr = 0;
-		esp->e_mode = 0;
-		esp->e_base.e_ap = NULL;
 		c = admode(xyz);
 		if (c && T_INDX) {
 			esp->e_mode = c;
@@ -42,11 +37,6 @@ register struct expr *esp;
 		unget(c);
 		if(admode(e) != 0) {
 			comma();
-			esp->e_mode = 0;
-			esp->e_flag = 0;
-			esp->e_addr = 0;
-			esp->e_mode = 0;
-			esp->e_base.e_ap = NULL;
 			c = admode(xyz);
 			if (c && T_INDX) {
 				esp->e_mode = T_E_I | (c & 0x30);

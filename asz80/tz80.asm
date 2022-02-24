@@ -907,16 +907,16 @@ jr5:
 	srl	a,l			; CB 3D
 	;***********************************************************
 	;subtract operand from 'a'
-	sub	a,(hl)			; CB 96
-	sub	a,offset(ix)		; DD CB 55 96
-	sub	a,offset(iy)		; FD CB 55 96
-	sub	a,a			; CB 97
-	sub	a,b			; CB 90
-	sub	a,c			; CB 91
-	sub	a,d			; CB 92
-	sub	a,e			; CB 93
-	sub	a,h			; CB 94
-	sub	a,l			; CB 95
+	sub	a,(hl)			; 96
+	sub	a,offset(ix)		; DD 96 55
+	sub	a,offset(iy)		; FD 96 55
+	sub	a,a			; 97
+	sub	a,b			; 90
+	sub	a,c			; 91
+	sub	a,d			; 92
+	sub	a,e			; 93
+	sub	a,h			; 94
+	sub	a,l			; 95
 	sub	a,#n			; D6 20
 	;***********************************************************
 	;logical 'xor' operand with 'a'

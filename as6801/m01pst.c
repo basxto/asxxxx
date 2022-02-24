@@ -1,7 +1,7 @@
 /* m01pst.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -53,6 +53,7 @@ struct	mne	mne[] = {
 	NULL,	".radix",	S_RADIX,	0,	0,
 	NULL,	".org",		S_ORG,		0,	0,
 	NULL,	".module",	S_MODUL,	0,	0,
+	NULL,	".ascis",	S_ASCIS,	0,	0,
 
 	/* 6303 */
 

@@ -1,7 +1,7 @@
 /* lksym.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,10 +14,45 @@
 #include <alloc.h>
 #include "aslink.h"
 
-/*
- * This routine is called early in the
- * game to set up the symbol hashtable.
+/*)Module	lksym.c
+ *
+ *	The module lksym.c contains the functions that operate
+ *	on the symbol structures.
+ *
+ *	lksym.c contains the following functions:
+ *		int	hash()
+ *		sym *	lkpsym()
+ *		VOID *	new()
+ *		sym *	newsym()
+ *		VOID	symdef()
+ *		int	symeq()
+ *		VOID	syminit()
+ *		VOID	symmod()
+ *		addr_t	symval()
+ *
+ *	lksym.c contains no local/static variables.
  */
+
+/*)Function	VOID	syminit()
+ *
+ *	The function syminit() is called to clear the hashtable.
+ *
+ *	local variables:
+ *		int	h		computed hash value
+ *		sym **	spp		pointer to an array of
+ *					sym structure pointers
+ *
+ *	global variables:
+ *		sym * symhash[]		array of pointers to NHASH
+ *					linked symbol lists
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		(1)	The symbol hash tables are cleared
+ */
+
 VOID
 syminit()
 {
@@ -28,6 +63,53 @@ syminit()
 	while (spp < &symhash[NHASH])
 		*spp++ = NULL;
 }
+
+/*)Function	sym *	newsym()
+ *
+ *	The function newsym() is called to evaluate the symbol
+ *	definition/reference directive from the .rel file(s).
+ *	If the symbol is not found in the symbol table a new
+ *	symbol structure is created.  Evaluation of the
+ *	directive determines if this is a reference or a definition.
+ *	Multiple definitions of the same variable will be flagged
+ *	as an error if the values are not identical.  A symbol
+ *	definition places the symbol value and area extension
+ *	into the symbols data structure.  And finally, a pointer
+ *	to the symbol structure is placed into the head structure
+ *	symbol list.  Refer to the description of the header, symbol,
+ *	area, and areax structures in lkdata.c for structure and
+ *	linkage details.
+ *
+ *	local variables:
+ *		int	c		character from input text
+ *		int	i		evaluation value
+ *		char	id[]		symbol name
+ *		int	nglob		number of symbols in this header
+ *		sym *	tsp		pointer to symbol structure
+ *		sym **	s		list of pointers to symbol structures
+ *
+ *	global variables:
+ *		areax	*axp		Pointer to the current
+ *				 	areax structure
+ *		head	*headp		The pointer to the first
+ *				 	head structure of a linked list
+ *		int	lkerr		error flag
+ *
+ *	functions called:
+ *		addr_t	eval()		lkeval.c
+ *		VOID	exit()		c_library
+ *		int	fprintf()	c_library
+ *		char	get()		lklex.c
+ *		char	getnb()		lklex.c
+ *		sym *	lkpsym()	lksym.c
+ *
+ *	side effects:
+ *		A symbol structure is created and/or modified.
+ *		If structure space allocation fails linker will abort.
+ *		Several severe errors (these are internal errors
+ *		indicating a corrupted .rel file or corrupted
+ *		assembler or linker) will terminated the linker.
+ */
 
 /*
  * Find/Create a global symbol entry.
@@ -52,13 +134,17 @@ newsym()
 	c = getnb();get();get();
 	if (c == 'R') {
 		tsp->s_type |= S_REF;
-		if (eval())
+		if (eval()) {
 			fprintf(stderr, "Non zero S_REF\n");
+			lkerr++;
+		}
 	} else
 	if (c == 'D') {
 		i = eval();
-		if (tsp->s_type & S_DEF && tsp->s_addr != i)
+		if (tsp->s_type & S_DEF && tsp->s_addr != i) {
 			fprintf(stderr, "Multiple definition of %.8s\n", id);
+			lkerr++;
+		}
 		tsp->s_type |= S_DEF;
 		/*
 		 * Set value and area extension link.
@@ -67,14 +153,14 @@ newsym()
 		tsp->s_axp = axp;
 	} else {
 		fprintf(stderr, "Invalid symbol type %c for %.8s\n", c, id);
-		exit(1);
+		lkexit(1);
 	}
 	/*
 	 * Place pointer in header symbol list
 	 */
 	if (headp == NULL) {
 		fprintf(stderr, "No header defined\n");
-		exit(1);
+		lkexit(1);
 	}
 	nglob = hp->h_nglob;
 	s = hp->s_list;
@@ -85,16 +171,40 @@ newsym()
 		}
 	}
 	fprintf(stderr, "Header symbol list overflow\n");
-	exit(1);
+	lkexit(1);
 }
 
-/*
- * Lookup the name `id' in the hashtable.
- * If it is not found either return a
- * `NULL' (`f' is false) or a
- * pointer to a newly created hash table
- * entry (`f' is true).
+/*)Function	sym *	lkpsym(id,f)
+ *
+ *		char *	id		symbol name string
+ *		int	f		f == 0, lookup only
+ *					f != 0, create if not found
+ *
+ *	The function lookup() searches the symbol hash tables for
+ *	a symbol name match returning a pointer to the sym structure.
+ *	If the symbol is not found then a sym structure is created,
+ *	initialized, and linked to the appropriate hash table if f != 0.
+ *	A pointer to this new sym structure is returned or a NULL
+ *	pointer is returned if f == 0.
+ *
+ *	local variables:
+ *		int	h		computed hash value
+ *		sym *	sp		pointer to a sym structure
+ *
+ *	global varaibles:
+ *		sym * symhash[]		array of pointers to NHASH
+ *					linked symbol lists
+ *
+ *	functions called:
+ *		int	hash()		lksym.c
+ *		VOID *	new()		lksym.c
+ *		int	symeq()		lksym.c
+ *
+ *	side effects:
+ *		If the function new() fails to allocate space
+ *		for the new sym structure the linker terminates.
  */
+
 struct sym *
 lkpsym(id, f)
 char *id;
@@ -118,9 +228,27 @@ char *id;
 	return (sp);
 }
 
-/*
- * Get value of relocated symbol
+/*)Function	addr_t	symval(tsp)
+ *
+ *		sym *	tsp		pointer to a symbol structure
+ *
+ *	The function symval() returns the value of the
+ *	relocated symbol by adding the variable definition
+ *	value to the areax base address.
+ *
+ *	local variables:
+ *		addr_t	val		relocated address value
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
  */
+
 addr_t
 symval(tsp)
 register struct sym *tsp;
@@ -134,9 +262,33 @@ register struct sym *tsp;
 	return(val);
 }
 
-/*
- * Check for undefined symbols
+/*)Function	VOID	symdef(fp)
+ *
+ *		FILE *	fp		file handle for output
+ *
+ *	The function symdef() scans the hashed symbol table
+ *	searching for variables referenced but not defined.
+ *	Undefined variables are linked to the default
+ *	area "_CODE" and reported as referenced by the
+ *	appropriate module.
+ *
+ *	local variables:
+ *		int	i		hash table index loop variable
+ *		sym *	sp		pointer to linked symbol structure
+ *
+ *	global variables:
+ *		area	*areap		The pointer to the first
+ *				 	area structure of a linked list
+ *		sym *symhash[NHASH] 	array of pointers to NHASH
+ *				      	linked symbol lists
+ *
+ *	functions called:
+ *		symmod()		lksym.c
+ *
+ *	side effects:
+ *		Undefined variables have their areas set to "_CODE".
  */
+
 VOID
 symdef(fp)
 FILE *fp;
@@ -156,6 +308,36 @@ FILE *fp;
 	}
 }
 
+/*)Function	VOID	symmod(fp,tsp)
+ *
+ *		FILE *	fp		output file handle
+ *		sym *	tsp		pointer to a symbol structure
+ *
+ *	The function symmod() scans the header structures
+ *	searching for a reference to the symbol structure
+ *	pointer to by tsp.  The function then generates an error
+ *	message whichs names the module having referenced the
+ *	undefined variable.
+ *
+ *	local variables:
+ *		int	i		loop counter
+ *		sym **	p		pointer to a list of pointers
+ *					to symbol structures
+ *
+ *	global variables:
+ *		head	*headp		The pointer to the first
+ *				 	head structure of a linked list
+ *		head	*hp		Pointer to the current
+ *				 	head structure
+ *		int	lkerr		error flag
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *
+ *	side effects:
+ *		Error output generated.
+ */
+
 VOID
 symmod(fp, tsp)
 FILE *fp;
@@ -169,8 +351,9 @@ struct sym *tsp;
 		p = hp->s_list;
 		for (i=0; i<hp->h_nglob; ++i) {
 		    if (p[i] == tsp) {
-			fprintf(fp, "\n?ASlink-W-Undefined Global %8.8s ", tsp->s_id);
+			fprintf(fp, "\n?ASlink-Warning-Undefined Global %8.8s ", tsp->s_id);
 			fprintf(fp, "referenced by module %8.8s\n", hp->m_id);
+			lkerr++;
 		    }
 		}
 	    hp = hp->h_hp;
@@ -178,9 +361,29 @@ struct sym *tsp;
 	}
 }
 
-/*
- * Compare two symbol names.
+/*)Function	int	symeq(p1, p2)
+ *
+ *		char *	p1		name string
+ *		char *	p2		name string
+ *
+ *	The function symeq() compares the two name strings for a match.
+ *	The return value is 1 for a match and 0 for no match.
+ *
+ *	local variables:
+ *		int	h		loop counter
+ *
+ *	global variables:
+ *		char	ccase[]		an array of characters which
+ *					perform the case translation function
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
+ *
  */
+
 int
 symeq(p1, p2)
 register char *p1, *p2;
@@ -202,14 +405,29 @@ register char *p1, *p2;
 	return (1);
 }
 
-/*
- * Given a pointer to a symbol name
- * compute and return the hash table
- * bucket.
- * The `sum of all the characters mod
- * table size' algorithm is perhaps
- * not the best.
+/*)Function	int	hash(p)
+ *
+ *		char *	p		pointer to string to hash
+ *
+ *	The function hash() computes a hash code using the sum
+ *	of all characters mod table size algorithm.
+ *
+ *	local variables:
+ *		int	h		accumulated character sum
+ *		int	n		loop counter
+ *
+ *	global variables:
+ *		char	ccase[]		an array of characters which
+ *					perform the case translation function
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
+ *
  */
+ 
 int
 hash(p)
 register char *p;
@@ -230,11 +448,30 @@ register char *p;
 	return (h&HMASK);
 }
 
-/*
- * Allocate and clear a block of space.
- * Leave if there is no space left
- * at all.
+/*)Function	VOID *	new(n)
+ *
+ *		unsigned int	n	allocation size in bytes
+ *
+ *	The function new() allocates n bytes of space and returns
+ *	a pointer to this memory.  If no space is available the
+ *	linker is terminated.
+ *
+ *	local variables:
+ *		char *	p		a general pointer
+ *		char *	q		a general pointer
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *		VOID *	malloc()	c_library
+ *
+ *	side effects:
+ *		Memory is allocated, if allocation fails
+ *		the linker is terminated.
  */
+
 VOID *
 new(n)
 unsigned int n;
@@ -244,7 +481,7 @@ unsigned int n;
 
 	if ((p = (char *) malloc(n)) == NULL) {
 		fprintf(stderr, "Out of space!\n");
-		exit(1);
+		lkexit(1);
 	}
 	for (i=0,q=p; i<n; i++) {
 		*q++ = 0;

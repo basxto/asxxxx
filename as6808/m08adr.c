@@ -1,7 +1,7 @@
 /* m08adr.c */
 
 /*
- * (C) Copyright 1993
+ * (C) Copyright 1993-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -44,9 +44,6 @@ register struct expr *esp;
 			break;
 		}
 		esp->e_mode = c;
-		esp->e_flag = 0;
-		esp->e_addr = 0;
-		esp->e_base.e_ap = NULL;
 	} else if (c == '*') {
 		expr(esp, 0);
 		esp->e_mode = S_DIR;

@@ -1,7 +1,7 @@
 /* M16MCH:C */
 
 /*
- * (C) Copyright 1991
+ * (C) Copyright 1991-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -33,16 +33,15 @@ struct mne *mp;
 	struct area *espa;
 	int c, pc, t1, t2, vn;
 
+	clrexpr(&e1);
+	clrexpr(&e2);
+	clrexpr(&e3);
 	pc = dot.s_addr;
 	cpg = 0;
 	op = mp->m_valu;
 	switch (rf = mp->m_type) {
 
 	case S_SDP:
-		e1.e_mode = 0;
-		e1.e_flag = 0;
-		e1.e_addr = 0;
-		e1.e_base.e_ap = NULL;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -167,9 +166,24 @@ struct mne *mp;
 			outrb(&e2, R_USGN);
 			outrw(&e1, R_NORM);
 			if (mchabs(&e3)) {
+				/*
+				 * pc     = address following instruction - 6
+				 *        = (dot.s_addr + 2) - 6
+				 *
+				 * offset = e3.e_addr - (pc + 6)
+				 *        = e3.e_addr - (((dot.s_addr + 2) - 6) + 6)
+				 *        = e3.e_addr - dot.s_addr - 2 + 6 - 6
+				 *        = e3.e_addr - dot.s_addr - 2
+				 */
 				vn = e3.e_addr - dot.s_addr - 2;
 				outaw(vn);
 			} else {
+				/* R_PCR is calculated relative to the
+				 * PC value after the R_PCR word. This
+				 * accounts for 6 of the 6 byte offset
+				 * required.  Thus no offset adjustment
+				 * is required.
+				 */ 
 				outrw(&e3, R_PCR);
 			}
 		} else
@@ -202,11 +216,27 @@ struct mne *mp;
 				mchubyt(&e1);
 				outrb(&e1, R_USGN);
 				if (mchabs(&e3)) {
-					vn = e3.e_addr - dot.s_addr - 1;
+					/*
+					 * pc     = address following instruction - 4
+					 *        = (dot.s_addr + 1) - 4
+					 *
+					 * offset = e3.e_addr - (pc + 6)
+					 *        = e3.e_addr - (((dot.s_addr + 1) - 4) + 6)
+					 *        = e3.e_addr - dot.s_addr - 1 + 4 - 6
+					 *        = e3.e_addr - dot.s_addr - 3
+					 */
+					vn = e3.e_addr - dot.s_addr - 3;
 					if ((vn < -128) || (vn > 127))
 						aerr();
 					outab(vn);
 				} else {
+					/* R_PCR is calculated relative to the
+					 * PC value after the R_PCR byte. This
+					 * accounts for 4 of the 6 byte offset
+					 * required.  Thus a 2 byte adjustment
+					 * is required.
+					 */ 
+					e3.e_addr -= 2;
 					outrb(&e3, R_PCR);
 				}
 			} else
@@ -216,9 +246,24 @@ struct mne *mp;
 				outrb(&e2, R_USGN);
 				outrw(&e1, R_NORM);
 				if (mchabs(&e3)) {
+					/*
+					 * pc     = address following instruction - 6
+					 *        = (dot.s_addr + 2) - 6
+					 *
+					 * offset = e3.e_addr - (pc + 6)
+					 *        = e3.e_addr - (((dot.s_addr + 2) - 6) + 6)
+					 *        = e3.e_addr - dot.s_addr - 2 + 6 - 6
+					 *        = e3.e_addr - dot.s_addr - 2
+					 */
 					vn = e3.e_addr - dot.s_addr - 2;
 					outaw(vn);
 				} else {
+					/* R_PCR is calculated relative to the
+					 * PC value after the R_PCR word. This
+					 * accounts for 6 of the 6 byte offset
+					 * required.  Thus no offset adjustment
+					 * is required.
+					 */ 
 					outrw(&e3, R_PCR);
 				}
 			}
@@ -533,9 +578,26 @@ struct mne *mp;
 		outab(cpg);
 		outab(op);
 		if (mchabs(&e1)) {
-			vn = e1.e_addr - dot.s_addr - 2;
+			/*
+			 * pc     = address following instruction - 4
+			 *        = (dot.s_addr + 2) - 4
+			 *
+			 * offset = e1.e_addr - (pc + 6)
+			 *        = e1.e_addr - (((dot.s_addr + 2) - 4) + 6)
+			 *        = e1.e_addr - dot.s_addr - 2 + 4 - 6
+			 *        = e1.e_addr - dot.s_addr - 4
+			 */
+			vn = e1.e_addr - dot.s_addr - 4;
 			outaw(vn);
 		} else {
+			/*
+			 * R_PCR is calculated relative to the
+			 * PC value after the R_PCR word. This
+			 * accounts for 4 of the 6 byte offset
+			 * required.  Thus a 2 byte adjustment
+			 * is required.
+			 */ 
+			e1.e_addr -= 2;
 			outrw(&e1, R_PCR);
 		}
 		if (e1.e_mode != S_USER)
@@ -547,11 +609,28 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(op);
 		if (mchabs(&e1)) {
-			vn = e1.e_addr - dot.s_addr - 1;
+			/*
+			 * pc     = address following instruction - 2
+			 *        = (dot.s_addr + 1) - 2
+			 *
+			 * offset = e1.e_addr - (pc + 6)
+			 *        = e1.e_addr - (((dot.s_addr + 1) - 2) + 6)
+			 *        = e1.e_addr - dot.s_addr - 1 + 2 - 6
+			 *        = e1.e_addr - dot.s_addr - 5
+			 */
+			vn = e1.e_addr - dot.s_addr - 5;
 			if ((vn < -128) || (vn > 127))
 				rerr();
 			outab(vn);
 		} else {
+			/*
+			 * R_PCR is calculated relative to the
+			 * PC value after the R_PCR byte. This
+			 * accounts for 2 of the 6 byte offset
+			 * required.  Thus a 4 byte adjustment
+			 * is required.
+			 */ 
+			e1.e_addr -= 4;
 			outrb(&e1, R_PCR);
 		}
 		if (e1.e_mode != S_USER)

@@ -1,7 +1,7 @@
 /* lkeval.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,9 +14,51 @@
 #include <alloc.h>
 #include "aslink.h"
 
-/*
- * Evaluate input term.
+/*)Module	lkeval.c
+ *
+ *	The module lkeval.c contains the routines to evaluate
+ *	arithmetic/numerical expressions.  The functions in
+ *	lkeval.c perform a recursive evaluation of the arithmetic
+ *	expression read from the input text line.
+ *	The expression may include binary/unary operators, brackets,
+ *	symbols, labels, and constants in hexadecimal, decimal, octal
+ *	and binary.  Arithmetic operations are prioritized and
+ *	evaluated by normal arithmetic conventions.
+ *
+ *	lkeval.c contains the following functions:
+ *		int	digit()
+ *		addr_t	eval()
+ *		addr_t	expr()
+ *		int	oprio()
+ *		addr_t	term()
+ *
+ *	lkeval.c contains no local/static variables
  */
+
+/*)Function	addr_t	eval()
+ *
+ *	The function eval() evaluates a character string to a
+ *	numerical value.
+ *
+ *	local variables:
+ *		int	c		character from input string
+ *		int	v		value of character in current radix
+ *		addr_t	n		evaluation value
+ *
+ *	global variables:
+ *		int	radix		current number conversion radix
+ *
+ *	functions called:
+ *		int	digit()		lkeval.c
+ *		char	get()		lklex.c
+ *		char	getnb()		lklex.c
+ *		VOID	unget()		lklex.c
+ *
+ *	side effects:
+ *		Input test is scanned and evaluated to a
+ *		numerical value.
+ */
+
 addr_t
 eval()
 {
@@ -33,11 +75,42 @@ eval()
 	return(n);
 }
 
-/*
- * Expression evaluation.
- * `N' is a firewall priority; all top level calls
- * (from the user) should be made with `n' set to 0.
+/*)Function	addr_t	expr(n)
+ *
+ *		int	n		a firewall priority; all top
+ *					level calls (from the user)
+ *					should be made with n set to 0.
+ *
+ *	The function expr() evaluates an expression and
+ *	returns the value.
+ *
+ *	local variables:
+ *		int	c		current input text character
+ *		int	p		current operator priority
+ *		addr_t	v		value returned by term()
+ *		addr_t	ve		value returned by a
+ *					recursive call to expr()
+ *
+ *	global variables:
+ *		char	ctype[]		array of character types, one per
+ *					ASCII character
+ *		int	lkerr		error flag
+ *		FILE *	stderr		c_library
+ *
+ *	functions called:
+ *		VOID	expr()		lkeval.c
+ *		int	fprintf()	c_library
+ *		int	getnb()		lklex.c
+ *		int	oprio()		lkeval.c
+ *		VOID	term()		lkeval.c
+ *		VOID	unget()		lklex.c
+ *
+ *
+ *	side effects:
+ *		An expression is evaluated by scanning the input
+ *		text string.
  */
+
 addr_t
 expr (n)
 {
@@ -50,6 +123,7 @@ expr (n)
 			break;
 		if ((c == '>' || c == '<') && c != get()) {
 			fprintf(stderr, "Invalid expression");
+			lkerr++;
 			return(v);
 		}
 		ve = expr(p);
@@ -99,12 +173,41 @@ expr (n)
 	return(v);
 }
 
-/*
- * Read a term.
- * Handles unary operators, brackets,
- * constants in decimal, octal or hexadecimal
- * and identifiers.
+/*)Function	addr_t	term()
+ *
+ *	The function term() evaluates a single constant
+ *	or symbol value prefaced by any unary operator
+ *	( +, -, ~, ', ", >, or < ).
+ *
+ *	local variables:
+ *		int	c		current character
+ *		char	id[]		symbol name
+ *		int	n		value of digit in current radix
+ *		int	r		current evaluation radix
+ *		sym *	sp		pointer to a sym structure
+ *		addr_t	v		evaluation value
+ *
+ *	global variables:
+ *		char	ctype[]		array of character types, one per
+ *					ASCII character
+ *		int	lkerr		error flag
+ *
+ *	functions called:
+ *		int	digit()		lkeval.c
+ *		VOID	expr()		lkeval.c
+ *		int	fprintf()	c_library
+ *		int	get()		lklex.c
+ *		VOID	getid()		lklex.c
+ *		int	getmap()	lklex.c
+ *		int	getnb()		lklex.c
+ *		sym *	lkpsym()	lksym.c
+ *		addr_t	symval()	lksym.c
+ *		VOID	unget()		lklex.c
+ *
+ *	side effects:
+ *		An arithmetic term is evaluated by scanning input text.
  */
+
 addr_t
 term()
 {
@@ -117,8 +220,10 @@ term()
 	if (c == '#') { c = getnb(); }
 	if (c == '(') {
 		v = expr(0);
-		if (getnb() != ')')
+		if (getnb() != ')') {
 			fprintf(stderr, "Missing delimiter");
+			lkerr++;
+		}
 		return(v);
 	}
 	if (c == '-') {
@@ -128,7 +233,7 @@ term()
 		return(~expr(100));
 	}
 	if (c == '\'') {
-		return(getmap(-1));
+		return(getmap(-1)&0377);
 	}
 	if (c == '\"') {
 		if (hilo) {
@@ -192,6 +297,7 @@ term()
 		getid(id, c);
 		if ((sp = lkpsym(id, 0)) == NULL) {
 			fprintf(stderr, "Undefined symbol %8s\n", id);
+			lkerr++;
 			return(0);
 		} else {
 			return(symval(sp));
@@ -199,11 +305,29 @@ term()
 	}
 }
 
-/*
- * If `c' is a legal radix `r' digit
- * return its value; otherwise return
- * -1.
+/*)Function	int	digit(c, r)
+ *
+ *		int	c		digit character
+ *		int	r		current radix
+ *
+ *	The function digit() returns the value of c
+ *	in the current radix r.  If the c value is not
+ *	a number of the current radix then a -1 is returned.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		char	ctype[]		array of character types, one per
+ *					ASCII character
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
  */
+
 int
 digit(c, r)
 register c, r;
@@ -232,10 +356,26 @@ register c, r;
 	return (-1);
 }
 
-/*
- * Return the priority of the binary
- * operator `c'.
+/*)Function	int	oprio(c)
+ *
+ *		int	c		operator character
+ *
+ *	The function oprio() returns a relative priority
+ *	for all valid unary and binary operators.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
  */
+ 
 int
 oprio(c)
 register c;

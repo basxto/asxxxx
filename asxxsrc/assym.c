@@ -1,7 +1,7 @@
 /* assym.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,15 +15,64 @@
 #include <alloc.h>
 #include "asm.h"
 
-/*
- * This routine is called early in the
- * game to set up the hashtables. First
- * all buckets in a table are cleared.
- * Then a pass is made through the respective
- * symbol lists, linking them into their hash
- * buckets. Finally the area list and
- * 'dca' are set up.
+/*)Module	assym.c
+ *
+ *	The module assym.c contains the functions that operate
+ *	on the mnemonic/directive and symbol structures.
+ *
+ *	assym.c contains the following functions:
+ *		VOID	allglob()
+ *		area *	alookup()
+ *		int	hash()
+ *		sym *	lookup()
+ *		mne *	mlookup()
+ *		VOID *	new()
+ *		int	symeq()
+ *		VOID	syminit()
+ *		VOID	symglob()
+ *
+ *	assym.c contains no local/static variables.
  */
+
+/*)Function	VOID	syminit()
+ *
+ *	The function syminit() is called early in the game
+ *	to set up the hashtables.  First all buckets in a
+ *	table are cleared.  Then a pass is made through
+ *	the respective symbol lists, linking them into
+ *	their hash buckets.  Finally the base area pointer
+ *	is set to 'dca'.
+ *
+ *	local variables:
+ *		int	h		computed hash value
+ *		mne *	mp		pointer to a mne structure
+ *		mne **	mpp		pointer to an array of
+ *					mne structure pointers
+ *		sym *	sp		pointer to a sym structure
+ *		sym **	spp		pointer to an array of
+ *					sym structure pointers
+ *
+ *	global variables:
+ *		area	area[]		single elememt area array
+ *		area	dca		defined as area[0]
+ *		mne * mnehash[]		array of pointers to NHASH
+ *					linked mnemonic/directive lists
+ *		sym * symhash[]		array of pointers to NHASH
+ *					linked symbol lists
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		(1)	The symbol hash tables are initialized,
+ *			the only defined symbol is '.'.
+ *		(2)	The mnemonic/directive hash tables are
+ *			initialized with the assembler directives
+ *			and mnemonics found in the machine dependent
+ *			file ___pst.c.
+ *		(3)	The area pointer is initialized to dca (area[0]).
+ */
+
 VOID
 syminit()
 {
@@ -62,9 +111,27 @@ syminit()
 	areap = &dca;
 }
 
-/*
- * Lookup the area `id'.
+/*)Function	area *	alookup(id)
+ *
+ *		char *	id		area name string
+ *
+ *	The function alookup() searches the area list for a
+ *	match with id.  If the area is defined then a pointer
+ *	to this area is returned else a NULL is returned.
+ *
+ *	local variables:
+ *		area *	ap		pointer to area structure
+ *
+ *	global variables:
+ *		area *	areap		pointer to an area structure
+ *
+ *	functions called:
+ *		int	symeq()		assym.c
+ *
+ *	side effects:
+ *		none
  */
+
 struct area *
 alookup(id)
 char *id;
@@ -81,10 +148,29 @@ char *id;
 	return(NULL);
 }
 
-/*
- * Lookup the mnemonic (or directive) `id' in the hashtable.
- * If it is not found return a NULL.
+/*)Function	mne *	mlookup(id)
+ *
+ *		char *	id		mnemonic/directive name string
+ *
+ *	The function mlookup() searches the mnemonic/directive
+ *	hash tables for a match returning a pointer to the
+ *	mne structure else it returns a NULL.
+ *
+ *	local variables:
+ *		mne *	mp		pointer to mne structure
+ *		int	h		calculated hash value
+ *
+ *	global variables:
+ *		mne * mnehash[]		array of pointers to NHASH
+ *					linked mnemonic/directive lists
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
  */
+
 struct mne *
 mlookup(id)
 char *id;
@@ -102,12 +188,34 @@ char *id;
 	return (NULL);
 }
 
-/*
- * Lookup the label `id' in the hashtable.
- * If it is not found return a
- * pointer to a newly created hash table
- * entry.
+/*)Function	sym *	lookup(id)
+ *
+ *		char *	id		symbol name string
+ *
+ *	The function lookup() searches the symbol hash tables for
+ *	a symbol name match returning a pointer to the sym structure.
+ *	If the symbol is not found then a sym structure is created,
+ *	initialized, and linked to the appropriate hash table.
+ *	A pointer to this new sym structure is returned.
+ *
+ *	local variables:
+ *		int	h		computed hash value
+ *		sym *	sp		pointer to a sym structure
+ *
+ *	global varaibles:
+ *		sym * symhash[]		array of pointers to NHASH
+ *					linked symbol lists
+ *
+ *	functions called:
+ *		int	hash()		assym.c
+ *		VOID *	new()		assym.c
+ *		int	symeq()		assym.c
+ *
+ *	side effects:
+ *		If the function new() fails to allocate space
+ *		for the new sym structure the assembly terminates.
  */
+
 struct sym *
 lookup(id)
 char *id;
@@ -135,10 +243,27 @@ char *id;
 	return (sp);
 }
 
-/*
- * Mark all symbols of type `S_NEW' global.
- * Called at the beginning of pass 1 if '-g'.
+/*)Function	VOID	symglob()
+ *
+ *	The function symglob() will mark all symbols of
+ *	type S_NEW as global.  Called at the beginning of pass 1
+ *	if the assembly option -g was specified.
+ *
+ *	local variables:
+ *		sym *	sp		pointer to a sym structure
+ *		int	i		loop index
+ *
+ *	global variables:
+ *		sym * symhash[]		array of pointers to NHASH
+ *					linked symbol lists
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		Symbol types changed.
  */
+
 VOID
 symglob()
 {
@@ -155,10 +280,27 @@ symglob()
 	}
 }
 
-/*
- * Mark all symbols of type `S_USER' global.
- * Called at the beginning of pass 1 if '-a'.
+/*)Function	VOID	allglob()
+ *
+ *	The function allglob() will mark all symbols of
+ *	type S_USER as global.  Called at the beginning of pass 1
+ *	if the assembly option -a was specified.
+ *
+ *	local variables:
+ *		sym *	sp		pointer to a sym structure
+ *		int	i		loop index
+ *
+ *	global variables:
+ *		sym * symhash[]		array of pointers to NHASH
+ *					linked symbol lists
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		Symbol types changed.
  */
+
 VOID
 allglob()
 {
@@ -175,9 +317,29 @@ allglob()
 	}
 }
 
-/*
- * Compare two symbol names.
+/*)Function	int	symeq(p1, p2)
+ *
+ *		char *	p1		name string
+ *		char *	p2		name string
+ *
+ *	The function symeq() compares the two name strings for a match.
+ *	The return value is 1 for a match and 0 for no match.
+ *
+ *	local variables:
+ *		int	h		loop counter
+ *
+ *	global variables:
+ *		char	ccase[]		an array of characters which
+ *					perform the case translation function
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
+ *
  */
+
 int
 symeq(p1, p2)
 register char *p1, *p2;
@@ -199,14 +361,28 @@ register char *p1, *p2;
 	return (1);
 }
 
-/*
- * Given a pointer to a symbol name
- * compute and return the hash table
- * bucket.
- * The `sum of all the characters mod
- * table size' algorithm is perhaps
- * not the best.
+/*)Function	int	hash(p)
+ *
+ *		char *	p		pointer to string to hash
+ *
+ *	The function hash() computes a hash code using the sum
+ *	of all characters mod table size algorithm.
+ *
+ *	local variables:
+ *		int	h		accumulated character sum
+ *		int	n		loop counter
+ *
+ *	global variables:
+ *		char	ccase[]		an array of characters which
+ *					perform the case translation function
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
  */
+ 
 int
 hash(p)
 register char *p;
@@ -227,11 +403,30 @@ register char *p;
 	return (h&HMASK);
 }
 
-/*
- * Allocate a block of space.
- * Leave if there is no space left
- * at all.
+/*)Function	VOID *	new(n)
+ *
+ *		unsigned int	n	allocation size in bytes
+ *
+ *	The function new() allocates n bytes of space and returns
+ *	a pointer to this memory.  If no space is available the
+ *	assembly is terminated.
+ *
+ *	local variables:
+ *		VOID *	p		a general pointer
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		VOID	asexit()	asmain.c
+ *		int	fprintf()	c_library
+ *		VOID *	malloc()	c_library
+ *
+ *	side effects:
+ *		Memory is allocated, if allocation fails
+ *		the assembly is terminated.
  */
+
 VOID *
 new(n)
 unsigned int n;
@@ -240,7 +435,7 @@ unsigned int n;
 
 	if ((p = (VOID *) malloc(n)) == NULL) {
 		fprintf(stderr, "Out of space!\n");
-		exit(1);
+		asexit(1);
 	}
 	return (p);
 }

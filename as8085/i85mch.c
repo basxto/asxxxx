@@ -1,7 +1,7 @@
 /* i85mch.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -24,6 +24,7 @@ struct mne *mp;
 	register unsigned op, rd, rs;
 	struct expr e;
 
+	clrexpr(&e);
 	op = mp->m_valu;
 	switch (mp->m_type) {
 
@@ -116,11 +117,12 @@ struct mne *mp;
 /*
  * Is the next character a comma ?
  */
-VOID
+int
 comma()
 {
 	if (getnb() != ',')
 		qerr();
+	return(1);
 }
 
 /*

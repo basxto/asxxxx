@@ -1,7 +1,7 @@
 /* m08mch.c */
 
 /*
- * (C) Copyright 1993
+ * (C) Copyright 1993-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -28,15 +28,14 @@ struct mne *mp;
 	char id[NCPS];
 	int c, v1;
 
+	clrexpr(&e1);
+	clrexpr(&e2);
+	clrexpr(&e3);
 	op = mp->m_valu;
 	type = mp->m_type;
 	switch (type) {
 
 	case S_SDP:
-		e1.e_mode = 0;
-		e1.e_flag = 0;
-		e1.e_addr = 0;
-		e1.e_base.e_ap = NULL;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);

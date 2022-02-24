@@ -1,7 +1,7 @@
 /* z80.h */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -156,7 +156,7 @@ extern	int		any();
 extern	int		srch();
 
 	/* z80mch.c */
-extern	VOID		comma();
+extern	int		comma();
 extern	int		genop();
 extern	int		gixiy();
 extern	VOID		machin();

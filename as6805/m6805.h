@@ -1,7 +1,7 @@
 /* m6805.h */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -78,5 +78,5 @@ extern	int		srch();
 	/* m05mch.c */
 extern	VOID		machin();
 extern	VOID		minit();
-extern	VOID		comma();
+extern	int		comma();
 

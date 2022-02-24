@@ -1,0 +1,200 @@
+.appendix AS68HC08 Assembler
+
+
+.header level 1;68HC08 Register Set
+
+.break
+The following is a list of the 68HC08 registers used by AS68HC08:
+.skip
+.literal
+	a	-	8-bit accumulator
+	x	-	index register  <H:X>
+	s	-	stack pointer
+.end literal	
+
+
+.header level 1;68HC08 Instruction Set
+
+The following tables list all 68HC08 mnemonics recognized by the
+AS68HC08 assembler. The designation [] refers to a required addressing mode
+argument. The following list specifies the format for
+each addressing mode supported by AS68HC08:
+
+.skip
+.literal
+	#data		immediate data
+			byte or word data
+
+	*dir		direct page addressing
+			(see .setdp directive)
+			0 <= dir <= 255 
+
+	,x		register indexed addressing
+			zero offset
+
+	offset,x	register indexed addressing
+			  0 <= offset <= 255   --- byte mode
+			256 <= offset <= 65535 --- word mode
+			(an externally defined offset uses the
+			 word mode)
+
+	,x+		register indexed addressing
+			zero offset with post increment
+
+	offset,x+	register indexed addressing
+			unsigned byte offset with post increment
+
+	offset,s	stack pointer indexed addressing
+			  0 <= offset <= 255   --- byte mode
+			256 <= offset <= 65535 --- word mode
+			(an externally defined offset uses the
+			 word mode)
+
+	ext		extended addressing
+
+	label		branch label
+.end literal
+
+.skip
+The terms data, dir, offset, and ext may all be expressions.
+
+Note that not all addressing modes are valid with every instruction,
+refer to the 68HC08 technical data for valid modes.
+
+
+.test page 14
+.header level 2;Control Instructions
+
+.literal
+	clc		cli		daa		div
+	mul		nop		nsa		psha
+	pshh		pshx		pula		pulh
+	pulx		rsp		rti		rts
+	sec		sei		stop		swi
+	tap		tax		tpa		tsx
+	txa		txs		wait
+.end literal
+
+.test page 12
+.header level 2;Bit Manipulation Instructions
+
+.literal
+	brset	#data,*dir,label
+	brclr	#data,*dir,label
+
+	bset	#data,*dir
+	bclr	#data,*dir
+.end literal
+
+
+.test page 18
+.header level 2;Branch Instructions
+
+.literal
+	bra	label		brn	label
+	bhi	label		bls	label
+	bcc	label		bcs	label
+	bne	label		beq	label
+	bhcc	label		bhcs	label
+	bpl	label		bmi	label
+	bmc	label		bms	label
+	bil	label		bih	label
+	bsr	label		bge	label
+	blt	label		bgt	label
+	ble	label
+.end literal
+
+.test page 13
+.header level 2;Complex Branch Instructions
+
+.literal
+	cbeqa	[],label
+	cbeqx	[],label
+	cbeq	[],label
+	dbnza	label
+	dbnzx	label
+	dbnz	[],label
+.end literal
+
+.test page 43
+.header level 2;Read-Modify-Write Instructions
+
+.literal
+	nega			negx
+	neg	[]
+
+	coma			comx
+	com	[]
+
+	lsra			lsrx
+	lsr	[]
+
+	rora			rorx
+	ror	[]
+
+	asra			asrx
+	asr	[]
+
+	asla			aslx
+	asl	[]
+
+	lsla			lslx
+	lsl	[]
+
+	rola			rolx
+	rol	[]
+
+	deca			decx
+	dec	[]
+
+	inca			incx
+	inc	[]
+
+	tsta			tstx
+	tst	[]
+
+	clra			clrx
+	clr	[]		clrh
+
+	aix	#data
+
+	ais	#data
+.end literal
+
+
+.test page 14
+.header level 2;Register_\Memory Instructions
+
+.literal
+	sub	[]		cmp	[]
+	sbc	[]		cpx	[]
+	and	[]		bit	[]
+	lda	[]		sta	[]
+	eor	[]		adc	[]
+	ora	[]		add	[]
+	ldx	[]		stx	[]
+.end literal
+
+.test page 8
+.header level 2;Double Operand Move Instruction
+
+.literal
+	mov	[],[]
+.end literal
+
+.test page 10
+.header level 2;16-Bit <H:X> Index Register Instructions
+
+.literal
+	cphx	[]
+	ldhx	[]
+	sthx	[]
+.end literal
+
+.test page 8
+.header level 2;Jump and Jump to Subroutine Instructions
+
+.literal
+	jmp	[]		jsr	[]
+.end literal
+

@@ -1,7 +1,7 @@
 /* M09MCH:C */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -34,14 +34,11 @@ struct mne *mp;
 	char id[NCPS];
 
 	cpg = 0;
+	clrexpr(&e1);
 	op = mp->m_valu;
 	switch (rf = mp->m_type) {
 
 	case S_SDP:
-		e1.e_mode = 0;
-		e1.e_flag = 0;
-		e1.e_addr = 0;
-		e1.e_base.e_ap = NULL;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -388,6 +385,7 @@ int i;
 {
 	register char *ptr;
 	register int j;
+
 	ptr = (char *) &mc6800[i];
 	for (j=0; j<4 ; j++) {
 		if ((i = *ptr++) != 0) {

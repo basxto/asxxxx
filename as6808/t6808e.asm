@@ -46,8 +46,8 @@ loce:	.byte	0
 	;	dec, inc, tst and clr
 
 	neg	,s		;a
-	neg	ix2,x		; will cause a link error
-	neg	ix2,s		; will cause a link error
+	neg	ix2,x		;a (may cause a link error if ix2 is external)
+	neg	ix2,s		;a (may cause a link error if ix2 is external)
 	neg	,x+		;a
 	neg	ix1,x+		;a
 
@@ -93,8 +93,8 @@ loce:	.byte	0
 10$:	cbeq	#0x21,10$	;a
 11$:	cbeq	,x,11$		;a
 12$:	cbeq	ix1,x,12$	;a
-13$:	cbeq	ix2,x,13$	;a
-14$:	cbeq	ix2,s,14$	; will cause a linker error
+13$:	cbeq	ix2,x,13$	;a (may cause link error if ix2 is external)
+14$:	cbeq	ix2,s,14$	;a (may cause link error if ix2 is external)
 
 	; Illegal Modes for:
 	;	dbnza and dbnzx
@@ -115,7 +115,7 @@ loce:	.byte	0
 24$:	dbnz	,x+,24$		;a
 25$:	dbnz	ix1,x+,25$	;a
 26$:	dbnz	ix2,x+,26$	;a
-27$:	dbnz	ix2,s,27$	; will cause a linker error
+27$:	dbnz	ix2,s,27$	;a (may cause link error if ix2 is external)
 
 
 	.page

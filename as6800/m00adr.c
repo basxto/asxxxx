@@ -1,7 +1,7 @@
 /* m00adr.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -25,9 +25,6 @@ register struct expr *esp;
 		esp->e_mode = S_IMMED;
 	} else if (c == ',') {
 		esp->e_mode = S_INDX;
-		esp->e_flag = 0;
-		esp->e_addr = 0;
-		esp->e_base.e_ap = NULL;
 		if (admode(abx) != S_X)
 			aerr();
 	} else if (c == '*') {

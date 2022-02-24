@@ -1,7 +1,7 @@
 /* m04adr.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -27,9 +27,6 @@ register struct expr *esp;
 	} else if (c == ',') {
 		if ((esp->e_mode = admode(xy)) == 0)
 			aerr();
-		esp->e_flag = 0;
-		esp->e_addr = 0;
-		esp->e_base.e_ap = NULL;
 	} else {
 		unget(c);
 		expr(esp, 0);

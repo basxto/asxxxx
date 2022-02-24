@@ -1,7 +1,7 @@
 /* m01mch.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -30,14 +30,12 @@ struct mne *mp;
 	int c, v1, reg;
 
 	reg = 0;
+	clrexpr(&e1);
+	clrexpr(&e2);
 	op = mp->m_valu;
 	switch (mp->m_type) {
 
 	case S_SDP:
-		e1.e_mode = 0;
-		e1.e_flag = 0;
-		e1.e_addr = 0;
-		e1.e_base.e_ap = NULL;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -290,11 +288,12 @@ struct mne *mp;
  * The next character must be a
  * comma.
  */
-VOID
+int
 comma()
 {
 	if (getnb() != ',')
 		qerr();
+	return(1);
 }
 
 /*

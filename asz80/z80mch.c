@@ -1,7 +1,7 @@
 /* z80mch.c */
 
 /*
- * (C) Copyright 1989,1990
+ * (C) Copyright 1989-1995
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -28,6 +28,8 @@ struct mne *mp;
 	struct expr e1, e2;
 	int rf, v1, v2;
 
+	clrexpr(&e1);
+	clrexpr(&e2);
 	op = mp->m_valu;
 	rf = mp->m_type;
 	if (!hd64 && rf>X_HD64)
@@ -130,13 +132,8 @@ struct mne *mp;
 			comma();
 			t2 = addr(&e2);
 		}
-		if (rf==S_SUB && t2!=S_IMMED) {
-			if (genop(0xCB, op, &e2, 0) || t1)
-				aerr();
-		} else {
-			if (genop(0, op, &e2, 1) || t1)
-				aerr();
-		}
+		if (genop(0, op, &e2, 1) || t1)
+			aerr();
 		break;
 
 	case S_ADD:
@@ -584,11 +581,12 @@ int v;
  * The next character must be a
  * comma.
  */
-VOID
+int
 comma()
 {
 	if (getnb() != ',')
 		qerr();
+	return(1);
 }
 
 /*
