@@ -3,8 +3,8 @@ C:\ASXXXX\ASXMAK\SYMANTEC\BUILD\asz80.prj
 asz80.OPN
 novcs
 asz80.DEF
-6
-925439174
+8
+950219210
 0 0 0 0 0 "..\..\..\ASXXSRC\ASDATA.C"
 0 0 0 0 0 "..\..\..\ASXXSRC\ASEXPR.C"
 0 0 0 0 0 "..\..\..\ASXXSRC\ASLEX.C"
@@ -23,5 +23,5 @@ asz80.DEF
 0 -1 0 0 0 "F:\SC\INCLUDE\string.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\alloc.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\stdlib.h"
-0 -1 -1 0 0 "..\..\..\ASXXSRC\asxxxx.h"
-0 -1 -1 0 0 "..\..\..\ASZ80\z80.h"
+0 -1 0 0 0 "..\..\..\ASXXSRC\asxxxx.h"
+0 -1 0 0 0 "..\..\..\ASZ80\z80.h"

@@ -11,7 +11,7 @@ NDEBUG		= 1
 !ENDIF
 
 PROJ		= aslink
-APPTYPE		= DOS EXE
+APPTYPE		= DOSX EXE
 PROJTYPE	= EXE
 
 CC		= SC
@@ -24,7 +24,7 @@ DISASM		= OBJ2ASM
 LNK		= LINK
 DLLS		= 
 
-HEADERS		= F:\SC\INCLUDE\STRING.H F:\SC\INCLUDE\ALLOC.H F:\SC\INCLUDE\stdio.h  \
+HEADERS		= F:\SC\INCLUDE\stdio.h F:\SC\INCLUDE\string.h F:\SC\INCLUDE\alloc.h  \
 		F:\SC\INCLUDE\stdlib.h ..\..\..\LINKSRC\aslink.h 
 
 DEFFILE		= aslink.DEF
@@ -37,7 +37,7 @@ CREATETARGETDIR	=
 
 LIBS		= 
 
-CFLAGS		=  -ms -C -S -3 -a2 -c -g 
+CFLAGS		=  -mx -C -S -3 -a4 -c -g -gd 
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
@@ -56,8 +56,8 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 
 LIBS		= 
 
-CFLAGS		=  -A -r -J -ms -o+time -0 -a2 -c 
-LFLAGS		=  /DE /E /PACKF /XN
+CFLAGS		=  -A -r -J -mx -o+time -3 -a4 -c 
+LFLAGS		=  /DE /PACKF /XN
 DEFINES		= 
 !ENDIF
 
@@ -69,7 +69,7 @@ DEBUGGERFLAGS	=
 AFLAGS		= $(CFLAGS) 
 HELPFLAGS	= 
 
-MODEL		= S
+MODEL		= N
 
 PAR		= PROJS BATS OBJS
 

@@ -3,8 +3,8 @@ C:\ASXXXX\ASXMAK\SYMANTEC\BUILD\as6812.prj
 as6812.OPN
 novcs
 as6812.DEF
-6
-925437316
+8
+950220926
 0 0 0 0 0 "..\..\..\ASXXSRC\ASDATA.C"
 0 0 0 0 0 "..\..\..\ASXXSRC\ASEXPR.C"
 0 0 0 0 0 "..\..\..\ASXXSRC\ASLEX.C"
@@ -20,8 +20,8 @@ as6812.DEF
 0 0 0 0 0 "..\..\..\AS6812\M12PST.C"
 0 -1 0 0 0 "F:\SC\INCLUDE\stdio.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\setjmp.h"
-0 -1 -1 0 0 "..\..\..\asxxsrc\asxxxx.h"
-0 -1 -1 0 0 "..\..\..\AS6812\m6812.h"
+0 -1 0 0 0 "..\..\..\asxxsrc\asxxxx.h"
+0 -1 0 0 0 "..\..\..\AS6812\m6812.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\string.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\alloc.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\stdlib.h"

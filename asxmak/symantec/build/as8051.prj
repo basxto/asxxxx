@@ -3,8 +3,8 @@ C:\ASXXXX\ASXMAK\SYMANTEC\BUILD\as8051.prj
 as8051.OPN
 novcs
 as8051.DEF
-6
-925438212
+8
+950220978
 0 0 0 0 0 "..\..\..\ASXXSRC\ASDATA.C"
 0 0 0 0 0 "..\..\..\ASXXSRC\ASEXPR.C"
 0 0 0 0 0 "..\..\..\ASXXSRC\ASLEX.C"
@@ -20,8 +20,8 @@ as8051.DEF
 0 0 0 0 0 "as8051.DEF"
 0 -1 0 0 0 "F:\SC\INCLUDE\stdio.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\setjmp.h"
-0 -1 -1 0 0 "..\..\..\asxxsrc\asxxxx.h"
-0 -1 -1 0 0 "..\..\..\AS8051\i8051.h"
+0 -1 0 0 0 "..\..\..\asxxsrc\asxxxx.h"
+0 -1 0 0 0 "..\..\..\AS8051\i8051.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\string.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\alloc.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\stdlib.h"

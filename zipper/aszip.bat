@@ -1,9 +1,9 @@
-del asv2p2.zip
-del asv2p2.exe
+del as*.zip
+del as*.exe
 cd ..
 cd ..
-\asxxxx\zipper\pkzip.exe -rP \asxxxx\zipper\asv2p2.zip asxxxx\*.*
+\asxxxx\zipper\pkzip.exe -rP \asxxxx\zipper\asx.zip asxxxx\*.*
 cd asxxxx
 cd zipper
-zip2exe.exe asv2p2.zip
+zip2exe.exe asx.zip
 

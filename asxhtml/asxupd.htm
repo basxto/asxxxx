@@ -13,62 +13,41 @@ ASxxxx Cross Assembler Updates
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 
 <B><PRE>
-New Release:
+Bug Fix for ASxxxx Cross Assemblers, Version 2.20
 
-        ASxxxx Cross Assemblers, Version 2.20, July 1999
-
-
-        Header files now include function prototypes.
-
-
-Addition of options:
-
-           The  -o/-v  options  allow the simple creation of loadable or
-        overlay modules.  Loadable and overlay modules normally need  to
-        be  linked  with  a  main module(s) to resolve external symbols.
-        The -o/-v options can be used to enable object  output  for  the
-        loadable  or overlay module(s) and suppress the object code from
-        the linked main module(s).  The -o/-v  options  can  be  applied
-        repeatedly  to specify a single linked file, groups of files, or
-        libraries for object code inclusion or suppression.  
-
-
-
-Previous Releases:
-
-        ASxxxx Cross Assemblers, Version 2.10, April 1999
-
-
-Supported Microprocessors:
-
-        6800(6802/6808)         68HC11
-        6801(hd6803)            68HC16
-        6804                    8051
-        6805                    8085(8080)
-        68HC08                  Z80(hd64180)
-        6809                    H8/3xx
-        68HC12                  6500 family
-
-New Features:
-
-        All ASlink commands may now be entered on the
-	command line.  (Useful for makefiles ...)
-
-        Directory Path fixes for ASxxxx and ASlink.
-
-	Many changes for increased portability to
-	GCC compilers in Linux and DJGPP.
-
-	Fix for Divide by 0 and Modulus by 0 errors.
-
-        Long Names (79 significant characters)
-
-        Assembler and Linker are Case Insensitive by default.
-        Case Sensitivity option enabled with the -z switch.
-
-        Assembler long name SYMBOL TABLE format with -w switch.
-	Linker long name MAP format with -w switch.
+New Version is 2.21, November 1999
 </PRE></B>
+
+<H4><B>
+<PRE>Updated source files:</PRE>
+<UL>
+<OL>
+   <LI><a href="ftp://shop-pdp.kent.edu/du3:/av2p21.dsk/asxxxx.h">
+   asxxxx.h (12K)</a>
+   <LI><a href="ftp://shop-pdp.kent.edu/du3:/av2p21.dsk/aslex.c">
+   aslex.c (22K)</a>
+   <LI><a href="ftp://shop-pdp.kent.edu/du3:/av2p21.dsk/aslink.h">
+   aslink.h (24K)</a>
+   <LI><a href="ftp://shop-pdp.kent.edu/du3:/av2p21.dsk/lkmain.c">
+   lkmain.c (28K)</a>
+   <LI><a href="ftp://shop-pdp.kent.edu/du3:/av2p21.dsk/lklex.c">
+   lklex.c (12K)</a>
+</OL>
+<BR>
+<LI><a href="ftp://shop-pdp.kent.edu/du3:/av2p21.zip">
+Updates (with executables) as a zipped file (1706K)</a><BR>
+(use 'pkunzip -d av2p21.zip' for extraction with MS-DOS)<BR>
+(use 'unzip -L -a av2p21.zip' for extraction with Linux)<BR>
+<BR>
+<LI><a href="ftp://shop-pdp.kent.edu/du3:/av2p21.exe">
+Updates (with executables) as a self extracting zip file (1722K)</a><BR>
+(use 'av2p21.exe -d' for extraction with MS-DOS)<BR>
+<BR>
+<LI><a href="ftp://shop-pdp.kent.edu/du3:/av2p21.dsk">
+Updates (with executables) in a single  RT-11 logical disk file (600K)</a><BR>
+<BR>
+</UL>
+</B></H4>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 

@@ -14,7 +14,7 @@
  *
  */
 
-#define	VERSION	"V02.21"
+#define	VERSION	"V02.22"
 
 /*)Module	aslink.h
  *

@@ -3,8 +3,8 @@ C:\ASXXXX\ASXMAK\SYMANTEC\BUILD\as6800.prj
 as6800.OPN
 novcs
 as6800.DEF
-6
-925434268
+8
+950220594
 0 0 0 0 0 "..\..\..\ASXXSRC\ASDATA.C"
 0 0 0 0 0 "..\..\..\ASXXSRC\ASEXPR.C"
 0 0 0 0 0 "..\..\..\ASXXSRC\ASLEX.C"
@@ -20,8 +20,8 @@ as6800.DEF
 0 0 0 0 0 "as6800.DEF"
 0 -1 0 0 0 "F:\SC\INCLUDE\stdio.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\setjmp.h"
-0 -1 -1 0 0 "..\..\..\asxxsrc\asxxxx.h"
-0 -1 -1 0 0 "..\..\..\AS6800\m6800.h"
+0 -1 0 0 0 "..\..\..\asxxsrc\asxxxx.h"
+0 -1 0 0 0 "..\..\..\AS6800\m6800.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\string.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\alloc.h"
 0 -1 0 0 0 "F:\SC\INCLUDE\stdlib.h"

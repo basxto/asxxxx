@@ -138,6 +138,7 @@ char *argv[];
 	fprintf(stdout, "\n");
 
 	startp = (struct lfile *) new (sizeof (struct lfile));
+	startp->f_idp = "";
 
 	pflag = 1;
 
@@ -847,7 +848,7 @@ doparse()
 		fclose(sfp);
 	}
 	sfp = NULL;
-	startp->f_idp = NULL;
+	startp->f_idp = "";
 	startp->f_idx = 0;
 	startp->f_type = 0;
 }
