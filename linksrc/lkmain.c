@@ -304,7 +304,7 @@ int i;
 	if (mfp != NULL) fclose(mfp);
 	if (ofp != NULL) fclose(ofp);
 	if (rfp != NULL) fclose(rfp);
-	if (sfp != NULL) fclose(sfp);
+	if (sfp != NULL) { if (sfp != stdin) fclose(sfp); }
 	if (tfp != NULL) fclose(tfp);
 	exit(i);
 }
@@ -843,8 +843,10 @@ doparse()
 		if (*ip == 0 || parse())
 			break;
 	}
-	if(sfp != stdin)
+	if(sfp != stdin) {
 		fclose(sfp);
+	}
+	sfp = NULL;
 	startp->f_idp = NULL;
 	startp->f_idx = 0;
 	startp->f_type = 0;

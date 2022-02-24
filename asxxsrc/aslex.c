@@ -410,7 +410,8 @@ register int i;
 
 loop:	if (incfil >= 0) {
 		if (fgets(ib, sizeof ib, ifp[incfil]) == NULL) {
-			fclose(ifp[incfil--]);
+			fclose(ifp[incfil]);
+			ifp[incfil--] = NULL;
 			if (incfil >= 0) {
 				strcpy(afn, incfn[incfil]);
 				afp = incfp[incfil];

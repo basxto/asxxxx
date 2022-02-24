@@ -415,8 +415,10 @@ loop:	if (cfp && cfp->f_type == F_STD)
 	if (sfp == NULL || fgets(ib, sizeof ib, sfp) == NULL) {
 		obj_flag = 0;
 		if (sfp) {
-			if(sfp != stdin)
+			if(sfp != stdin) {
 				fclose(sfp);
+			}
+			sfp = NULL;
 			lkulist(0);
 		}
 		if (cfp == NULL) {

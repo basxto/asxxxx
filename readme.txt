@@ -1,6 +1,6 @@
-ASxxxx and ASlink V2.20 July 1999
+ASxxxx and ASlink V2.20 -->> V2.21  Bug Fix November 1999
 
-ASV2P2.ZIP	ASxxxx and ASlink V2.20 Zipped
+AS2P21.ZIP	ASxxxx and ASlink V2.21 Updates Zipped
 
 	MS-DOS:
 	DJGPP:		pkunzip -d asv2p2.zip
@@ -20,23 +20,5 @@ Exectutables are in directories:
 	DJGPP:		\asxxxx\asxmak\djgpp\exe\
 
 	RT-11/TSX+:	\asxxxx\asxmak\decusc\exe\
-
-
-Makefiles or Build command files are in directories:
-
-	MS-DOS:		\asxxxx\asxmak\symantec\build\
-
-	Linux:		/asxxxx/asxmak/linux/build/
-
-	DJGPP:		\asxxxx\asxmak\djgpp\build\
-
-	RT-11/TSX+:	\asxxxx\asxmak\decusc\build\
-
-
- Documentation in plain text form is
- 	\asxxxx\asxdoc\asmlnk.doc
-
- Documentation in HTML form may be found starting with
- 	\asxxxx\asxhtml\asxxxx.htm
 
 
