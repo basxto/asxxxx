@@ -149,6 +149,24 @@ extern	struct	adsym	CND[];
 
 	/* machine dependent functions */
 
+#ifdef	OTHERSYSTEM
+	
+	/* z80adr.c */
+extern	int		addr(struct expr *esp);
+extern	int		admode(struct adsym *sp);
+extern	int		any(int c, char *str);
+extern	int		srch(char *str);
+
+	/* z80mch.c */
+extern	int		comma(void);
+extern	int		genop(int pop, int op, struct expr *esp, int f);
+extern	int		gixiy(int v);
+extern	VOID		machine(struct mne *mp);
+extern	int		mchpcr(struct expr *esp);
+extern	VOID		minit(void);
+
+#else
+
 	/* z80adr.c */
 extern	int		addr();
 extern	int		admode();
@@ -162,3 +180,6 @@ extern	int		gixiy();
 extern	VOID		machine();
 extern	int		mchpcr();
 extern	VOID		minit();
+
+#endif
+

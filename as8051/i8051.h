@@ -114,6 +114,24 @@ extern struct PreDef preDef[];
 
 	/* machine dependent functions */
 
+#ifdef	OTHERSYSTEM
+	
+	/* i51adr.c */
+extern	struct	adsym	reg51[];
+extern	int		addr(struct expr *esp);
+extern	int		admode(struct adsym *sp);
+extern	int		any(int c, char *str);
+extern	int		srch(char *str);
+extern	int		reg(void);
+
+	/* i51mch.c */
+extern	int		comma(void);
+extern	VOID		machine(struct mne *mp);
+extern	int		mchpcr(struct expr *esp);
+extern	VOID		minit(void);
+
+#else
+
 	/* i51adr.c */
 extern	struct	adsym	reg51[];
 extern	int		addr();
@@ -127,3 +145,6 @@ extern	int		comma();
 extern	VOID		machine();
 extern	int		mchpcr();
 extern	VOID		minit();
+
+#endif
+

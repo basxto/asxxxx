@@ -69,11 +69,25 @@
 
 	/* machine dependent functions */
 
+#ifdef	OTHERSYSTEM
+	
+	/* 85mch.c */
+extern	int		comma(void);
+extern	VOID		machine(struct mne *mp);
+extern	VOID		minit(void);
+extern	VOID		out3(int a, int b);
+extern	int		reg(void);
+extern	int		regpair(int r, int s);
+
+#else
+
 	/* 85mch.c */
 extern	int		comma();
 extern	VOID		machine();
-extern	int		mchpcr();
 extern	VOID		minit();
 extern	VOID		out3();
 extern	int		reg();
 extern	int		regpair();
+
+#endif
+

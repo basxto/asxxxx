@@ -46,48 +46,53 @@ The allowed linker commands are:
      4.  -i/-s   Intel Hex (file.ihx) or Motorola S19 (file.s19)
          image output file.  
 
-     5.  -z      Specifies that symbol names are case sensitive. 
+     5.  -o/-v   Specifies      that      subsequent      linked
+         files/libraries will generate object  output  (default)
+         or  suppress  object  output.   (if option -s or -i was
+         specified) 
 
-     6.  -m      Generate a map file (file.map).  This file con-
+     6.  -z      Specifies that symbol names are case sensitive. 
+
+     7.  -m      Generate a map file (file.map).  This file con-
          tains a list of the symbols (by area) with absolute ad-
          dresses,  sizes  of  linked  areas,  and  other linking
          information.  
 
-     7.  -w      Specifies  that  a  wide listing format be used
+     8.  -w      Specifies  that  a  wide listing format be used
          for the map file.  
 
-     8.  -xdq    Specifies  the  number  radix  for the map file
+     9.  -xdq    Specifies  the  number  radix  for the map file
          (Hexidecimal, Decimal, or Octal).  
 
-     9.  -u      Generate  an  updated  listing  file (file.rst)
+    10.  -u      Generate  an  updated  listing  file (file.rst)
          derived from the relocated addresses and data from  the
          linker.  
 
-    10.  file    File(s) to be linked.  Files may be on the same
+    11.  file    File(s) to be linked.  Files may be on the same
          line as the above options or on a separate line(s)  one
          file  per line or multiple files separated by spaces or
          tabs.  
 
-    11.  -b  area=expression (one definition per line) 
+    12.  -b  area=expression (one definition per line) 
          This  specifies  an area base address where the expres-
          sion may contain constants and/or defined symbols  from
          the linked files.  
 
-    12.  -g  symbol=expression (one definition per line) 
+    13.  -g  symbol=expression (one definition per line) 
          This  specifies  the value for the symbol where the ex-
          pression may contain constants and/or  defined  symbols
          from the linked files.  
 
-    13.  -k  library directory path 
+    14.  -k  library directory path 
          (one  definition  per line) This specifies one possible
          path to an object library.  More than one path  is  al-
          lowed.  
 
-    14.  -l  library file specification 
+    15.  -l  library file specification 
          (one  definition  per  line)  This specifies a possible
          library file.  More than one file is allowed.  
 
-    15.  -e      or null line, terminates input to the linker.  
+    16.  -e      or null line, terminates input to the linker.  
 
 <H5><A HREF="aslink.htm #Index">  Return to the Linker Index</A></H5>
 </PRE></B></H4>
@@ -233,6 +238,15 @@ the listing files  (file.lst)  associated  with  the  relocation
 files  (file.rel)  are  scanned  and  used  to create a new file
 (file.rst) which has all addresses and data relocated  to  their
 final values.  
+
+   The  -o/-v  options  allow the simple creation of loadable or
+overlay modules.  Loadable and overlay modules normally need  to
+be  linked  with  a  main module(s) to resolve external symbols.
+The -o/-v options can be used to enable object  output  for  the
+loadable  or overlay module(s) and suppress the object code from
+the linked main module(s).  The -o/-v  options  can  be  applied
+repeatedly  to specify a single linked file, groups of files, or
+libraries for object code inclusion or suppression.  
 
 <H5><A HREF="aslink.htm #Index">  Return to the Linker Index</A></H5>
 </PRE></B></H4>

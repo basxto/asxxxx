@@ -271,6 +271,7 @@ int b;
 
 VOID
 outaw(w)
+int w;
 {
 	if (pass == 2) {
 		out_lw(w,0);

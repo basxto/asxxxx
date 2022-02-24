@@ -583,6 +583,7 @@ map()
  *				 	specification
  *		int	mflag		Map output flag
  *		int	oflag		Output file type flag
+ *		int	objflg		Linked file/library output object flag
  *		int	pflag		print linker command file flag
  *		FILE *	stderr		c_library
  *		int	uflag		Relocated listing flag
@@ -658,6 +659,16 @@ parse()
 				case 's':
 				case 'S':
 					oflag = 2;
+					break;
+
+				case 'o':
+				case 'O':
+					objflg = 0;
+					break;
+
+				case 'v':
+				case 'V':
+					objflg = 1;
 					break;
 
 				case 'm':
@@ -772,6 +783,7 @@ parse()
 			lfp->f_idp = strsto(p);
 			lfp->f_idx = fndidx(p);
 			lfp->f_type = F_REL;
+			lfp->f_obj = objflg;
 		} else {
 			fprintf(stderr, "Invalid input");
 			lkexit(ER_FATAL);
@@ -1122,12 +1134,12 @@ int wf;
 	 */
 	strcpy(fb, fn);
 	c = fndidx(fb);
-	p1 = fb + c;
+	p1 = &fb[c];
+	p2 = &fn[c];
 
 	/*
 	 * Skip to File Extension Seperator
 	 */
-	p2 = &fn[c];
 	while ((c = *p2++) != 0 && c != FSEPX) {
 		p1++;
 	}
@@ -1141,7 +1153,7 @@ int wf;
 		if (c == FSEPX) {
 			p3 = p2;
 		} else {
-			p3 = "REL";
+			p3 = "rel";
 		}
 	}
 	while ((c = *p3++) != 0) {
@@ -1204,7 +1216,7 @@ char *usetxt[] = {
 	"  -n   No echo of commands to stdout",
 	"Alternates to Command Line Input:",
 	"  -c                   ASlink >> prompt input",
-	"  -f   file[LNK]       Command File input",
+	"  -f   file[.lnk]      Command File input",
 	"Librarys:",
 	"  -k   Library path specification, one per -k",
 	"  -l   Library file specification, one per -l",
@@ -1212,16 +1224,18 @@ char *usetxt[] = {
 	"  -b   area base address = expression",
 	"  -g   global symbol = expression",
 	"Map format:",
-	"  -m   Map output generated as file[MAP]",
+	"  -m   Map output generated as file[.map]",
 	"  -w   Wide listing format for map file",
 	"  -x   Hexidecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
-	"  -i   Intel Hex as file[IHX]",
-	"  -s   Motorola S19 as file[S19]",
+	"  -i   Intel Hex as file[.ihx]",
+	"  -s   Motorola S19 as file[.s19]",
+	"  -o   Linked file/library object output enable (default)",
+	"  -v   Linked file/library object output disable",
 	"List:",
-	"  -u   Update listing file(s) with link data as file(s)[.RST]",
+	"  -u   Update listing file(s) with link data as file(s)[.rst]",
 	"Case Sensitivity:",
 	"  -z   Enable Case Sensitivity for Symbols",
 	"End:",

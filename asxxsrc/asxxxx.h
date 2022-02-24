@@ -14,7 +14,7 @@
  *
  */
 
-#define	VERSION	"V02.10"
+#define	VERSION	"V02.2"
 
 /*)Module	asxxxx.h
  *
@@ -553,6 +553,124 @@ extern	char *		strrchr();
 
 /* Machine independent functions */
 
+#ifdef	OTHERSYSTEM
+
+/* asmain.c */
+extern	FILE *		afile(char *fn, char *ft, int wf);
+extern	VOID		afilex(char *fn, char *ft);
+extern	VOID		asexit(int i);
+extern	VOID		asmbl(void);
+extern	int		fndidx(char *str);
+extern	int		main(int argc, char *argv[]);
+extern	VOID		newdot(struct area *nap);
+extern	VOID		phase(struct area *ap, addr_t a);
+extern	char *		usetxt[];
+extern	VOID		usage(int n);
+
+/* aslex.c */
+extern	char		endline(void);
+extern	int		get(void);
+extern	VOID		getid(char *id, int c);
+extern	int		getline(void);
+extern	int		getmap(int d);
+extern	int		getnb(void);
+extern	VOID		getst(char *id, int c);
+extern	int		more(void);
+extern	VOID		unget(int c);
+
+/* assym.c */
+extern	struct	area *	alookup(char *id);
+extern	struct	mne *	mlookup(char *id);
+extern	int		hash(char *p, int cflag);
+extern	struct	sym *	lookup(char *id);
+extern	char *		new(unsigned int n);
+extern	char *		strsto(char *str);
+extern	int		symeq(char *p1, char *p2, int cflag);
+extern	VOID		syminit(void);
+extern	VOID		symglob(void);
+extern	VOID		allglob(void);
+
+/* assubr.c */
+extern	VOID		aerr(void);
+extern	VOID		diag(void);
+extern	VOID		err(int c);
+extern	char *		errors[];
+extern	char *		geterr(int c);
+extern	VOID		qerr(void);
+extern	VOID		rerr(void);
+
+/* asexpr.c */
+extern	VOID		abscheck(struct expr *esp);
+extern	addr_t		absexpr(void);
+extern	VOID		clrexpr(struct expr *esp);
+extern	int		digit(int c, int r);
+extern	int		is_abs(struct expr *esp);
+extern	VOID		expr(struct expr *esp, int n);
+extern	int		oprio(int c);
+extern	VOID		term(struct expr *esp);
+
+/* aslist.c */
+extern	VOID		list(void);
+extern	VOID		list1(char *wp, int *wpt, int nb, int f);
+extern	VOID		list2(int t);
+extern	VOID		lstsym(FILE *fp);
+extern	VOID		slew(FILE *fp, int flag);
+
+/* asout.c */
+extern	int		hibyte(int n);
+extern	int		lobyte(int n);
+extern	VOID		out(char *p, int n);
+extern	VOID		outab(int b);
+extern	VOID		outarea(struct area *ap);
+extern	VOID		outaw(int w);
+extern	VOID		outdp(struct area *carea, struct expr *esp);
+extern	VOID		outall(void);
+extern	VOID		outdot(void);
+extern	VOID		outbuf(char *s);
+extern	VOID		outchk(int nt, int nr);
+extern	VOID		outgsd(void);
+extern	VOID		outrb(struct expr *esp, int r);
+extern	VOID		outrw(struct expr *esp, int r);
+extern	VOID		outr11(struct expr *esp, int op, int r);	/* JLH */
+extern	VOID		outsym(struct sym *sp);
+extern	VOID		out_lb(int b, int n);
+extern	VOID		out_lw(int n, int t);
+extern	VOID		out_rw(int n);
+extern	VOID		out_tw(int n);
+
+/* Machine dependent variables */
+
+extern	char *		cpu;
+extern	char *		dsft;
+extern	int		hilo;
+extern	struct	mne	mne[];
+
+/* Machine dependent functions */
+
+extern	VOID		machine(struct mne *mp);
+extern	VOID		minit(void);
+
+/* asxcnv.c */
+
+/* Defined under asmain.c above
+extern	VOID		asexit(int i);
+extern	int		main(int argc, char *argv[]);
+extern	char *		usetxt[];
+extern	VOID		usage(int n);
+*/
+extern	VOID		linout(char *str);
+
+/* asxscn.c */
+
+/* Defined under asmain.c above
+extern	VOID		asexit(int i);
+extern	int		main(int argc, char *argv[]);
+extern	char *		usetxt[];
+extern	VOID		usage(int n);
+*/
+
+#else
+
 /* asmain.c */
 extern	FILE *		afile();
 extern	VOID		afilex();
@@ -562,6 +680,7 @@ extern	int		fndidx();
 extern	int		main();
 extern	VOID		newdot();
 extern	VOID		phase();
+extern	char *		usetxt[];
 extern	VOID		usage();
 
 /* aslex.c */
@@ -580,7 +699,7 @@ extern	struct	area *	alookup();
 extern	struct	mne *	mlookup();
 extern	int		hash();
 extern	struct	sym *	lookup();
-extern	VOID *		new();
+extern	char *		new();
 extern	char *		strsto();
 extern	int		symeq();
 extern	VOID		syminit();
@@ -591,6 +710,7 @@ extern	VOID		allglob();
 extern	VOID		aerr();
 extern	VOID		diag();
 extern	VOID		err();
+extern	char *		errors[];
 extern	char *		geterr();
 extern	VOID		qerr();
 extern	VOID		rerr();
@@ -645,4 +765,25 @@ extern	struct	mne	mne[];
 
 extern	VOID		machine();
 extern	VOID		minit();
+
+/* asxcnv.c */
+
+/* Defined under asmain.c above
+extern	VOID		asexit();
+extern	int		main();
+extern	char *		usetxt[];
+extern	VOID		usage();
+*/
+extern	VOID		linout();
+
+/* asxscn.c */
+
+/* Defined under asmain.c above
+extern	VOID		asexit();
+extern	int		main();
+extern	char *		usetxt[];
+extern	VOID		usage();
+*/
+
+#endif
 

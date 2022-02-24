@@ -128,6 +128,28 @@ extern struct opdata mc6811[];
 
 	/* machine dependent functions */
 
+#ifdef	OTHERSYSTEM
+	
+	/* m12adr.c */
+extern	int		addr(struct expr *esp);
+extern	int		addr1(struct expr *esp);
+extern	int		admode(struct adsym *sp);
+extern	int		any(int c, char *str);
+extern	int		srch(char *str);
+
+	/* m12mch.c */
+extern	VOID		machine(struct mne *mp);
+extern	VOID		genout(int cpg, int op, int rf, struct expr *esp);
+extern	VOID		movout(struct expr *esp, int indx, int offset);
+extern	VOID		m68out(int i);
+extern	int		setbit(int b);
+extern	int		getbit(void);
+extern	int		mchpcr(struct expr *esp);
+extern	VOID		minit(void);
+extern	int		comma(void);
+
+#else
+
 	/* m12adr.c */
 extern	int		addr();
 extern	int		addr1();
@@ -145,3 +167,6 @@ extern	int		getbit();
 extern	int		mchpcr();
 extern	VOID		minit();
 extern	int		comma();
+
+#endif
+

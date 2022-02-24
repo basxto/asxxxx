@@ -1063,12 +1063,12 @@ char *ft;
 	 */
 	strcpy(afntmp, fn);
 	afptmp = fndidx(afntmp);
-	p1 = afntmp + afptmp;
+	p1 = &afntmp[afptmp];
+	p2 = &fn[afptmp];
 
 	/*
 	 * Skip to File Extension Seperator
 	 */
-	p2 = &fn[afptmp];
 	while (((c = *p2++) != 0) && (c != FSEPX)) {
 		p1++;
 	}
@@ -1217,16 +1217,16 @@ char *usetxt[] = {
 	"  x    hex     listing (default)",
 	"  g    undefined symbols made global",
 	"  a    all user symbols made global",
-	"  l    create list   output file1[LST]",
-	"  o    create object output file1[REL]",
-	"  s    create symbol output file1[SYM]",
+	"  l    create list   output file1[.lst]",
+	"  o    create object output file1[.rel]",
+	"  s    create symbol output file1[.sym]",
 	"  p    disable listing pagination",
 	"  w    wide listing format for symbol table",
 	"  z    enable case sensitivity for symbols",
 	"  f    flag relocatable references by  `   in listing file",
 	" ff    flag relocatable references by mode in listing file",
 	"",
-	0
+	NULL
 };
 
 /*)Function	VOID	usage(n)

@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <setjmp.h>
+#include <alloc.h>
 #include "asxxxx.h"
 
 
@@ -71,11 +72,6 @@ char	ccase[128] = {
 /*p*/	'\160',	'\161',	'\162',	'\163',	'\164',	'\165',	'\166',	'\167',
 /*x*/	'\170',	'\171',	'\172',	'\173',	'\174',	'\175',	'\176',	'\177'
 };
-
-
-extern	VOID	asexit();
-extern	VOID	linout();
-extern	VOID	usage();
 
 
 /*)Function	int	main(argc, argv)
@@ -372,7 +368,7 @@ char *usetxt[] = {
 	"  q    octal   listing",
 	"  x    hex     listing (default)",
 	"",
-	0
+	NULL
 };
 
 /*)Function	VOID	usage(n)

@@ -13,7 +13,6 @@
 
 <B><PRE>
 
-
                                 ASxxxx Assemblers
 
 
@@ -25,173 +24,8 @@
 
 
 
-                                 Version   2.10
-                                   April 1999
-
-
-                                                                  Page 2
-        
-
-
-         
-                                  P R E F A C E
-
-
-
-
-
-           The  ASxxxx  assemblers  were  written following the style of
-        several cross assemblers found in the Digital Equipment Corpora-
-        tion  Users  Society  (DECUS)  distribution of the C programming
-        language.  The DECUS code was provided with no documentation  as
-        to  the  input  syntax  or the output format.  Study of the code
-        revealed that the unknown author of the code  had  attempted  to
-        formulate  an assembler with attributes similiar to those of the
-        PDP-11 MACRO assembler (without macro's).  The  incomplete  code
-        from  the  DECUS C distribution has been largely rewritten, only
-        the program structure, and C source  file  organization  remains
-        relatively  unchanged.   However, I wish to thank the author for
-        his contribution to this set of assemblers.  
-
-           The  ASLINK  program was written as a companion to the ASxxxx
-        assemblers, its design and implementation was not  derived  from
-        any other work.  
-
-           The  ASxxxx  assemblers  and the ASLINK relocating linker are
-        placed in the Public Domain.   Publication  or  distribution  of
-        these programs for non-commercial use is hereby granted with the
-        stipulation that the  copyright  notice  be  included  with  all
-        copies.  
-
-           I  would  greatly  appreciate  receiving  the  details of any
-        changes, additions, or errors pertaining to these  programs  and
-        will  attempt  to  incorporate  any  fixes  or  generally useful
-        changes in a future update to these programs.  
-
-
-
-                Alan R.  Baldwin 
-                Kent State University 
-                Physics Department 
-                Kent, Ohio 44242 
-                U.S.A.  
-
-
-                http://shop-pdp.kent.edu/ashtml/asxxxx.htm 
-
-                baldwin@shop-pdp.kent.edu 
-                tel:  (330) 672 2531 
-                fax:  (330) 672 2959 
-
-
-                                                                  Page 3
-        
-
-
-         
-
-
-
-
-                             C O N T R I B U T O R S
-
-
-
-
-           Thanks  to  Marko  Makela  for his contribution of the AS6500
-        cross assembler.  
-
-                Marko Makela
-                Sillitie 10 A
-                01480 Vantaa
-                Finland
-                Internet: Marko.Makela@Helsinki.Fi
-                EARN/BitNet: msmakela@finuh
-
-
-
-
-
-           Thanks  to  John  Hartman  for his contribution of the AS8051
-        cross assembler and updates to the ASxxxx and ASLINK internals. 
-
-                John L. Hartman
-                jhartman@compuserve.com
-                http://ourworld.compuserve.com/homepages/jhartman/
-
-
-
-
-
-           Thanks  to  G.   Osborn  for his contributions to LKS19.C and
-        LKIHX.C.  
-
-                G. Osborn
-                gary@s-4.com
-
-
-                                                                  Page 4
-        
-
-
-        ASxxxx Cross Assemblers, Version 2.10, April 1999 
-
-        Submitted by Alan R.  Baldwin, 
-        Kent State University, Kent, Ohio 
-
-        Operating System:  TSX+, RT-11, MS-DOS, Windows 3.x/95/98, Linux 
-        or other supporting K&amp;amp;R C.  
-
-        Source Langauge:  C 
-
-        Abstract:  
-
-           The  ASxxxx  assemblers are a series of microprocessor assem-
-        blers written in the C programming  language.   This  collection
-        contains cross assemblers for the 6800(6802/6808), 6801(hd6303),
-        6804,  6805,  68HC08,  6809,  68HC11,  68HC12,   68HC16,   8051,
-        8085(8080),  z80(hd64180),  H8/3xx, and 6500 series microproces-
-        sors.  Each  assembler  has  a  device  specific  section  which
-        includes:   (1)  device description, byte order, and file exten-
-        sion information, (2) a table of assembler  general  directives,
-        special directives, assembler mnemonics and associated operation
-        codes, (3) machine  specific  code  for  processing  the  device
-        mnemonics, addressing modes, and special directives.  
-
-           The assemblers have a common device independent section which
-        handles the details of file input/output, symbol  table  genera-
-        tion,  program/data  areas,  expression  analysis, and assembler
-        directive processing.  
-
-           The  assemblers  provide  the following features:  (1) alpha-
-        betized, formatted symbol table listings, (2) relocatable object
-        modules, (3) global symbols for linking object modules, (4) con-
-        ditional assembly directives, (5) reusable  local  symbols,  and
-        (6) include-file processing.  
-
-           The  companion program ASLINK is a relocating linker perform-
-        ing the following functions:  (1) bind multiple  object  modules
-        into  a  single  memory  image,  (2) resolve inter-module symbol
-        references,  (3)  resolve  undefined  symbols   from   specified
-        librarys of object modules, (4) process absolute, relative, con-
-        catenated, and overlay attributes in data and program  sections,
-        (5)  perform  byte and word program-counter relative (pc or pcr)
-        addressing calculations, (6) define absolute  symbol  values  at
-        link  time, (7) define absolute area base address values at link
-        time, (8) produce Intel Hex or Motorola  S19  output  file,  (9)
-        produce  a  map  of the linked memory image, and (10) update the
-        ASxxxx assembler listing files  with  the  absolute  linked  ad-
-        dresses and data.  
-
-           The assemblers and linker have been tested using DECUS C with
-        TSX+ and RT-11, GCC 2.7.2 with LINUX, Symantec  C/C++  V6.1/V7.2
-        and  DJGPP  (GCC 2.8.1) with MS-DOS/Windows 3.x/95/98.  Complete
-        source code and documentation for the assemblers and  linker  is
-        included  with  the  distribution.   Additionally, test code for
-        each assembler and several microprocessor  monitors  (  ASSIST05
-        for  the 6805, MONDEB and ASSIST09 for the 6809, and BUFFALO 2.5
-        for the 6811) are included as working examples of use  of  these
-        assemblers.  
+                                 Version   2.20
+                                    July 1999
 
 
         CHAPTER 1  THE ASSEMBLER                                     1-1 
@@ -245,23 +79,23 @@
           2.3     LIBRARY PATH(S) AND FILE(S)                        2-3 
           2.4     ASLINK PROCESSING                                  2-4 
           2.5     LINKER INPUT FORMAT                                2-6 
-          2.5.1     Object Module Format                             2-6 
-          2.5.2     Header Line                                      2-6 
+          2.5.1     Object Module Format                             2-7 
+          2.5.2     Header Line                                      2-7 
           2.5.3     Module Line                                      2-7 
           2.5.4     Symbol Line                                      2-7 
-          2.5.5     Area Line                                        2-7 
+          2.5.5     Area Line                                        2-8 
 
 
                                                                  Page ii
         
 
 
-          2.5.6     T Line                                           2-7 
+          2.5.6     T Line                                           2-8 
           2.5.7     R Line                                           2-8 
-          2.5.8     P Line                                           2-8 
+          2.5.8     P Line                                           2-9 
           2.6     LINKER ERROR MESSAGES                              2-9 
-          2.7     INTEL HEX OUTPUT FORMAT                           2-11 
-          2.8     MOTORLA S1-S9 OUTPUT FORMAT                       2-12 
+          2.7     INTEL HEX OUTPUT FORMAT                           2-12 
+          2.8     MOTORLA S1-S9 OUTPUT FORMAT                       2-13 
 
         CHAPTER 3  BUILDING ASXXXX AND ASLINK                        3-1 
           3.1     BUILDING AN ASSEMBLER                              3-1 
@@ -473,6 +307,181 @@
           N.3.9     65C00/21 and 65C29 Specific Instructions         N-5 
           N.3.10    65C02, 65C102, and 65C112 Specific
                     Instructions                                     N-6 
+
+
+                                                                  Page 2
+        
+
+
+         
+                                  P R E F A C E
+
+
+
+
+
+           The  ASxxxx  assemblers  were  written following the style of
+        several cross assemblers found in the Digital Equipment Corpora-
+        tion  Users  Society  (DECUS)  distribution of the C programming
+        language.  The DECUS code was provided with no documentation  as
+        to  the  input  syntax  or the output format.  Study of the code
+        revealed that the unknown author of the code  had  attempted  to
+        formulate  an assembler with attributes similiar to those of the
+        PDP-11 MACRO assembler (without macro's).  The  incomplete  code
+        from  the  DECUS C distribution has been largely rewritten, only
+        the program structure, and C source  file  organization  remains
+        relatively  unchanged.   However, I wish to thank the author for
+        his contribution to this set of assemblers.  
+
+           The  ASLINK  program was written as a companion to the ASxxxx
+        assemblers, its design and implementation was not  derived  from
+        any other work.  
+
+           The  ASxxxx  assemblers  and the ASLINK relocating linker are
+        placed in the Public Domain.   Publication  or  distribution  of
+        these programs for non-commercial use is hereby granted with the
+        stipulation that the  copyright  notice  be  included  with  all
+        copies.  
+
+           I  would  greatly  appreciate  receiving  the  details of any
+        changes, additions, or errors pertaining to these  programs  and
+        will  attempt  to  incorporate  any  fixes  or  generally useful
+        changes in a future update to these programs.  
+
+
+
+                Alan R.  Baldwin 
+                Kent State University 
+                Physics Department 
+                Kent, Ohio 44242 
+                U.S.A.  
+
+
+                http://shop-pdp.kent.edu/ashtml/asxxxx.htm 
+
+                baldwin@shop-pdp.kent.edu 
+                tel:  (330) 672 2531 
+                fax:  (330) 672 2959 
+
+
+                                                                  Page 3
+        
+
+
+         
+
+
+
+
+                             C O N T R I B U T O R S
+
+
+
+
+           Thanks  to  Marko  Makela  for his contribution of the AS6500
+        cross assembler.  
+
+                Marko Makela
+                Sillitie 10 A
+                01480 Vantaa
+                Finland
+                Internet: Marko.Makela@Helsinki.Fi
+                EARN/BitNet: msmakela@finuh
+
+
+
+
+
+           Thanks  to  John  Hartman  for his contribution of the AS8051
+        cross assembler and updates to the ASxxxx and ASLINK internals. 
+
+                John L. Hartman
+                jhartman@compuserve.com
+                http://ourworld.compuserve.com/homepages/jhartman/
+
+
+
+
+
+           Thanks  to  G.   Osborn  for his contributions to LKS19.C and
+        LKIHX.C.  
+
+                G. Osborn
+                gary@s-4.com
+
+
+
+
+
+           Thanks  to  Ken  Hornstein  for  his  contribution  of object
+        libraries contained in LKLIBR.C.  
+
+                Ken Hornstein
+                kenh@cmf.nrl.navy.mil
+
+
+                                                                  Page 4
+        
+
+
+        ASxxxx Cross Assemblers, Version 2.20, July 1999 
+
+        Submitted by Alan R.  Baldwin, 
+        Kent State University, Kent, Ohio 
+
+        Operating System:  TSX+, RT-11, MS-DOS, Windows 3.x/95/98, Linux 
+        or other supporting K&amp;R C.  
+
+        Source Langauge:  C 
+
+        Abstract:  
+
+           The  ASxxxx  assemblers are a series of microprocessor assem-
+        blers written in the C programming  language.   This  collection
+        contains cross assemblers for the 6800(6802/6808), 6801(hd6303),
+        6804,  6805,  68HC08,  6809,  68HC11,  68HC12,   68HC16,   8051,
+        8085(8080),  z80(hd64180),  H8/3xx, and 6500 series microproces-
+        sors.  Each  assembler  has  a  device  specific  section  which
+        includes:   (1)  device description, byte order, and file exten-
+        sion information, (2) a table of assembler  general  directives,
+        special directives, assembler mnemonics and associated operation
+        codes, (3) machine  specific  code  for  processing  the  device
+        mnemonics, addressing modes, and special directives.  
+
+           The assemblers have a common device independent section which
+        handles the details of file input/output, symbol  table  genera-
+        tion,  program/data  areas,  expression  analysis, and assembler
+        directive processing.  
+
+           The  assemblers  provide  the following features:  (1) alpha-
+        betized, formatted symbol table listings, (2) relocatable object
+        modules, (3) global symbols for linking object modules, (4) con-
+        ditional assembly directives, (5) reusable  local  symbols,  and
+        (6) include-file processing.  
+
+           The  companion program ASLINK is a relocating linker perform-
+        ing the following functions:  (1) bind multiple  object  modules
+        into  a  single  memory  image,  (2) resolve inter-module symbol
+        references,  (3)  resolve  undefined  symbols   from   specified
+        librarys of object modules, (4) process absolute, relative, con-
+        catenated, and overlay attributes in data and program  sections,
+        (5)  perform  byte and word program-counter relative (pc or pcr)
+        addressing calculations, (6) define absolute  symbol  values  at
+        link  time, (7) define absolute area base address values at link
+        time, (8) produce Intel Hex or Motorola  S19  output  file,  (9)
+        produce  a  map  of the linked memory image, and (10) update the
+        ASxxxx assembler listing files  with  the  absolute  linked  ad-
+        dresses and data.  
+
+           The assemblers and linker have been tested using DECUS C with
+        TSX+ and RT-11, GCC 2.7.2 with LINUX, Symantec  C/C++  V6.1/V7.2
+        and  DJGPP  (GCC 2.8.1) with MS-DOS/Windows 3.x/95/98.  Complete
+        source code and documentation for the assemblers and  linker  is
+        included  with  the  distribution.   Additionally, test code for
+        each assembler and several microprocessor  monitors  (  ASSIST05
+        for  the 6805, MONDEB and ASSIST09 for the 6809, and BUFFALO 2.5
+        for the 6811) are included as working examples of use  of  these
+        assemblers.  
 
 
 
@@ -947,7 +956,7 @@
                                                 operator.        (signed
                                                 16-bit quotient) 
 
-                &amp;amp;   Ampersand       A &amp;amp; B       Logical AND operator.  
+                &amp;   Ampersand       A &amp; B       Logical AND operator.  
 
                 |   Bar             A | B       Logical OR operator.  
 
@@ -1660,8 +1669,7 @@
                 's_&lt;area&gt;'      This is the starting address of the pro-
                                 gram area.  
 
-                                indent  -16  'l_&lt;area&gt;'      This is the
-                                length of the program area.  
+                'l_&lt;area&gt;'      This is the length of the program area. 
 
         The .area names and options are never case sensitive.  
 
@@ -2306,54 +2314,59 @@
              4.  -i/-s   Intel Hex (file.ihx) or Motorola S19 (file.s19)
                  image output file.  
 
-             5.  -z      Specifies that symbol names are case sensitive. 
+             5.  -o/-v   Specifies      that      subsequent      linked
+                 files/libraries will generate object  output  (default)
+                 or  suppress  object  output.   (if option -s or -i was
+                 specified) 
 
-             6.  -m      Generate a map file (file.map).  This file con-
+             6.  -z      Specifies that symbol names are case sensitive. 
+
+             7.  -m      Generate a map file (file.map).  This file con-
                  tains a list of the symbols (by area) with absolute ad-
                  dresses,  sizes  of  linked  areas,  and  other linking
                  information.  
 
-             7.  -w      Specifies  that  a  wide listing format be used
+             8.  -w      Specifies  that  a  wide listing format be used
                  for the map file.  
 
-             8.  -xdq    Specifies  the  number  radix  for the map file
+             9.  -xdq    Specifies  the  number  radix  for the map file
                  (Hexidecimal, Decimal, or Octal).  
 
-             9.  -u      Generate  an  updated  listing  file (file.rst)
-                 derived from the relocated addresses and data from  the
-                 linker.  
-
-            10.  file    File(s) to be linked.  Files may be on the same
-                 line as the above options or on a separate line(s)  one
 
 
         THE LINKER                                              PAGE 2-3
         INVOKING ASLINK
 
 
+            10.  -u      Generate  an  updated  listing  file (file.rst)
+                 derived from the relocated addresses and data from  the
+                 linker.  
+
+            11.  file    File(s) to be linked.  Files may be on the same
+                 line as the above options or on a separate line(s)  one
                  file  per line or multiple files separated by spaces or
                  tabs.  
 
-            11.  -b  area=expression (one definition per line) 
+            12.  -b  area=expression (one definition per line) 
                  This  specifies  an area base address where the expres-
                  sion may contain constants and/or defined symbols  from
                  the linked files.  
 
-            12.  -g  symbol=expression (one definition per line) 
+            13.  -g  symbol=expression (one definition per line) 
                  This  specifies  the value for the symbol where the ex-
                  pression may contain constants and/or  defined  symbols
                  from the linked files.  
 
-            13.  -k  library directory path 
+            14.  -k  library directory path 
                  (one  definition  per line) This specifies one possible
                  path to an object library.  More than one path  is  al-
                  lowed.  
 
-            14.  -l  library file specification 
+            15.  -l  library file specification 
                  (one  definition  per  line)  This specifies a possible
                  library file.  More than one file is allowed.  
 
-            15.  -e      or null line, terminates input to the linker.  
+            16.  -e      or null line, terminates input to the linker.  
 
 
 
@@ -2377,17 +2390,16 @@
 
            The  library  file  specification may be formed in one of two
         ways:  
-
-             1.  If  the  library  file  contained an absolute path/file
-                 specification  then  this  is   the   object   module's
-                 path/file.  
-                 (i.e.  C:\...  or C:/...) 
-
 
 
         THE LINKER                                              PAGE 2-4
         LIBRARY PATH(S) AND FILE(S)
 
+
+             1.  If  the  library  file  contained an absolute path/file
+                 specification  then  this  is   the   object   module's
+                 path/file.  
+                 (i.e.  C:\...  or C:/...) 
 
              2.  If  the  library  file  contains  a  relative path/file
                  specification then the concatenation of  the  path  and
@@ -2435,18 +2447,18 @@
            The  area  linking proceeds by first examining the area types
         ABS, CON, REL, OVR and PAG.  Absolute areas (ABS) from  separate
         object modules are always overlayed and have been assembled at a
-        specific address, these are not normally relocated (if a -b com-
-        mand  is  used  on an absolute area the area will be relocated).
-        Relative areas (normally defined as REL|CON) have a base address
-        of  0x0000  as read from the object files, the -b command speci-
-        fies the beginning address of the area.  All subsequent relative
-        areas  will  be  concatenated  with  proceeding  relative areas.
+        specific address, these are not  normally  relocated  (if  a  -b
 
 
         THE LINKER                                              PAGE 2-5
         ASLINK PROCESSING
 
 
+        command is used on an absolute area the area will be relocated).
+        Relative areas (normally defined as REL|CON) have a base address
+        of  0x0000  as read from the object files, the -b command speci-
+        fies the beginning address of the area.  All subsequent relative
+        areas  will  be  concatenated  with  proceeding  relative areas.
         Where specific ordering is desired, the first linker input  file
         should  have  the area definitions in the desired order.  At the
         completion of the area linking all area  addresses  and  lengths
@@ -2493,19 +2505,28 @@
         second pass of the input files.  As the xxx.rel files  are  read
         the code is relocated by substituting the physical addresses for
         the referenced symbols and areas and may be output in  Intel  or
-        Motorola  formats.   The  number of files linked and symbols de-
-        fined/referenced is limited by the processor space available  to
-        build the area/symbol lists.  If the -u option is specified then
-        the listing files  (file.lst)  associated  with  the  relocation
-        files  (file.rel)  are  scanned  and  used  to create a new file
+        Motorola  formats.   The  number  of  files  linked  and symbols
 
 
         THE LINKER                                              PAGE 2-6
         ASLINK PROCESSING
 
 
+        defined/referenced is limited by the processor  space  available
+        to  build  the area/symbol lists.  If the -u option is specified
+        then the listing files (file.lst) associated with the relocation
+        files  (file.rel)  are  scanned  and  used  to create a new file
         (file.rst) which has all addresses and data relocated  to  their
         final values.  
+
+           The  -o/-v  options  allow the simple creation of loadable or
+        overlay modules.  Loadable and overlay modules normally need  to
+        be  linked  with  a  main module(s) to resolve external symbols.
+        The -o/-v options can be used to enable object  output  for  the
+        loadable  or overlay module(s) and suppress the object code from
+        the linked main module(s).  The -o/-v  options  can  be  applied
+        repeatedly  to specify a single linked file, groups of files, or
+        libraries for object code inclusion or suppression.  
 
 
         2.5  LINKER INPUT FORMAT 
@@ -2534,6 +2555,12 @@
                 P       Paging information
 
 
+
+
+        THE LINKER                                              PAGE 2-7
+        LINKER INPUT FORMAT
+
+
         2.5.1  Object Module Format 
 
 
@@ -2549,12 +2576,6 @@
            The  header  line  specifies  the number of areas(aa) and the
         number of global symbols(gg) defined or referenced in  this  ob-
         ject module segment.  
-
-
-
-
-        THE LINKER                                              PAGE 2-7
-        LINKER INPUT FORMAT
 
 
         2.5.3  Module Line 
@@ -2582,6 +2603,12 @@
         zero.  
 
 
+
+
+        THE LINKER                                              PAGE 2-8
+        LINKER INPUT FORMAT
+
+
         2.5.5  Area Line 
 
                 A label size ss flags ff 
@@ -2605,12 +2632,6 @@
         bler with xx xx being the offset address from the  current  area
         base address and nn being the assembled instructions and data in
         byte format.  
-
-
-
-
-        THE LINKER                                              PAGE 2-8
-        LINKER INPUT FORMAT
 
 
         2.5.7  R Line 
@@ -2640,6 +2661,11 @@
                  updated  by  the  relocation).   The T line data may be
                  1-byte or  2-byte  byte  data  format  or  2-byte  word
                  format.  
+
+
+        THE LINKER                                              PAGE 2-9
+        LINKER INPUT FORMAT
+
 
              3.  xx xx  is the area/symbol index for the area/symbol be-
                  ing referenced.  the corresponding area/symbol is found
@@ -2664,12 +2690,6 @@
         selected page area and bb bb is the base address  of  the  page.
         bb bb will require relocation processing if the 'n1 n2 xx xx' is
         specified in the P line.  The linker will verify that  the  base
-
-
-        THE LINKER                                              PAGE 2-9
-        LINKER INPUT FORMAT
-
-
         address is on a 256 byte boundary and that the page length of an
         area defined with the PAG type is not larger than 256 bytes.  
 
@@ -2697,6 +2717,12 @@
            During  Pass  two the linker reads the T, R, and P lines per-
         forming the necessary relocations and  outputting  the  absolute
         code.  Various errors may be reported during this process 
+
+
+        THE LINKER                                             PAGE 2-10
+        LINKER ERROR MESSAGES
+
+
         The P line processing can produce only one possible error:  
 
         ?ASlink-Warning-Page Definition Boundary Error
@@ -2719,11 +2745,6 @@
                  file        module      area        offset
           Refby  t6800l      t6800l      DIRECT      0015
           Defin  tconst      tconst      .  .ABS.    0100
-
-
-        THE LINKER                                             PAGE 2-10
-        LINKER ERROR MESSAGES
-
 
         ?ASlink-Warning-Page0 relocation error for symbol  ltwo56
                  file        module      area        offset
@@ -2754,6 +2775,11 @@
 
              2.  The Unsigned byte error indicates an indexing value was
                  negative or larger than 255.  
+
+
+        THE LINKER                                             PAGE 2-11
+        LINKER ERROR MESSAGES
+
 
              3.  The  Page0  error is generated if the direct page vari-
                  able is not in the page0 range of 0 to 255.  
@@ -2763,7 +2789,7 @@
 
 
 
-        THE LINKER                                             Page 2-11
+        THE LINKER                                             Page 2-12
         INTEL HEX OUTPUT FORMAT
 
 
@@ -2819,7 +2845,7 @@
                                 first.  
 
 
-        THE LINKER                                             Page 2-12
+        THE LINKER                                             Page 2-13
         MOTOROLA S1-S9 OUTPUT FORMAT
 
 
@@ -6498,8 +6524,7 @@
                 bit     []                      jmp     []
         
                 dec                             inc
-
-</PRE></B>
+</PRE></B>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 

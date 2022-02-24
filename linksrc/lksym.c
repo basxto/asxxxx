@@ -27,7 +27,7 @@
  *	lksym.c contains the following functions:
  *		int	hash()
  *		sym *	lkpsym()
- *		VOID *	new()
+ *		char *	new()
  *		sym *	newsym()
  *		char *	strsto()
  *		VOID	symdef()
@@ -210,7 +210,7 @@ newsym()
  *
  *	functions called:
  *		int	hash()		lksym.c
- *		VOID *	new()		lksym.c
+ *		char *	new()		lksym.c
  *		int	symeq()		lksym.c
  *
  *	side effects:
@@ -504,7 +504,7 @@ register int cflag;
  *		none
  *
  *	functions called:
- *		VOID *	new()		assym.c
+ *		char *	new()		assym.c
  *		char *	strncpy()	c_library
  *
  *	side effects:
@@ -546,7 +546,7 @@ char *str;
  * requirement.
  */
 
-/*)Function	VOID *	new(n)
+/*)Function	char *	new(n)
  *
  *		unsigned int	n	allocation size in bytes
  *
@@ -591,7 +591,7 @@ char *str;
 static	char *	pnext = NULL;
 static	int	bytes = 0;
    
-VOID *
+char *
 new(n)
 unsigned int n;
 {
@@ -661,7 +661,7 @@ unsigned int n;
  *		none
  *
  *	functions called:
- *		VOID *	new()		assym.c
+ *		char *	new()		assym.c
  *		char *	strncpy()	c_library
  *
  *	side effects:
@@ -713,7 +713,7 @@ char *str;
 	return(p);
 }
 
-/*)Function	VOID *	new(n)
+/*)Function	char *	new(n)
  *
  *		unsigned int	n	allocation size in bytes
  *
@@ -737,7 +737,7 @@ char *str;
  *		the linker is terminated.
  */
 
-VOID *
+char *
 new(n)
 unsigned int n;
 {

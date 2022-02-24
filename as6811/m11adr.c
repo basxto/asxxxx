@@ -158,7 +158,8 @@ register char *str;
  */
 int
 any(c,str)
-char    c, *str;
+int c;
+char *str;
 {
 	while (*str)
 		if(*str++ == c)

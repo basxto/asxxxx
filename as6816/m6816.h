@@ -100,6 +100,28 @@ extern struct adsym pulm[];
 
 	/* machine dependent functions */
 
+#ifdef	OTHERSYSTEM
+	
+	/* m16adr.c */
+extern	int		addr(struct expr *esp);
+extern	int		admode(struct adsym *sp);
+extern	int		any(int c, char *str);
+extern	int		srch(char *str);
+
+	/* m16mch.c */
+extern	VOID		machine(struct mne *mp);
+extern	VOID		mchubyt(struct expr *e1);
+extern	int		mchindx(int t1, struct expr *e1);
+extern	int		mchimm(struct expr *e1);
+extern	int		mchcon(struct expr *e1);
+extern	int		mchpcr(struct expr *esp);
+extern	VOID		minit(void);
+extern	int		setbit(int b);
+extern	int		getbit(void);
+extern	int		comma(void);
+
+#else
+
 	/* m16adr.c */
 extern	int		addr();
 extern	int		admode();
@@ -108,7 +130,6 @@ extern	int		srch();
 
 	/* m16mch.c */
 extern	VOID		machine();
-extern	int		mchabs();
 extern	VOID		mchubyt();
 extern	int		mchindx();
 extern	int		mchimm();
@@ -118,3 +139,6 @@ extern	VOID		minit();
 extern	int		setbit();
 extern	int		getbit();
 extern	int		comma();
+
+#endif
+

@@ -76,6 +76,23 @@ struct adsym
 
 	/* machine dependent functions */
 
+#ifdef	OTHERSYSTEM
+
+	/* m00adr.c */
+extern	struct	adsym	abx[];
+extern	int		addr(struct expr *esp);
+extern	int		admode(struct adsym *sp);
+extern	int		any(int c, char *str);
+extern	int		srch(char *str);
+
+	/* m00mch.c */
+extern	VOID		machine(struct mne *mp);
+extern	int		mchpcr(struct expr *esp);
+extern	VOID		minit(void);
+extern	int		comma(void);
+
+#else
+
 	/* m00adr.c */
 extern	struct	adsym	abx[];
 extern	int		addr();
@@ -88,4 +105,6 @@ extern	VOID		machine();
 extern	int		mchpcr();
 extern	VOID		minit();
 extern	int		comma();
+
+#endif
 

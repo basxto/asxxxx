@@ -14,7 +14,7 @@
  *
  */
 
-#define	VERSION	"V02.10"
+#define	VERSION	"V02.2"
 
 /*)Module	aslink.h
  *
@@ -294,7 +294,8 @@ struct	sym
  *	The structure lfile contains a pointer to a
  *	file specification string, an index which points
  *	to the file name (past the 'path'), the file type,
- *	and a link to the next lfile structure.
+ *	an object output flag, and a link to the next
+ *	lfile structure.
  */
 struct	lfile
 {
@@ -302,6 +303,7 @@ struct	lfile
 	int	f_type;		/* File type */
 	char	*f_idp;		/* Pointer to file spec */
 	int	f_idx;		/* Index to file name */
+	int	f_obj;		/* Object output flag */
 };
 
 /*
@@ -395,6 +397,7 @@ struct lbname {
 	char		*path;
 	char		*libfil;
 	char		*libspc;
+	int		f_obj;
 };
 
 /*
@@ -410,8 +413,10 @@ struct lbname {
  *	The element libspc points to the library file path specification
  *	and element relfil points to the object file specification string.
  *	The element filspc is the complete path/file specification for
- *	the library file to be imported into the linker.  The
- *	file specicifation may be formed in one of two ways:
+ *	the library file to be imported into the linker.  The f_obj
+ *	flag specifies if the object code from this file is
+ *	to be output by the linker.  The file specification
+ *	may be formed in one of two ways:
  *
  *	(1)	If the library file contained an absolute
  *		path/file specification then this becomes filspc.
@@ -430,6 +435,7 @@ struct lbfile {
 	char		*libspc;
 	char		*relfil;
 	char		*filspc;
+	int		f_obj;
 };
 
 /*
@@ -556,6 +562,8 @@ extern	FILE	*tfp;		/*	File handle for input
 				 */
 extern	int	oflag;		/*	Output file type flag
 				 */
+extern	int	objflg;		/*	Linked file/library object output flag
+				 */
 extern	int	mflag;		/*	Map output flag
 				 */
 extern	int	xflag;		/*	Map file radix type flag
@@ -596,6 +604,8 @@ extern	addr_t	rtadr1;		/*
 				 */
 extern	addr_t	rtadr2;		/*
 				 */
+extern	int	obj_flag;	/*	Linked file/library object output flag
+				 */
 extern	int	hilo;		/*	REL file byte ordering
 				 */
 extern	int	gline;		/*	LST file relocation active
@@ -631,6 +641,112 @@ extern	char *		strrchr();
 */
 
 /* Program function definitions */
+
+#ifdef	OTHERSYSTEM
+
+/* lkmain.c */
+extern	FILE *		afile(char *fn, char *ft, int wf);
+extern	VOID		bassav(void);
+extern	int		fndidx(char *str);
+extern	VOID		gblsav(void);
+extern	VOID		link(void);
+extern	VOID		lkexit(int i);
+extern	int		main(int argc, char *argv[]);
+extern	VOID		map(void);
+extern	int		parse(void);
+extern	VOID		doparse(void);
+extern	VOID		setbas(void);
+extern	VOID		setgbl(void);
+extern	VOID		usage(int n);
+
+/* lklex.c */
+extern	char		endline(void);
+extern	int		get(void);
+extern	VOID		getfid(char *str, int c);
+extern	VOID		getid(char *id, int c);
+extern	int		getline(void);
+extern	int		getmap(int d);
+extern	int		getnb(void);
+extern	int		more(void);
+extern	VOID		skip(int c);
+extern	VOID		unget(int c);
+
+/* lkarea.c */
+extern	VOID		lkparea(char *id);
+extern	VOID		lnkarea(void);
+extern	VOID		lnksect(struct area *tap);
+extern	VOID		newarea(void);
+
+/* lkhead.c */
+extern	VOID		module(void);
+extern	VOID		newhead(void);
+
+/* lksym.c */
+extern	int		hash(char *p, int cflag);
+extern	struct	sym *	lkpsym(char *id, int f);
+extern	char *		new(unsigned int n);
+extern	struct	sym *	newsym(void);
+extern	char *		strsto(char *str);
+extern	VOID		symdef(FILE *fp);
+extern	int		symeq(char *p1, char *p2, int cflag);
+extern	VOID		syminit(void);
+extern	VOID		symmod(FILE *fp, struct sym *tsp);
+extern	addr_t		symval(struct sym *tsp);
+
+/* lkeval.c */
+extern	int		digit(int c, int r);
+extern	addr_t		eval(void);
+extern	addr_t		expr(int n);
+extern	int		oprio(int c);
+extern	addr_t		term(void);
+
+/* lklist.c */
+extern	int		dgt(int rdx, char *str, int n);
+extern	VOID		lkulist(int i);
+extern	VOID		lkalist(addr_t pc);
+extern	VOID		lkglist(addr_t pc, int v);
+extern	VOID		lstarea(struct area *xp);
+extern	VOID		newpag(FILE *fp);
+extern	VOID		slew(struct area *xp);
+
+/* lkrloc.c */
+extern	addr_t		adb_b(addr_t v, int i);
+extern	addr_t		adb_hi(addr_t v, int i);
+extern	addr_t		adb_lo(addr_t v, int i);
+extern	addr_t		adw_w(addr_t v, int i);
+extern	addr_t		adw_hi(addr_t v, int i);
+extern	addr_t		adw_lo(addr_t v, int i);
+extern	addr_t		evword(void);
+extern	VOID		rele(void);
+extern	VOID		reloc(int c);
+extern	VOID		relt(void);
+extern	VOID		relr(void);
+extern	VOID		relp(void);
+extern	VOID		relerr(char *str);
+extern	char *		errmsg[];
+extern	VOID		errdmp(FILE *fptr, char *str);
+extern	VOID		relerp(char *str);
+extern	VOID		erpdmp(FILE *fptr, char *str);
+extern	VOID		prntval(FILE *fptr, addr_t v);
+
+/* lklibr.c */
+extern	VOID		addfile(char *path, char *libfil);
+extern	VOID		addlib(void);
+extern	VOID		addpath(void);
+extern	int		fndsym(char *name);
+extern	VOID		library(void);
+extern	VOID		loadfile(char *filspc);
+extern	VOID		search(void);
+
+/* lks19.c */
+extern	VOID		s19(int i);
+extern	VOID		sflush(void);
+
+/* lkihx.c */
+extern	VOID		ihx(int i);
+extern	VOID		iflush(void);
+
+#else
 
 /* lkmain.c */
 extern	FILE *		afile();
@@ -733,4 +849,6 @@ extern	VOID		sflush();
 /* lkihx.c */
 extern	VOID		ihx();
 extern	VOID		iflush();
+
+#endif
 

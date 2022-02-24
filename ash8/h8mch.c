@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <string.h>
 #include "asxxxx.h"
 #include "h8.h"
 
@@ -835,7 +836,7 @@ char *dpcode[] = {
 	";	H8/3xx Direct Page Initialization",
 	"	.setdp	0xFF00,_CODE",
 	"",
-	0
+	NULL
 };
 
 /*

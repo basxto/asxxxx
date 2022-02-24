@@ -105,6 +105,29 @@ extern struct adsym ccr_reg[];
 
 	/* machine dependent functions */
 
+#ifdef	OTHERSYSTEM
+	
+	/* h8adr.c */
+extern	int		addr(struct expr *esp);
+extern	int		addr1(struct expr *esp);
+extern	int		admode(struct adsym *sp);
+extern	int		any(int c, char *str);
+extern	int		srch(char *str);
+
+	/* h8mch.c */
+extern	VOID		machine(struct mne *mp);
+extern	VOID		normbyte(struct expr *esp);
+extern	VOID		usgnbyte(struct expr *esp);
+extern	VOID		pagebyte(struct expr *esp);
+extern	int		abstype(struct expr *esp);
+extern	int		mchpcr(struct expr *esp);
+extern	VOID		minit(void);
+extern	int		setbit(int b);
+extern	int		getbit(void);
+extern	int		comma(void);
+
+#else
+
 	/* h8adr.c */
 extern	int		addr();
 extern	int		addr1();
@@ -123,3 +146,6 @@ extern	VOID		minit();
 extern	int		setbit();
 extern	int		getbit();
 extern	int		comma();
+
+#endif
+

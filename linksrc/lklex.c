@@ -93,7 +93,7 @@ char *id;
 	*p++ = 0;
 }
 
-/*)Function	VOID	getfid(fid,c)
+/*)Function	VOID	getfid(str,c)
  *
  *		char *	str		a pointer to a string of
  *					maximum length FILSPC-1
@@ -162,12 +162,13 @@ getnb()
 	return (c);
 }
 
-/*)Function	VOID	skip()
+/*)Function	VOID	skip(c)
  *
  *	The function skip() scans the input text skipping all
  *	letters and digits.
  *
  *	local variables:
+ *		int	c		last character read
  *		none
  *
  *	global variables:
@@ -412,6 +413,7 @@ loop:	if (cfp && cfp->f_type == F_STD)
 		fprintf(stdout, "ASlink >> ");
 
 	if (sfp == NULL || fgets(ib, sizeof ib, sfp) == NULL) {
+		obj_flag = 0;
 		if (sfp) {
 			if(sfp != stdin)
 				fclose(sfp);
@@ -432,8 +434,9 @@ loop:	if (cfp && cfp->f_type == F_STD)
 				sfp = afile(fid, "lnk", 0);
 			} else
 			if (ftype == F_REL) {
-				sfp = afile(fid, "rel", 0);
-				if (uflag && pass != 0) {
+				obj_flag = cfp->f_obj;
+				sfp = afile(fid, "", 0);
+				if (uflag && (obj_flag == 0) && pass != 0) {
 				 if ((tfp = afile(fid, "lst", 0)) != NULL) {
 				  if ((rfp = afile(fid, "rst", 1)) == NULL) {
 					fclose(tfp);

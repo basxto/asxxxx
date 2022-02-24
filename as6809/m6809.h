@@ -118,6 +118,28 @@ extern struct opdata mc6800[];
 
 	/* machine dependent functions */
 
+#ifdef	OTHERSYSTEM
+	
+	/* m09adr.c */
+extern	int		addr(struct expr *esp);
+extern	int		addr1(struct expr *esp);
+extern	int		admode(struct adsym *sp);
+extern	int		any(int c, char *str);
+extern	int		srch(char *str);
+
+	/* m09mch.c */
+extern	VOID		machine(struct mne *mp);
+extern	VOID		genout(int cpg, int op, int rf, struct expr *esp);
+extern	VOID		m68out(int i);
+extern	int		mchpcr(struct expr *esp);
+extern	VOID		minit(void);
+extern	int		setbit(int b);
+extern	int		getbit(void);
+extern	int		comma(void);
+extern	struct	sdp	sdp;
+
+#else
+
 	/* m09adr.c */
 extern	int		addr();
 extern	int		addr1();
@@ -135,3 +157,6 @@ extern	int		setbit();
 extern	int		getbit();
 extern	int		comma();
 extern	struct	sdp	sdp;
+
+#endif
+

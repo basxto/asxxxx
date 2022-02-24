@@ -510,7 +510,7 @@ char *str;
 	return(p);
 }
 
-/*)Function	VOID *	new(n)
+/*)Function	char *	new(n)
  *
  *		unsigned int	n	allocation size in bytes
  *
@@ -534,7 +534,7 @@ char *str;
  *		the assembly is terminated.
  */
 
-VOID *
+char *
 new(n)
 unsigned int n;
 {

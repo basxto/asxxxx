@@ -49,7 +49,7 @@
 
 /*)Function	VOID	reloc(c)
  *
- *			char c		process code
+ *		int c			process code
  *
  *	The function reloc() calls a particular relocation
  *	function determined by the process code.
@@ -74,7 +74,7 @@
 
 VOID
 reloc(c)
-char c;
+int c;
 {
 	switch(c) {
 

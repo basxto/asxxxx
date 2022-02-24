@@ -196,7 +196,7 @@ char *errors[] = {
 	NULL
 };
 	
-/*)Function:	char	*getarr(c)
+/*)Function:	char	*geterr(c)
  *
  *		int	c		the error code character
  *

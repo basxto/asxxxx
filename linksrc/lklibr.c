@@ -148,9 +148,10 @@ addlib()
  *	global variables:
  *		lbname	*lbnhead	The pointer to the first
  *				 	path structure
+ *		int	objflg		linked file/library object output flag
  *
  *	 functions called:
- *		VOID *	new()		lksym.c
+ *		VOID *	malloc()	c_library
  *		int	strlen()	c_library
  *		char *	strcpy()	c_library
  *
@@ -168,17 +169,18 @@ char *libfil;
 	struct lbname *lbnh, *lbn;
 
 	if ((path != NULL) && (strchr(libfil,':') == NULL)){
-		str = (char *) new (strlen(path) + strlen(libfil) + 6);
+		str = (char *) malloc (strlen(path) + strlen(libfil) + 5);
 		strcpy(str,path);
 		strend = str + strlen(str) - 1;
 		if ((*libfil == '\\' && *strend == '\\') ||
 		    (*libfil ==  '/' && *strend ==  '/')) {
 			*strend = '\0';
 		}
+		strcat(str,libfil);
 	} else {
-		str = (char *) new (strlen(libfil) + 5);
+		str = (char *) malloc (strlen(libfil) + 5);
+		strcpy(str,libfil);
 	}
-	strcat(str,libfil);
 	if(strchr(str,FSEPX) == NULL) {
 		sprintf(&str[strlen(str)], "%clib", FSEPX);
 	}
@@ -199,6 +201,7 @@ char *libfil;
 		lbnh->libfil = (char *) new (strlen(libfil) + 1);
 		strcpy(lbnh->libfil,libfil);
 		lbnh->libspc = str;
+		lbnh->f_obj = objflg;
 	} else {
 		free(str);
 	}
@@ -306,6 +309,7 @@ search()
  *		FILE	*fp		file handle for object file
  *		lbfile	*lbf		temporary pointer
  *		lbfile	*lbfh		pointer to lbfile structure
+ *		int	lbscan		scan library file flag
  *		FILE	*libfp		file handle for library file
  *		lbname	*lbnh		pointer to lbname structure
  *		char	*path		file specification path
@@ -319,6 +323,7 @@ search()
  *				 	name structure
  *		lbfile	*lbfhead	The pointer to the first
  *				 	file structure
+ *		int	obj_flag	linked file/library object output flag
  *
  *	 functions called:
  *		int	fclose()	c_library
@@ -327,7 +332,7 @@ search()
  *		VOID	free()		c_library
  *		VOID	lkexit()	lkmain.c
  *		VOID	loadfile()	lklibr.c
- *		VOID *	new()		lksym.c
+ *		VOID *	malloc()	c_library
  *		char *	sprintf()	c_library
  *		int	sscanf()	c_library
  *		char *	strcat()	c_library
@@ -356,6 +361,7 @@ char *name;
 	char symname[NINPUT];
 	char *path,*str,*strend;
 	char c;
+	int lbscan;
 
 	/*
 	 * Search through every library in the linked list "lbnhead".
@@ -379,21 +385,30 @@ char *name;
 		    relfil[NINPUT+1] = '\0';
 		    relfil[strlen(relfil) - 1] = '\0';
 		    if (path != NULL) {
-			str = (char *) new (strlen(path)+strlen(relfil)+6);
+			str = (char *) malloc (strlen(path)+strlen(relfil)+5);
 			strcpy(str,path);
 			strend = str + strlen(str) - 1;
 			if ((*relfil == '\\' && *strend == '\\') ||
 			    (*relfil ==  '/' && *strend ==  '/')) {
 				*strend = '\0';
 			}
+			strcat(str,relfil);
 		    } else {
-			str = (char *) new (strlen(relfil) + 5);
+			str = (char *) malloc (strlen(relfil) + 5);
+			strcpy(str,relfil);
 		    }
-		    strcat(str,relfil);
 		    if(strchr(str,FSEPX) == NULL) {
 			sprintf(&str[strlen(str)], "%crel", FSEPX);
 		    }
-/*3*/		    if ((fp = fopen(str, "r")) != NULL) {
+		    /*
+		     * Scan only files not yet loaded
+		     */
+		    for (lbf=lbfhead, lbscan=1; lbf&&lbscan; lbf=lbf->next) {
+			if (strcmp(lbf->filspc,str) == 0) {
+			    lbscan = 0;
+			}
+		    }
+/*3*/		    if (lbscan && (fp = fopen(str, "r")) != NULL) {
 
 			/*
 			 * Read in the object file.  Look for lines that
@@ -409,17 +424,17 @@ char *name;
 			buf[strlen(buf) - 1] = '\0';
 
 			/*
+			 * When a 'T line' is found terminate file scan.
+			 * All 'S lines' preceed 'T lines' in .REL files.
+			 */
+			if (buf[0] == 'T')
+				break;
+
+			/*
 			 * Skip everything that's not a symbol record.
 			 */
 			if (buf[0] != 'S')
 				continue;
-
-			/*
-			 * When a 'T line' is found terminate file scan.
-			 * All 'S line's preceed 'T line's in .REL files.
-			 */
-			if (buf[0] == 'T')
-				break;
 
 			sscanf(buf, "S %s %c", symname, &c);
 
@@ -444,8 +459,10 @@ char *name;
 			lbfh->filspc = str;
 			lbfh->relfil = (char *) new (strlen(relfil) + 1);
 			strcpy(lbfh->relfil,relfil);
+			lbfh->f_obj = lbnh->f_obj;
 			fclose(fp);
 			fclose(libfp);
+			obj_flag = lbfh->f_obj;
 			loadfile(str);
 			return (1);
 
@@ -454,7 +471,6 @@ char *name;
 /*4*/			}
 		    fclose(fp);
 /*3*/		    }
-
 		    free(str);
 /*2*/		}
 		fclose(libfp);
@@ -472,6 +488,7 @@ char *name;
  *
  *	global variables:
  *		lbfile	*lbfhead	pointer to first lbfile structure
+ *		int	obj_flag	linked file/library object output flag
  *
  *	 functions called:
  *		VOID	loadfile	lklibr.c
@@ -486,6 +503,7 @@ library()
 	struct lbfile *lbfh;
 
 	for (lbfh=lbfhead; lbfh; lbfh=lbfh->next) {
+		obj_flag = lbfh->f_obj;
 		loadfile(lbfh->filspc);
 	}
 }

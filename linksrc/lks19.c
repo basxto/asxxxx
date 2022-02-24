@@ -88,6 +88,7 @@
  *
  *	global variables:
  *		int	hilo		byte order
+ *		int	obj_flag	linked file/library object output flag
  *		FILE *	ofp		output file handle
  *		int	rtcnt		count of data words
  *		int	rtflg[]		output the data flag
@@ -106,16 +107,17 @@
  */
 
 /*
- * The maximum number of Data Field bytes is NMAX less:
+ * Number of Data Field bytes is:
+ *
  *	2	Record Type Field
  *	2	Record Length Field
  *	4	Load Address Field
  *	2	Checksum Field
  *
- *	Divided by 2 (2 characters per byte)
+ *	Plus 32 data bytes (64 characters)
  */
 
-#define	MAXBYTES	((NMAX - 10)/2)
+#define	MAXBYTES	32
 
 VOID
 s19(i)
@@ -137,11 +139,13 @@ int i;
 			sflush();
 			rtadr0 = rtadr1 = rtadr2;
 		}
-		for (j=2; j<rtcnt; j++) {
-			if (rtflg[j]) {
-				rtbuf[rtadr1++ - rtadr0] = rtval[j];
-				if (rtadr1 - rtadr0 == MAXBYTES) {
-					sflush();
+		if (obj_flag == 0) {
+			for (j=2; j<rtcnt; j++) {
+				if (rtflg[j]) {
+					rtbuf[rtadr1++ - rtadr0] = rtval[j];
+					if (rtadr1 - rtadr0 == MAXBYTES) {
+						sflush();
+					}
 				}
 			}
 		}

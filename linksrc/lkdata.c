@@ -45,6 +45,8 @@ char	rb[NINPUT];	/*	LST file text line being
 			 */
 int	oflag;		/*	Output file type flag
 			 */
+int	objflg;		/*	Linked file/library object output flag
+			 */
 int	mflag;		/*	Map output flag
 			 */
 int	xflag;		/*	Map file radix type flag
@@ -85,6 +87,8 @@ addr_t	rtadr1 = 0;	/*
 			 */
 addr_t	rtadr2 = 0;	/*
 			 */
+int	obj_flag = 0;	/*	Linked file/library object output flag
+			 */
 int	hilo;		/*	REL file byte ordering
 			 */
 int	gline;		/*	LST file relocation active
@@ -98,7 +102,8 @@ int	gcntr;		/*	LST file relocation active
  *	The structure lfile contains a pointer to a
  *	file specification string, an index which points
  *	to the file name (past the 'path'), the file type,
- *	and a link to the next lfile structure.
+ *	an object output flag, and a link to the next
+ *	lfile structure.
  *
  *	struct	lfile
  *	{
@@ -106,6 +111,7 @@ int	gcntr;		/*	LST file relocation active
  *		int	f_type;			File type
  *		char	*f_idp;			Pointer to file spec
  *		int	f_idx;			Index to file name
+ *		int	f_obj;			Object output flag
  *	};
  */
 struct	lfile	*filep;	/*	The pointers (lfile *) filep,
@@ -385,6 +391,7 @@ struct	lbpath	*lbphead;	/*	pointer to the first
  *		char		*path;
  *		char		*libfil;
  *		char		*libspc;
+ *		char		f_obj;
  *	};
  */
 struct	lbname	*lbnhead;	/*	pointer to the first
@@ -404,8 +411,10 @@ struct	lbname	*lbnhead;	/*	pointer to the first
  *	The element libspc points to the library file path specification
  *	and element relfil points to the object file specification string.
  *	The element filspc is the complete path/file specification for
- *	the library file to be imported into the linker.  The
- *	file specicifation may be formed in one of two ways:
+ *	the library file to be imported into the linker.  The f_obj
+ *	flag specifies if the object code from this file is
+ *	to be output by the linker.  The file specification
+ *	may be formed in one of two ways:
  *
  *	(1)	If the library file contained an absolute
  *		path/file specification then this becomes filspc.
@@ -424,6 +433,7 @@ struct	lbname	*lbnhead;	/*	pointer to the first
  *		char		*libspc;
  *		char		*relfil;
  *		char		*filspc;
+ *		int		f_obj;
  *	};
  */
 struct	lbfile	*lbfhead;	/*	pointer to the first
