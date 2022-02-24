@@ -28,6 +28,8 @@
 ..\exe\asxscn.exe -x3 ..\..\..\asxtst\asmt3h.lst
 ..\exe\asz80.exe -glaxff ..\..\..\asxtst\asmtl.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmtl.lst
+..\exe\asgb.exe -glaxff ..\..\..\asxtst\asmtl.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmtl.lst
 ..\exe\ash8.exe -glaxff ..\..\..\asxtst\asmth.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
 ..\exe\as6500.exe -glaxff ..\..\..\as6500\t6500.asm
@@ -70,6 +72,8 @@
 ..\exe\asxscn.exe -x3 ..\..\..\as8xcxxx\t80c390.lst
 ..\exe\asz80.exe -glaxff ..\..\..\asz80\tz80.asm
 ..\exe\asxscn.exe ..\..\..\asz80\tz80.lst
+..\exe\asgb.exe -glaxff ..\..\..\asgb\tgb.asm
+..\exe\asxscn.exe ..\..\..\asgb\tgb.lst
 ..\exe\ash8.exe -glaxff ..\..\..\ash8\th8.asm
 ..\exe\asxscn.exe ..\..\..\ash8\th8.lst
 

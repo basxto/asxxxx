@@ -1,7 +1,7 @@
 /* m11mch.c */
 
 /*
- * (C) Copyright 1989-2000
+ * (C) Copyright 1989-2001
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -243,7 +243,7 @@ struct mne *mp;
 			outrb(&e1, R_USGN);
 			break;
 		}
-		if (t1 == S_EXT) {
+		if ((t1 == S_DIR) || (t1 == S_EXT)) {
 			outab(op|0x10);
 			outrw(&e1, 0);
 			break;

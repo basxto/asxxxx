@@ -10,7 +10,7 @@ DEBUG		= 0
 NDEBUG		= 1
 !ENDIF
 
-PROJ		= as6801
+PROJ		= AS6801
 APPTYPE		= DOSX EXE
 PROJTYPE	= EXE
 
@@ -186,7 +186,7 @@ clean:
 		-del $(TARGETDIR)\$$SCW$$.$(PROJTYPE)
 		-del $(TARGETDIR)\$(PROJ).CLE
 		-del $(OUTPUTDIR)\SCPH.SYM
-		-del as6801.dpd
+		-del AS6801.dpd
 		-del $(OBJS)
 
 cleanres:
@@ -202,8 +202,8 @@ link:
 
 
 
-!IF EXIST (as6801.dpd)
-!INCLUDE as6801.dpd
+!IF EXIST (AS6801.dpd)
+!INCLUDE AS6801.dpd
 !ENDIF
 
 

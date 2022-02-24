@@ -6,30 +6,27 @@
 --------------------Configuration: as6804 - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\WINDOWS\TEMP\RSP3395.TMP" with contents
+Creating temporary file "C:\WINDOWS\TEMP\RSP40B5.TMP" with contents
 [
 /nologo /ML /W3 /GX /O2 /I "c:\asxxxx\asxxsrc" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Release/as6804.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
-"C:\Asxxxx\as6804\m04ext.c"
-"C:\Asxxxx\as6804\m04mch.c"
-"C:\Asxxxx\as6804\m04pst.c"
-"C:\Asxxxx\as6804\m04adr.c"
-"C:\Asxxxx\asxxsrc\asexpr.c"
-"C:\Asxxxx\asxxsrc\aslex.c"
-"C:\Asxxxx\asxxsrc\aslist.c"
-"C:\Asxxxx\asxxsrc\asmain.c"
-"C:\Asxxxx\asxxsrc\asout.c"
-"C:\Asxxxx\asxxsrc\assubr.c"
-"C:\Asxxxx\asxxsrc\assym.c"
-"C:\Asxxxx\asxxsrc\asdata.c"
+"C:\ASXXXX\asxxsrc\asdata.c"
+"C:\ASXXXX\asxxsrc\asexpr.c"
+"C:\ASXXXX\asxxsrc\aslex.c"
+"C:\ASXXXX\asxxsrc\aslist.c"
+"C:\ASXXXX\asxxsrc\asmain.c"
+"C:\ASXXXX\asxxsrc\asout.c"
+"C:\ASXXXX\asxxsrc\assubr.c"
+"C:\ASXXXX\asxxsrc\assym.c"
+"C:\ASXXXX\as6804\m04adr.c"
+"C:\ASXXXX\as6804\m04ext.c"
+"C:\ASXXXX\as6804\m04mch.c"
+"C:\ASXXXX\as6804\m04pst.c"
 ]
-Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP3395.TMP" 
-Creating temporary file "C:\WINDOWS\TEMP\RSP3396.TMP" with contents
+Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP40B5.TMP" 
+Creating temporary file "C:\WINDOWS\TEMP\RSP40B6.TMP" with contents
 [
-kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/as6804.pdb" /machine:I386 /out:"..\..\exe\as6804.exe" 
-.\Release\m04ext.obj
-.\Release\m04mch.obj
-.\Release\m04pst.obj
-.\Release\m04adr.obj
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/as6804.pdb" /machine:I386 /out:"..\..\exe\as6804.exe" 
+.\Release\asdata.obj
 .\Release\asexpr.obj
 .\Release\aslex.obj
 .\Release\aslist.obj
@@ -37,15 +34,15 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 .\Release\asout.obj
 .\Release\assubr.obj
 .\Release\assym.obj
-.\Release\asdata.obj
+.\Release\m04adr.obj
+.\Release\m04ext.obj
+.\Release\m04mch.obj
+.\Release\m04pst.obj
 ]
-Creating command line "link.exe @C:\WINDOWS\TEMP\RSP3396.TMP"
+Creating command line "link.exe @C:\WINDOWS\TEMP\RSP40B6.TMP"
 <h3>Output Window</h3>
 Compiling...
-m04ext.c
-m04mch.c
-m04pst.c
-m04adr.c
+asdata.c
 asexpr.c
 aslex.c
 aslist.c
@@ -53,7 +50,10 @@ asmain.c
 asout.c
 assubr.c
 assym.c
-asdata.c
+m04adr.c
+m04ext.c
+m04mch.c
+m04pst.c
 Linking...
 
 

@@ -10,7 +10,7 @@ DEBUG		= 0
 NDEBUG		= 1
 !ENDIF
 
-PROJ		= asxscn
+PROJ		= ASXSCN
 APPTYPE		= DOSX EXE
 PROJTYPE	= EXE
 
@@ -183,7 +183,7 @@ clean:
 		-del $(TARGETDIR)\$$SCW$$.$(PROJTYPE)
 		-del $(TARGETDIR)\$(PROJ).CLE
 		-del $(OUTPUTDIR)\SCPH.SYM
-		-del asxscn.dpd
+		-del ASXSCN.dpd
 		-del $(OBJS)
 
 cleanres:
@@ -199,8 +199,8 @@ link:
 
 
 
-!IF EXIST (asxscn.dpd)
-!INCLUDE asxscn.dpd
+!IF EXIST (ASXSCN.dpd)
+!INCLUDE ASXSCN.dpd
 !ENDIF
 
 

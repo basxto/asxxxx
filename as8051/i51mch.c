@@ -1,7 +1,7 @@
 /* i51mch.c */
 
 /*
- * (C) Copyright 1998-2000
+ * (C) Copyright 1998-2001
  * All Rights Reserved
  *
  * Alan R. Baldwin

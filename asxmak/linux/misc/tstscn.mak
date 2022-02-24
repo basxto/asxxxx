@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#  2-Apr-99	Alan Baldwin
+#  10-Nov-2001	Alan Baldwin
 #
 ####################################################################
 
@@ -39,6 +39,8 @@ all:
 	../exe/as8051 -glaxff ../../../asxtst/asmth.asm
 	../exe/asxscn ../../../asxtst/asmth.lst
 	../exe/asz80 -glaxff ../../../asxtst/asmtl.asm
+	../exe/asxscn ../../../asxtst/asmtl.lst
+	../exe/asgb -glaxff ../../../asxtst/asmtl.asm
 	../exe/asxscn ../../../asxtst/asmtl.lst
 	../exe/ash8 -glaxff ../../../asxtst/asmth.asm
 	../exe/asxscn ../../../asxtst/asmth.lst
@@ -82,6 +84,8 @@ all:
 	../exe/asxscn -x3 ../../../as8xcxxx/t80c390.lst
 	../exe/asz80 -glaxff ../../../asz80/tz80.asm
 	../exe/asxscn ../../../asz80/tz80.lst
+	../exe/asgb -glaxff ../../../asgb/tgb.asm
+	../exe/asxscn ../../../asgb/tgb.lst
 	../exe/ash8 -glaxff ../../../ash8/th8.asm
 	../exe/asxscn ../../../ash8/th8.lst
 

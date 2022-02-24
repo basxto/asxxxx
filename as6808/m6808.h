@@ -1,7 +1,7 @@
 /* m6808.h */
 
 /*
- * (C) Copyright 1993-2000
+ * (C) Copyright 1993-2001
  * All Rights Reserved
  *
  * Alan R. Baldwin

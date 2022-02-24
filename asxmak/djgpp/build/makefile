@@ -12,7 +12,7 @@
 all:	as6500.sv as6800.sv as6801.sv as6804.sv	\
 	as6805.sv as6808.sv as6809.sv as6811.sv	\
 	as6812.sv as6816.sv as8051.sv as8085.sv	\
-	as8xcxxx.sv ash8.sv asz80.sv	\
+	as8xcxxx.sv ash8.sv asz80.sv asgb.sv	\
 	aslink.sv	\
 	asxcnv.sv asxscn.sv
 
@@ -36,6 +36,7 @@ as8085:		as8085.sv
 as8xcxxx:	as8xcxxx.sv
 ash8:		ash8.sv
 asz80:		asz80.sv
+asgb:		asgb.sv
 
 aslink:		aslink.sv
 
@@ -74,12 +75,13 @@ SRC8085=	$(ASXBAS)as8085/
 SRC8xcxxx=	$(ASXBAS)as8xcxxx/
 SRCH8=		$(ASXBAS)ash8/
 SRCZ80=		$(ASXBAS)asz80/
+SRCGB=		$(ASXBAS)asgb/
 
 VPATH =		$(SRCASX);	$(SRCLNK);	$(SRCMISC);	\
 		$(SRC6500);	$(SRC6800);	$(SRC6801);	$(SRC6804);	\
 		$(SRC6805);	$(SRC6808);	$(SRC6809);	$(SRC6811);	\
 		$(SRC6812);	$(SRC6816);	$(SRC8051);	$(SRC8085);	\
-		$(SRC8xcxxx);	$(SRCH8);	$(SRCZ80)
+		$(SRC8xcxxx);	$(SRCH8);	$(SRCZ80);	$(SRCGB)
 
 
 .SUFFIXES:	.c .o .new .sv
@@ -328,6 +330,21 @@ z80adr.o :	$(SRCZ80)z80adr.c $(SRCZ80)z80.h $(SRCASX)asxxxx.h
 
 asz80.new:	$(ASXX) $(ASZ80)
 	$(LD) $(LDFLAGS) $(ASXX) $(ASZ80) -o asz80.new
+
+
+####################################################################
+# ASGB
+####################################################################
+
+ASGB =		gbext.o gbpst.o gbmch.o gbadr.o
+
+gbext.o :	$(SRCGB)gbext.c $(SRCGB)gb.h $(SRCASX)asxxxx.h
+gbpst.o :	$(SRCGB)gbpst.c $(SRCGB)gb.h $(SRCASX)asxxxx.h
+gbmch.o :	$(SRCGB)gbmch.c $(SRCGB)gb.h $(SRCASX)asxxxx.h
+gbadr.o :	$(SRCGB)gbadr.c $(SRCGB)gb.h $(SRCASX)asxxxx.h
+
+asgb.new:	$(ASXX) $(ASGB)
+	$(LD) $(LDFLAGS) $(ASXX) $(ASGB) -o asgb.new
 
 
 ####################################################################

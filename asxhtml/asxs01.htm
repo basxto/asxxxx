@@ -37,8 +37,10 @@ number of bytes for each assembled source line is estimated.
 (external) using the ASxxxx switch -g, otherwise undefined  sym-
 bols will be flagged as errors during succeeding passes.
   
+</PRE></B></H4>
 <H5><A HREF= #Assemblers> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Pass2"></A><FONT COLOR="#FF0000">Assembly Pass 2</FONT>
 
    During  pass  2  the ASxxxx assembler resolves forward refer-
@@ -49,8 +51,10 @@ struction allows multiple forms based upon the relative distance
 to the addressed location, or other factors.   Pass  2  resolves
 these cases and determines the address of all symbols.
   
+</PRE></B></H4>
 <H5><A HREF= #Assemblers> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Pass3"></A><FONT COLOR="#FF0000">Assembly Pass 3</FONT>
 
    Pass 3 by the assembler generates the listing file, the relo-
@@ -63,8 +67,8 @@ the  relocatable assembled code, the linker ASLINK will use this
 information to generate an absolute load file (Motorola or Intel
 formats).
   
-<H5><A HREF= #Assemblers> =&gt; Section Index</A></H5>
 </PRE></B></H4>
+<H5><A HREF= #Assemblers> =&gt; Section Index</A></H5>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 <BR><BR>
@@ -109,8 +113,10 @@ operator.
 time.  Each statement causes a particular operation to  be  per-
 formed.  
 
+</PRE></B></H4>
 <H5><A HREF= #Source> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Label"></A><FONT COLOR="#FF0000">Label Field</FONT>  -
 
    A  label is a user-defined symbol which is assigned the value
@@ -199,8 +205,10 @@ later section.
    The  label  must  not  start  with  the  sequence $$, as this
 represents the temporary radix 16 for constants.  
 
+</PRE></B></H4>
 <H5><A HREF= #Source> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Operator"></A><FONT COLOR="#FF0000">Operator Field</FONT>  -
 
    The  operator field specifies the action to be performed.  It
@@ -219,8 +227,10 @@ the operator field from the preceeding and following fields.
 
    An operator is terminated by a space, tab or end of line.  
 
+</PRE></B></H4>
 <H5><A HREF= #Source> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Operand"></A><FONT COLOR="#FF0000">Operand Field</FONT>  -
 
    When  the  operator is an instruction mnemonic (op code), the
@@ -247,8 +257,10 @@ field and defines the beginning of the comment field.   When  no
 comment  field  follows,  the operand field is terminated by the
 end of the source line.  
 
+</PRE></B></H4>
 <H5><A HREF= #Source> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Comment"></A><FONT COLOR="#FF0000">Comment Field</FONT>  -
 
    The comment field begins with a semicolon and extends through
@@ -445,8 +457,10 @@ Table 6         Temporary Radix Operators
 
 ---------------------------------------------------------------- 
 
+</PRE></B></H4>
 <H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "User"></A><FONT COLOR="#FF0000">User-Defined Symbols</FONT> 
 
    User-defined  symbols are those symbols that are equated to a
@@ -470,8 +484,10 @@ The following rules govern the creation of user-defined symbols:
 
      4.  Spaces and Tabs must not be embedded within a symbol.  
 
+</PRE></B></H4>
 <H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Local"></A><FONT COLOR="#FF0000">Local Symbols</FONT> 
 
    Local  symbols are specially formatted symbols used as labels
@@ -525,8 +541,10 @@ Example of local symbols:
                 deca
                 bne     1$
 
+</PRE></B></H4>
 <H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Current"></A><FONT COLOR="#FF0000">Current Location Counter</FONT> 
 
    The  period  (.) is the symbol for the current location coun-
@@ -616,8 +634,10 @@ num3:   .word   0               ;The label num3 has
    The  .blkb  and .blkw directives are the preferred methods of
 allocating space.  
 
+</PRE></B></H4>
 <H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Numbers"><A/><FONT COLOR="#FF0000">Numbers</FONT>
 
    ASxxxx  assumes that all numbers in the source program are to
@@ -634,8 +654,10 @@ numbers may (but need not) be preceeded by a plus sign.
    Numbers are always considered to be absolute values, therefor
 they are never relocatable.  
 
+</PRE></B></H4>
 <H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Terms"></A><FONT COLOR="#FF0000">Terms</FONT>
 
    A  term is a component of an expression and may be one of the
@@ -665,8 +687,10 @@ following:
 
      5.  A unary operator followed by a symbol or number.  
 
+</PRE></B></H4>
 <H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "Expressions"></A><FONT COLOR="#FF0000">Expressions</FONT>
 
    Expressions  are  combinations  of  terms  joined together by

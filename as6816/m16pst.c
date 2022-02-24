@@ -1,7 +1,7 @@
 /* m16pst.c */
 
 /*
- * (C) Copyright 1991-2000
+ * (C) Copyright 1991-2001
  * All Rights Reserved
  *
  * Alan R. Baldwin

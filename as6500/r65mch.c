@@ -1,7 +1,7 @@
 /* r65mch.c */
 
 /*
- * (C) Copyright 1995-2000
+ * (C) Copyright 1995-2001
  * All Rights Reserved
  *
  * Alan R. Baldwin

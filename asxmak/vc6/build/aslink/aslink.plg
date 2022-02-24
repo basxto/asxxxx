@@ -6,7 +6,7 @@
 --------------------Configuration: aslink - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\WINDOWS\TEMP\RSP9201.TMP" with contents
+Creating temporary file "C:\WINDOWS\TEMP\RSP83A5.TMP" with contents
 [
 /nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Release/aslink.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "C:\ASXXXX\linksrc\lkarea.c"
@@ -21,8 +21,8 @@ Creating temporary file "C:\WINDOWS\TEMP\RSP9201.TMP" with contents
 "C:\ASXXXX\linksrc\lkrloc.c"
 "C:\ASXXXX\linksrc\lksym.c"
 ]
-Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP9201.TMP" 
-Creating temporary file "C:\WINDOWS\TEMP\RSP9202.TMP" with contents
+Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP83A5.TMP" 
+Creating temporary file "C:\WINDOWS\TEMP\RSP83A6.TMP" with contents
 [
 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/aslink.pdb" /machine:I386 /out:"..\..\exe\aslink.exe" 
 .\Release\lkarea.obj
@@ -37,7 +37,7 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 .\Release\lkrloc.obj
 .\Release\lksym.obj
 ]
-Creating command line "link.exe @C:\WINDOWS\TEMP\RSP9202.TMP"
+Creating command line "link.exe @C:\WINDOWS\TEMP\RSP83A6.TMP"
 <h3>Output Window</h3>
 Compiling...
 lkarea.c

@@ -1,7 +1,7 @@
 /* i85pst.c */
 
 /*
- * (C) Copyright 1989-2000
+ * (C) Copyright 1989-2001
  * All Rights Reserved
  *
  * Alan R. Baldwin

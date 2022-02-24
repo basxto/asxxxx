@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#  25 March 2000		Created for LINUX gcc 2.7.2.1 / make /
+#  29 October 2001		Created for LINUX gcc 2.7.2.1 / make /
 #
 ######################################################################
 
@@ -12,7 +12,7 @@
 all:	as6500 as6800 as6801 as6804	\
 	as6805 as6808 as6809 as6811	\
 	as6812 as6816 as8051 as8085	\
-	ash8 asz80 as8xcxxx	\
+	ash8 asz80 as8xcxxx asgb	\
 	aslink	\
 	asxcnv asxscn
 
@@ -35,6 +35,7 @@ clean:
 	rm -f $(SRCH8)*.o
 	rm -f $(SRCZ80)*.o
 	rm -f $(SRC8XCXXX)*.o
+	rm -f $(SRCGB)*.o
 	rm -f *.new
 
 
@@ -69,6 +70,7 @@ SRC8085=	$(ASXBAS)as8085/
 SRCH8=		$(ASXBAS)ash8/
 SRCZ80=		$(ASXBAS)asz80/
 SRC8XCXXX=	$(ASXBAS)as8xcxxx/
+SRCGB=		$(ASXBAS)asgb/
 
 .SUFFIXES:	.c .o .new
 
@@ -237,6 +239,16 @@ $(AS8XCXXXSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC8XCXXX)ds8.h
 
 as8xcxxx.new:	$(ASXXSRC) $(AS8XCXXXSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8XCXXXSRC) -o as8xcxxx.new
+
+
+ASGB =		gbadr.o gbext.o gbmch.o gbpst.o
+
+ASGBSRC =	$(addprefix $(SRCGB),$(ASGB))
+
+$(ASGBSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCGB)gb.h
+
+asgb.new:	$(ASXXSRC) $(ASGBSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASGBSRC) -o asgb.new
 
 
 ASLINK =	lkmain.o lkarea.o lkdata.o lkeval.o	\

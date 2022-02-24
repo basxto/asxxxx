@@ -10,7 +10,7 @@ DEBUG		= 0
 NDEBUG		= 1
 !ENDIF
 
-PROJ		= asxcnv
+PROJ		= ASXCNV
 APPTYPE		= DOSX EXE
 PROJTYPE	= EXE
 
@@ -183,7 +183,7 @@ clean:
 		-del $(TARGETDIR)\$$SCW$$.$(PROJTYPE)
 		-del $(TARGETDIR)\$(PROJ).CLE
 		-del $(OUTPUTDIR)\SCPH.SYM
-		-del asxcnv.dpd
+		-del ASXCNV.dpd
 		-del $(OBJS)
 
 cleanres:
@@ -199,8 +199,8 @@ link:
 
 
 
-!IF EXIST (asxcnv.dpd)
-!INCLUDE asxcnv.dpd
+!IF EXIST (ASXCNV.dpd)
+!INCLUDE ASXCNV.dpd
 !ENDIF
 
 

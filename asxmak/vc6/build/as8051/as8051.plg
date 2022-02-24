@@ -6,30 +6,27 @@
 --------------------Configuration: as8051 - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\WINDOWS\TEMP\RSP2123.TMP" with contents
+Creating temporary file "C:\WINDOWS\TEMP\RSP6393.TMP" with contents
 [
 /nologo /ML /W3 /GX /O2 /I "c:\asxxxx\asxxsrc" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Release/as8051.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
-"C:\Asxxxx\as8051\i51ext.c"
-"C:\Asxxxx\as8051\i51mch.c"
-"C:\Asxxxx\as8051\i51pst.c"
-"C:\Asxxxx\as8051\i51adr.c"
-"C:\Asxxxx\asxxsrc\asexpr.c"
-"C:\Asxxxx\asxxsrc\aslex.c"
-"C:\Asxxxx\asxxsrc\aslist.c"
-"C:\Asxxxx\asxxsrc\asmain.c"
-"C:\Asxxxx\asxxsrc\asout.c"
-"C:\Asxxxx\asxxsrc\assubr.c"
-"C:\Asxxxx\asxxsrc\assym.c"
-"C:\Asxxxx\asxxsrc\asdata.c"
+"C:\ASXXXX\asxxsrc\asdata.c"
+"C:\ASXXXX\asxxsrc\asexpr.c"
+"C:\ASXXXX\asxxsrc\aslex.c"
+"C:\ASXXXX\asxxsrc\aslist.c"
+"C:\ASXXXX\asxxsrc\asmain.c"
+"C:\ASXXXX\asxxsrc\asout.c"
+"C:\ASXXXX\asxxsrc\assubr.c"
+"C:\ASXXXX\asxxsrc\assym.c"
+"C:\ASXXXX\as8051\i51adr.c"
+"C:\ASXXXX\as8051\i51ext.c"
+"C:\ASXXXX\as8051\i51mch.c"
+"C:\ASXXXX\as8051\i51pst.c"
 ]
-Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP2123.TMP" 
-Creating temporary file "C:\WINDOWS\TEMP\RSP2124.TMP" with contents
+Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP6393.TMP" 
+Creating temporary file "C:\WINDOWS\TEMP\RSP6394.TMP" with contents
 [
-kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/as8051.pdb" /machine:I386 /out:"..\..\exe\as8051.exe" 
-.\Release\i51ext.obj
-.\Release\i51mch.obj
-.\Release\i51pst.obj
-.\Release\i51adr.obj
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/as8051.pdb" /machine:I386 /out:"..\..\exe\as8051.exe" 
+.\Release\asdata.obj
 .\Release\asexpr.obj
 .\Release\aslex.obj
 .\Release\aslist.obj
@@ -37,15 +34,15 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 .\Release\asout.obj
 .\Release\assubr.obj
 .\Release\assym.obj
-.\Release\asdata.obj
+.\Release\i51adr.obj
+.\Release\i51ext.obj
+.\Release\i51mch.obj
+.\Release\i51pst.obj
 ]
-Creating command line "link.exe @C:\WINDOWS\TEMP\RSP2124.TMP"
+Creating command line "link.exe @C:\WINDOWS\TEMP\RSP6394.TMP"
 <h3>Output Window</h3>
 Compiling...
-i51ext.c
-i51mch.c
-i51pst.c
-i51adr.c
+asdata.c
 asexpr.c
 aslex.c
 aslist.c
@@ -53,7 +50,10 @@ asmain.c
 asout.c
 assubr.c
 assym.c
-asdata.c
+i51adr.c
+i51ext.c
+i51mch.c
+i51pst.c
 Linking...
 
 

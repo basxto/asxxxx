@@ -1,0 +1,27 @@
+82569
+C:\ASXXXX\ASXMAK\SYMANTEC\BUILD\ASGB.PRJ
+ASGB.OPN
+novcs
+ASGB.DEF
+8
+1002593184
+0 0 0 0 0 "..\..\..\ASXXSRC\ASDATA.C"
+0 0 0 0 0 "..\..\..\ASXXSRC\ASEXPR.C"
+0 0 0 0 0 "..\..\..\ASXXSRC\ASLEX.C"
+0 0 0 0 0 "..\..\..\ASXXSRC\ASLIST.C"
+0 0 0 0 0 "..\..\..\ASXXSRC\ASMAIN.C"
+0 0 0 0 0 "..\..\..\ASXXSRC\ASOUT.C"
+0 0 0 0 0 "..\..\..\ASXXSRC\ASSUBR.C"
+0 0 0 0 0 "..\..\..\ASXXSRC\ASSYM.C"
+0 0 0 0 0 "..\..\..\ASGB\GBADR.C"
+0 0 0 0 0 "..\..\..\ASGB\GBEXT.C"
+0 0 0 0 0 "..\..\..\ASGB\GBMCH.C"
+0 0 0 0 0 "..\..\..\ASGB\GBPST.C"
+0 0 0 0 0 "ASGB.DEF"
+0 -1 0 0 0 "F:\SC\INCLUDE\stdio.h"
+0 -1 0 0 0 "F:\SC\INCLUDE\setjmp.h"
+0 -1 0 0 0 "..\..\..\asxxsrc\asxxxx.h"
+0 -1 0 0 0 "..\..\..\ASGB\gb.h"
+0 -1 0 0 0 "F:\SC\INCLUDE\string.h"
+0 -1 0 0 0 "F:\SC\INCLUDE\alloc.h"
+0 -1 0 0 0 "F:\SC\INCLUDE\stdlib.h"
