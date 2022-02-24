@@ -2,7 +2,7 @@
 
 	.area	DIRECT
 
-	.setdp
+	.setdp	0,DIRECT
 
 	ext	= 0x1234	; extended address
 	.blkb	0x12

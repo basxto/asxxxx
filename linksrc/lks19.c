@@ -1,7 +1,7 @@
 /* lks19.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,12 +10,14 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <alloc.h>
 #include "aslink.h"
 
 VOID
 s19(i)
 {
-	register chksum;
+	register addr_t chksum;
 
 	if (i) {
 		if (hilo == 0) {
@@ -23,11 +25,16 @@ s19(i)
 			rtval[0] = rtval[1];
 			rtval[1] = chksum;
 		}
-		chksum = rtcnt+1;
+		for (i = 0, chksum = 1; i < rtcnt; i++) {
+			if (rtflg[i])
+				chksum++;
+		}
 		fprintf(ofp, "S1%02X", chksum);
-		for (i = 0; i < rtcnt ; ++i) {
-			fprintf(ofp, "%02X", rtval[i]);
-			chksum += rtval[i];
+		for (i = 0; i < rtcnt ; i++) {
+			if (rtflg[i]) {
+				fprintf(ofp, "%02X", rtval[i]);
+				chksum += rtval[i];
+			}
 		}
 		fprintf(ofp, "%02X\n", (-chksum-1) & 0xff);
 	} else {

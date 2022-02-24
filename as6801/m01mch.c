@@ -1,7 +1,7 @@
 /* m01mch.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,13 +12,9 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6801.h"
+#include "m6801.h"
 
 int	hd63;
-
-struct	sdp	sdp[] = {
-	NULL
-};
 
 /*
  * Process a machine op.
@@ -31,25 +27,39 @@ struct mne *mp;
 	struct expr e1, e2;
 	struct area *espa;
 	char id[NCPS];
-	int v1, reg;
+	int c, v1, reg;
 
 	reg = 0;
 	op = mp->m_valu;
 	switch (mp->m_type) {
 
 	case S_SDP:
+		e1.e_mode = 0;
+		e1.e_flag = 0;
+		e1.e_addr = 0;
+		e1.e_base.e_ap = NULL;
 		espa = NULL;
 		if (more()) {
-			getid(id, -1);
-			espa = alookup(id);
-			if ( espa == NULL) {
-				err('u');
+			expr(&e1, 0);
+			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
+				if (e1.e_addr) {
+					err('b');
+				}
+			}
+			if ((c = getnb()) == ',') {
+				getid(id, -1);
+				espa = alookup(id);
+				if (espa == NULL) {
+					err('u');
+				}
+			} else {
+				unget(c);
 			}
 		}
 		if (espa) {
-			sdp->s_area = espa;
+			outdp(espa, &e1);
 		} else {
-			sdp->s_area = dot->s_area;
+			outdp(dot.s_area, &e1);
 		}
 		lmode = SLIST;
 		break;
@@ -81,13 +91,13 @@ struct mne *mp;
 		if (t1 == S_DIR) {
 			outab(op|0x10);
 			outrb(&e2, 0);
-			outrb(&e1, 0);
+			outrb(&e1, R_PAG0);
 			break;
 		}
 		if (t1 == S_INDX) {
 			outab(op);
 			outrb(&e2, 0);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		aerr();
@@ -112,13 +122,17 @@ struct mne *mp;
 
 	case S_BRA:
 		expr(&e1, 0);
-		v1 = e1.e_addr - dot->s_addr - 2;
-		if ((v1 < -128) || (v1 > 127))
-			aerr();
-		if (e1.e_base.e_ap != dot->s_area)
-			rerr();
 		outab(op);
-		outab(v1);
+		if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
+			v1 = e1.e_addr - dot.s_addr - 1;
+			if ((v1 < -128) || (v1 > 127))
+				aerr();
+			outab(v1);
+		} else {
+			outrb(&e1, R_PCR);
+		}
+		if (e1.e_mode != S_USER)
+			rerr();
 		break;
 
 	case S_TYP1:
@@ -145,10 +159,16 @@ struct mne *mp;
 		}
 		if (t1 == S_INDX) {
 			outab(op|X);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
-		if (t1 == S_DIR || t1 == S_EXT) {
+		if (t1 == S_DIR) {
+			outab(op|0x30);
+			outrw(&e1, 0);
+			aerr();
+			break;
+		}
+		if (t1 == S_EXT) {
 			outab(op|0x30);
 			outrw(&e1, 0);
 			break;
@@ -157,7 +177,7 @@ struct mne *mp;
 		break;
 
 	case S_TYP2:
-		if (!(reg = admode(abdx)))
+		if ((reg = admode(abdx)) == 0)
 			aerr();
 
 	case S_TYP3:
@@ -196,12 +216,12 @@ struct mne *mp;
 		}
 		if (t1 == S_DIR) {
 			outab(op|reg|0x10);
-			outrb(&e1, 0);
+			outrb(&e1, R_PAG0);
 			break;
 		}
 		if (t1 == S_INDX) {
 			outab(op|reg|0x20);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		if (t1 == S_EXT) {
@@ -223,12 +243,12 @@ struct mne *mp;
 		}
 		if (t1 == S_DIR) {
 			outab(op|0x10);
-			outrb(&e1, 0);
+			outrb(&e1, R_PAG0);
 			break;
 		}
 		if (t1 == S_INDX) {
 			outab(op|0x20);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		if (t1 == S_EXT) {
@@ -243,10 +263,16 @@ struct mne *mp;
 		t1 = addr(&e1);
 		if (t1 == S_INDX) {
 			outab(op);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
-		if (t1 == S_DIR || t1 == S_EXT) {
+		if (t1 == S_DIR) {
+			outab(op|0x10);
+			outrw(&e1, 0);
+			aerr();
+			break;
+		}
+		if (t1 == S_EXT) {
 			outab(op|0x10);
 			outrw(&e1, 0);
 			break;
@@ -278,5 +304,4 @@ VOID
 minit()
 {
 	hd63 = 0;
-	sdp->s_area = dot->s_area;
 }

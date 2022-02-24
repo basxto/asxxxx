@@ -1,7 +1,7 @@
 /* asout.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,23 +11,10 @@
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <string.h>
+#include <alloc.h>
 #include "asm.h"
 
-#define  R_WORD	0	/* 16 bit */
-#define	 R_BYTE 01
-
-#define	 R_AREA	0	/* Base type */
-#define  R_SYM	02
-
-#define	 R_NORM	0	/* PC adjust */
-#define	 R_PCR	04
-
-#define	 R_DEF	00	/* Global def. */
-#define	 R_REF	01	/* Global ref. */
-#define	 R_REL	00	/* Relocatable */
-#define  R_ABS	02	/* Absolute */
-#define  R_GBL	00	/* Global */
-#define  R_LCL	04	/* Local */
 
 #define	 NTXT	16
 #define	 NREL	16
@@ -45,90 +32,54 @@ VOID
 outab(b)
 {
 	if (pass == 2) {
-		out_lb(b);
+		out_lb(b,0);
 		if (oflag) {
 			outchk(1, 0);
 			*txtp++ = lobyte(b);
 		}
 	}
-	++dot->s_addr;
+	++dot.s_addr;
 }
 
 /*
  * Output absolute word.
- * Low then high.
  */
 VOID
 outaw(w)
 {
 	if (pass == 2) {
-		out_lw(w);
+		out_lw(w,0);
 		if (oflag) {
 			outchk(2, 0);
 			out_tw(w);
 		}
 	}
-	dot->s_addr += 2;
+	dot.s_addr += 2;
 }
 
 /*
  * Output relocatable byte.
  */
 VOID
-outrb(esp, pcrf)
+outrb(esp, r)
 register struct expr *esp;
+int r;
 {
-	register n, r;
+	register n;
 
 	if (pass == 2) {
-		out_lb(esp->e_addr);
-		if (oflag) {
-			if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+			out_lb(esp->e_addr,0);
+			if (oflag) {
 				outchk(1, 0);
 				*txtp++ = lobyte(esp->e_addr);
-			} else {
-				outchk(1, 4);
-				*txtp++ = lobyte(esp->e_addr);
-				r = R_BYTE;
-				if (pcrf)
-					r |= R_PCR;
-				if (esp->e_flag) {
-					n = esp->e_base.e_sp->s_ref;
-					r |= R_SYM;
-				} else {
-					n = esp->e_base.e_ap->a_ref;
-				}
-				*relp++ = r;
-				*relp++ = txtp - txt - 1;
-				out_rw(n);
 			}
-		}
-	}
-	++dot->s_addr;
-}
-
-/*
- * Output relocatable word.
- * Low then high.
- */
-VOID
-outrw(esp, pcrf)
-register struct expr *esp;
-{
-	register n, r;
-
-	if (pass == 2) {
-		out_lw(esp->e_addr);
-		if (oflag) {
-			if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
-				outchk(2, 0);
-				out_tw(esp->e_addr);
-			} else {
+		} else {
+			r |= R_BYTE|R_BYT2;
+			out_lb(esp->e_addr,r|R_RELOC);
+			if (oflag) {
 				outchk(2, 4);
 				out_tw(esp->e_addr);
-				r = R_WORD;
-				if (pcrf)
-					r |= R_PCR;
 				if (esp->e_flag) {
 					n = esp->e_base.e_sp->s_ref;
 					r |= R_SYM;
@@ -141,7 +92,75 @@ register struct expr *esp;
 			}
 		}
 	}
-	dot->s_addr += 2;
+	++dot.s_addr;
+}
+
+/*
+ * Output relocatable word.
+ */
+VOID
+outrw(esp, r)
+register struct expr *esp;
+int r;
+{
+	register n;
+
+	if (pass == 2) {
+		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+			out_lw(esp->e_addr,0);
+			if (oflag) {
+				outchk(2, 0);
+				out_tw(esp->e_addr);
+			}
+		} else {
+			r |= R_WORD;
+			out_lw(esp->e_addr,r|R_RELOC);
+			if (oflag) {
+				outchk(2, 4);
+				out_tw(esp->e_addr);
+				if (esp->e_flag) {
+					n = esp->e_base.e_sp->s_ref;
+					r |= R_SYM;
+				} else {
+					n = esp->e_base.e_ap->a_ref;
+				}
+				*relp++ = r;
+				*relp++ = txtp - txt - 2;
+				out_rw(n);
+			}
+		}
+	}
+	dot.s_addr += 2;
+}
+
+/*
+ * Output Page Information
+ */
+VOID
+outdp(carea, esp)
+register struct area *carea;
+register struct expr *esp;
+{
+	register n, r;
+
+	if (pass == 2 && oflag != 0) {
+		outchk(16,16);
+		out_tw(carea->a_ref);
+		out_tw(esp->e_addr);
+		if (esp->e_flag || esp->e_base.e_ap!=NULL) {
+			r = R_WORD;
+			if (esp->e_flag) {
+				n = esp->e_base.e_sp->s_ref;
+				r |= R_SYM;
+			} else {
+				n = esp->e_base.e_ap->a_ref;
+			}
+			*relp++ = r;
+			*relp++ = txtp - txt - 2;
+			out_rw(n);
+		}
+		outbuf("P");
+	}
 }
 
 /*
@@ -151,7 +170,7 @@ VOID
 outall()
 {
 	if (oflag && pass==2)
-		outbuf();
+		outbuf("R");
 }
 
 /*
@@ -163,11 +182,11 @@ outchk(nt, nr)
 	register struct area *ap;
 
 	if (txtp+nt > &txt[NTXT] || relp+nr > &rel[NREL]) {
-		outbuf();
+		outbuf("R");
 	}
 	if (txtp == txt) {
-		out_tw(dot->s_addr);
-		if (ap = dot->s_area) {
+		out_tw(dot.s_addr);
+		if ((ap = dot.s_area) != NULL) {
 			*relp++ = R_WORD|R_AREA;
 			*relp++ = 0;
 			out_rw(ap->a_ref);
@@ -179,23 +198,19 @@ outchk(nt, nr)
  * Output any bufferred text and relocation information
  */
 VOID
-outbuf()
+outbuf(s)
+char *s;
 {
 	if (txtp > &txt[2]) {
 		fprintf(ofp, "T");
-		out(txt, txtp-txt);
+		out(txt,(int) (txtp-txt));
 		fprintf(ofp, "\n");
-		txtp = txt;
-		if (relp > rel) {
-			fprintf(ofp, "R");
-			out(rel, relp-rel);
-			fprintf(ofp, "\n");
-			relp = rel;
-		}
-	} else {
-		txtp = txt;
-		relp = rel;
+		fprintf(ofp, s);
+		out(rel,(int) (relp-rel));
+		fprintf(ofp, "\n");
 	}
+	txtp = txt;
+	relp = rel;
 }
 
 /*
@@ -245,7 +260,7 @@ outgsd()
 		fprintf(ofp, "M ");
 		ptr = &module[0];
 		while (ptr < &module[NCPS]) {
-			if (c = *ptr++)
+			if ((c = *ptr++) != 0)
 				putc(c, ofp);
 		}
 		putc('\n', ofp);
@@ -301,7 +316,7 @@ register struct area *ap;
 	fprintf(ofp, "A ");
 	ptr = &ap->a_id[0];
 	while (ptr < &ap->a_id[NCPS]) {
-		if (c = *ptr++)
+		if ((c = *ptr++) != 0)
 			putc(c, ofp);
 	}
 	if (xflag == 0) {
@@ -329,7 +344,7 @@ register struct sym *sp;
 	fprintf(ofp, "S ");
 	ptr = &sp->s_id[0];
 	while (ptr < &sp->s_id[NCPS]) {
-		if (c = *ptr++)
+		if ((c = *ptr++) != 0)
 			putc(c, ofp);
 	}
 	fprintf(ofp, " %s", sp->s_type==S_NEW ? "Ref" : "Def");
@@ -366,26 +381,27 @@ register n;
  * Output a byte to the listing buffer.
  */
 VOID
-out_lb(b)
-register b;
+out_lb(b,t)
+register b,t;
 {
 	if (cp < &cb[NCODE])
 		*cp++ = b;
+		*cpt++ = t;
 }
 
 /*
  * Output ordered word to the listing buffer.
  */
 VOID
-out_lw(n)
-register n;
+out_lw(n,t)
+register n,t;
 {
 	if (hilo) {
-		out_lb(hibyte(n));
-		out_lb(lobyte(n));
+		out_lb(hibyte(n),t ? t|R_HIGH : 0);
+		out_lb(lobyte(n),t);
 	} else {
-		out_lb(lobyte(n));
-		out_lb(hibyte(n));
+		out_lb(lobyte(n),t);
+		out_lb(hibyte(n),t ? t|R_HIGH : 0);
 	}
 }
 

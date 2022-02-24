@@ -1,7 +1,7 @@
 /* z80ext.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,4 +16,4 @@
 
 char	*cpu	= "Zilog Z80 / Hitachi HD64180";
 int	hilo	= 0;
-char	*dsft	= "asm";
+char	*dsft	= "ASM";

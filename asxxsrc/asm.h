@@ -1,7 +1,7 @@
 /* asm.h */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,12 +9,30 @@
  * Kent, Ohio  44240
  */
 
+#define	VERSION	"V01.50"
+
 /* DECUS C void definition */
+/* File/extension seperator */
 
 #ifdef	decus
 #define	VOID	char
-#else
+#define	FSEPX	'.'
+#endif
+
+/* PDOS C void definition */
+/* File/extension seperator */
+
+#ifdef	PDOS
+#define	VOID	char
+#define	FSEPX	':'
+#endif
+
+/* Default void definition */
+/* File/extension seperator */
+
+#ifndef	VOID
 #define	VOID	void
+#define	FSEPX	'.'
 #endif
 
 /*
@@ -23,7 +41,7 @@
 #define	CASE_SENSITIVE	1
 
 /*
- * Assembler header.
+ * Assembler definitions.
  */
 #define	LFTERM	'('		/* Left expression delimeter */
 #define	RTTERM	')'		/* Right expression delimeter */
@@ -48,10 +66,10 @@
 #define ALIST	2		/* Address only */
 #define CLIST	3		/* Code */
 
-#define	dot	(&sym[0])	/* Dot, current loc */
-#define	dca	(&area[0])	/* Dca, default code area */
+#define	dot	sym[0]		/* Dot, current loc */
+#define	dca	area[0]		/* Dca, default code area */
 
-typedef	unsigned addr_t;
+typedef	unsigned int addr_t;
 
 struct	area
 {
@@ -67,10 +85,41 @@ struct	area
 #define	A_OVR	004		/* Overlaying */
 #define	A_REL	000		/* Relocatable */
 #define	A_ABS	010		/* absolute */
+#define	A_NOPAG	000		/* Non-Paged */
+#define	A_PAG	020		/* Paged */
+
+#define	R_WORD	0000		/* 16 bit */
+#define	R_BYTE	0001		/*  8 bit */
+
+#define	R_AREA	0000		/* Base type */
+#define	R_SYM	0002
+
+#define	R_NORM	0000		/* PC adjust */
+#define	R_PCR	0004
+
+#define	R_BYT1	0000		/* Byte count for R_BYTE = 1 */
+#define	R_BYT2	0010		/* Byte count for R_BYTE = 2 */
+
+#define	R_SGND	0000		/* Signed Byte */
+#define	R_USGN	0020		/* Unsigned Byte */
+
+#define	R_NOPAG	0000		/* Page Mode */
+#define	R_PAG0	0040		/* Page '0' */
+#define	R_PAG	0100		/* Page 'nnn' */
+
+#define	R_HIGH	0040000		/* High Byte */
+#define	R_RELOC	0100000		/* Relocation */
+
+#define	R_DEF	00		/* Global def. */
+#define	R_REF	01		/* Global ref. */
+#define	R_REL	00		/* Relocatable */
+#define	R_ABS	02		/* Absolute */
+#define	R_GBL	00		/* Global */
+#define	R_LCL	04		/* Local */
 
 struct	mne
 {
-	struct	mne  *m_mp;	/* Hash link */
+	struct	mne *m_mp;	/* Hash link */
 	char	m_id[NCPS];	/* Mnemonic */
 	char	m_type;		/* Mnemonic subtype */
 	char	m_flag;		/* Mnemonic flags */
@@ -151,6 +200,7 @@ extern	int	aflag;
 extern	int	oflag;
 extern	int	sflag;
 extern	int	xflag;
+extern	int	fflag;
 extern	addr_t	laddr;
 extern	addr_t	fuzz;
 extern	int	lmode;
@@ -166,6 +216,8 @@ extern	char	*ip;
 extern	char	ib[NINPUT];
 extern	char	*cp;
 extern	char	cb[NCODE];
+extern	int	*cpt;
+extern	int	cbt[NCODE];
 extern	char	tb[NTITL];
 extern	char	stb[NSBTL];
 extern	char	symtbl[];
@@ -183,12 +235,21 @@ extern	char	ctype[];
 extern	char	ccase[];
 #endif
 
-#define	LETTER	0
-#define	DIGIT	1
-#define	BINOP	2
-#define ETC	3
-#define	ILL	4
-#define	SPACE	5
+#define	SPACE	0000
+#define ETC	0000
+#define	LETTER	0001
+#define	DIGIT	0002
+#define	BINOP	0004
+#define	RAD2	0010
+#define	RAD8	0020
+#define	RAD10	0040
+#define	RAD16	0100
+#define	ILL	0200
+
+#define	DGT2	DIGIT|RAD16|RAD10|RAD8|RAD2
+#define	DGT8	DIGIT|RAD16|RAD10|RAD8
+#define	DGT10	DIGIT|RAD16|RAD10
+#define	LTR16	LETTER|RAD16
 
 /*
  * Expression.
@@ -206,7 +267,6 @@ struct	expr
 
 /* C Library functions */
 /* for reference only
-extern	VOID *		calloc();
 extern	int		fclose();
 extern	char *		fgets();
 extern	FILE *		fopen();
@@ -271,6 +331,7 @@ extern	VOID		term();
 /* aslist.c */
 extern	VOID		list();
 extern	VOID		list1();
+extern	VOID		list2();
 extern	VOID		lstsym();
 extern	VOID		slew();
 

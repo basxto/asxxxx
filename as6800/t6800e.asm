@@ -2,11 +2,11 @@
 
 	.area	DIRECT
 
-dirval:	.blkb	0
+dirval:	.blkb	0d256
 
 	.area	AS6800
 
-	.setdp	DIRECT
+	.setdp	0,DIRECT
 
 	dir	=	0x0100
 	offset	=	0x0101
@@ -33,6 +33,11 @@ dirval:	.blkb	0
 
 	lda a	*dirval		;OK
 	lda a	dirval		;OK
-	lda a	*dirval+0x100	;error
-	lda a	*1$		;error
+	lda a	*dirval+0x100	;error / error at link time
+	lda a	*1$		;error at link time
+
+	.setdp	1,DIRECT	;error / error at link time
+	.setdp	0x100,DIRECT	;error
+				;all subsequent direct page accesses
+				;will give errors at link time
 

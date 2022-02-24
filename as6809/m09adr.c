@@ -1,7 +1,7 @@
-/* m09adr.c */
+/* M09ADR:C */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6809.h"
+#include "m6809.h"
 
 int index;
 
@@ -127,7 +127,7 @@ register struct adsym *sp;
 	register int i, v;
 	unget(getnb());
 	i = 0;
-	while ( *(ptr = (char *) &sp[i].a_str) ) {
+	while ( *(ptr = (char *) &sp[i]) ) {
 		if (srch(ptr)) {
 			v = sp[i].a_val;
 			index |= (v | 0x80);

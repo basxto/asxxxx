@@ -1,7 +1,7 @@
 /* lkhead.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,6 +10,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <alloc.h>
 #include "aslink.h"
 
 /*
@@ -45,14 +47,14 @@ newhead()
 	 */
 	i = hp->h_narea = eval();
 	if (i)
-		hp->a_list = (VOID **) new (i*sizeof(struct area *));
+		hp->a_list = (struct areax **) new (i*sizeof(struct areax *));
 	/*
 	 * Evaluate and build Global symbol pointer list
 	 */
 	skip(-1);
 	i = hp->h_nglob = eval();
 	if (i)
-		hp->s_list = (VOID **) new (i*sizeof(struct sym *));
+		hp->s_list = (struct sym **) new (i*sizeof(struct sym *));
 	/*
 	 * Setup Absolute DEF linkage.
 	 */

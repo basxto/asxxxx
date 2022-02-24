@@ -1,7 +1,7 @@
 /* aslex.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <string.h>
+#include <alloc.h>
 #include "asm.h"
 
 VOID
@@ -22,14 +24,14 @@ char *id;
 
 	if (c < 0) {
 		c = getnb();
-		if (ctype[c] != LETTER)
+		if ((ctype[c] & LETTER) == 0)
 			qerr();
 	}
 	p = id;
 	do {
 		if (p < &id[NCPS])
 			*p++ = c;
-	} while (ctype[c=get()] == LETTER || ctype[c] == DIGIT);
+	} while (ctype[c=get()] & (LETTER|DIGIT));
 	unget(c);
 	while (p < &id[NCPS])
 		*p++ = 0;
@@ -50,7 +52,7 @@ get()
 {
 	register c;
 
-	if (c = *ip)
+	if ((c = *ip) != 0)
 		++ip;
 	return (c);
 }
@@ -120,21 +122,23 @@ getmap(d)
 int
 getline()
 {
+register i;
+
 loop:	if (incfil >= 0) {
 		if (fgets(ib, sizeof ib, ifp[incfil]) == NULL) {
 			fclose(ifp[incfil--]);
 			lop = NLPP;
 			goto loop;
 		}
-		ib[strlen(ib) - 1] = 0;
-		return(1);
-	}
+	} else
 	if (fgets(ib, sizeof ib, sfp[cfile]) == NULL) {
 		if (++cfile <= inpfil)
 			goto loop;
 		return (0);
 	}
-	ib[strlen(ib) - 1] = 0;
+	i = strlen(ib) - 1;
+	if (ib[i] == '\n')
+		ib[i] = 0;
 	return (1);
 }
 

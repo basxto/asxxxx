@@ -1,7 +1,7 @@
 /* lkeval.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,15 +10,18 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <alloc.h>
 #include "aslink.h"
 
 /*
  * Evaluate input term.
  */
-int
+addr_t
 eval()
 {
-	register c, n, v;
+	register c, v;
+	register addr_t n;
 
 	c = getnb();
 	n = 0;
@@ -35,14 +38,14 @@ eval()
  * `N' is a firewall priority; all top level calls
  * (from the user) should be made with `n' set to 0.
  */
-int
+addr_t
 expr (n)
 {
 	register c, p;
-	register v, ve;
+	register addr_t v, ve;
 
 	v = term();
-	while (ctype[c = getnb()] == BINOP) {
+	while (ctype[c = getnb()] & BINOP) {
 		if ((p = oprio(c)) <= n)
 			break;
 		if ((c == '>' || c == '<') && c != get()) {
@@ -102,11 +105,11 @@ expr (n)
  * constants in decimal, octal or hexadecimal
  * and identifiers.
  */
-int
+addr_t
 term()
 {
-	register c, n;
-	register r, v;
+	register c, r, n;
+	register addr_t v;
 	struct sym *sp;
 	char id[NCPS];
 
@@ -129,10 +132,13 @@ term()
 	}
 	if (c == '\"') {
 		if (hilo) {
-			return((getmap(-1)&0377)<<8 | (getmap(-1)&0377));
+			v  = (getmap(-1)&0377)<<8;
+			v |=  getmap(-1)&0377;
 		} else {
-			return((getmap(-1)&0377) | (getmap(-1)&0377)<<8);
+			v  =  getmap(-1)&0377;
+			v |= (getmap(-1)&0377)<<8;
 		}
+		return(v);
 	}
 	if (c == '>' || c == '<') {
 		v = expr(100);
@@ -140,7 +146,7 @@ term()
 			v >>= 8;
 		return(v&0377);
 	}
-	if (ctype[c] == DIGIT) {
+	if (ctype[c] & DIGIT) {
 		r = 10;
 		if (c == '0') {
 			c = get();
@@ -174,15 +180,15 @@ term()
 				break;
 			}
 		}
-		n = 0;
-		while ((v = digit(c, r)) >= 0) {
-			n = r*n + v;
+		v = 0;
+		while ((n = digit(c, r)) >= 0) {
+			v = r*v + n;
 			c = get();
 		}
 		unget(c);
-		return(n);
+		return(v);
 	}
-	if (ctype[c] == LETTER) {
+	if (ctype[c] & LETTER) {
 		getid(id, c);
 		if ((sp = lkpsym(id, 0)) == NULL) {
 			fprintf(stderr, "Undefined symbol %8s\n", id);
@@ -203,13 +209,26 @@ digit(c, r)
 register c, r;
 {
 	if (r == 16) {
-		if (c >= 'A' && c <= 'F')
-			return (c - 'A' + 10);
-		if (c >= 'a' && c <= 'f')
-			return (c - 'a' + 10);
+		if (ctype[c] & RAD16) {
+			if (c >= 'A' && c <= 'F')
+				return (c - 'A' + 10);
+			if (c >= 'a' && c <= 'f')
+				return (c - 'a' + 10);
+			return (c - '0');
+		}
+	} else
+	if (r == 10) {
+		if (ctype[c] & RAD10)
+			return (c - '0');
+	} else
+	if (r == 8) {
+		if (ctype[c] & RAD8)
+			return (c - '0');
+	} else
+	if (r == 2) {
+		if (ctype[c] & RAD2)
+			return (c - '0');
 	}
-	if (c >= '0' && c <= '9')
-		return (c - '0');
 	return (-1);
 }
 

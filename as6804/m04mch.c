@@ -1,7 +1,7 @@
 /* m04mch.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6804.h"
+#include "m6804.h"
 
 /*
  * Process a machine op.
@@ -23,11 +23,44 @@ struct mne *mp;
 {
 	register op, t1, t2, type;
 	struct expr e1, e2, e3;
-	int v1, v2;
+	struct area *espa;
+	int c, v1, v2, v3;
+	char id[NCPS];
 
 	op = mp->m_valu;
 	type = mp->m_type;
 	switch (type) {
+
+	case S_SDP:
+		e1.e_mode = 0;
+		e1.e_flag = 0;
+		e1.e_addr = 0;
+		e1.e_base.e_ap = NULL;
+		espa = NULL;
+		if (more()) {
+			expr(&e1, 0);
+			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
+				if (e1.e_addr) {
+					err('b');
+				}
+			}
+			if ((c = getnb()) == ',') {
+				getid(id, -1);
+				espa = alookup(id);
+				if (espa == NULL) {
+					err('u');
+				}
+			} else {
+				unget(c);
+			}
+		}
+		if (espa) {
+			outdp(espa, &e1);
+		} else {
+			outdp(dot.s_area, &e1);
+		}
+		lmode = SLIST;
+		break;
 
 	case S_INH:
 		outab(op);
@@ -35,16 +68,19 @@ struct mne *mp;
 
 	case S_BRA:
 		expr(&e1, 0);
-		v1 = e1.e_addr - dot->s_addr - 1;
+		v1 = e1.e_addr - dot.s_addr - 1;
 		if ((v1 < -16) || (v1 > 15))
 			aerr();
-		if (e1.e_base.e_ap != dot->s_area)
+		if (e1.e_base.e_ap != dot.s_area)
 			rerr();
 		outab(op | v1&0x1F);
 		break;
 
 	case S_TYP1:
 		expr(&e1, 0);
+		v1 = e1.e_addr;
+		if ((v1 < -4096) || (v1 > 4095))
+			aerr();
 		e1.e_addr += op;
 		outrw(&e1, 0);
 		break;
@@ -59,7 +95,7 @@ struct mne *mp;
 		}
 		if (t1 == S_DIR) {
 			v1 = e1.e_addr;
-			if (!e1.e_base.e_ap &
+			if ((e1.e_base.e_ap == NULL) &
 			    v1 >= 0x80 & v1 <= 0x83) {
 				v1 &= 0x03;
 				if (op == 0xE0) {
@@ -80,7 +116,7 @@ struct mne *mp;
 				}
 			}
 			outab(op|0x18);
-			outrb(&e1, 0);
+			outrb(&e1, R_PAG0);
 			break;
 		}
 		if (t1 == S_IX) {
@@ -132,31 +168,32 @@ struct mne *mp;
 	case S_BPM:
 	case S_BXPM:
 	case S_BYPM:
+		expr(&e2, 0);
+		outab(op);
 		if (type == S_BPM)
 			v1 = 0xFF;
 		if (type == S_BXPM)
 			v1 = 0x80;
 		if (type == S_BYPM)
 			v1 = 0x81;
-		expr(&e2, 0);
-		v2 = e2.e_addr - dot->s_addr - 3;
-		if ((v2 < -128) || (v2 > 127))
-			aerr();
-		if (e2.e_base.e_ap != dot->s_area)
-			rerr();
-		outab(op);
 		outab(v1);
-		outab(v2);
+		if (e2.e_base.e_ap == NULL || e2.e_base.e_ap == dot.s_area) {
+			v2 = e2.e_addr - dot.s_addr - 1;
+			if ((v2 < -128) || (v2 > 127))
+				aerr();
+			outab(v2);
+		} else {
+			outrb(&e2, R_PCR);
+		}
+		if (e2.e_mode != S_USER)
+			rerr();
 		break;
 
 	case S_BTB:
 	case S_BSC:
 		t1 = addr(&e1);
-		if (t1 != S_IMMED)
+		if (t1 != S_IMMED || e1.e_addr & ~0x07)
 			aerr();
-		if (e1.e_addr & ~0x07)
-			aerr();
-		e1.e_addr += op;
 		comma();
 		t2 = addr(&e2);
 		if (t2 != S_DIR)
@@ -164,16 +201,21 @@ struct mne *mp;
 		if (type == S_BTB) {
 			comma();
 			expr(&e3, 0);
-			v1 = e3.e_addr - dot->s_addr - 3;
-			if ((v1 < -128) || (v1 > 127))
-				aerr();
-			if (e3.e_base.e_ap != dot->s_area)
+		}
+		outab(op + (e1.e_addr & 0x07));
+		outrb(&e2, R_USGN);
+		if (type == S_BTB) {
+			if (e3.e_base.e_ap == NULL || e3.e_base.e_ap == dot.s_area) {
+				v3 = e3.e_addr - dot.s_addr - 1;
+				if ((v3 < -128) || (v3 > 127))
+					aerr();
+				outab(v3);
+			} else {
+				outrb(&e3, R_PCR);
+			}
+			if (e3.e_mode != S_USER)
 				rerr();
 		}
-		outrb(&e1, 0);
-		outrb(&e2, 0);
-		if (type == S_BTB)
-			outab(v1);
 		break;
 
 	default:

@@ -1,7 +1,7 @@
 /* lkarea.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,6 +10,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <alloc.h>
 #include "aslink.h"
 
 /*
@@ -65,7 +67,7 @@ newarea()
 		exit(1);
 	}
 	narea = hp->h_narea;
-	halp = (struct areax **) hp->a_list;
+	halp = hp->a_list;
 	for (i=0; i < narea ;++i) {
 		if (halp[i] == NULL) {
 			halp[i] = taxp;
@@ -96,6 +98,8 @@ char *id;
 			while (taxp->a_axp)
 				taxp = taxp->a_axp;
 			taxp->a_axp = axp;
+			axp->a_bap = ap;
+			axp->a_bhp = hp;
 			return;
 		}
 		ap = ap->a_ap;
@@ -110,6 +114,8 @@ char *id;
 		tap->a_ap = ap;
 	}
 	ap->a_axp = axp;
+	axp->a_bap = ap;
+	axp->a_bhp = hp;
 	strncpy(ap->a_id, id, NCPS);
 }
 
@@ -154,6 +160,9 @@ register struct area *tap;
 
 	size = 0;
 	addr = tap->a_addr;
+	if ((tap->a_flag&A_PAG) && (addr & 0xFF))
+	    fprintf(stderr,
+			"\n?ASlink-W-Paged Area %.8s Boundary Error\n", tap->a_id);
 	taxp = tap->a_axp;
 	if (tap->a_flag&A_OVR) {
 		/*
@@ -177,4 +186,7 @@ register struct area *tap;
 		}
 	}
 	tap->a_size = size;
+	if ((tap->a_flag&A_PAG) && (size > 256))
+	    fprintf(stderr,
+			"\n?ASlink-W-Paged Area %.8s Length Error\n", tap->a_id);
 }

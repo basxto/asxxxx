@@ -1,7 +1,7 @@
 /* assym.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <string.h>
+#include <alloc.h>
 #include "asm.h"
 
 /*
@@ -57,7 +59,7 @@ syminit()
 		++sp;
 	}
 
-	areap = dca;
+	areap = &dca;
 }
 
 /*
@@ -102,7 +104,7 @@ char *id;
 
 /*
  * Lookup the label `id' in the hashtable.
- * If it is not found either return a
+ * If it is not found return a
  * pointer to a newly created hash table
  * entry.
  */
@@ -124,9 +126,12 @@ char *id;
 	sp->s_sp = symhash[h];
 	symhash[h] = sp;
 	sp->s_tsym = NULL;
-	sp->s_type = S_NEW;
-	sp->s_area = NULL;
 	strncpy(sp->s_id, id, NCPS);
+	sp->s_type = S_NEW;
+	sp->s_flag = 0;
+	sp->s_area = NULL;
+	sp->s_ref = 0;
+	sp->s_addr = 0;
 	return (sp);
 }
 
@@ -163,7 +168,7 @@ allglob()
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
 		while (sp != NULL) {
-			if (sp != dot && sp->s_type == S_USER)
+			if (sp != &dot && sp->s_type == S_USER)
 				sp->s_flag |= S_GBL;
 			sp = sp->s_sp;
 		}
@@ -229,10 +234,11 @@ register char *p;
  */
 VOID *
 new(n)
+unsigned int n;
 {
 	register VOID *p;
 
-	if ((p = (VOID *) calloc(1,n)) == NULL) {
+	if ((p = (VOID *) malloc(n)) == NULL) {
 		fprintf(stderr, "Out of space!\n");
 		exit(1);
 	}

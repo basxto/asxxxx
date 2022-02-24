@@ -1,7 +1,7 @@
 /* m04adr.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6804.h"
+#include "m6804.h"
 
 int
 addr(esp)
@@ -25,7 +25,7 @@ register struct expr *esp;
 		expr(esp, 0);
 		esp->e_mode = S_IMMED;
 	} else if (c == ',') {
-		if (!(esp->e_mode = admode(xy)))
+		if ((esp->e_mode = admode(xy)) == 0)
 			aerr();
 		esp->e_flag = 0;
 		esp->e_addr = 0;
@@ -53,7 +53,7 @@ register struct adsym *sp;
 	register int i;
 	unget(getnb());
 	i = 0;
-	while ( *(ptr = (char *) &sp[i].a_str) ) {
+	while ( *(ptr = (char *) &sp[i]) ) {
 		if (srch(ptr)) {
 			return(sp[i].a_val);
 		}

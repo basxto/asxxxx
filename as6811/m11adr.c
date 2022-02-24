@@ -1,7 +1,7 @@
 /* m11adr.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6811.h"
+#include "m6811.h"
 
 int
 addr(esp)
@@ -44,15 +44,10 @@ register struct expr *esp;
 	if (c == '*') {
 		expr(esp, 0);
 		esp->e_mode = S_DIR;
-		espa = esp->e_base.e_ap;
-		if (esp->e_addr & ~0xFF)
-			aerr();
-		if (espa && espa != sdp->s_area)
-			rerr();
 		if (more()) {
 			comma();
 			tcp = ip;
-			if (c = admode(abdxy)) {
+			if ((c = admode(abdxy)) != 0) {
 				if (c == S_X) {
 					esp->e_mode = S_INDX;
 				} else
@@ -67,14 +62,14 @@ register struct expr *esp;
 		}
 	} else {
 		unget(c);
-		if (esp->e_mode = admode(abdxy)) {
+		if ((esp->e_mode = admode(abdxy)) != 0) {
 			;
 		} else {
 			expr(esp, 0);
 			if (more()) {
-				tcp = ip;
 				comma();
-				if (c = admode(abdxy)) {
+				tcp = ip;
+				if ((c = admode(abdxy)) != 0) {
 					if (c == S_X) {
 						esp->e_mode = S_INDX;
 					} else
@@ -83,25 +78,25 @@ register struct expr *esp;
 					} else {
 						aerr();
 					}
-					if (c == S_X || c == S_Y) {
-						espa = esp->e_base.e_ap;
-						if (esp->e_addr & ~0xFF)
-							aerr();
-						if (espa &&
-						    espa != sdp->s_area)
-							rerr();
-					}
 				} else {
 					ip = --tcp;
 				}
 			} else {
-				if ( !esp->e_base.e_ap &&
-				    !(esp->e_addr & ~0xFF)) {
+				if (esp->e_flag == 0 &&
+					esp->e_base.e_ap == NULL &&
+					(esp->e_addr & ~0xFF) == 0 ) {
 					esp->e_mode = S_DIR;
 				} else {
 					esp->e_mode = S_EXT;
 				}
 			}
+		}
+	}
+	c = esp->e_mode;
+	if (c == S_INDX || c == S_INDY || c == S_DIR) {
+		if (esp->e_flag == 0 && esp->e_base.e_ap == NULL) {
+			if (esp->e_addr & ~0xFF)
+				err('d');
 		}
 	}
 	return (esp->e_mode);
@@ -120,7 +115,7 @@ register struct adsym *sp;
 	register int i;
 	unget(getnb());
 	i = 0;
-	while ( *(ptr = (char *) &sp[i].a_str) ) {
+	while ( *(ptr = (char *) &sp[i]) ) {
 		if (srch(ptr)) {
 			return(sp[i].a_val);
 		}

@@ -1,7 +1,7 @@
 /* aslist.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <string.h>
+#include <alloc.h>
 #include "asm.h"
 
 /*
@@ -25,6 +27,7 @@ VOID
 list()
 {
 	register char *wp;
+	register int *wpt;
 	register nb;
 
 	if (lfp == NULL || lmode == NLIST)
@@ -44,14 +47,16 @@ list()
 			return;
 		}
 		wp = cb;
-		nb = cp - cb;
-		list1(wp, nb, 1);
+		wpt = cbt;
+		nb = (int) (cp - cb);
+		list1(wp, wpt, nb, 1);
 		fprintf(lfp, " %5u %s\n", line, ib);
 		while ((nb -= 6) > 0) {
 			wp += 6;
+			wpt += 6;
 			slew(lfp);
 			fprintf(lfp, "%7s", "");
-			list1(wp, nb, 0);
+			list1(wp, wpt, nb, 0);
 			putc('\n', lfp);
 		}
 	} else
@@ -62,14 +67,16 @@ list()
 			return;
 		}
 		wp = cb;
-		nb = cp - cb;
-		list1(wp, nb, 1);
+		wpt = cbt;
+		nb = (int) (cp - cb);
+		list1(wp, wpt, nb, 1);
 		fprintf(lfp, " %5u %s\n", line, ib);
 		while ((nb -= 4) > 0) {
 			wp += 4;
+			wpt += 4;
 			slew(lfp);
 			fprintf(lfp, "%9s", "");
-			list1(wp, nb, 0);
+			list1(wp, wpt, nb, 0);
 			putc('\n', lfp);
 		}
 	} else
@@ -80,14 +87,16 @@ list()
 			return;
 		}
 		wp = cb;
-		nb = cp - cb;
-		list1(wp, nb, 1);
+		wpt = cbt;
+		nb = (int) (cp - cb);
+		list1(wp, wpt, nb, 1);
 		fprintf(lfp, " %5u %s\n", line, ib);
 		while ((nb -= 4) > 0) {
 			wp += 4;
+			wpt += 4;
 			slew(lfp);
 			fprintf(lfp, "%9s", "");
-			list1(wp, nb, 0);
+			list1(wp, wpt, nb, 0);
 			putc('\n', lfp);
 		}
 	}
@@ -98,45 +107,87 @@ list()
  * A subroutine of `list'.
  */
 VOID
-list1(wp, nb, f)
+list1(wp, wpt, nb, f)
 register char *wp;
-register nb;
+register int nb, *wpt;
 {
 	register i;
 
 	if (xflag == 0) {		/* HEX */
-	if (nb > 6)
-		nb = 6;
-	for (i=0; i<nb; ++i)
-		fprintf(lfp, " %02X", (*wp++)&0377);
-	if (f)
-		while (i < 6) {
-			fprintf(lfp, "   ");
-			++i;
+		if (nb > 6)
+			nb = 6;
+		for (i=0; i<nb; ++i) {
+			list2(*wpt++);
+			fprintf(lfp, "%02X", (*wp++)&0377);
+		}
+		if (f) {
+			while (i < 6) {
+				fprintf(lfp, "   ");
+				++i;
+			}
 		}
 	} else
 	if (xflag == 1) {		/* OCTAL */
-	if (nb > 4)
-		nb = 4;
-	for (i=0; i<nb; ++i)
-		fprintf(lfp, " %03o", (*wp++)&0377);
-	if (f)
-		while (i < 4) {
-			fprintf(lfp, "    ");
-			++i;
+		if (nb > 4)
+			nb = 4;
+		for (i=0; i<nb; ++i) {
+			list2(*wpt++);
+			fprintf(lfp, "%03o", (*wp++)&0377);
+		}
+		if (f) {
+			while (i < 4) {
+				fprintf(lfp, "    ");
+				++i;
+			}
 		}
 	} else
 	if (xflag == 2) {		/* DECIMAL */
-	if (nb > 4)
-		nb = 4;
-	for (i=0; i<nb; ++i)
-		fprintf(lfp, " %03u", (*wp++)&0377);
-	if (f)
-		while (i < 4) {
-			fprintf(lfp, "    ");
-			++i;
+		if (nb > 4)
+			nb = 4;
+		for (i=0; i<nb; ++i) {
+			list2(*wpt++);
+			fprintf(lfp, "%03u", (*wp++)&0377);
+		}
+		if (f) {
+			while (i < 4) {
+				fprintf(lfp, "    ");
+				++i;
+			}
 		}
 	}
+}
+
+/*
+ * Send relocation type to the listing.
+ * A subroutine of `list1'.
+ */
+VOID
+list2(t)
+register int t;
+{
+	register int c;
+
+	c = ' ';
+	if (fflag == 1) {
+		if (t & R_RELOC) {
+			c = '`';
+		}
+	} else
+	if (fflag >= 2) {
+		if (t & R_RELOC) {
+			if (t & (R_PAG0|R_PAG)) {
+				c = '*';
+			} else if (t & R_USGN) {
+				c = 'u';
+			} else if (t & R_PCR) {
+				c = 'p';
+			} else {
+				c = 'r';
+			}
+			if (t & R_HIGH) c += 1;
+		}
+	}
+	putc(c, lfp);
 }
 
 /*
@@ -152,7 +203,8 @@ slew(fp)
 FILE *fp;
 {
 	if (lop++ >= NLPP) {
-		fprintf(fp, "\fAssembler (%s), page %u.\n", cpu, ++page);
+		fprintf(fp, "\fASxxxx Assembler %s  (%s), page %u.\n",
+			VERSION, cpu, ++page);
 		fprintf(fp, "%s\n", tb);
 		fprintf(fp, "%s\n\n", stb);
 		lop = 5;
@@ -166,7 +218,7 @@ VOID
 lstsym(fp)
 FILE *fp;
 {
-	register c, i, j, k;
+	register int c, i, j, k;
 	register char *ptr;
 	int nmsym, narea;
 	struct sym *sp;
@@ -189,11 +241,13 @@ FILE *fp;
 	for (i=0; i<NHASH; i++) {
 		sp = symhash[i];
 		while (sp) {
-			if (sp != dot)
+			if (sp != &dot)
 				++nmsym;
 			sp = sp->s_sp;
 		}
 	}
+	if (nmsym == 0)
+		goto atable;
 
 	/*
 	 * Allocate space for an array of pointers to symbols
@@ -208,7 +262,7 @@ FILE *fp;
 	for (i=0; i<NHASH; i++) {
 		sp = symhash[i];
 		while (sp) {
-			if (sp != dot)
+			if (sp != &dot)
 				p[nmsym++] = sp;
 			sp = sp->s_sp;
 		}
@@ -252,7 +306,7 @@ FILE *fp;
 		}
 		ptr = &sp->s_id[0];
 		while (ptr < &sp->s_id[NCPS]) {
-			if (c = *ptr++) {
+			if ((c = *ptr++) != 0) {
 				putc(c, fp);
 			} else {
 				putc(' ', fp);
@@ -313,6 +367,8 @@ FILE *fp;
 	/*
 	 * Area Table Header
 	 */
+
+atable:
 	strcpy(stb, &aretbl[0]);
 	lop = NLPP;
 	slew(fp);
@@ -342,7 +398,7 @@ FILE *fp;
 		}
 		ptr = &ap->a_id[0];
 		while (ptr < &ap->a_id[NCPS]) {
-			if (c = *ptr++) {
+			if ((c = *ptr++) != 0) {
 				putc(c, fp);
 			} else {
 				putc(' ', fp);

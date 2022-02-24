@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -28,12 +28,30 @@
 	$(STACK) = 2000
 */
 
+#define	VERSION	"V01.50"
+
 /* DECUS C void definition */
+/* File/extension seperator */
 
 #ifdef	decus
 #define	VOID	char
-#else
+#define	FSEPX	'.'
+#endif
+
+/* PDOS C void definition */
+/* File/extension seperator */
+
+#ifdef	PDOS
+#define	VOID	char
+#define	FSEPX	':'
+#endif
+
+/* Default void definition */
+/* File/extension seperator */
+
+#ifndef	VOID
 #define	VOID	void
+#define	FSEPX	'.'
 #endif
 
 /*
@@ -58,14 +76,24 @@
 /*
  * Relocation types.
  */
-#define  R_WORD	0	/* 16 bit */
-#define	 R_BYTE 01
+#define	R_WORD	0000		/* 16 bit */
+#define	R_BYTE	0001		/*  8 bit */
 
-#define	 R_AREA	0	/* Base type */
-#define  R_SYM	02
+#define	R_AREA	0000		/* Base type */
+#define	R_SYM	0002
 
-#define	 R_NORM	0	/* PC adjust */
-#define	 R_PCR	04
+#define	R_NORM	0000		/* PC adjust */
+#define	R_PCR	0004
+
+#define	R_BYT1	0000		/* Byte count for R_BYTE = 1 */
+#define	R_BYT2	0010		/* Byte count for R_BYTE = 2 */
+
+#define	R_SGND	0000		/* Signed value */
+#define	R_USGN	0020		/* Unsigned value */
+
+#define	R_NOPAG	0000		/* Page Mode */
+#define	R_PAG0	0040		/* Page '0' */
+#define	R_PAG	0100		/* Page 'nnn' */
 
 /*
  * Global symbol types.
@@ -80,6 +108,8 @@
 #define	A_OVR	004		/* overlay */
 #define	A_REL	000		/* relocatable */
 #define	A_ABS	010		/* absolute */
+#define	A_NOPAG	000		/* non-paged */
+#define	A_PAG	020		/* paged */
 
 /*
  * File types
@@ -88,16 +118,16 @@
 #define	F_LNK	2		/* File.lnk */
 #define	F_REL	3		/* File.rel */
 
-typedef unsigned addr_t;
+typedef unsigned int addr_t;
 
 struct	head
 {
 	struct	head   *h_hp;	/* Header link */
 	struct	lfile  *h_lfile;/* Associated file */
 	int	h_narea;	/* # of areas */
-	VOID	**a_list;	/* Area list */
+	struct	areax **a_list;	/* Area list */
 	int	h_nglob;	/* # of global symbols */
-	VOID	**s_list;	/* Globle symbol list */
+	struct	sym   **s_list;	/* Globle symbol list */
 	char	m_id[NCPS];	/* Module name */
 };
 
@@ -115,6 +145,8 @@ struct	area
 struct	areax
 {
 	struct	areax	*a_axp;	/* Area extension link */
+	struct	area	*a_bap;	/* Base area link */
+	struct	head	*a_bhp;	/* Base header link */
 	addr_t	a_addr;		/* Beginning address of section */
 	addr_t	a_size;		/* Size of the area in section */
 };
@@ -148,12 +180,21 @@ struct	globl
 	char	      *g_strp;	/* String pointer */
 };
 
-#define	LETTER	0
-#define	DIGIT	1
-#define	BINOP	2
-#define ETC	3
-#define	ILL	4
-#define	SPACE	5
+struct	sdp
+{
+	struct	area  *s_area;	/* Paged Area link */
+	struct	areax *s_areax;	/* Paged Area Extension Link */
+	addr_t	s_addr;		/* Page address offset */
+};
+
+struct	rerr
+{
+	int	aindex;		/* Linking area */
+	int	mode;		/* Relocation mode */
+	addr_t	rtbase;		/* Base address in section */
+	int	rindex;		/* Area/Symbol reloaction index */
+	addr_t	rval;		/* Area/Symbol offset value */
+};
 
 /* Variable definitions */
 
@@ -167,6 +208,22 @@ extern		char	ctype[];
 #else
 extern		char	ccase[];
 #endif
+
+#define	SPACE	0000
+#define ETC	0000
+#define	LETTER	0001
+#define	DIGIT	0002
+#define	BINOP	0004
+#define	RAD2	0010
+#define	RAD8	0020
+#define	RAD10	0040
+#define	RAD16	0100
+#define	ILL	0200
+
+#define	DGT2	DIGIT|RAD16|RAD10|RAD8|RAD2
+#define	DGT8	DIGIT|RAD16|RAD10|RAD8
+#define	DGT10	DIGIT|RAD16|RAD10
+#define	LTR16	LETTER|RAD16
 
 extern	struct	lfile	*startp;
 extern	struct	lfile	*linkp;
@@ -183,6 +240,8 @@ extern	struct	base	*basep;
 extern	struct	base	*bsp;
 extern	struct	globl	*globlp;
 extern	struct	globl	*gsp;
+extern	struct	sdp	sdp;
+extern	struct	rerr	rerr;
 
 extern		FILE	*sfp;
 extern		FILE	*ofp;
@@ -201,11 +260,11 @@ extern		int	line;
 extern		int	page;
 extern		int	lop;
 extern		int	rtcnt;
-extern		int	rtval[];
+extern		addr_t	rtval[];
+extern		int	rtflg[];
 
 /* C Library function definitions */
 /* for reference only
-extern	VOID *		calloc();
 extern	VOID		exit();
 extern	int		fclose();
 extern	char *		fgets();
@@ -264,14 +323,14 @@ extern	VOID		symdef();
 extern	int		symeq();
 extern	VOID		syminit();
 extern	VOID		symmod();
-extern	int		symval();
+extern	addr_t		symval();
 
 /* lkeval.c */
 extern	int		digit();
-extern	int		eval();
-extern	int		expr();
+extern	addr_t		eval();
+extern	addr_t		expr();
 extern	int		oprio();
-extern	int		term();
+extern	addr_t		term();
 
 /* lklist.c */
 extern	VOID		lstarea();
@@ -279,13 +338,21 @@ extern	VOID		newpag();
 extern	VOID		slew();
 
 /* lkrloc.c */
-extern	int		add_b();
-extern	int		add_w();
-extern	int		evword();
+extern	addr_t		add_b1();
+extern	addr_t		add_b2();
+extern	addr_t		add_w();
+extern	addr_t		evword();
 extern	VOID		rele();
 extern	VOID		reloc();
-extern	VOID		relr();
 extern	VOID		relt();
+extern	VOID		relr();
+extern	VOID		relp();
+extern	VOID		relerr();
+extern	char *		errmsg[];
+extern	VOID		errdmp();
+extern	VOID		relerp();
+extern	VOID		erpdmp();
+extern	VOID		prntval();
 
 /* lks19.c */
 extern	VOID		s19();

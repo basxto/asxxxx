@@ -1,7 +1,7 @@
-/* m09mch.c */
+/* M09MCH:C */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,17 +12,13 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6809.h"
+#include "m6809.h"
 
 #define	NB	256
 
 int	*bp;
 int	bm;
 int	bb[NB];
-
-struct	sdp	sdp[] = {
-	0,	NULL
-};
 
 /*
  * Process a machine op.
@@ -34,11 +30,43 @@ struct mne *mp;
 	register op, rf, cpg, c;
 	struct expr e1;
 	int t1, v1, v2;
-	struct area *amp;
+	struct area *espa;
 	char id[NCPS];
+
 	cpg = 0;
 	op = mp->m_valu;
 	switch (rf = mp->m_type) {
+
+	case S_SDP:
+		e1.e_mode = 0;
+		e1.e_flag = 0;
+		e1.e_addr = 0;
+		e1.e_base.e_ap = NULL;
+		espa = NULL;
+		if (more()) {
+			expr(&e1, 0);
+			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
+				if (e1.e_addr & 0xFF) {
+					err('b');
+				}
+			}
+			if ((c = getnb()) == ',') {
+				getid(id, -1);
+				espa = alookup(id);
+				if (espa == NULL) {
+					err('u');
+				}
+			} else {
+				unget(c);
+			}
+		}
+		if (espa) {
+			outdp(espa, &e1);
+		} else {
+			outdp(dot.s_area, &e1);
+		}
+		lmode = SLIST;
+		break;
 
 	case S_INH2:
 		cpg += 0x01;
@@ -54,13 +82,17 @@ struct mne *mp;
 
 	case S_BRA:
 		expr(&e1, 0);
-		v1 = e1.e_addr - dot->s_addr - 2;
-		if ((v1 < -128) || (v1 > 127))
-			aerr();
-		if (e1.e_base.e_ap != dot->s_area)
-			rerr();
 		outab(op);
-		outab(v1);
+		if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
+			v1 = e1.e_addr - dot.s_addr - 1;
+			if ((v1 < -128) || (v1 > 127))
+				aerr();
+			outab(v1);
+		} else {
+			outrb(&e1, R_PCR);
+		}
+		if (e1.e_mode != S_USER)
+			rerr();
 		break;
 
 	case S_LBRA:
@@ -71,11 +103,11 @@ struct mne *mp;
 		if (cpg)
 			outab(cpg);
 		outab(op);
-		if (e1.e_base.e_ap != dot->s_area) {
-			outrw(&e1, 1);
-		} else {
-			v1 = e1.e_addr - dot->s_addr - 2;
+		if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
+			v1 = e1.e_addr - dot.s_addr - 2;
 			outaw(v1);
+		} else {
+			outrw(&e1, R_PCR);
 		}
 		if (e1.e_mode != S_USER)
 			aerr();
@@ -167,27 +199,6 @@ struct mne *mp;
 		m68out(op);
 		break;		
 
-	case S_SDP:
-		expr(&e1, 0);
-		amp = NULL;
-		if ((c = getnb()) == ',') {
-			getid(id, -1);
-			amp = alookup(id);
-			if ( amp == NULL) {
-				err('u');
-			}
-		} else {
-			unget(c);
-		}
-		if (amp) {
-			sdp->s_area = amp;
-		} else {
-			sdp->s_area = dot->s_area;
-		}
-		sdp->s_addr = e1.e_addr & ~0xFF;
-		lmode = SLIST;
-		break;
-
 	default:
 		err('o');
 	}
@@ -213,14 +224,14 @@ register struct expr *esp;
 		if (cpg)
 			outab(cpg);
 		outab(op);
-		outrb(esp, 0);
+		outrb(esp, R_NORM);
 		break;
 
 	case S_IMW:
 		if (cpg)
 			outab(cpg);
 		outab(op);
-		outrw(esp, 0);
+		outrw(esp, R_NORM);
 		break;
 
 	case S_DIR:
@@ -231,12 +242,7 @@ register struct expr *esp;
 		} else {
 			outab(op|0x10);
 		}
-		if (espa && espa != sdp->s_area)
-			rerr();
-		espv = espv - sdp->s_addr;
-		if (espv & ~0xFF)
-			aerr();
-		outab(espv);
+		outrb(esp, R_PAG);
 		break;
 
 	case S_EXT:
@@ -245,11 +251,11 @@ register struct expr *esp;
 		if (index) {
 			outab(op|0x20);
 			outab(index|0x0F);
-			outrw(esp, 0);
+			outrw(esp, R_NORM);
 			break;
 		}
 		outab(op|0x30);
-		outrw(esp, 0);
+		outrw(esp, R_NORM);
 		break;
 
 	case S_IND:
@@ -268,18 +274,18 @@ register struct expr *esp;
 			outab(cpg);
 		outab(op|0x20);
 		if (pass == 0) {
-			dot->s_addr += 3;
+			dot.s_addr += 3;
 		} else
 		if (pass == 1) {
-			if (esp->e_addr >= dot->s_addr)
+			if (esp->e_addr >= dot.s_addr)
 				esp->e_addr -= fuzz;
-			dot->s_addr += 2;
+			dot.s_addr += 2;
 			disp = esp->e_addr;
 			flag = 0;
 			if (disp<-128 || disp>127)
 				++flag;
 			if (setbit(flag))
-				++dot->s_addr;
+				++dot.s_addr;
 		} else {
 			if (getbit()) {
 				outab(index|0x01);
@@ -296,30 +302,30 @@ register struct expr *esp;
 			outab(cpg);
 		outab(op|0x20);
 		if (pass == 0) {
-			dot->s_addr += 3;
+			dot.s_addr += 3;
 		} else
-		if (espa && espa != dot->s_area) {
+		if (espa && espa != dot.s_area) {
 			outab(index|0x01);
-			outrw(esp, 1);
+			outrw(esp, R_PCR);
 		} else
 		if (pass == 1) {
-			if (esp->e_addr >= dot->s_addr)
+			if (esp->e_addr >= dot.s_addr)
 				esp->e_addr -= fuzz;
-			dot->s_addr += 2;
-			disp = esp->e_addr - dot->s_addr;
+			dot.s_addr += 2;
+			disp = esp->e_addr - dot.s_addr;
 			flag = 0;
 			if (disp<-128 || disp>127)
 				++flag;
 			if (setbit(flag))
-				++dot->s_addr;
+				++dot.s_addr;
 		} else {
 			if (getbit()) {
 				outab(index|0x01);
-				disp = espv - dot->s_addr - 2;
+				disp = espv - dot.s_addr - 2;
 				outaw(disp);
 			} else {
 				outab(index);
-				disp = espv - dot->s_addr - 1;
+				disp = espv - dot.s_addr - 1;
 				outab(disp);
 			}
 		}
@@ -330,27 +336,27 @@ register struct expr *esp;
 			outab(cpg);
 		outab(op|0x20);
 		if (pass == 0) {
-			dot->s_addr += 3;
+			dot.s_addr += 3;
 		} else
 		if (espa) {
 			outab(index|0x09);
-			outrw(esp, 0);
+			outrw(esp, R_NORM);
 		} else
 		if (pass == 1) {
-			if (esp->e_addr >= dot->s_addr)
+			if (esp->e_addr >= dot.s_addr)
 				esp->e_addr -= fuzz;
-			dot->s_addr += 1;
+			dot.s_addr += 1;
 			flag = 0;
 			if (espv <- 128 || espv > 127)
 				++flag;
 			if (setbit(flag)) {
-				dot->s_addr += 2;
+				dot.s_addr += 2;
 			} else {
 				flag = index & 0x10;
 				if (espv <- 16 || espv > 15)
 					++flag;
 				if (setbit(flag))
-					++dot->s_addr;
+					++dot.s_addr;
 			}
 		} else {
 			if (getbit()) {
@@ -382,9 +388,9 @@ int i;
 {
 	register char *ptr;
 	register int j;
-	ptr = (char *) &mc6800[i].opcode;
+	ptr = (char *) &mc6800[i];
 	for (j=0; j<4 ; j++) {
-		if (i = *ptr++) {
+		if ((i = *ptr++) != 0) {
 			outab(i);
 		} else {
 			break;
@@ -395,15 +401,12 @@ int i;
 /*
  * Machine specific initialization.
  * Set up the bit table.
- * Reset direct page.
  */
 VOID
 minit()
 {
 	bp = bb;
 	bm = 1;
-	sdp->s_addr = 0;
-	sdp->s_area = dot->s_area;
 }
 
 /*

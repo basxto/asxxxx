@@ -1,7 +1,7 @@
 /* m00pst.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6800.h"
+#include "m6800.h"
 
 struct	mne	mne[] = {
 
@@ -26,6 +26,8 @@ struct	mne	mne[] = {
 	NULL,	"OVR",		S_ATYP,		0,	A_OVR,
 	NULL,	"REL",		S_ATYP,		0,	A_REL,
 	NULL,	"ABS",		S_ATYP,		0,	A_ABS|A_OVR,
+	NULL,	"NOPAG",	S_ATYP,		0,	A_NOPAG,
+	NULL,	"PAG",		S_ATYP,		0,	A_PAG,
 
 	NULL,	".byte",	S_BYTE,		0,	0,
 	NULL,	".db",		S_BYTE,		0,	0,

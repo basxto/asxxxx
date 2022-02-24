@@ -1,7 +1,7 @@
 /* lklex.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,6 +10,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <alloc.h>
 #include "aslink.h"
 
 VOID
@@ -26,7 +28,7 @@ char *id;
 	do {
 		if (p < &id[NCPS])
 			*p++ = c;
-	} while (ctype[c=get()]==LETTER || ctype[c]==DIGIT);
+	} while (ctype[c=get()] & (LETTER|DIGIT));
 	unget(c);
 	while (p < &id[NCPS])
 		*p++ = 0;
@@ -42,7 +44,7 @@ char *str;
 	if (c < 0)
 		c = getnb();
 	p = str;
-	while (ctype[c] == LETTER || ctype[c] == DIGIT || c == ':') {
+	while (ctype[c] & (LETTER|DIGIT) || c == FSEPX) {
 		if (p < &str[FILSPC-1])
 			*p++ = c;
 		c = get();
@@ -68,7 +70,7 @@ register c;
 {
 	if (c < 0)
 		c = getnb();
-	while (ctype[c=get()]==LETTER || ctype[c]==DIGIT);
+	while (ctype[c=get()] & (LETTER|DIGIT)) { ; }
 	unget(c);
 }
 
@@ -147,11 +149,11 @@ getmap(d)
 int
 getline()
 {
-	register ftype;
+	register i, ftype;
 	register char *fid;
 
 loop:	if (pflag && cfp && cfp->f_type == F_STD)
-		fprintf(stdout, "aslink >> ");
+		fprintf(stdout, "ASlink >> ");
 
 	if (sfp == NULL || fgets(ib, sizeof ib, sfp) == NULL) {
 		if (sfp) {
@@ -169,10 +171,10 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 				sfp = stdin;
 			} else
 			if (ftype == F_LNK) {
-				sfp = afile(fid, "lnk", 0);
+				sfp = afile(fid, "LNK", 0);
 			} else
 			if (ftype == F_REL) {
-				sfp = afile(fid, "rel", 0);
+				sfp = afile(fid, "REL", 0);
 			} else {
 				fprintf(stderr, "Invalid file type\n");
 				exit(1);
@@ -183,7 +185,9 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 			return(0);
 		}
 	}
-	ib[strlen(ib) - 1] = 0;
+	i = strlen(ib) - 1;
+	if (ib[i] == '\n')
+		ib[i] = 0;
 	return (1);
 }
 

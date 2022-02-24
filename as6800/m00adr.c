@@ -1,7 +1,7 @@
 /* m00adr.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,14 +12,13 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6800.h"
+#include "m6800.h"
 
 int
 addr(esp)
 register struct expr *esp;
 {
 	register c;
-	register struct area *espa;
 
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
@@ -34,11 +33,8 @@ register struct expr *esp;
 	} else if (c == '*') {
 		expr(esp, 0);
 		esp->e_mode = S_DIR;
-		espa = esp->e_base.e_ap;
 		if (esp->e_addr & ~0xFF)
-			aerr();
-		if (espa && espa != sdp->s_area)
-			rerr();
+			err('d');
 		if (more()) {
 			comma();
 			esp->e_mode = S_INDX;
@@ -47,7 +43,7 @@ register struct expr *esp;
 		}
 	} else {
 		unget(c);
-		if (esp->e_mode = admode(abx)) {
+		if ((esp->e_mode = admode(abx)) != 0) {
 			;
 		} else {
 			expr(esp, 0);
@@ -56,14 +52,14 @@ register struct expr *esp;
 				esp->e_mode = S_INDX;
 				if (admode(abx) != S_X)
 					aerr();
-				espa = esp->e_base.e_ap;
-				if (esp->e_addr & ~0xFF)
+				if ((!esp->e_flag)
+					&& (esp->e_base.e_ap==NULL)
+					&& (esp->e_addr & ~0xFF))
 					aerr();
-				if (espa && espa != sdp->s_area)
-					rerr();
 			} else {
-				if ( !esp->e_base.e_ap &&
-				    !(esp->e_addr & ~0xFF)) {
+				if ((!esp->e_flag)
+					&& (esp->e_base.e_ap==NULL)
+					&& !(esp->e_addr & ~0xFF)) {
 					esp->e_mode = S_DIR;
 				} else {
 					esp->e_mode = S_EXT;
@@ -87,7 +83,7 @@ register struct adsym *sp;
 	register int i;
 	unget(getnb());
 	i = 0;
-	while ( *(ptr = (char *) &sp[i].a_str) ) {
+	while ( *(ptr = (char *) &sp[i]) ) {
 		if (srch(ptr)) {
 			return(sp[i].a_val);
 		}

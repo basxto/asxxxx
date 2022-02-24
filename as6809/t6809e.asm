@@ -1,6 +1,41 @@
 	.title	6809 Error Tests
 
+	;a   errors reported at assembly time
+	;*L  errors reported at LINK time
+	;
+	;ASLINK -C
+	;-XMS
+	;T6809E
+	;-B DATA = 0x100
+	;-B ROM  = 0x400
+	;-E
+	;
+
+	.blkb	0d256		;.area _CODE
+
+	.area	DATA
+
+	.globl	dat0,dat255,dat256
+
+dat0:	.byte	4
+	.blkb	254
+dat255:	.byte	5
+dat256:	.byte	6
+
+	.area	ROM
+
+	.globl	rom0,rom255,rom256
+
+rom0:	.byte	1
+	.blkb	254
+rom255:	.byte	2
+rom256:	.byte	3
+
 	.sbttl	S_ACC Tests
+
+	.area	PROGRAM
+
+	.setdp	0,_CODE
 
 	mmnn	=	0x2233
 
@@ -56,57 +91,39 @@
 	.page
 	.sbttl	Direct Addressing Tests
 
-	.area	ROM
-
-	.globl	rom0,rom255,rom256
-
-rom0:	.byte	1
-	.blkb	254
-rom255:	.byte	2
-rom256:	.byte	3
-
-	.area	DATA
-
-	.globl	dat0,dat255,dat256
-
-dat0:	.byte	4
-	.blkb	254
-dat255:	.byte	5
-dat256:	.byte	6
-
-	.area	PROGRAM
+	;*L == Error reported at LINK time !!!
 
 	neg	*0x20		;00 20
 
-	.setdp	rom0,ROM
+	.setdp	0,ROM
 
 	neg	*rom0		;   00 00
 	neg	*rom255		;   00 ff
 
-	neg	*rom256		;a  00 00
-	neg	*dat0		;r  00 00
-	neg	*dat255		;r  00 ff
-	neg	*dat256		;ra 00 00
+	neg	*rom256		;*L 00 00
+	neg	*dat0		;*L 00 00
+	neg	*dat255		;*L 00 ff
+	neg	*dat256		;*L 00 00
 
-	.setdp	dat0,DATA
+	.setdp	0,DATA
 
-	neg	*rom0		;r  00 00
-	neg	*rom255		;r  00 ff
-	neg	*rom256		;ra 00 00
+	neg	*rom0		;*L 00 00
+	neg	*rom255		;*L 00 ff
+	neg	*rom256		;*L 00 00
 
 	neg	*dat0		;   00 00
 	neg	*dat255		;   00 ff
-	neg	*dat256		;a  00 00
+	neg	*dat256		;*L 00 00
 
 	.setdp	0,_CODE
 
-	neg	*rom0		;r  00 00
-	neg	*rom255		;r  00 ff
-	neg	*rom256		;ra 00 00
+	neg	*rom0		;*L 00 00
+	neg	*rom255		;*L 00 ff
+	neg	*rom256		;*L 00 00
 
-	neg	*dat0		;r  00 00
-	neg	*dat255		;r  00 ff
-	neg	*dat256		;ra 00 00
+	neg	*dat0		;*L 00 00
+	neg	*dat255		;*L 00 ff
+	neg	*dat256		;*L 00 00
 
 
 	.sbttl	PC and PCR mode checks

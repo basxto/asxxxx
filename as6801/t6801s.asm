@@ -9,7 +9,7 @@ dirpag:				; direct page location
 
 	.area	AS6801
 
-	.setdp	DIRECT
+	.setdp	0,DIRECT
 
 	.hd6303
 				; 00

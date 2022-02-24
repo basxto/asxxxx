@@ -2,7 +2,7 @@
 
 	.area	DIRECT
 
-	.setdp
+	.setdp	0,DIRECT
 
 	bit0	=	0
 	bit1	=	1

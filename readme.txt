@@ -1,12 +1,12 @@
-ASxxxx and ASlink V1.00 March 1989
-ASXV1P00.ZIP	ASxxxx and ASlink V1.00 Zipped
+ASxxxx and ASlink V1.50 July 1990, February 1991, August 1993
+ASXV1P50.ZIP	ASxxxx and ASlink V1.50 Zipped
 
 	MS-DOS:
 	VC6:
-	DJGPP:		pkunzip -d asxv1p00.zip
+	DJGPP:		pkunzip -d asxv1p50.zip
 			unzips and restores directory structure
 
-	Linux:		unzip -L -a asxv1p00.zip
+	Linux:		unzip -L -a asxv1p50.zip
 			unzips to lower-case names and converts ascii
 			files to \n from \r\n form.
 

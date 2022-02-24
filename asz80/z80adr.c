@@ -1,7 +1,7 @@
 /* z80adr.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -40,17 +40,17 @@ register struct expr *esp;
 		esp->e_mode = S_IMMED;
 	} else
 	if (c == LFIND) {
-		if (indx=admode(R8)) {
+		if ((indx = admode(R8)) != 0) {
 			mode = S_INDB;
 		} else
-		if (indx=admode(R16)) {
+		if ((indx = admode(R16)) != 0) {
 			mode = S_INDR;
 		} else	
-		if (indx=admode(R8X)) {
+		if ((indx = admode(R8X)) != 0) {
 			mode = S_R8X;
 			aerr();
 		} else
-		if (indx=admode(R16X)) {
+		if ((indx = admode(R16X)) != 0) {
 			mode = S_R16X;
 			aerr();
 		} else {
@@ -67,16 +67,16 @@ register struct expr *esp;
 			qerr();
 	} else {
 		unget(c);
-		if (indx=admode(R8)) {
+		if ((indx = admode(R8)) != 0) {
 			mode = S_R8;
 		} else
-		if (indx=admode(R16)) {
+		if ((indx = admode(R16)) != 0) {
 			mode = S_R16;
 		} else	
-		if (indx=admode(R8X)) {
+		if ((indx = admode(R8X)) != 0) {
 			mode = S_R8X;
 		} else
-		if (indx=admode(R16X)) {
+		if ((indx = admode(R16X)) != 0) {
 			mode = S_R16X;
 		} else {
 			expr(esp, 0);
@@ -89,7 +89,7 @@ register struct expr *esp;
 			esp->e_base.e_ap = NULL;
 		}
 		if ((c = getnb()) == LFIND) {
-			if ((indx=admode(R16))
+			if ((indx=admode(R16))!=0
 				&& ((indx&0xFF)==IX || (indx&0xFF)==IY)) {
 				esp->e_mode = S_INDR + (indx&0xFF);
 			} else {
@@ -117,7 +117,7 @@ register struct adsym *sp;
 	register int i;
 	unget(getnb());
 	i = 0;
-	while ( *(ptr = (char *) &sp[i].a_str) ) {
+	while ( *(ptr = (char *) &sp[i]) ) {
 		if (srch(ptr)) {
 			return(sp[i].a_val);
 		}

@@ -1,0 +1,153 @@
+/* V01.50 Bugs */
+
+(1):	1-May-91
+
+/* aslist.c ----------------------------------------*/
+/*
+ * Send bytes of code to the listing.
+ * A subroutine of `list'.
+ */
+VOID
+list1(wp, wpt, nb, f)
+register char *wp;
+register int nb, *wpt;		/* needs , f */
+{
+/*--------------------------------------------------*/
+
+
+(2):	15-May-91
+
+The construct of (more() && comma()) used in m09mch.c is invalid
+because comma() is of type VOID. Change comma() to type int and return(1).
+
+/* m09mch.c ----------------------------------------*/
+/*
+ * The next character must be a
+ * comma.
+ */
+int
+comma()
+{
+	if (getnb() != ',')
+		qerr();
+	return(1);
+}
+/*--------------------------------------------------*/
+
+Change the external definition of comma in m6809.h from VOID to int.
+
+All xxxmch.c and xxx.h files should incorporate these changes.
+
+
+(3):	31-May-91
+
+Compiling the assemblers with Turbo C (V2.01) in the unsigned character
+mode causes the assemblers to produce errors when processing the
+.ascii and .asciz directives.  The C subroutine getmap() in aslex.c and
+lklex.c should be changed from type char to int (this allows the match
+case to return a -1 rather than a character value of 0xFF (unsigned
+character) or the sign extended value of 0xFFFF (for a signed character).
+
+/* aslex.c ----------------------------------------*/
+char
+getmap(d)
+{
+/*--------------------------------------------------*/
+/* lklex.c ----------------------------------------*/
+char
+getmap(d)
+{
+/*--------------------------------------------------*/
+
+The use of getmap() in asexpr.c and lkeval.c should be characterized by
+&0377.
+/* asexpr.c ----------------------------------------*/
+	if (c == '\'') {
+		esp->e_mode = S_USER;
+		esp->e_flag = 0;
+		esp->e_base.e_ap = NULL;
+		esp->e_addr = getmap(-1)&0377;
+		return;
+	}
+/*--------------------------------------------------*/
+/* lkeval.c ----------------------------------------*/
+	if (c == '\'') {
+		return(getmap(-1)&0377);
+	}
+/*--------------------------------------------------*/
+
+Change the external definitions in asm.h and aslink.h from char to int.
+
+
+(4):	15-Jun-91
+
+An assembler bug has been noted for the 'sub' instruction in the asz80
+assembler. Only the immediate mode is assembled correctly.
+The following change is required in the file z80mch.c :
+
+/* incorrect z80mch.c-------------------------------*/
+	case S_AND:
+	case S_SUB:
+		t1 = 0;
+		t2 = addr(&e2);
+		if (more()) {
+			if ((t2 != S_R8) || (e2.e_addr != A))
+				++t1;
+			comma();
+			t2 = addr(&e2);
+		}
+		if (rf==S_SUB && t2!=S_IMMED) {
+			if (genop(0xCB, op, &e2, 0) || t1)
+				aerr();
+		} else {
+			if (genop(0, op, &e2, 1) || t1)
+				aerr();
+		}
+		break;
+/*--------------------------------------------------*/
+
+/* corrected z80mch.c-------------------------------*/
+	case S_AND:
+	case S_SUB:
+		t1 = 0;
+		t2 = addr(&e2);
+		if (more()) {
+			if ((t2 != S_R8) || (e2.e_addr != A))
+				++t1;
+			comma();
+			t2 = addr(&e2);
+		}
+		if (genop(0, op, &e2, 1) || t1)
+			aerr();
+		break;
+/*--------------------------------------------------*/
+
+Change the z80 sub instruction test in file tz80.asm to:
+/* tz80.asm ----------------------------------------*/
+	;subtract operand from 'a'
+	sub	a,(hl)			; 96
+	sub	a,offset(ix)		; DD 96 55
+	sub	a,offset(iy)		; FD 96 55
+	sub	a,a			; 97
+	sub	a,b			; 90
+	sub	a,c			; 91
+	sub	a,d			; 92
+	sub	a,e			; 93
+	sub	a,h			; 94
+	sub	a,l			; 95
+	sub	a,#n			; D6 20
+/*--------------------------------------------------*/
+
+(5)	Other Notes:
+
+	The #define statement for FILSPC in asm.h and aslink.h
+	should be changed from
+
+		#define	FILSPC	...
+
+	to:
+
+		#define	FILSPC	80
+
+	to allow a directory path to be specified.
+

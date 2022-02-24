@@ -45,3 +45,13 @@
 	xgdx			;ok
 
 	slp			;ok
+
+	.area	A
+
+A:	bra	B		;ok
+
+	.area	B
+
+B:	bra	A		;ok
+
+

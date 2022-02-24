@@ -1,7 +1,7 @@
 /* m11ext.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6811.h"
+#include "m6811.h"
 
 char	*cpu	= "Motorola 6811";
 int	hilo	= 1;
-char	*dsft	= "asm";
+char	*dsft	= "ASM";

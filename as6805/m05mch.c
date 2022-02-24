@@ -1,7 +1,7 @@
 /* m05mch.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,17 +12,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6805.h"
-
-#define	NB	256
-
-int	*bp;
-int	bm;
-int	bb[NB];
-
-struct	sdp	sdp[] = {
-	NULL
-};
+#include "m6805.h"
 
 /*
  * Process a machine op.
@@ -36,25 +26,39 @@ struct mne *mp;
 	addr_t espv;
 	struct area *espa;
 	char id[NCPS];
-	int flag, v1;
+	int c, v1;
 
 	op = mp->m_valu;
 	type = mp->m_type;
 	switch (type) {
 
 	case S_SDP:
+		e1.e_mode = 0;
+		e1.e_flag = 0;
+		e1.e_addr = 0;
+		e1.e_base.e_ap = NULL;
 		espa = NULL;
 		if (more()) {
-			getid(id, -1);
-			espa = alookup(id);
-			if ( espa == NULL) {
-				err('u');
+			expr(&e1, 0);
+			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
+				if (e1.e_addr) {
+					err('b');
+				}
+			}
+			if ((c = getnb()) == ',') {
+				getid(id, -1);
+				espa = alookup(id);
+				if (espa == NULL) {
+					err('u');
+				}
+			} else {
+				unget(c);
 			}
 		}
 		if (espa) {
-			sdp->s_area = espa;
+			outdp(espa, &e1);
 		} else {
-			sdp->s_area = dot->s_area;
+			outdp(dot.s_area, &e1);
 		}
 		lmode = SLIST;
 		break;
@@ -65,19 +69,21 @@ struct mne *mp;
 
 	case S_BRA:
 		expr(&e1, 0);
-		v1 = e1.e_addr - dot->s_addr - 2;
-		if ((v1 < -128) || (v1 > 127))
-			aerr();
-		if (e1.e_base.e_ap != dot->s_area)
-			rerr();
 		outab(op);
-		outab(v1);
+		if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
+			v1 = e1.e_addr - dot.s_addr - 1;
+			if ((v1 < -128) || (v1 > 127))
+				aerr();
+			outab(v1);
+		} else {
+			outrb(&e1, R_PCR);
+		}
+		if (e1.e_mode != S_USER)
+			rerr();
 		break;
 
 	case S_TYP1:
 		t1 = addr(&e1);
-		espv = e1.e_addr;
-		espa = e1.e_base.e_ap;
 		if (t1 == S_A) {
 			outab(op+0x10);
 			break;
@@ -86,18 +92,18 @@ struct mne *mp;
 			outab(op+0x20);
 			break;
 		}
-		if (t1 == S_DIR) {
+		if (t1 == S_DIR || t1 == S_EXT) {
 			outab(op);
-			outrb(&e1, 0);
+			outrb(&e1, R_PAG0);
 			break;
 		}
 		if (t1 == S_IX) {
 			outab(op+0x40);
 			break;
 		}
-		if (t1 == S_DIRX) {
+		if (t1 == S_I8X || t1 == S_INDX) {
 			outab(op+0x30);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		aerr();
@@ -118,7 +124,7 @@ struct mne *mp;
 		}
 		if (t1 == S_DIR) {
 			outab(op+0x10);
-			outrb(&e1, 0);
+			outrb(&e1, R_PAG0);
 			break;
 		}
 		if (t1 == S_EXT) {
@@ -130,80 +136,61 @@ struct mne *mp;
 			outab(op+0x50);
 			break;
 		}
-		if (t1 == S_DIRX) {
+		if (t1 == S_I8X) {
 			outab(op+0x40);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		if (t1 == S_INDX) {
-			if (pass == 0) {
-				dot->s_addr += 3;
-			} else
-			if (e1.e_flag ||
-			   (espa && espa != dot->s_area)) {
-				outab(op+0x30);
-				outrw(&e1, 0);
-			} else
-			if (pass == 1) {
-				if (e1.e_addr >= dot->s_addr)
-					e1.e_addr -= fuzz;
-				flag = 0;
-				if (espv & ~0xFF)
-					++flag;
-				if (setbit(flag)) {
-					dot->s_addr += 3;
-				} else {
-					dot->s_addr += 2;
-				}
-			} else {
-				if (getbit()) {
-					outab(op+0x30);
-					outrw(&e1, 0);
-				} else {
-					outab(op+0x40);
-					outrb(&e1, 0);
-				}
-			}
+			outab(op+0x30);
+			outrw(&e1, 0);
 			break;
 		}
 		aerr();
 		break;
 
 	case S_TYP3:
-	case S_TYP4:
 		t1 = addr(&e1);
 		espv = e1.e_addr;
-		if (t1 != S_IMMED)
+		if (t1 != S_IMMED || espv & ~0x07)
 			aerr();
-		if (espv & ~0x07)
-			aerr();
-		e1.e_addr = op + 2*(espv&0x07);
 		comma();
 		t2 = addr(&e2);
 		if (t2 != S_DIR)
 			aerr();
-		espa = e2.e_base.e_ap;
-		if (espa && espa != sdp->s_area)
-			rerr();
-		if (type == S_TYP4) {
-			expr(&e3, 0);
-			v1 = e3.e_addr - dot->s_addr - 3;
+		outab(op + 2*(espv&0x07));
+		outrb(&e2, R_PAG0);
+		break;
+
+	case S_TYP4:
+		t1 = addr(&e1);
+		espv = e1.e_addr;
+		if (t1 != S_IMMED || espv & ~0x07)
+			aerr();
+		comma();
+		t2 = addr(&e2);
+		if (t2 != S_DIR)
+			aerr();
+		comma();
+		expr(&e3, 0);
+		outab(op + 2*(espv&0x07));
+		outrb(&e2, R_PAG0);
+		if (e3.e_base.e_ap == NULL || e3.e_base.e_ap == dot.s_area) {
+			v1 = e3.e_addr - dot.s_addr - 1;
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
-			if (e3.e_base.e_ap != dot->s_area)
-				rerr();
-		}
-		outrb(&e1, 0);
-		outrb(&e2, 0);
-		if (type == S_TYP4)
 			outab(v1);
+		} else {
+			outrb(&e3, R_PCR);
+		}
+		if (e3.e_mode != S_USER)
+			rerr();
 		break;
 
 	default:
 		err('o');
 	}
 }
-
 
 /*
  * The next character must be a
@@ -218,53 +205,8 @@ comma()
 
 /*
  * Machine specific initialization.
- * Set up the bit table.
- * Reset direct page.
  */
 VOID
 minit()
 {
-	bp = bb;
-	bm = 1;
-	sdp->s_area = dot->s_area;
-}
-
-/*
- * Store `b' in the next slot of the bit table.
- * If no room, force the longer form of the offset.
- */
-int
-setbit(b)
-{
-	if (bp >= &bb[NB])
-		return(1);
-	if (b)
-		*bp |= bm;
-	bm <<= 1;
-	if (bm == 0) {
-		bm = 1;
-		++bp;
-	}
-	return(b);
-}
-
-/*
- * Get the next bit from the bit table.
- * If none left, return a `1'.
- * This will force the longer form of the offset.
- */
-int
-getbit()
-{
-	register f;
-
-	if (bp >= &bb[NB])
-		return (1);
-	f = *bp & bm;
-	bm <<= 1;
-	if (bm == 0) {
-		bm = 1;
-		++bp;
-	}
-	return (f);
 }

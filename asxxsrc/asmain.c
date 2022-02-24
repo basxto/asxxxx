@@ -1,7 +1,7 @@
 /* asmain.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <string.h>
+#include <alloc.h>
 #include "asm.h"
 
 
@@ -23,12 +25,13 @@ char *argv[];
 	struct area *ap;
 	FILE *afile();
 
+	fprintf(stdout, "\n");
 	inpfil = -1;
 	for (i=1; i<argc; ++i) {
 		p = argv[i];
 		if (*p == '-') {
 			++p;
-			while (c = *p++)
+			while ((c = *p++) != 0)
 				switch(c) {
 
 				case 'a':
@@ -71,6 +74,11 @@ char *argv[];
 					xflag = 2;
 					break;
 
+				case 'f':
+				case 'F':
+					++fflag;
+					break;
+
 				default:
 					usage();
 				}
@@ -82,11 +90,11 @@ char *argv[];
 			sfp[inpfil] = afile(p, "", 0);
 			if (inpfil == 0) {
 				if (lflag)
-					lfp = afile(p, "lst", 1);
+					lfp = afile(p, "LST", 1);
 				if (oflag)
-					ofp = afile(p, "rel", 1);
+					ofp = afile(p, "REL", 1);
 				if (sflag)
-					tfp = afile(p, "sym", 1);
+					tfp = afile(p, "SYM", 1);
 			}
 		}
 	}
@@ -120,13 +128,14 @@ char *argv[];
 			ap = ap->a_ap;
 		}
 		fuzz = 0;
-		dot->s_addr = 0;
-		dot->s_area = dca;
-		symp = dot;
+		dot.s_addr = 0;
+		dot.s_area = &dca;
+		symp = &dot;
 		minit();
 		while (getline()) {
 			++line;
 			cp = cb;
+			cpt = cbt;
 			ep = eb;
 			ip = ib;
 			if (setjmp(jump_env) == 0)
@@ -136,7 +145,7 @@ char *argv[];
 				list();
 			}
 		}
-		newdot(dot->s_area); /* Flush area info */
+		newdot(dot.s_area); /* Flush area info */
 		if (flevel || tlevel)
 			err('i');
 	}
@@ -165,11 +174,11 @@ asmbl()
 	char *p;
 	int d, n, uaf, uf;
 
-	laddr = dot->s_addr;
+	laddr = dot.s_addr;
 	lmode = SLIST;
 loop:
 	if ((c=endline()) == 0) { return; }
-	if (ctype[c] == DIGIT) {
+	if (ctype[c] & DIGIT) {
 		if (flevel)
 			return;
 		n = 0;
@@ -192,8 +201,9 @@ loop:
 				tp=(struct tsym *) new (sizeof(struct tsym));
 				tp->t_lnk = symp->s_tsym;
 				tp->t_num = n;
-				tp->t_area = dot->s_area;
-				tp->t_addr = dot->s_addr;
+				tp->t_flg = 0;
+				tp->t_area = dot.s_area;
+				tp->t_addr = dot.s_addr;
 				symp->s_tsym = tp;
 			}
 		} else {
@@ -205,9 +215,9 @@ loop:
 			}
 			if (tp) {
 				if (pass == 1) {
-					fuzz = tp->t_addr - dot->s_addr;
-					tp->t_area = dot->s_area;
-					tp->t_addr = dot->s_addr;
+					fuzz = tp->t_addr - dot.s_addr;
+					tp->t_area = dot.s_area;
+					tp->t_addr = dot.s_addr;
 				} else {
 					phase(tp->t_area, tp->t_addr);
 					if (tp->t_flg & S_MDF)
@@ -219,7 +229,7 @@ loop:
 		}
 		goto loop;
 	}
-	if (ctype[c] != LETTER) 
+	if ((ctype[c] & LETTER) == 0)
 		if (flevel) {
 			return;
 		} else {
@@ -235,17 +245,17 @@ loop:
 			c = 0;
 		}
 		symp = lookup(id);
-		if (symp == dot)
+		if (symp == &dot)
 			err('.');
 		if (pass == 0)
-			if (symp->s_type != S_NEW &&
-			   (symp->s_flag & S_ASG) == 0)
+			if ((symp->s_type != S_NEW) &&
+			   ((symp->s_flag & S_ASG) == 0))
 				symp->s_flag |= S_MDF;
 		if (pass != 2) {
-			fuzz = symp->s_addr - dot->s_addr;
+			fuzz = symp->s_addr - dot.s_addr;
 			symp->s_type = S_USER;
-			symp->s_area = dot->s_area;
-			symp->s_addr = dot->s_addr;
+			symp->s_area = dot.s_area;
+			symp->s_addr = dot.s_addr;
 		} else {
 			if (symp->s_flag & S_MDF)
 				err('m');
@@ -266,9 +276,9 @@ loop:
 		}
 		expr(&e1, 0);
 		sp = lookup(id);
-		if (sp == dot) {
+		if (sp == &dot) {
 			outall();
-			if (e1.e_flag || e1.e_base.e_ap != dot->s_area)
+			if (e1.e_flag || e1.e_base.e_ap != dot.s_area)
 				err('.');
 		} else
 		if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
@@ -345,13 +355,13 @@ loop:
 
 	case S_EVEN:
 		outall();
-		dot->s_addr = (dot->s_addr + 1) & ~1;
+		dot.s_addr = (dot.s_addr + 1) & ~1;
 		lmode = SLIST;
 		break;
 
 	case S_ODD:
 		outall();
-		dot->s_addr |= 1;
+		dot.s_addr |= 1;
 		lmode = SLIST;
 		break;
 
@@ -360,9 +370,9 @@ loop:
 		do {
 			expr(&e1, 0);
 			if (mp->m_type == S_BYTE) {
-				outrb(&e1, 0);
+				outrb(&e1, R_NORM);
 			} else {
-				outrw(&e1, 0);
+				outrw(&e1, R_NORM);
 			}
 		} while ((c = getnb()) == ',');
 		unget(c);
@@ -381,16 +391,16 @@ loop:
 	case S_BLK:
 		expr(&e1, 0);
 		outall();
-		dot->s_addr += e1.e_addr*mp->m_valu;
+		dot.s_addr += e1.e_addr*mp->m_valu;
 		break;
 
 	case S_TITLE:
 		p = tb;
-		if (c = getnb()) {
+		if ((c = getnb()) != 0) {
 			do {
 				if (p < &tb[NTITL-1])
 					*p++ = c;
-			} while (c = get());
+			} while ((c = get()) != 0);
 		}
 		*p = 0;
 		unget(c);
@@ -399,11 +409,11 @@ loop:
 
 	case S_SBTL:
 		p = stb;
-		if (c = getnb()) {
+		if ((c = getnb()) != 0) {
 			do {
 				if (p < &stb[NSBTL-1])
 					*p++ = c;
-			} while (c = get());
+			} while ((c = get()) != 0);
 		}
 		*p = 0;
 		unget(c);
@@ -450,7 +460,7 @@ loop:
 		} else {
 			unget(c);
 		}
-		if (ap = alookup(id)) {
+		if ((ap = alookup(id)) != NULL) {
 			if (uaf && uf != ap->a_flag)
 				err('m');
 		} else {
@@ -458,6 +468,8 @@ loop:
 			ap->a_ap = areap;
 			strncpy(ap->a_id, id, NCPS);
 			ap->a_ref = areap->a_ref + 1;
+			ap->a_size = 0;
+			ap->a_fuzz = 0;
 			ap->a_flag = uaf ? uf : (A_CON|A_REL);
 			areap = ap;
 		}
@@ -466,9 +478,9 @@ loop:
 		break;
 
 	case S_ORG:
-		if (dot->s_area->a_flag & A_ABS) {
+		if (dot.s_area->a_flag & A_ABS) {
 			outall();
-			dot->s_addr = absexpr();
+			dot.s_addr = absexpr();
 		} else {
 			err('o');
 		}
@@ -500,8 +512,8 @@ loop:
 				radix = 16;
 				break;
 			default:
-				qerr();
 				radix = 10;
+				qerr();
 				break;
 			}
 		} else {
@@ -551,19 +563,19 @@ char *ft;
 	p1 = fn;
 	p2 = fb;
 	p3 = ft;
-	while ((c = *p1++) && c != '.') {
+	while ((c = *p1++) != 0 && c != FSEPX) {
 		if (p2 < &fb[FILSPC-4])
 			*p2++ = c;
 	}
-	*p2++ = '.';
+	*p2++ = FSEPX;
 	if (*p3 == 0) {
-		if (c == '.') {
+		if (c == FSEPX) {
 			p3 = p1;
 		} else {
 			p3 = dsft;
 		}
 	}
-	while (c = *p3++) {
+	while ((c = *p3++) != 0) {
 		if (p2 < &fb[FILSPC-1])
 			*p2++ = c;
 	}
@@ -581,12 +593,12 @@ register struct area *nap;
 {
 	register struct area *oap;
 
-	oap = dot->s_area;
+	oap = dot.s_area;
 	oap->a_fuzz = fuzz;
-	oap->a_size = dot->s_addr;
+	oap->a_size = dot.s_addr;
 	fuzz = nap->a_fuzz;
-	dot->s_area = nap;
-	dot->s_addr = nap->a_size;
+	dot.s_area = nap;
+	dot.s_addr = nap->a_size;
 	outall();
 }
 
@@ -595,20 +607,22 @@ phase(ap, a)
 struct area *ap;
 addr_t a;
 {
-	if (ap != dot->s_area || a != dot->s_addr)
+	if (ap != dot.s_area || a != dot.s_addr)
 		err('p');
 }
 
 char *usetxt[] = {
-	"Usage: [-dqxgalos] file1 [file2 file3 ...]",
+	"Usage: [-dqxgalosf] file1 [file2 file3 ...]",
 	"  d	decimal	listing",
 	"  q	octal	listing",
 	"  x	hex	listing (default)",
 	"  g	undefined symbols made global",
 	"  a	all user symbols made global",
-	"  l	create list   output file1.lst",
-	"  o	create object output file1.rel",
-	"  s	create symbol output file1.sym",
+	"  l	create list   output file1[LST]",
+	"  o	create object output file1[REL]",
+	"  s	create symbol output file1[SYM]",
+	"  f	flag relocatable references by  `   in listing file",
+	" ff	flag relocatable references by mode in listing file",
 	"",
 	0
 };
@@ -618,7 +632,7 @@ usage()
 {
 	register char	**dp;
 
-	fprintf(stderr, "\nAssembler (%s)\n\n", cpu);
+	fprintf(stderr, "\nASxxxx Assembler %s  (%s)\n\n", VERSION, cpu);
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	exit(1);

@@ -1,7 +1,7 @@
 /* asexpr.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <string.h>
+#include <alloc.h>
 #include "asm.h"
 
 /*
@@ -31,7 +33,7 @@ register struct expr *esp;
 	struct expr re;
 
 	term(esp);
-	while (ctype[c = getnb()] == BINOP) {
+	while (ctype[c = getnb()] & BINOP) {
 		if ((p = oprio(c)) <= n)
 			break;
 		if ((c == '>' || c == '<') && c != get())
@@ -48,7 +50,7 @@ register struct expr *esp;
 			esp->e_addr += re.e_addr;
 		} else
 		if (c == '-') {
-			if (ap = re.e_base.e_ap) {
+			if ((ap = re.e_base.e_ap) != NULL) {
 				if (esp->e_base.e_ap == ap) {
 					esp->e_base.e_ap = NULL;
 				} else {
@@ -127,7 +129,8 @@ VOID
 term(esp)
 register struct expr *esp;
 {
-	register c, n, nd;
+	register c, n;
+	register char *jp;
 	char id[NCPS];
 	struct sym  *sp;
 	struct tsym *tp;
@@ -165,9 +168,11 @@ register struct expr *esp;
 		esp->e_flag = 0;
 		esp->e_base.e_ap = NULL;
 		if (hilo) {
-		    esp->e_addr = (getmap(-1)&0377)<<8 | (getmap(-1)&0377);
+		    esp->e_addr  = (getmap(-1)&0377)<<8;
+		    esp->e_addr |= (getmap(-1)&0377);
 		} else {
-		    esp->e_addr = (getmap(-1)&0377) | (getmap(-1)&0377)<<8;
+		    esp->e_addr  = (getmap(-1)&0377);
+		    esp->e_addr |= (getmap(-1)&0377)<<8;
 		}
 		return;
 	}
@@ -179,54 +184,23 @@ register struct expr *esp;
 		esp->e_addr &= 0377;
 		return;
 	}
-	if (ctype[c] == DIGIT) {
+	if (ctype[c] & DIGIT) {
 		esp->e_mode = S_USER;
 		esp->e_flag = 0;
 		esp->e_base.e_ap = NULL;
-		r = radix;
-		if (c == '0') {
-			c = get();
-			switch (c) {
-			case 'b':
-			case 'B':
-				r = 2;
+		jp = ip;
+		while (ctype[*jp] & RAD10) {
+			jp++;
+		}
+		if (*jp == '$') {
+			n = 0;
+			while ((v = digit(c, 10)) >= 0) {
+				n = 10*n + v;
 				c = get();
-				break;
-			case '@':
-			case 'o':
-			case 'O':
-			case 'q':
-			case 'Q':
-				r = 8;
-				c = get();
-				break;
-			case 'd':
-			case 'D':
-				r = 10;
-				c = get();
-				break;
-			case 'h':
-			case 'H':
-			case 'x':
-			case 'X':
-				r = 16;
-				c = get();
-				break;
-			default:
-				break;
 			}
-		}
-		n = 0;
-		nd = 0;
-		while ((v = digit(c, r)) >= 0) {
-			n = r*n + v;
-			nd = 10*nd + v;
-			c = get();
-		}
-		if (c=='$') {
 			tp = symp->s_tsym;
 			while (tp) {
-				if (nd == tp->t_num) {
+				if (n == tp->t_num) {
 					esp->e_base.e_ap = tp->t_area;
 					esp->e_addr = tp->t_addr;
 					return;
@@ -237,32 +211,67 @@ register struct expr *esp;
 			esp->e_addr = 0;
 			return;
 		}
+		r = radix;
+		if (c == '0') {
+			c = get();
+			switch (c) {
+				case 'b':
+				case 'B':
+					r = 2;
+					c = get();
+					break;
+				case '@':
+				case 'o':
+				case 'O':
+				case 'q':
+				case 'Q':
+					r = 8;
+					c = get();
+					break;
+				case 'd':
+				case 'D':
+					r = 10;
+					c = get();
+					break;
+				case 'h':
+				case 'H':
+				case 'x':
+				case 'X':
+					r = 16;
+					c = get();
+					break;
+				default:
+					break;
+			}
+		}
+		n = 0;
+		while ((v = digit(c, r)) >= 0) {
+			n = r*n + v;
+			c = get();
+		}
 		unget(c);
 		esp->e_addr = n;
 		return;
 	}
-	if (ctype[c] == LETTER) {
+	if (ctype[c] & LETTER) {
 		esp->e_mode = S_USER;
 		esp->e_flag = 0;
 		esp->e_base.e_ap = NULL;
 		esp->e_addr = 0;
 		getid(id, c);
-		if (sp = lookup(id)) {
-			if (sp->s_type == S_NEW) {
-				if (sp->s_flag&S_GBL) {
-					esp->e_flag = 1;
-					esp->e_base.e_sp = sp;
-					return;
-				}
-				err('u');
+		sp = lookup(id);
+		if (sp->s_type == S_NEW) {
+			if (sp->s_flag&S_GBL) {
+				esp->e_flag = 1;
+				esp->e_base.e_sp = sp;
 				return;
 			}
+			err('u');
+		} else {
 			esp->e_mode = sp->s_type;
-			esp->e_base.e_ap = sp->s_area;
 			esp->e_addr = sp->s_addr;
-			return;
+			esp->e_base.e_ap = sp->s_area;
 		}
-		err('u');
 		return;
 	}
 	qerr();
@@ -278,13 +287,26 @@ digit(c, r)
 register c, r;
 {
 	if (r == 16) {
-		if (c >= 'A' && c <= 'F')
-			return (c - 'A' + 10);
-		if (c >= 'a' && c <= 'f')
-			return (c - 'a' + 10);
+		if (ctype[c] & RAD16) {
+			if (c >= 'A' && c <= 'F')
+				return (c - 'A' + 10);
+			if (c >= 'a' && c <= 'f')
+				return (c - 'a' + 10);
+			return (c - '0');
+		}
+	} else
+	if (r == 10) {
+		if (ctype[c] & RAD10)
+			return (c - '0');
+	} else
+	if (r == 8) {
+		if (ctype[c] & RAD8)
+			return (c - '0');
+	} else
+	if (r == 2) {
+		if (ctype[c] & RAD2)
+			return (c - '0');
 	}
-	if (c >= '0' && c <= '9')
-		return (c - '0');
 	return (-1);
 }
 
@@ -299,9 +321,9 @@ abscheck(esp)
 register struct expr *esp;
 {
 	if (esp->e_flag || esp->e_base.e_ap) {
-		rerr();
 		esp->e_flag = 0;
 		esp->e_base.e_ap = NULL;
+		rerr();
 	}
 }
 

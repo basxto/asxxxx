@@ -1,7 +1,7 @@
 /* z80mch.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -45,7 +45,7 @@ struct mne *mp;
 
 	case S_RET:
 		if (more()) {
-			if (v1 = admode(CND)) {
+			if ((v1 = admode(CND)) != 0) {
 				outab(op | v1<<3);
 			} else {
 				qerr();
@@ -60,7 +60,7 @@ struct mne *mp;
 			outab(op+0x30);
 			break;
 		} else
-		if ((v1=admode(R16)) && (v1&=0xFF)!=SP) {
+		if ((v1 = admode(R16)) != 0 && (v1 &= 0xFF) != SP) {
 			if (v1 != gixiy(v1)) {
 				outab(op+0x20);
 				break;
@@ -380,8 +380,8 @@ struct mne *mp;
 
 	case S_DJNZ:
 	case S_JR:
-		if ((v1=admode(CND)) && (rf != S_DJNZ)) {
-			if ((v1&=0xFF) <= 0x18) {
+		if ((v1 = admode(CND)) != 0 && rf != S_DJNZ) {
+			if ((v1 &= 0xFF) <= 0x18) {
 				op += (v1+1)<<3;
 			} else {
 				aerr();
@@ -389,17 +389,21 @@ struct mne *mp;
 			comma();
 		}
 		expr(&e2, 0);
-		v2 = e2.e_addr - dot->s_addr - 2;
-		if ((v2 < -128) || (v2 > 127))
-			aerr();
-		if (e2.e_base.e_ap != dot->s_area)
-			rerr();
 		outab(op);
-		outab(v2);
+		if (e2.e_base.e_ap == NULL || e2.e_base.e_ap == dot.s_area) {
+			v2 = e2.e_addr - dot.s_addr - 1;
+			if ((v2 < -128) || (v2 > 127))
+				aerr();
+			outab(v2);
+		} else {
+			outrb(&e2, R_PCR);
+		}
+		if (e2.e_mode != S_USER)
+			rerr();
 		break;
 
 	case S_CALL:
-		if (v1=admode(CND)) {
+		if ((v1 = admode(CND)) != 0) {
 			op |= (v1&0xFF)<<3;
 			comma();
 		} else {
@@ -411,7 +415,7 @@ struct mne *mp;
 		break;
 
 	case S_JP:
-		if (v1=admode(CND)) {
+		if ((v1 = admode(CND)) != 0) {
 			op |= (v1&0xFF)<<3;
 			comma();
 			expr(&e1, 0);

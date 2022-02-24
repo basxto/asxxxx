@@ -1,7 +1,7 @@
 /* lkmain.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,6 +10,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <alloc.h>
 #include "aslink.h"
 
 VOID
@@ -20,13 +22,15 @@ char *argv[];
 	register c, i;
 	FILE *afile();
 
+	fprintf(stdout, "\n");
+
 	pflag = 1;
 	startp = (struct lfile *) new (sizeof (struct lfile));
 
 	for (i=1; i<argc; ++i) {
 		p = argv[i];
 		if (*p == '-') {
-			while (ctype[c = *(++p)] == LETTER) {
+			while (ctype[c = *(++p)] & LETTER) {
 				switch(c) {
 
 				case 'c':
@@ -118,9 +122,9 @@ char *argv[];
 			 * Open output file
 			 */
 			if (oflag == 1)
-				ofp = afile(linkp->f_idp, "ihx", 1);
+				ofp = afile(linkp->f_idp, "IHX", 1);
 			if (oflag == 2)
-				ofp = afile(linkp->f_idp, "s19", 1);
+				ofp = afile(linkp->f_idp, "S19", 1);
 		} else {
 			reloc('E');
 		}
@@ -157,6 +161,9 @@ link()
 				hp = hp->h_hp;
 			}
 		}
+		sdp.s_area = NULL;
+		sdp.s_areax = NULL;
+		sdp.s_addr = 0;
 		break;
 
 	case 'M':
@@ -167,6 +174,11 @@ link()
 	case 'A':
 		if (pass == 0)
 			newarea();
+		if (sdp.s_area == NULL) {
+			sdp.s_area = areap;
+			sdp.s_areax = areap->a_axp;
+			sdp.s_addr = 0;
+		}
 		break;
 
 	case 'S':
@@ -176,6 +188,7 @@ link()
 
 	case 'T':
 	case 'R':
+	case 'P':
 		if (pass == 0)
 			break;
 		reloc(c);
@@ -203,7 +216,7 @@ map()
 	/*
 	 * Open Map File
 	 */
-	mfp = afile(linkp->f_idp, "map", 1);
+	mfp = afile(linkp->f_idp, "MAP", 1);
 	/*
 	 * Output Map Area Lists
 	 */
@@ -269,7 +282,6 @@ map()
 	}
 	fprintf(mfp, "\n\f");
 	symdef(mfp);
-	fclose(mfp);
 }
 
 int
@@ -278,9 +290,9 @@ parse()
 	register c;
 	char fid[NINPUT];
 
-	while (c = getnb()) {
+	while ((c = getnb()) != 0) {
 		if ( c == '-') {
-			while (ctype[c=get()] == LETTER) {
+			while (ctype[c=get()] & LETTER) {
 				switch(c) {
 
 				case 'i':
@@ -343,7 +355,7 @@ parse()
 				}
 			}
 		} else
-		if (ctype[c] == LETTER || ctype[c] == DIGIT) {
+		if (ctype[c] & (LETTER|DIGIT)) {
 			if (linkp == NULL) {
 				linkp = (struct lfile *)
 					new (sizeof (struct lfile));
@@ -486,19 +498,19 @@ char *ft;
 	p1 = fn;
 	p2 = fb;
 	p3 = ft;
-	while ((c = *p1++) && c != '.') {
+	while ((c = *p1++) != 0 && c != FSEPX) {
 		if (p2 < &fb[FILSPC-4])
 			*p2++ = c;
 	}
-	*p2++ = '.';
+	*p2++ = FSEPX;
 	if (*p3 == 0) {
-		if (c == '.') {
+		if (c == FSEPX) {
 			p3 = p1;
 		} else {
-			p3 = "rel";
+			p3 = "REL";
 		}
 	}
-	while (c = *p3++) {
+	while ((c = *p3++) != 0) {
 		if (p2 < &fb[FILSPC-1])
 			*p2++ = c;
 	}
@@ -513,21 +525,21 @@ char *ft;
 char *usetxt[] = {
 	"Startup:",
 	"  -c                           Command line input",
-	"  -f   file [.lnk]             File input",
+	"  -f   file[LNK]               File input",
 	"Usage: [-Options] file [file ...]",
-	"  -p   Prompt and echo of file.lnk to stdout(default)",
-	"  -n   No echo of file.lnk to stdout",
+	"  -p   Prompt and echo of file[LNK] to stdout (default)",
+	"  -n   No echo of file[LNK] to stdout",
 	"Relocation:",
 	"  -b   area base address = expression",
 	"  -g   global symbol = expression",
 	"Map format:",
-	"  -m   Map output generated as file.map",
+	"  -m   Map output generated as file[MAP]",
 	"  -x   Hexidecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
-	"  -i   Intel Hex as file.ihx",
-	"  -s   Motorola S19 as file.s19",
+	"  -i   Intel Hex as file[IHX]",
+	"  -s   Motorola S19 as file[S19]",
 	"End:",
 	"  -e   or null line terminates input",
 	"",
@@ -539,8 +551,8 @@ usage()
 {
 	register char	**dp;
 
+	fprintf(stderr, "\nASxxxx Linker %s\n\n", VERSION);
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	exit(1);
 }
-

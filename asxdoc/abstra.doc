@@ -1,11 +1,11 @@
 
 
-        ASxxxx Cross Assemblers, Version 1, March 1989 
+        ASxxxx Cross Assemblers, Version 1.1, June 1990 
 
         Submitted by Alan R.  Baldwin, 
         Kent State University, Kent, Ohio 
 
-        Operating System:  TSX+, RT-11, MS/DOS, 
+        Operating System:  TSX+, RT-11, MS/DOS, PDOS 
         or other supporting K&R C.  
 
         Source Langauge:  C 
@@ -46,11 +46,11 @@
         map of the linked memory image.  
 
            The  assemblers  and  linker  have  been tested using DECUS C
-        under TSX+ and RT-11, and with TurboC V1.5 under  MS/DOS.   Com-
-        plete  source  code  and  documentation  for  the assemblers and
-        linker is included with the  distribution.   Additionally,  test
-        code  for  each  assembler and several microprocessor monitors (
-        ASSIST05 for the 6805, MONDEB and ASSIST09  for  the  6809,  and
-        BUFFALO  2.5  for  the 6811) are included as working examples of
-        use of these assemblers.  
+        under TSX+ and RT-11, PDOS C V5.4b, and with TurboC  V1.5  under
+        MS/DOS.   Complete  source code and documentation for the assem-
+        blers and linker  is  included  with  the  distribution.   Addi-
+        tionally,   test   code   for   each   assembler   and   several
+        microprocessor monitors ( ASSIST05  for  the  6805,  MONDEB  and
+        ASSIST09  for  the  6809,  and BUFFALO 2.5 for the 6811) are in-
+        cluded as working examples of use of these assemblers.  
 

@@ -1,7 +1,7 @@
 /* lklist.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,6 +10,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <alloc.h>
 #include "aslink.h"
 
 /*
@@ -50,7 +52,7 @@ VOID
 newpag(fp)
 FILE *fp;
 {
-	fprintf(fp, "\faslink,  page %u.\n", ++page);
+	fprintf(fp, "\fASxxxx Linker %s,  page %u.\n", VERSION, ++page);
 	lop = 1;
 }
 
@@ -66,7 +68,7 @@ struct area *rp;
 	register c, i, j;
 	register char *ptr;
 	int nmsym;
-	addr_t a0, ai;
+	addr_t a0, ai, aj;
 	struct sym *sp;
 	struct sym **p;
 
@@ -77,33 +79,46 @@ struct area *rp;
 	 */
 	ptr = &rp->a_id[0];
 	while (ptr < &rp->a_id[NCPS]) {
-		if (c = *ptr++) {
+		if ((c = *ptr++) != 0) {
 			putc(c, mfp);
 		} else {
 			putc(' ', mfp);
 		}
 	}
-	i = rp->a_addr;
-	j = rp->a_size;
+	ai = rp->a_addr;
+	aj = rp->a_size;
 	if (xflag == 0) {
-		fprintf(mfp, "   %04X   %04X", i, j);
+		fprintf(mfp, "   %04X   %04X", ai, aj);
 	} else
 	if (xflag == 1) {
-		fprintf(mfp, " %06o %06o", i, j);
+		fprintf(mfp, " %06o %06o", ai, aj);
 	} else
 	if (xflag == 2) {
-		fprintf(mfp, "  %05u  %05u", i, j);
+		fprintf(mfp, "  %05u  %05u", ai, aj);
 	}
-	fprintf(mfp, " = %6u. bytes ", j);
+	fprintf(mfp, " = %6u. bytes ", aj);
 	if (rp->a_flag & A_ABS) {
 		fprintf(mfp, "(ABS");
 	} else {
 		fprintf(mfp, "(REL");
 	}
 	if (rp->a_flag & A_OVR) {
-		fprintf(mfp, ",OVR)");
+		fprintf(mfp, ",OVR");
 	} else {
-		fprintf(mfp, ",CON)");
+		fprintf(mfp, ",CON");
+	}
+	if (rp->a_flag & A_PAG) {
+		fprintf(mfp, ",PAG");
+	}
+	fprintf(mfp, ")");
+	if (rp->a_flag & A_PAG) {
+		ai = (ai & 0xFF);
+		aj = (aj > 256);
+		if (ai || aj) { fprintf(mfp, "  "); }
+		if (ai)      { fprintf(mfp, " Boundary"); }
+		if (ai & aj)  { fprintf(mfp, " /"); }
+		if (aj)      { fprintf(mfp, " Length"); }
+		if (ai || aj) { fprintf(mfp, " Error"); }
 	}
 
 	/*
@@ -184,19 +199,19 @@ struct area *rp;
 			fprintf(mfp, "     ");
 		}
 		sp = p[i];
-		j = sp->s_addr + sp->s_axp->a_addr;
+		aj = sp->s_addr + sp->s_axp->a_addr;
 		if (xflag == 0) {
-			fprintf(mfp, "  %04X  ", j);
+			fprintf(mfp, "  %04X  ", aj);
 		} else
 		if (xflag == 1) {
-			fprintf(mfp, "%06o  ", j);
+			fprintf(mfp, "%06o  ", aj);
 		} else
 		if (xflag == 2) {
-			fprintf(mfp, " %05u  ", j);
+			fprintf(mfp, " %05u  ", aj);
 		}
 		ptr = &sp->s_id[0];
 		while (ptr < &sp->s_id[NCPS]) {
-			if (c = *ptr++) {
+			if ((c = *ptr++) != 0) {
 				putc(c, mfp);
 			} else {
 				putc(' ', mfp);

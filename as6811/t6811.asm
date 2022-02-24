@@ -10,7 +10,7 @@ dir:	.byte	0,0
 
 	.area	AS6811
 
-	.setdp	DIRECT
+	.setdp	0,DIRECT
 
 	aba			;1B
 	abx			;3A

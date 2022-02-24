@@ -1,7 +1,7 @@
 /* lksym.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,6 +10,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <alloc.h>
 #include "aslink.h"
 
 /*
@@ -75,7 +77,7 @@ newsym()
 		exit(1);
 	}
 	nglob = hp->h_nglob;
-	s = (struct sym **) hp->s_list;
+	s = hp->s_list;
 	for (i=0; i < nglob ;++i) {
 		if (s[i] == NULL) {
 			s[i] = tsp;
@@ -119,11 +121,11 @@ char *id;
 /*
  * Get value of relocated symbol
  */
-int
+addr_t
 symval(tsp)
 register struct sym *tsp;
 {
-	register val;
+	register addr_t val;
 
 	val = tsp->s_addr;
 	if (tsp->s_axp) {
@@ -162,12 +164,12 @@ struct sym *tsp;
 	register i, j;
 	struct sym **p;
 
-	if (hp = headp) {
+	if ((hp = headp) != NULL) {
 	    while(hp) {
-		p = (struct sym **) hp->s_list;
+		p = hp->s_list;
 		for (i=0; i<hp->h_nglob; ++i) {
 		    if (p[i] == tsp) {
-			fprintf(fp, "Undefined Global %8.8s ", tsp->s_id);
+			fprintf(fp, "\n?ASlink-W-Undefined Global %8.8s ", tsp->s_id);
 			fprintf(fp, "referenced by module %8.8s\n", hp->m_id);
 		    }
 		}
@@ -235,12 +237,17 @@ register char *p;
  */
 VOID *
 new(n)
+unsigned int n;
 {
-	register VOID *p;
+	register char *p,*q;
+	register unsigned int i;
 
-	if ((p = (VOID *) calloc(n,1)) == NULL) {
+	if ((p = (char *) malloc(n)) == NULL) {
 		fprintf(stderr, "Out of space!\n");
 		exit(1);
+	}
+	for (i=0,q=p; i<n; i++) {
+		*q++ = 0;
 	}
 	return (p);
 }

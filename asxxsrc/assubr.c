@@ -1,7 +1,7 @@
 /* assubr.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <string.h>
+#include <alloc.h>
 #include "asm.h"
 
 /*
@@ -47,9 +49,13 @@ diag()
 {
 	register char *p;
 
-	p = eb;
-	while (p < ep)
-		printf("%c %04d\n", *p++, line);
+	if (eb != ep) {
+		p = eb;
+		while (p < ep) {
+			fprintf(stderr, "%c", *p++);
+		}
+		fprintf(stderr, " %04d\n", line);
+	}
 }
 
 /*

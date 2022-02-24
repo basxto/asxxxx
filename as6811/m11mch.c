@@ -1,7 +1,7 @@
 /* m11mch.c */
 
 /*
- * (C) Copyright 1989
+ * (C) Copyright 1989,1990
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,11 +12,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include "asm.h"
-#include "6811.h"
-
-struct	sdp	sdp[] = {
-	NULL
-};
+#include "m6811.h"
 
 /*
  * Process a machine op.
@@ -29,7 +25,7 @@ struct mne *mp;
 	struct expr e1, e2, e3;
 	struct area *espa;
 	char id[NCPS];
-	int reg, cpg, type, v1;
+	int c, reg, cpg, type, v1, v3;
 
 	reg = 0;
 	cpg = 0;
@@ -38,18 +34,32 @@ struct mne *mp;
 	switch (type) {
 
 	case S_SDP:
+		e1.e_mode = 0;
+		e1.e_flag = 0;
+		e1.e_addr = 0;
+		e1.e_base.e_ap = NULL;
 		espa = NULL;
 		if (more()) {
-			getid(id, -1);
-			espa = alookup(id);
-			if ( espa == NULL) {
-				err('u');
+			expr(&e1, 0);
+			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
+				if (e1.e_addr) {
+					err('b');
+				}
+			}
+			if ((c = getnb()) == ',') {
+				getid(id, -1);
+				espa = alookup(id);
+				if (espa == NULL) {
+					err('u');
+				}
+			} else {
+				unget(c);
 			}
 		}
 		if (espa) {
-			sdp->s_area = espa;
+			outdp(espa, &e1);
 		} else {
-			sdp->s_area = dot->s_area;
+			outdp(dot.s_area, &e1);
 		}
 		lmode = SLIST;
 		break;
@@ -85,13 +95,17 @@ struct mne *mp;
 
 	case S_BRA:
 		expr(&e1, 0);
-		v1 = e1.e_addr - dot->s_addr - 2;
-		if ((v1 < -128) || (v1 > 127))
-			aerr();
-		if (e1.e_base.e_ap != dot->s_area)
-			rerr();
 		outab(op);
-		outab(v1);
+		if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
+			v1 = e1.e_addr - dot.s_addr - 1;
+			if ((v1 < -128) || (v1 > 127))
+				aerr();
+			outab(v1);
+		} else {
+			outrb(&e1, R_PCR);
+		}
+		if (e1.e_mode != S_USER)
+			rerr();
 		break;
 
 	case S_TYP1:
@@ -120,7 +134,7 @@ struct mne *mp;
 			if (t1 == S_INDY)
 				outab(PAGE2);
 			outab(op|X);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		if (t1 == S_DIR || t1 == S_EXT) {
@@ -132,7 +146,7 @@ struct mne *mp;
 		break;
 
 	case S_TYP2:
-		if (!(reg = admode(abdxy)))
+		if ((reg = admode(abdxy)) == 0)
 			aerr();
 
 	case S_TYP3:
@@ -174,14 +188,14 @@ struct mne *mp;
 		}
 		if (t1 == S_DIR) {
 			outab(op|reg|0x10);
-			outrb(&e1, 0);
+			outrb(&e1, R_PAG0);
 			break;
 		}
 		if (t1 == S_INDX || t1 == S_INDY) {
 			if (t1 == S_INDY)
 				outab(PAGE2);
 			outab(op|reg|0x20);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		if (t1 == S_EXT) {
@@ -203,14 +217,14 @@ struct mne *mp;
 		}
 		if (t1 == S_DIR) {
 			outab(op|0x10);
-			outrb(&e1, 0);
+			outrb(&e1, R_PAG0);
 			break;
 		}
 		if (t1 == S_INDX || t1 == S_INDY) {
 			if (t1 == S_INDY)
 				outab(PAGE2);
 			outab(op|0x20);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		if (t1 == S_EXT) {
@@ -227,7 +241,7 @@ struct mne *mp;
 			if (t1 == S_INDY)
 				outab(PAGE2);
 			outab(op);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		if (t1 == S_EXT) {
@@ -259,14 +273,14 @@ struct mne *mp;
 			if (cpg)
 				outab(cpg);
 			outab(op|0x10);
-			outrb(&e1, 0);
+			outrb(&e1, R_PAG0);
 			break;
 		}
 		if (t1 == S_INDX) {
 			if (cpg)
 				outab(PAGE3);
 			outab(op|0x20);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		if (t1 == S_INDY) {
@@ -276,7 +290,7 @@ struct mne *mp;
 				outab(PAGE4);
 			}
 			outab(op|0x20);
-			outrb(&e1, 0);
+			outrb(&e1, R_USGN);
 			break;
 		}
 		if (t1 == S_EXT) {
@@ -291,10 +305,16 @@ struct mne *mp;
 
 	case S_BTB:
 	case S_STCLR:
-		v1 = 0;
 		t1 = addr(&e1);
+		comma();
+		t2 = addr(&e2);
+		if (type == S_BTB) {
+			comma();
+			expr(&e3, 0);
+		}
 		if (t1 == S_DIR) {
-			;
+			outab(op);
+			outrb(&e1, R_PAG0);
 		} else
 		if (t1 == S_INDX || t1 == S_INDY) {
 			if (type == S_BTB) {
@@ -302,31 +322,30 @@ struct mne *mp;
 			} else {
 				op += 0x08;
 			}
+			if (t1 == S_INDY)
+				outab(PAGE2);
+			outab(op);
+			outrb(&e1, R_USGN);
 		} else {
+			outab(op);
+			outrb(&e1, 0);
 			aerr();
 		}
-		comma();
-		t2 = addr(&e2);
 		if (t2 != S_IMMED)
 			aerr();
+		outrb(&e2, 0);
 		if (type == S_BTB) {
-			comma();
-			expr(&e3, 0);
-			v1 = e3.e_addr - dot->s_addr - 4;
-			if (t1 == S_INDY)
-				--v1;
-			if ((v1 < -128) || (v1 > 127))
-				aerr();
-			if (e3.e_base.e_ap != dot->s_area)
+			if (e3.e_base.e_ap == NULL || e3.e_base.e_ap == dot.s_area) {
+				v3 = e3.e_addr - dot.s_addr - 1;
+				if ((v3 < -128) || (v3 > 127))
+					aerr();
+				outab(v3);
+			} else {
+				outrb(&e3, R_PCR);
+			}
+			if (e3.e_mode != S_USER)
 				rerr();
 		}
-		if (t1 == S_INDY)
-			outab(PAGE2);
-		outab(op);
-		outrb(&e1, 0);
-		outrb(&e2, 0);
-		if (type == S_BTB)
-			outab(v1);
 		break;
 
 	default:
@@ -352,5 +371,4 @@ comma()
 VOID
 minit()
 {
-	sdp->s_area = dot->s_area;
 }
