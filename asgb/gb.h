@@ -182,6 +182,8 @@
 #define S_LDX	91	/* Loads which increment/decrement HL */
 #define S_SWAP	92	/* SWAP A, nybble swaps the accumulator */
 #define S_TILE	93	/* .TILE pseudo-op */
+#define	S_STOP	83
+#define	S_LDA	84
 
 struct adsym
 {

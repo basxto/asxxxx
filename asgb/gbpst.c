@@ -288,5 +288,7 @@ struct	mne	mne[] = {
     {	NULL,	"rrca",		S_INH1,		0,	0x0F	},
     {	NULL,	"scf",		S_INH1,		0,	0x37	},
     {	NULL,	"reti",		S_INH1,		0,	0xD9	},
+    {	NULL,	"lda",		S_LDA,		0,	0xE8	},
+    {	NULL,	"ldhl",		S_LDHL,		0,	0x0F	},
     {	NULL,	"stop",		S_INH1,		S_EOL,	0x10	}
 };

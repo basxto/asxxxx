@@ -64,10 +64,10 @@ static char  gbpg1[256] = {
 /*90*/   4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
 /*A0*/   4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
 /*B0*/   4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-/*C0*/  20,12,12,16,24,16, 8,16,20,16,12,P2,24,24, 8,16,
-/*D0*/  20,12,12,UN,24,16, 8,16,20,16,12,UN,24,UN, 8,16,
+/*C0*/  20,12,16,16,24,16, 8,16,20,16,16,P2,24,24, 8,16,
+/*D0*/  20,12,16,UN,24,16, 8,16,20,16,16,UN,24,UN, 8,16,
 /*E0*/  12,12, 8,UN,UN,16, 8,16,16, 4,16,UN,UN,UN, 8,16,
-/*F0*/  12,12, 8, 4,UN,16, 8,16, 8, 8,16, 4,UN,UN, 8,16
+/*F0*/  12,12, 8, 4,UN,16, 8,16,12, 8,16, 4,UN,UN, 8,16
 };
 
 static char  gbpg2[256] = {  /* P2 == CB */
@@ -434,6 +434,54 @@ struct mne *mp;
 		xerr('a', "Invalid Addressing Mode.");
 		break;
 
+	case S_STOP:    /* 0x10 */
+		/*
+		 * 0x10 : STOP
+		 */
+		outab(op);
+		/* due to a hardware bug it's sometimes a 2B instruction*/
+		outab(0x00);
+		break;
+
+	case S_LDA:     /* 0xE8 */
+		/*
+		 * 0xE8 : LDA SP,n(SP)
+		 * 0xF8 : LDA HL,n(SP)
+		 */
+		t1 = addr(&e1);
+		comma(1);
+		t2 = addr(&e2);
+		if ((t1 == S_R16) && (t2 == S_INDR+SP)) {
+			if (e1.e_addr == SP) {
+				outab(0xE8);
+				outrb(&e2, 0);
+				break;
+			}
+			if (e1.e_addr == HL) {
+				outab(0xF8);
+				outrb(&e2, 0);
+				break;
+			}
+			xerr('a', "First argument must be SP or HL.");
+			break;
+		}
+		xerr('a', "Invalid Addressing Mode.");
+		break;
+
+	case S_LDHL:    /* 0xF8 */
+		/*
+		 * 0xF8 : LDHL SP,#n
+		 */
+		t1 = addr(&e1);
+		comma(1);
+		t2 = addr(&e2);
+		if ((t1 == S_R16) && (e1.e_addr == SP) && (t2 == S_IMMED)) {
+			outab(0xF8);
+			outrb(&e2,0);
+			break;
+		}
+		xerr('a', "Invalid Addressing Mode.");
+		break;
 
 	case S_DEC:
 	case S_INC:
