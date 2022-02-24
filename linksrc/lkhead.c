@@ -1,7 +1,7 @@
 /* lkhead.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -75,7 +75,7 @@
 VOID
 newhead()
 {
-	register i;
+	register int i;
 	struct head *thp;
 
 	hp = (struct head *) new (sizeof(struct head));

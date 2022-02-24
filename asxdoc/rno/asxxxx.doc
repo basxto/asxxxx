@@ -1,6 +1,6 @@
 
 
-        ASxxxx Cross Assemblers, Version 2.00, August 1998 
+        ASxxxx Cross Assemblers, Version 2.10, April 1999 
 
         Submitted by:  
         Alan R.  Baldwin, 
@@ -8,13 +8,13 @@
         Kent State University 
         Kent, Ohio 44242 
 
-        Operating System:  TSX+, RT-11, PDOS, MS/DOS, Windows 3.x/95 
+        Operating System:  TSX+, RT-11, MS-DOS, Windows 3.x/95/98, Linux 
         or other supporting K&R C.  
 
         Source Langauge:  C 
 
-           The  ASxxxx  Cross Assembler and Linker package (V2.00 August
-        1998)  contains  cross  assemblers  for   the   6800(6802/6808),
+           The  ASxxxx  Cross  Assembler and Linker package (V2.10 April
+        1999)  contains  cross  assemblers  for   the   6800(6802/6808),
         6801(hd6303),  6804, 6805, 68HC08, 6809, 68HC11, 68HC12, 68HC16,
         8051,  8085(8080),  z80(hd64180),  H8/3xx,   and   6500   series
         microprocessors.   Complete source code is provided with the as-

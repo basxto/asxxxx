@@ -1,7 +1,7 @@
 /* M09MCH:C */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -27,7 +27,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register op, rf, cpg, c;
+	register int op, rf, cpg, c;
 	struct expr e1;
 	int t1, v1, v2;
 	struct area *espa;
@@ -175,7 +175,7 @@ struct mne *mp;
 
 	case S_LEA:
 		t1 = addr(&e1);
-		if (index) {
+		if (aindx) {
 			genout(cpg, op, rf, &e1);
 			break;
 		}
@@ -245,9 +245,9 @@ register struct expr *esp;
 	case S_EXT:
 		if (cpg)
 			outab(cpg);
-		if (index) {
+		if (aindx) {
 			outab(op|0x20);
-			outab(index|0x0F);
+			outab(aindx|0x0F);
 			outrw(esp, R_NORM);
 			break;
 		}
@@ -259,7 +259,7 @@ register struct expr *esp;
 		if (cpg)
 			outab(cpg);
 		outab(op|0x20);
-		outab(index);
+		outab(aindx);
 		break;
 
 	case S_PC:
@@ -279,16 +279,16 @@ register struct expr *esp;
 			dot.s_addr += 2;
 			disp = esp->e_addr;
 			flag = 0;
-			if (disp<-128 || disp>127)
+			if (disp < -128 || disp > 127)
 				++flag;
 			if (setbit(flag))
 				++dot.s_addr;
 		} else {
 			if (getbit()) {
-				outab(index|0x01);
+				outab(aindx|0x01);
 				outaw(espv);
 			} else {
-				outab(index);
+				outab(aindx);
 				outab(espv);
 			}
 		}
@@ -302,7 +302,7 @@ register struct expr *esp;
 			dot.s_addr += 3;
 		} else
 		if (espa && espa != dot.s_area) {
-			outab(index|0x01);
+			outab(aindx|0x01);
 			outrw(esp, R_PCR);
 		} else
 		if (pass == 1) {
@@ -311,17 +311,17 @@ register struct expr *esp;
 			dot.s_addr += 2;
 			disp = esp->e_addr - dot.s_addr;
 			flag = 0;
-			if (disp<-128 || disp>127)
+			if (disp < -128 || disp > 127)
 				++flag;
 			if (setbit(flag))
 				++dot.s_addr;
 		} else {
 			if (getbit()) {
-				outab(index|0x01);
+				outab(aindx|0x01);
 				disp = espv - dot.s_addr - 2;
 				outaw(disp);
 			} else {
-				outab(index);
+				outab(aindx);
 				disp = espv - dot.s_addr - 1;
 				outab(disp);
 			}
@@ -336,7 +336,7 @@ register struct expr *esp;
 			dot.s_addr += 3;
 		} else
 		if (espa) {
-			outab(index|0x09);
+			outab(aindx|0x09);
 			outrw(esp, R_NORM);
 		} else
 		if (pass == 1) {
@@ -344,27 +344,27 @@ register struct expr *esp;
 				esp->e_addr -= fuzz;
 			dot.s_addr += 1;
 			flag = 0;
-			if (espv <- 128 || espv > 127)
+			if (espv < -128 || espv > 127)
 				++flag;
 			if (setbit(flag)) {
 				dot.s_addr += 2;
 			} else {
-				flag = index & 0x10;
-				if (espv <- 16 || espv > 15)
+				flag = aindx & 0x10;
+				if (espv < -16 || espv > 15)
 					++flag;
 				if (setbit(flag))
 					++dot.s_addr;
 			}
 		} else {
 			if (getbit()) {
-				outab(index|0x09);
+				outab(aindx|0x09);
 				outaw(espv);
 			} else {
 				if (getbit()) {
-					outab(index|0x08);
+					outab(aindx|0x08);
 					outab(espv);
 				} else {
-					outab((index & 0x60) | (espv & 0x1F));
+					outab((aindx & 0x60) | (espv & 0x1F));
 				}
 			}
 		}
@@ -438,6 +438,7 @@ minit()
  */
 int
 setbit(b)
+int b;
 {
 	if (bp >= &bb[NB])
 		return(1);
@@ -459,7 +460,7 @@ setbit(b)
 int
 getbit()
 {
-	register f;
+	register int f;
 
 	if (bp >= &bb[NB])
 		return (1);

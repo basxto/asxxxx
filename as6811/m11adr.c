@@ -1,7 +1,7 @@
 /* m11adr.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -18,8 +18,7 @@ int
 addr(esp)
 register struct expr *esp;
 {
-	register c;
-	register struct area *espa;
+	register int c;
 	register char *tcp;
 
 	if ((c = getnb()) == '#') {
@@ -115,7 +114,7 @@ register struct adsym *sp;
 	unget(getnb());
 
 	i = 0;
-	while ( *(ptr = (char *) &sp[i]) ) {
+	while ( *(ptr = &sp[i].a_str[0]) ) {
 		if (srch(ptr)) {
 			return(sp[i].a_val);
 		}
@@ -136,12 +135,12 @@ register char *str;
 	ptr = ip;
 
 	while (*ptr && *str) {
-		if(ccase[*ptr] != ccase[*str])
+		if(ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
 			break;
 		ptr++;
 		str++;
 	}
-	if (ccase[*ptr] == ccase[*str]) {
+	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
 		ip = ptr;
 		return(1);
 	}
@@ -168,10 +167,10 @@ char    c, *str;
 }
 
 struct adsym	abdxy[] = {	/* a, b, d, x, or y registers */
-	"a",	S_A,
-	"b",	S_B,
-	"d",	S_D,
-	"x",	S_X,
-	"y",	S_Y,
-	"",	0x00
+    {	"a",	S_A	},
+    {	"b",	S_B	},
+    {	"d",	S_D	},
+    {	"x",	S_X	},
+    {	"y",	S_Y	},
+    {	"",	0x00	}
 };

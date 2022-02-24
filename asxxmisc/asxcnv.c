@@ -1,7 +1,7 @@
-/* ASXCNV.C */
+/* asxcnv.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -18,7 +18,7 @@
 
 static int inpfil;		/* Input File Counter	*/
 static int xflag;		/* Radix Flag		*/
-static int asserr;		/* Error Counter	*/
+static int aserr;		/* Error Counter	*/
 
 static FILE *nfp;		/* Input File Handle	*/
 static FILE *dfp;		/* Output File Handle	*/
@@ -73,7 +73,12 @@ char	ccase[128] = {
 };
 
 
-/*)Function	VOID	main(argc, argv)
+extern	VOID	asexit();
+extern	VOID	linout();
+extern	VOID	usage();
+
+
+/*)Function	int	main(argc, argv)
  *
  *		int	argc		argument count
  *		char *	argv		array of pointers to argument strings
@@ -87,7 +92,7 @@ char	ccase[128] = {
  *	(4)	remove any symbol table or area table
  */
 
-VOID
+int
 main(argc, argv)
 int argc;
 char *argv[];
@@ -100,7 +105,7 @@ char *argv[];
 	 */
 	xflag = 0;
 	inpfil = 0;
-	asserr = 0;
+	aserr = 0;
 
 	fprintf(stdout, "\n");
 
@@ -127,27 +132,27 @@ char *argv[];
 					break;
 
 				default:
-					usage();
+					usage(ER_FATAL);
 				}
 		} else {
 			if (++inpfil > 1) {
 				fprintf(stderr, "\r\nToo many files.\r\n");
-				asexit(1);
+				asexit(ER_FATAL);
 			}
 			nfp = fopen(p, "r");
 			if (nfp == NULL) {
 				printf("\r\nFile %s not found\r\n", p);
-				asexit(1);
+				asexit(ER_FATAL);
 			}
 			dfp = fopen("a.out", "w");
 			if (dfp == NULL) {
 				printf("\r\nFile a.out not opened\r\n");
-				asexit(1);
+				asexit(ER_FATAL);
 			}
 		}
 	}
 	if (inpfil == 0)
-		usage();
+		usage(ER_WARNING);
 
 	printf("\r\nASxxxx Assembler Listing Converter %s\r\n\r\n", VERSION);
 
@@ -201,8 +206,8 @@ loop:
 		 * Strip the line.
 		 */
 		for (i=0; i<n; i++,p++) {
-			if ((ctype[*p] & rdx) != rdx &&
-			     ctype[*p] != SPACE) {
+			if ((ctype[*p & 0x007F] & rdx) != rdx &&
+			     ctype[*p & 0x007F] != SPACE) {
 				goto loop;
 			}
 		}
@@ -216,8 +221,8 @@ loop:
 		r = p+1;
 		for (i=0; i<m; i++,r++) {
 			for (j=0; j<l; j++,r++) {
-				if ((ctype[*r] & rdx) != rdx &&
-				     ctype[*r] != SPACE) {
+				if ((ctype[*r & 0x007F] & rdx) != rdx &&
+				     ctype[*r & 0x007F] != SPACE) {
 					goto loop;
 				}
 			}
@@ -229,7 +234,7 @@ loop:
 		 */
 		r = p+1;
 		for (j=0; j<l; j++,r++) {
-			if ((ctype[*r] & rdx) != rdx) {
+			if ((ctype[*r & 0x007F] & rdx) != rdx) {
 				linout(scline);
 				goto loop;
 			}
@@ -238,9 +243,9 @@ loop:
 		/*
 		 * Scan for the last data digit.
 		 */
-		s = scline;
+		s = q = scline;
 		for (i=0; *s && i<25; i++) {
-			if ((ctype[*s++] & rdx) == rdx)
+			if ((ctype[*s++ & 0x007F] & rdx) == rdx)
 				q = s;
 		}
 
@@ -296,7 +301,8 @@ loop:
 			linout(scline);
 		}
 	}
-	asexit(1);
+	asexit(aserr ? ER_ERROR : ER_NONE);
+	return(0);
 }
 
 /*)Function	VOID	asexit(i)
@@ -351,6 +357,7 @@ int i;
  *		string is copied to a.out
  */
 
+VOID
 linout(str)
 char * str;
 {
@@ -368,7 +375,9 @@ char *usetxt[] = {
 	0
 };
 
-/*)Function	VOID	usage()
+/*)Function	VOID	usage(n)
+ *
+ *		int	n		exit code
  *
  *	The function usage() outputs to the stderr device the
  *	program name and version and a list of valid assembler options.
@@ -389,7 +398,8 @@ char *usetxt[] = {
  */
 
 VOID
-usage()
+usage(n)
+int n;
 {
 	register char   **dp;
 
@@ -397,6 +407,6 @@ usage()
 		"\nASxxxx Assembler Listing Converter %s\n\n", VERSION);
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
-	asexit(1);
+	asexit(n);
 }
 

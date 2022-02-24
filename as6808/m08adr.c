@@ -1,7 +1,7 @@
 /* m08adr.c */
 
 /*
- * (C) Copyright 1993-1998
+ * (C) Copyright 1993-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -18,7 +18,7 @@ int
 addr(esp)
 register struct expr *esp;
 {
-	register c;
+	register int c;
 	register struct area *espa;
 	register addr_t espv;
 	char *tcp;
@@ -143,7 +143,7 @@ register struct adsym *sp;
 	unget(getnb());
 
 	i = 0;
-	while ( *(ptr = (char *) &sp[i]) ) {
+	while ( *(ptr = &sp[i].a_str[0]) ) {
 		if (srch(ptr)) {
 			return(sp[i].a_val);
 		}
@@ -164,12 +164,12 @@ register char *str;
 	ptr = ip;
 
 	while (*ptr && *str) {
-		if(ccase[*ptr] != ccase[*str])
+		if(ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
 			break;
 		ptr++;
 		str++;
 	}
-	if (ccase[*ptr] == ccase[*str]) {
+	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
 		ip = ptr;
 		return(1);
 	}
@@ -196,9 +196,9 @@ char    c, *str;
 }
 
 struct adsym	axs[] = {	/* a, x, or s registers */
-	"a",	S_A,
-	"x",	S_X,
-	"s",	S_S,
-	"x+",	S_XP,
-	"",	0x00
+    {	"a",	S_A	},
+    {	"x",	S_X	},
+    {	"s",	S_S	},
+    {	"x+",	S_XP	},
+    {	"",	0x00	}
 };

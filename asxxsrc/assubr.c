@@ -1,7 +1,7 @@
 /* assubr.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -43,6 +43,7 @@
  *		char *	p		pointer to the error array
  *
  *	global variables:
+ *		int	aserr		error counter
  *		char	eb[]		array of generated error codes
  *
  *	functions called:
@@ -55,7 +56,7 @@
 
 VOID
 err(c)
-register c;
+register int c;
 {
 	register char *p;
 
@@ -191,6 +192,7 @@ char *errors[] = {
 	"<q> missing or improper operators, terminators, or delimiters",
 	"<r> relocation error",
 	"<u> undefined symbol encountered during assembly",
+	"<z> divide by zero or mod of zero error",
 	NULL
 };
 	

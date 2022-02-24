@@ -483,6 +483,12 @@ file.  The maximum nesting level of source files specified by  a
 unlimited as each .include file is opened and then closed during
 each pass made by the assembler.  
 
+   The  default  directory  path,  if none is specified, for any
+.include file is the directory path of the  current  file.   For
+example:   if  the  current  source file, D:\proj\file1.asm, in-
+cludes  a  file  specified   as   "include1"   then   the   file
+D:\proj\include1.asm is opened.
+  
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <A NAME = "setdp"></A><FONT COLOR="#FF0000">.setdp</FONT> Directive 

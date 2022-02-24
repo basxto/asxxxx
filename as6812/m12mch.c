@@ -1,6 +1,6 @@
 /* M12MCH:C */
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -26,7 +26,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register op, rf, cpg, c;
+	register int op, rf, cpg, c;
 	struct expr e1, e2, e3;
 	int t1, t2;
 	int v1, v2, v3;
@@ -339,10 +339,10 @@ struct mne *mp;
 	case S_MOVB:
 	case S_MOVW:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 
 		/*
 		 * Byte / Word Checks
@@ -553,9 +553,9 @@ register struct expr *esp;
 		if ((espv < 1) || (espv > 8))
 			aerr();
 		espv -= 1;
-		if (index & 0x08)
+		if (aindx & 0x08)
 			espv = ~espv;
-		outab(index + (espv & 0x07));
+		outab(aindx + (espv & 0x07));
 		break;
 
 	case S_IND:
@@ -574,7 +574,7 @@ register struct expr *esp;
 			outab(op);
 			break;
 		}
-		outab(index | 0xE3);
+		outab(aindx | 0xE3);
 		outrw(esp, R_NORM);
 		break;
 
@@ -595,7 +595,7 @@ register struct expr *esp;
 			outab(op);
 			break;
 		}
-		outab(index);
+		outab(aindx);
 		break;
 
 	case S_OFST:
@@ -618,7 +618,7 @@ register struct expr *esp;
 			dot.s_addr += 3;
 		} else
 		if (espa) {
-			outab(index | 0xE2);
+			outab(aindx | 0xE2);
 			outrw(esp, R_NORM);
 		} else
 		if (pass == 1) {
@@ -631,23 +631,23 @@ register struct expr *esp;
 			if (setbit(flag)) {
 				dot.s_addr += 2;
 			} else {
-				if (espv <- 16 || espv > 15)
+				if (espv < -16 || espv > 15)
 					++flag;
 				if (setbit(flag))
 					++dot.s_addr;
 			}
 		} else {
 			if (getbit()) {
-				outab(index | 0xE2);
+				outab(aindx | 0xE2);
 				outaw(espv);
 			} else {
 				if (getbit()) {
-					index |= 0xE0 | ((espv >> 8) & 0x01);
-					outab(index);
+					aindx |= 0xE0 | ((espv >> 8) & 0x01);
+					outab(aindx);
 					outab(espv);
 				} else {
-					index = (index << 3) | (espv & 0x1F);
-					outab(index);
+					aindx = (aindx << 3) | (espv & 0x1F);
+					outab(aindx);
 				}
 			}
 		}
@@ -733,7 +733,7 @@ register int indx, offset;
 			if (setbit(flag)) {
 				dot.s_addr += 2;
 			} else {
-				if (espv <- 16 || espv > 15)
+				if (espv < -16 || espv > 15)
 					++flag;
 				if (setbit(flag))
 					++dot.s_addr;
@@ -797,11 +797,10 @@ minit()
  */
 int
 setbit(b)
+int b;
 {
-	if (bp >= &bb[NB]) {
-		fprintf(stderr, "Addressing Mode Bit Table Full\n");
+	if (bp >= &bb[NB])
 		return(1);
-	}
 	if (b)
 		*bp |= bm;
 	bm <<= 1;
@@ -820,7 +819,7 @@ setbit(b)
 int
 getbit()
 {
-	register f;
+	register int f;
 
 	if (bp >= &bb[NB])
 		return (1);

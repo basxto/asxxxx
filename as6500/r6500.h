@@ -1,7 +1,7 @@
 /* r6500.h */
 
 /*
- * (C) Copyright 1995-1998
+ * (C) Copyright 1995-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -122,6 +122,7 @@ extern	int		any();
 extern	int		srch();
 
 	/* r65mch.c */
-extern	VOID		machin();
+extern	VOID		machine();
+extern	int		mchpcr();
 extern	VOID		minit();
 extern	VOID		comma();

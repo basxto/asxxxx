@@ -1,7 +1,7 @@
 /* h8ext.c */
 
 /*
- * (C) Copyright 1994-1998
+ * (C) Copyright 1994-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,5 +14,5 @@
 #include "asxxxx.h"
 
 char	*cpu	= "Hitachi H8/3xx";
-char	*dsft	= "ASM";
 int	hilo	= 1;
+char	*dsft	= "asm";

@@ -1,7 +1,7 @@
 /* z80mch.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -24,7 +24,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register op, t1, t2;
+	register int op, t1, t2;
 	struct expr e1, e2;
 	int rf, v1, v2;
 

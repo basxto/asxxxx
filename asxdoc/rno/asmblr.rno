@@ -1180,6 +1180,11 @@ The total number of separately specified .include files is unlimited
 as each .include file is opened and then closed during each pass
 made by the assembler.
 
+The default directory path, if none is specified, for any .include file
+is the directory path of the current file.  For example: if the
+current source file, D:_\proj_\file1.asm, includes a file specified
+as "include1" then the file D:_\proj_\include1.asm is opened.
+
 
 .header level 2;_.\s\e\t\d\p Directive
 
@@ -1291,12 +1296,19 @@ index register and the direct addressing is the offset.
 .tp 35
 .header level 1;INVOKING ASXXXX
 
-The ASxxxx assemblers are command line oriented. The PC assemblers
-are started with the appropriate option(s) and file(s) to assemble
-following the assembler name:
+The  ASxxxx  assemblers are command line oriented.  Most
+sytems require the option(s) and file(s) arguments to
+follow the ASxxxx assembler name:
 .skip
-as6809 [-dqxgalosff] file1 [file2 file3 ... file6]
+as6809  [-dqxgalopswzff] file1 [file2 file3 ...  file6]
+.skip 2
+Some systems may request the arguments after the assembler is
+started at a system specific prompt:
 .skip
+as6809
+.br
+argv:   [-dqxgalopswzff] file1 [file2 file3 ...  file6]
+.skip 2
 The options are:
 .skip;.literal
 	d	decimal	listing
@@ -1405,6 +1417,9 @@ same programming area or external symbols.
 .skip;.indent -6
 (u)###
 Undefined symbol encountered during assembly.
+.skip;.indent -6
+(z)###
+Divide by 0 or Modulus by 0 error: result is 0.
 .left margin -12
 
 

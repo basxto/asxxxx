@@ -1,7 +1,7 @@
 /* M09ADR:C */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,21 +14,21 @@
 #include "asxxxx.h"
 #include "m6809.h"
 
-int index;
+int aindx;
 
 int
 addr(esp)
 register struct expr *esp;
 {
-	register c;
+	register int c;
 
-	index = 0;
+	aindx = 0;
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
 		esp->e_mode = S_IMMED;
 	} else
 	if (c == '[') {
-		index = 0x90;
+		aindx = 0x90;
 		addr1(esp);
 		if (getnb() != ']') {
 			aerr();
@@ -44,7 +44,7 @@ int
 addr1(esp)
 register struct expr *esp;
 {
-	register c;
+	register int c;
 
 	if (admode(abd)) {
 		comma();
@@ -54,12 +54,12 @@ register struct expr *esp;
 	} else
 	if ((c = getnb()) == ',') {
 		if (admode(xyus)) {
-			index |= 0x04;
+			aindx |= 0x04;
 		} else
 		if (admode(auto2)) {
 			;
 		} else
-		if (!(index & 0x10) && admode(auto1)) {
+		if (!(aindx & 0x10) && admode(auto1)) {
 			;
 		} else {
 			aerr();
@@ -125,10 +125,10 @@ register struct adsym *sp;
 	unget(getnb());
 
 	i = 0;
-	while ( *(ptr = (char *) &sp[i]) ) {
+	while ( *(ptr = &sp[i].a_str[0]) ) {
 		if (srch(ptr)) {
 			v = sp[i].a_val;
-			index |= (v | 0x80);
+			aindx |= (v | 0x80);
 			return(v);
 		}
 		i++;
@@ -148,12 +148,12 @@ register char *str;
 	ptr = ip;
 
 	while (*ptr && *str) {
-		if (ccase[*ptr] != ccase[*str])
+		if (ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
 			break;
 		ptr++;
 		str++;
 	}
-	if (ccase[*ptr] == ccase[*str]) {
+	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
 		ip = ptr;
 		return(1);
 	}
@@ -180,90 +180,90 @@ char    c, *str;
 }
 
 struct adsym	abd[] = {	/* a, b, or d indexed offset */
-	"a",	0x06,
-	"b",	0x05,
-	"d",	0x0B,
-	"",	0x00
+    {	"a",	0x06	},
+    {	"b",	0x05	},
+    {	"d",	0x0B	},
+    {	"",	0x00	}
 };
 
 struct adsym	xyus[] = {	/* x, y, u, or s index register */
-	"x",	0x100,
-	"y",	0x120,
-	"u",	0x140,
-	"s",	0x160,
-	"",	0x000
+    {	"x",	0x100	},
+    {	"y",	0x120	},
+    {	"u",	0x140	},
+    {	"s",	0x160	},
+    {	"",	0x000	}
 };
 
 struct adsym	auto1[] = {	/* auto increment/decrement by 1 */
-	"x+",	0x100,
-	"-x",	0x102,
-	"y+",	0x120,
-	"-y",	0x122,
-	"u+",	0x140,
-	"-u",	0x142,
-	"s+",	0x160,
-	"-s",	0x162,
-	"",	0x000
+    {	"x+",	0x100	},
+    {	"-x",	0x102	},
+    {	"y+",	0x120	},
+    {	"-y",	0x122	},
+    {	"u+",	0x140	},
+    {	"-u",	0x142	},
+    {	"s+",	0x160	},
+    {	"-s",	0x162	},
+    {	"",	0x000	}
 };
 
 struct adsym	auto2[] = {	/* auto increment/decrement by 2 */
-	"x++",	0x101,
-	"--x",	0x103,
-	"y++",	0x121,
-	"--y",	0x123,
-	"u++",	0x141,
-	"--u",	0x143,
-	"s++",	0x161,
-	"--s",	0x163,
-	"",	0x000
+    {	"x++",	0x101	},
+    {	"--x",	0x103	},
+    {	"y++",	0x121	},
+    {	"--y",	0x123	},
+    {	"u++",	0x141	},
+    {	"--u",	0x143	},
+    {	"s++",	0x161	},
+    {	"--s",	0x163	},
+    {	"",	0x000	}
 };
 
 struct adsym	pc[] = {	/* pc */
-	"pc",	0x0C,
-	"",	0x00
+    {	"pc",	0x0C	},
+    {	"",	0x00	}
 };
 
 struct adsym	pcr[] = {	/* pc relative */
-	"pcr",	0x0C,
-	"",	0x00
+    {	"pcr",	0x0C	},
+    {	"",	0x00	}
 };
 
 struct adsym	regs[] = {	/* exg, tfr register coding */
-	"d",	0x100,
-	"x",	0x101,
-	"y",	0x102,
-	"u",	0x103,
-	"s",	0x104,
-	"pc",	0x105,
-	"a",	0x108,
-	"b",	0x109,
-	"cc",	0x10A,
-	"dp",	0x10B,
-	"",	0x000
+    {	"d",	0x100	},
+    {	"x",	0x101	},
+    {	"y",	0x102	},
+    {	"u",	0x103	},
+    {	"s",	0x104	},
+    {	"pc",	0x105	},
+    {	"a",	0x108	},
+    {	"b",	0x109	},
+    {	"cc",	0x10A	},
+    {	"dp",	0x10B	},
+    {	"",	0x000	}
 };
 
 struct adsym	stks[] = {	/* push/pull on system stack */
-	"cc",	0x01,
-	"a",	0x02,
-	"b",	0x04,
-	"d",	0x06,
-	"dp",	0x08,
-	"x",	0x10,
-	"y",	0x20,
-	"u",	0x40,
-	"pc",	0x80,
-	"",	0x00
+    {	"cc",	0x01	},
+    {	"a",	0x02	},
+    {	"b",	0x04	},
+    {	"d",	0x06	},
+    {	"dp",	0x08	},
+    {	"x",	0x10	},
+    {	"y",	0x20	},
+    {	"u",	0x40	},
+    {	"pc",	0x80	},
+    {	"",	0x00	}
 };
 
 struct adsym	stku[] = {	/* push/pull on user stack */
-	"cc",	0x01,
-	"a",	0x02,
-	"b",	0x04,
-	"d",	0x06,
-	"dp",	0x08,
-	"x",	0x10,
-	"y",	0x20,
-	"s",	0x40,
-	"pc",	0x80,
-	"",	0x00
+    {	"cc",	0x01	},
+    {	"a",	0x02	},
+    {	"b",	0x04	},
+    {	"d",	0x06	},
+    {	"dp",	0x08	},
+    {	"x",	0x10	},
+    {	"y",	0x20	},
+    {	"s",	0x40	},
+    {	"pc",	0x80	},
+    {	"",	0x00	}
 };

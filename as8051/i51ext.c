@@ -1,7 +1,7 @@
 /* i51ext.c */
 
 /*
- * (C) Copyright 1998
+ * (C) Copyright 1998-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,4 +21,4 @@
 
 char	*cpu	= "Intel 8051";
 int	hilo	= 1;
-char	*dsft	= "ASM";
+char	*dsft	= "asm";

@@ -1,7 +1,7 @@
 /* i8085.h */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -71,9 +71,9 @@
 
 	/* 85mch.c */
 extern	int		comma();
-extern	VOID		machin();
+extern	VOID		machine();
+extern	int		mchpcr();
 extern	VOID		minit();
 extern	VOID		out3();
 extern	int		reg();
 extern	int		regpair();
-

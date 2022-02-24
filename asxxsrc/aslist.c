@@ -1,7 +1,7 @@
 /* aslist.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -46,6 +46,7 @@
  *		int *	wp		pointer to the assembled data bytes
  *		int *	wpt		pointer to the data byte mode
  *		int	nb		computed number of assembled bytes
+ *		int	l_addr		laddr (int) truncated to 2-bytes
  *
  *	global variables:
  *		int	cb[]		array of assembler output values
@@ -58,6 +59,8 @@
  *		char *	ep		pointer into error list
  *					array eb[]
  *		char	ib[]		assembler-source text line
+ *		addr_t	laddr		address of current assembler line,
+ *				 	equate, or value of .if argument
  *		FILE *	lfp		list output file handle
  *		int	line		current assembler source line number
  *		int	lmode		listing mode
@@ -78,7 +81,8 @@ list()
 {
 	register char *wp;
 	register int *wpt;
-	register nb;
+	register int nb;
+	register int l_addr;
 
 	if (lfp == NULL || lmode == NLIST)
 		return;
@@ -123,6 +127,11 @@ list()
 	}
 
 	/*
+	 * Truncate (int) to 2-Bytes
+	 */
+	l_addr = laddr & 0xFFFF;
+
+	/*
 	 * HEX output Option.
 	 */
 	if (xflag == 0) {		/* HEX */
@@ -130,7 +139,7 @@ list()
 		 * Equate only
 		 */
 		if (lmode == ELIST) {
-			fprintf(lfp, "%18s%04X", "", laddr);
+			fprintf(lfp, "%18s%04X", "", l_addr);
 			fprintf(lfp, "  %5u %s\n", line, ib);
 			return;
 		}
@@ -138,7 +147,7 @@ list()
 		/*
 		 * Address (with allocation)
 		 */
-		fprintf(lfp, " %04X", laddr);
+		fprintf(lfp, " %04X", l_addr);
 		if (lmode == ALIST || lmode == BLIST) {
 			fprintf(lfp, "%19s%5u %s\n", "", line, ib);
 			outdot();
@@ -174,7 +183,7 @@ list()
 		 * Equate only
 		 */
 		if (lmode == ELIST) {
-			fprintf(lfp, "%16s%06o", "", laddr);
+			fprintf(lfp, "%16s%06o", "", l_addr);
 			fprintf(lfp, "  %5u %s\n", line, ib);
 			return;
 		}
@@ -182,7 +191,7 @@ list()
 		/*
 		 * Address (with allocation)
 		 */
-		fprintf(lfp, " %06o", laddr);
+		fprintf(lfp, " %06o", l_addr);
 		if (lmode == ALIST || lmode == BLIST) {
 			fprintf(lfp, "%17s%5u %s\n", "", line, ib);
 			outdot();
@@ -218,7 +227,7 @@ list()
 		 * Equate only
 		 */
 		if (lmode == ELIST) {
-			fprintf(lfp, "%16s%05u", "", laddr);
+			fprintf(lfp, "%16s%05u", "", l_addr);
 			fprintf(lfp, "   %5u %s\n", line, ib);
 			return;
 		}
@@ -226,7 +235,7 @@ list()
 		/*
 		 * Address (with allocation)
 		 */
-		fprintf(lfp, "  %05u", laddr);
+		fprintf(lfp, "  %05u", l_addr);
 		if (lmode == ALIST || lmode == BLIST) {
 			fprintf(lfp, "%17s%5u %s\n", "", line, ib);
 			outdot();
@@ -282,7 +291,7 @@ list1(wp, wpt, nb, f)
 register char *wp;
 register int *wpt, nb, f;
 {
-	register i;
+	register int i;
 
 	/*
 	 * HEX output Option.
@@ -634,7 +643,7 @@ FILE *fp;
 				fprintf(fp, " ***** ");
 			}
 		} else {
-			j = sp->s_addr;
+			j = sp->s_addr & 0xFFFF;
 			if (xflag == 0) {
 				fprintf(fp, "  %04X ", j);
 			} else
@@ -715,7 +724,7 @@ atable:
 			fprintf(fp, "%-8.8s", ptr);
 		}
 
-		j = ap->a_size;
+		j = ap->a_size & 0xFFFF;
 		k = ap->a_flag;
 		if (xflag==0) {
 			fprintf(fp, "   size %4X   flags %X\n", j, k);

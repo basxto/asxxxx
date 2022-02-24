@@ -1,7 +1,7 @@
 /* m01ext.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,4 +16,4 @@
 
 char	*cpu	= "Motorola 6801/6803 [Hitachi HD6303]";
 int	hilo	= 1;
-char	*dsft	= "ASM";
+char	*dsft	= "asm";

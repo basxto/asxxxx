@@ -16,78 +16,78 @@
 </B></H3>
 
 <H4><B><PRE>
-   The  linker  may run in the command line mode or command file
-modes.  The allowed startup linker commands are:  
+   Most  sytems require the options to be entered on the command
+   line:  
 
--c/-f           command line / command file modes 
+        aslink -[options] -[option arg] files 
 
--p/-n           enable/disable echo file.lnk input to stdout 
+   Some  systems  may  request the arguments after the linker is
+   started at a system specific prompt:  
 
-   If  command  line  mode is selected, all linker commands come
-from stdin, if the command file mode is  selected  the  commands
-are input from the specified file (extension must be .lnk).  
+        aslink 
+        argv:  -[options] -[option arg] files 
 
+The allowed linker commands are:  
 
-   Most sytems require the initial options to be entered on the
-   command line:
-   
-       ASLINK  -[cfpn] 
+     1.  -c         ASlink &gt;&gt; prompt mode.  
+         The  ASlink &gt;&gt;  prompt  mode reads linker commands from
+         stdin.  
 
+     2.  -f  file   Command file mode.  
+         The  command file mode imports linker commands from the
+         specified file (extension must be  .lnk),  imported  -c
+         and  -f  commands  are ignored.  If the directory path,
+         for a file to be linked, is not specified in  the  com-
+         mand  file  then  the  path  defaults  to the .lnk file
+         directory path.  
 
-   Some systems may request the arguments after the linker is
-   started at a system specific prompt:
+     3.  -p/-n   enable/disable echoing commands to stdout.  
 
-       ASLINK
-       argv:   -[cfpn]
-
-
-After invoking the linker the valid options are:  
-
-     1.  -i/-s   Intel Hex (file.ihx) or Motorola S19 (file.s19)
+     4.  -i/-s   Intel Hex (file.ihx) or Motorola S19 (file.s19)
          image output file.  
 
-     2.  -z      Specifies that symbol names are case sensitive. 
+     5.  -z      Specifies that symbol names are case sensitive. 
 
-     3.  -m      Generate a map file (file.map).  This file con-
+     6.  -m      Generate a map file (file.map).  This file con-
          tains a list of the symbols (by area) with absolute ad-
          dresses,  sizes  of  linked  areas,  and  other linking
          information.  
 
-     4.  -w      Specifies  that  a  wide listing format be used
+     7.  -w      Specifies  that  a  wide listing format be used
          for the map file.  
 
-     5.  -xdq    Specifies  the  number  radix  for the map file
+     8.  -xdq    Specifies  the  number  radix  for the map file
          (Hexidecimal, Decimal, or Octal).  
 
-     6.  -u      Generate  an  updated  listing  file (file.rst)
+     9.  -u      Generate  an  updated  listing  file (file.rst)
          derived from the relocated addresses and data from  the
-         linker 
+         linker.  
 
-     7.  fileN   Files  to  be linked.  Files may be on the same
+    10.  file    File(s) to be linked.  Files may be on the same
          line as the above options or on a separate line(s)  one
          file  per line or multiple files separated by spaces or
          tabs.  
 
-     8.  -b  area = expression (one definition per line) 
+    11.  -b  area=expression (one definition per line) 
          This  specifies  an area base address where the expres-
          sion may contain constants and/or defined symbols  from
          the linked files.  
 
-     9.  -g  symbol = expression (one definition per line) 
-         This  specifies  the  value  for  the  symbol where the
-         expression may contain constants and/or defined symbols
+    12.  -g  symbol=expression (one definition per line) 
+         This  specifies  the value for the symbol where the ex-
+         pression may contain constants and/or  defined  symbols
          from the linked files.  
 
-    10.  -k  library directory path 
+    13.  -k  library directory path 
          (one  definition  per line) This specifies one possible
          path to an object library.  More than one path  is  al-
          lowed.  
 
-    11.  -l  library file specification 
+    14.  -l  library file specification 
          (one  definition  per  line)  This specifies a possible
          library file.  More than one file is allowed.  
 
-    12.  -e      or null line, terminates input to the linker.  
+    15.  -e      or null line, terminates input to the linker.  
 
 <H5><A HREF="aslink.htm #Index">  Return to the Linker Index</A></H5>
 </PRE></B></H4>

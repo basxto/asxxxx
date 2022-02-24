@@ -1,7 +1,7 @@
 /* M09EXT:C */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,5 +14,5 @@
 #include "asxxxx.h"
 
 char	*cpu	= "Motorola 6809";
-char	*dsft	= "ASM";
 int	hilo	= 1;
+char	*dsft	= "asm";

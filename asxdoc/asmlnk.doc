@@ -34,8 +34,8 @@
 
 
 
-                                  Version   2.0
-                                   August 1998
+                                 Version   2.10
+                                   April 1999
 
 
                                                                   Page 2
@@ -143,12 +143,12 @@
         
 
 
-        ASxxxx Cross Assemblers, Version 2.00, August 1998 
+        ASxxxx Cross Assemblers, Version 2.10, April 1999 
 
         Submitted by Alan R.  Baldwin, 
         Kent State University, Kent, Ohio 
 
-        Operating System:  TSX+, RT-11, MS/DOS, PDOS 
+        Operating System:  TSX+, RT-11, MS-DOS, Windows 3.x/95/98, Linux 
         or other supporting K&R C.  
 
         Source Langauge:  C 
@@ -192,14 +192,15 @@
         ASxxxx assembler listing files  with  the  absolute  linked  ad-
         dresses and data.  
 
-           The  assemblers  and  linker  have  been tested using DECUS C
-        under TSX+ and RT-11, PDOS C V5.4b, and Symantec C/C++ V6.1/V7.2
-        under  DOS/Windows  3.x/95.  Complete source code and documenta-
-        tion for the assemblers and linker is included with the  distri-
-        bution.   Additionally, test code for each assembler and several
-        microprocessor monitors ( ASSIST05  for  the  6805,  MONDEB  and
-        ASSIST09  for  the  6809,  and BUFFALO 2.5 for the 6811) are in-
-        cluded as working examples of use of these assemblers.  
+           The assemblers and linker have been tested using DECUS C with
+        TSX+ and RT-11, GCC 2.7.2 with LINUX, Symantec  C/C++  V6.1/V7.2
+        and  DJGPP  (GCC 2.8.1) with MS-DOS/Windows 3.x/95/98.  Complete
+        source code and documentation for the assemblers and  linker  is
+        included  with  the  distribution.   Additionally, test code for
+        each assembler and several microprocessor  monitors  (  ASSIST05
+        for  the 6805, MONDEB and ASSIST09 for the 6809, and BUFFALO 2.5
+        for the 6811) are included as working examples of use  of  these
+        assemblers.  
 
 
         CHAPTER 1  THE ASSEMBLER                                     1-1 
@@ -244,7 +245,7 @@
           1.5     INVOKING ASXXXX                                   1-27 
           1.6     ERRORS                                            1-28 
           1.7     LISTING FILE                                      1-29 
-          1.8     SYMBOL TABLE FILE                                 1-30 
+          1.8     SYMBOL TABLE FILE                                 1-31 
           1.9     OBJECT FILE                                       1-31 
 
         CHAPTER 2  THE LINKER                                        2-1 
@@ -1815,6 +1816,12 @@
         unlimited as each .include file is opened and then closed during
         each pass made by the assembler.  
 
+           The  default  directory  path,  if none is specified, for any
+        .include file is the directory path of the  current  file.   For
+        example:   if  the  current  source file, D:\proj\file1.asm, in-
+        cludes  a  file  specified   as   "include1"   then   the   file
+        D:\proj\include1.asm is opened.  
+
 
         1.4.19  .setdp Directive 
 
@@ -1856,13 +1863,14 @@
 
            The  6809  microprocessor  allows the selection of the direct
         page to be on any 256 byte boundary by loading  the  appropriate
-        value  into the dp register.  Typically one would like to select
-        the page boundary at link time, one method follows:  
 
 
         THE ASSEMBLER                                          PAGE 1-26
         GENERAL ASSEMBLER DIRECTIVES
 
+
+        value  into the dp register.  Typically one would like to select
+        the page boundary at link time, one method follows:  
 
                 .area   DIRECT  (PAG)   ; define the direct page
                 .setdp
@@ -1913,26 +1921,34 @@
         defined data structure within a direct page and there  are  many
         pages,  define  a  dumby  direct page linked at address 0.  This
         dumby page is used only to define  the  variable  labels.   Then
-        load  the dp register with the real base address but donot use a
-        .setdp  directive.   This  method  is  equivalent   to   indexed
 
 
         THE ASSEMBLER                                          PAGE 1-27
         GENERAL ASSEMBLER DIRECTIVES
 
 
-        addressing,  where the dp register is the index register and the
-        direct addressing is the offset.  
+        load  the dp register with the real base address but donot use a
+        .setdp directive.  This method is equivalent to indexed address-
+        ing,  where the dp register is the index register and the direct
+        addressing is the offset.  
 
 
         1.5  INVOKING ASXXXX 
 
 
-           The  ASxxxx assemblers are command line oriented.  The PC as-
-        semblers are started with the appropriate option(s) and  file(s)
-        to assemble following the assembler name:  
+           The ASxxxx assemblers are command line oriented.  Most sytems
+        require the option(s) and file(s) arguments to follow the ASxxxx
+        assembler name:  
 
-        as6809 [-dqxgalosff] file1 [file2 file3 ...  file6] 
+        as6809 [-dqxgalopswzff] file1 [file2 file3 ...  file6] 
+
+
+        Some  systems  may  request the arguments after the assembler is
+        started at a system specific prompt:  
+
+        as6809 
+        argv:  [-dqxgalopswzff] file1 [file2 file3 ...  file6] 
+
 
         The options are:  
 
@@ -1963,6 +1979,12 @@
            The file name for the .lst, .rel, and .sym files is the first
         file name specified in the command line.  All output  files  are
         ascii  text  files which may be edited, copied, etc.  The output
+
+
+        THE ASSEMBLER                                          PAGE 1-28
+        INVOKING ASXXXX
+
+
         files are the concatenation of all the input files, if files are
         to  be  assembled  independently  invoke  the assembler for each
         file.  
@@ -1970,12 +1992,6 @@
            The  .rel  file contains a radix directive so that the linker
         will use the proper conversion for this file.  Linked files  may
         have different radices.  
-
-
-
-        THE ASSEMBLER                                          PAGE 1-28
-        INVOKING ASXXXX
-
 
            If  the list (l) option is specified without the symbol table
         (s) option, the symbol table is placed at the end of the listing
@@ -2021,6 +2037,12 @@
               (o)   Directive  or  mnemonic error or the use of the .org
                     directive in a relocatable area.  
 
+
+
+        THE ASSEMBLER                                          PAGE 1-29
+        ERRORS
+
+
               (p)   Phase error:  label location changing between passes
                     2 and 3.  Normally caused by having  more  than  one
                     level of forward referencing.  
@@ -2029,17 +2051,13 @@
                     terminators, or delimiters.  
 
               (r)   Relocation  error:   logic  operation attempted on a
-
-
-        THE ASSEMBLER                                          PAGE 1-29
-        ERRORS
-
-
                     relocatable term, addition of two relocatable terms,
                     subtraction  of two relocatable terms not within the
                     same programming area or external symbols.  
 
               (u)   Undefined symbol encountered during assembly.  
+
+              (z)   Divide by 0 or Modulus by 0 error:  result is 0.  
 
 
         1.7  LISTING FILE 
@@ -2076,6 +2094,12 @@
            The error field may contain upto 2 error flags indicating any
         errors encountered while assembling this line of source code.  
 
+
+
+        THE ASSEMBLER                                          PAGE 1-30
+        LISTING FILE
+
+
            The  current  location counter field displays the 16-bit pro-
         gram position.  This field will be in the selected radix.  
 
@@ -2086,12 +2110,6 @@
         If more than one field of data is generated from the assembly of
         a single line of source code, then the data field is repeated on
         successive lines.  
-
-
-
-        THE ASSEMBLER                                          PAGE 1-30
-        LISTING FILE
-
 
            The source text line number is printed in decimal and is fol-
         lowed by the source text.  
@@ -2128,6 +2146,12 @@
 
 
 
+
+
+        THE ASSEMBLER                                          PAGE 1-31
+        SYMBOL TABLE FILE
+
+
         1.8  SYMBOL TABLE FILE 
 
 
@@ -2145,11 +2169,6 @@
 
              1.  Program  area  number (none if absolute value or exter-
                  nal) 
-
-
-        THE ASSEMBLER                                          PAGE 1-31
-        SYMBOL TABLE FILE
-
 
              2.  The symbol or label 
 
@@ -2185,6 +2204,12 @@
                         L       Least significant byte first
         
                 H       Header 
+
+
+        THE ASSEMBLER                                          PAGE 1-32
+        OBJECT FILE
+
+
                 M       Module
                 A       Area
                 S       Symbol
@@ -2260,81 +2285,84 @@
         2.2  INVOKING ASLINK 
 
 
-           The  linker  may run in the command line mode or command file
-        modes.  The allowed startup linker commands are:  
+           Most  sytems require the options to be entered on the command
+           line:  
 
-        -c/-f           command line / command file modes 
-
-        -p/-n           enable/disable echo file.lnk input to stdout 
-
-           If  command  line  mode is selected, all linker commands come
-        from stdin, if the command file mode is  selected  the  commands
-        are input from the specified file (extension must be .lnk).  
-
-           Most  sytems require the initial options to be entered on the
-           command line:  
-
-                ASLINK -[cfpn] 
+                aslink -[options] -[option arg] files 
 
            Some  systems  may  request the arguments after the linker is
            started at a system specific prompt:  
 
-                ASLINK 
-                argv:  -[cfpn] 
+                aslink 
+                argv:  -[options] -[option arg] files 
 
-        After invoking the linker the valid options are:  
+        The allowed linker commands are:  
 
-             1.  -i/-s   Intel Hex (file.ihx) or Motorola S19 (file.s19)
+             1.  -c         ASlink >> prompt mode.  
+                 The  ASlink >>  prompt  mode reads linker commands from
+                 stdin.  
+
+             2.  -f  file   Command file mode.  
+                 The  command file mode imports linker commands from the
+                 specified file (extension must be  .lnk),  imported  -c
+                 and  -f  commands  are ignored.  If the directory path,
+                 for a file to be linked, is not specified in  the  com-
+                 mand  file  then  the  path  defaults  to the .lnk file
+                 directory path.  
+
+             3.  -p/-n   enable/disable echoing commands to stdout.  
+
+             4.  -i/-s   Intel Hex (file.ihx) or Motorola S19 (file.s19)
                  image output file.  
 
-             2.  -z      Specifies that symbol names are case sensitive. 
+             5.  -z      Specifies that symbol names are case sensitive. 
 
-             3.  -m      Generate a map file (file.map).  This file con-
+             6.  -m      Generate a map file (file.map).  This file con-
                  tains a list of the symbols (by area) with absolute ad-
                  dresses,  sizes  of  linked  areas,  and  other linking
                  information.  
 
-             4.  -w      Specifies  that  a  wide listing format be used
+             7.  -w      Specifies  that  a  wide listing format be used
                  for the map file.  
 
-             5.  -xdq    Specifies  the  number  radix  for the map file
+             8.  -xdq    Specifies  the  number  radix  for the map file
                  (Hexidecimal, Decimal, or Octal).  
 
-             6.  -u      Generate  an  updated  listing  file (file.rst)
+             9.  -u      Generate  an  updated  listing  file (file.rst)
                  derived from the relocated addresses and data from  the
-                 linker 
+                 linker.  
 
-             7.  fileN   Files  to  be linked.  Files may be on the same
+            10.  file    File(s) to be linked.  Files may be on the same
                  line as the above options or on a separate line(s)  one
-                 file  per line or multiple files separated by spaces or
-                 tabs.  
-
 
 
         THE LINKER                                              PAGE 2-3
         INVOKING ASLINK
 
 
-             8.  -b  area = expression (one definition per line) 
+                 file  per line or multiple files separated by spaces or
+                 tabs.  
+
+            11.  -b  area=expression (one definition per line) 
                  This  specifies  an area base address where the expres-
                  sion may contain constants and/or defined symbols  from
                  the linked files.  
 
-             9.  -g  symbol = expression (one definition per line) 
+            12.  -g  symbol=expression (one definition per line) 
                  This  specifies  the value for the symbol where the ex-
                  pression may contain constants and/or  defined  symbols
                  from the linked files.  
 
-            10.  -k  library directory path 
+            13.  -k  library directory path 
                  (one  definition  per line) This specifies one possible
                  path to an object library.  More than one path  is  al-
                  lowed.  
 
-            11.  -l  library file specification 
+            14.  -l  library file specification 
                  (one  definition  per  line)  This specifies a possible
                  library file.  More than one file is allowed.  
 
-            12.  -e      or null line, terminates input to the linker.  
+            15.  -e      or null line, terminates input to the linker.  
 
 
 
@@ -2362,19 +2390,19 @@
              1.  If  the  library  file  contained an absolute path/file
                  specification  then  this  is   the   object   module's
                  path/file.  
-                 (i.e.  C:\...) 
+                 (i.e.  C:\...  or C:/...) 
 
-             2.  If  the  library  file  contains  a  relative path/file
-                 specification then the concatenation of  the  path  and
 
 
         THE LINKER                                              PAGE 2-4
         LIBRARY PATH(S) AND FILE(S)
 
 
+             2.  If  the  library  file  contains  a  relative path/file
+                 specification then the concatenation of  the  path  and
                  this  file  specification  becomes  the object module's
                  path/file.  
-                 (i.e.  \...) 
+                 (i.e.  \...  or /...) 
 
 
            As  an example, assume there exists a library file termio.lib
@@ -2422,14 +2450,14 @@
         of  0x0000  as read from the object files, the -b command speci-
         fies the beginning address of the area.  All subsequent relative
         areas  will  be  concatenated  with  proceeding  relative areas.
-        Where specific ordering is desired, the first linker input  file
-        should  have  the area definitions in the desired order.  At the
 
 
         THE LINKER                                              PAGE 2-5
         ASLINK PROCESSING
 
 
+        Where specific ordering is desired, the first linker input  file
+        should  have  the area definitions in the desired order.  At the
         completion of the area linking all area  addresses  and  lengths
         have  been determined.  The areas of type PAG are verified to be
         on a 256 byte boundary and that the length does not  exceed  256
@@ -2479,13 +2507,14 @@
         build the area/symbol lists.  If the -u option is specified then
         the listing files  (file.lst)  associated  with  the  relocation
         files  (file.rel)  are  scanned  and  used  to create a new file
-        (file.rst) which has all addresses and data relocated  to  their
-        final values.  
-
 
 
         THE LINKER                                              PAGE 2-6
-        LINKER INPUT FORMAT
+        ASLINK PROCESSING
+
+
+        (file.rst) which has all addresses and data relocated  to  their
+        final values.  
 
 
         2.5  LINKER INPUT FORMAT 
@@ -2868,13 +2897,15 @@
 
            The assemblers and linker have been successfully compiled us-
         ing  the  DECUS C  (PDP-11)  compiler  (patch  level   9)   with
-        RT-11/TSX+,  Eyring  Research  Institute,  Inc.   PDOS (680x0) C
-        V5.4b compiler, and Symantec C/C++ V6.1/V7.2.  
+        RT-11/TSX+,  GCC  2.7.2 with Linux, Symantec C/C++ V6.1/V7.2 and
+        DJGPP (GCC 2.8.2) with MS-DOS and Windows 3.x/95/98.  
 
            The  device  specific  header  file  (i.e.  m6800.h, m6801.h,
         etc.) contains the DECUS C 'BUILD' directives for  generating  a
         command  file to compile, assemble, and link the necessary files
-        to prepare an executable image for a particular assembler.  
+        to prepare an executable image for a  particular  assembler.   A
+        Linux makefile and DJGPP makefile are available to build all the
+        assemblers and the linker.  
 
 
         3.1  BUILDING AN ASSEMBLER 
@@ -2883,30 +2914,30 @@
            The  building  of  a typical assembler (6809 for example) re-
         quires the following files:  
 
-             1.  M6809.H 
-             2.  M09EXT.C 
-             3.  M09MCH.C 
-             4.  M09ADR.C 
-             5.  M09PST.C 
-             6.  ASXXXX.H 
-             7.  ASMAIN.C 
-             8.  ASLEX.C 
-             9.  ASSYM.C 
-            10.  ASSUBR.C 
-            11.  ASEXPR.C 
-            12.  ASDATA.C 
-            13.  ASLIST.C 
-            14.  ASOUT.C 
+             1.  m6809.h 
+             2.  m09ext.c 
+             3.  m09mch.c 
+             4.  m09adr.c 
+             5.  m09pst.c 
+             6.  asxxxx.h 
+             7.  asmain.c 
+             8.  aslex.c 
+             9.  assym.c 
+            10.  assubr.c 
+            11.  asexpr.c 
+            12.  asdata.c 
+            13.  aslist.c 
+            14.  asout.c 
 
 
            The  first  five  files are the 6809 processor dependent sec-
         tions which contain the following:  
-
-
 
 
         BUILDING ASXXXX AND ASLINK                              PAGE 3-2
         BUILDING AN ASSEMBLER
+
+
 
 
              1.  m6809.h -  header  file containing the machine specific
@@ -2936,19 +2967,19 @@
 
            The building of the linker requires the following files:  
 
-             1.  ASLINK.H 
-             2.  LKMAIN.C 
-             3.  LKLEX.C 
-             4.  LKAREA.C 
-             5.  LKHEAD.C 
-             6.  LKSYM.C 
-             7.  LKEVAL.C 
-             8.  LKDATA.C 
-             9.  LKLIST.C 
-            10.  LKRLOC.C 
-            11.  LKLIBR.C 
-            12.  LKS19.C 
-            13.  LKIHX.C 
+             1.  aslink.h 
+             2.  lkmain.c 
+             3.  lklex.c 
+             4.  lkarea.c 
+             5.  lkhead.c 
+             6.  lksym.c 
+             7.  lkeval.c 
+             8.  lkdata.c 
+             9.  lklist.c 
+            10.  lkrloc.c 
+            11.  lklibr.c 
+            12.  lks19.c 
+            13.  lkihx.c 
 
 
 

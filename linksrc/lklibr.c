@@ -1,7 +1,7 @@
 /* lklibr.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -53,7 +53,7 @@
  *				 	path structure
  *
  *	 functions called:
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID *	new()		lksym.c
  *		int	strlen()	c_library
  *		char *	strcpy()	c_library
@@ -100,7 +100,7 @@ addpath()
  *
  *	 functions called:
  *		VOID	addfile()	lklibr.c
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -136,23 +136,23 @@ addlib()
  *	linked list is used by the function fndsym() to attempt
  *	to find any undefined symbols.
  *
- *	The function does not give report an error on invalid
+ *	The function does not report an error on invalid
  *	path / file specifications or if the file is not found.
  *
  *	local variables:
  *		lbname	*lbnh		pointer to new name structure
  *		lbname	*lbn		temporary pointer
+ *		char *	str		path / file string
+ *		char *	strend		end of path pointer
  *
  *	global variables:
  *		lbname	*lbnhead	The pointer to the first
  *				 	path structure
  *
  *	 functions called:
- *		char	getnb()		lklex.c
  *		VOID *	new()		lksym.c
  *		int	strlen()	c_library
  *		char *	strcpy()	c_library
- *		VOID	unget()		lklex.c
  *
  *	side effects:
  *		An lbname structure may be created.
@@ -164,23 +164,20 @@ char *path;
 char *libfil;
 {
 	FILE *fp;
-	char *str;
+	char *str, *strend;
 	struct lbname *lbnh, *lbn;
 
 	if ((path != NULL) && (strchr(libfil,':') == NULL)){
 		str = (char *) new (strlen(path) + strlen(libfil) + 6);
 		strcpy(str,path);
-#ifdef	OTHERSYSTEM
-		if (str[strlen(str)-1] != '\\') {
-			strcat(str,"\\");
+		strend = str + strlen(str) - 1;
+		if ((*libfil == '\\' && *strend == '\\') ||
+		    (*libfil ==  '/' && *strend ==  '/')) {
+			*strend = '\0';
 		}
-#endif
 	} else {
 		str = (char *) new (strlen(libfil) + 5);
 	}
-#ifdef	OTHERSYSTEM
-	if (libfil[0] == '\\') { libfil++; }
-#endif
 	strcat(str,libfil);
 	if(strchr(str,FSEPX) == NULL) {
 		sprintf(&str[strlen(str)], "%clib", FSEPX);
@@ -242,7 +239,7 @@ VOID
 search()
 {
 	register struct sym *sp;
-	register i,symfnd;
+	register int i,symfnd;
 
 	/*
 	 * Look for undefined symbols.  Keep
@@ -285,7 +282,7 @@ search()
  *	library file specifications (input by the -l option) that
  *	lead to an existing file.
  *
- *	The file specicifation may be formed in one of two ways:
+ *	The file specification may be formed in one of two ways:
  *
  *	(1)	If the library file contained an absolute
  *		path/file specification then this becomes filspc.
@@ -314,6 +311,7 @@ search()
  *		char	*path		file specification path
  *		char	relfil[]	[.REL] file specification
  *		char	*str		combined path and file specification
+ *		char	*strend		end of path pointer
  *		char	symname[]	[.REL] file symbol string
  *
  *	global variables:
@@ -327,7 +325,6 @@ search()
  *		int	fgets()		c_library
  *		FILE	*fopen()	c_library
  *		VOID	free()		c_library
- *		char	getnb()		lklex.c
  *		VOID	lkexit()	lkmain.c
  *		VOID	loadfile()	lklibr.c
  *		VOID *	new()		lksym.c
@@ -357,7 +354,7 @@ char *name;
 	char relfil[NINPUT+2];
 	char buf[NINPUT+2];
 	char symname[NINPUT];
-	char *path,*str;
+	char *path,*str,*strend;
 	char c;
 
 	/*
@@ -368,7 +365,7 @@ char *name;
 		if ((libfp = fopen(lbnh->libspc, "r")) == NULL) {
 			fprintf(stderr, "Cannot open library file %s\n",
 				lbnh->libspc);
-			lkexit(1);
+			lkexit(ER_FATAL);
 		}
 		path = lbnh->path;
 
@@ -384,19 +381,15 @@ char *name;
 		    if (path != NULL) {
 			str = (char *) new (strlen(path)+strlen(relfil)+6);
 			strcpy(str,path);
-#ifdef	OTHERSYSTEM
-			if (str[strlen(str)-1] != '\\') {
-				strcat(str,"\\");
+			strend = str + strlen(str) - 1;
+			if ((*relfil == '\\' && *strend == '\\') ||
+			    (*relfil ==  '/' && *strend ==  '/')) {
+				*strend = '\0';
 			}
-#endif
 		    } else {
 			str = (char *) new (strlen(relfil) + 5);
 		    }
-		    if (relfil[0] == '\\') {
-			strcat(str,relfil+1);
-		    } else {
-			strcat(str,relfil);
-		    }
+		    strcat(str,relfil);
 		    if(strchr(str,FSEPX) == NULL) {
 			sprintf(&str[strlen(str)], "%crel", FSEPX);
 		    }

@@ -1,7 +1,7 @@
 /* assym.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -89,14 +89,14 @@ syminit()
 	struct mne **mpp;
 	register struct sym  *sp;
 	struct sym **spp;
-	register h;
+	register int h;
 
 	mpp = &mnehash[0];
 	while (mpp < &mnehash[NHASH])
 		*mpp++ = NULL;
 	mp = &mne[0];
 	for (;;) {
-		h = hash(mp->m_id);
+		h = hash(mp->m_id, 0);
 		mp->m_mp = mnehash[h];
 		mnehash[h] = mp;
 		if (mp->m_flag&S_END)
@@ -109,7 +109,7 @@ syminit()
 		*spp++ = NULL;
 	sp = &sym[0];
 	for (;;) {
-		h = hash(sp->s_id);
+		h = hash(sp->s_id, zflag);
 		sp->s_sp = symhash[h];
 		symhash[h] = sp;
 		if (sp->s_flag&S_END)
@@ -187,14 +187,14 @@ mlookup(id)
 char *id;
 {
 	register struct mne *mp;
-	register h;
+	register int h;
 
-	h = hash(id);
+	/*
+	 * JLH: case insensitive lookup always
+	 */
+	h = hash(id, 0);
 	mp = mnehash[h];
 	while (mp) {
-		/*
-		 * JLH: case insensitive lookup always
-		 */
 		if(symeq(id, mp->m_id, 0))
 			return (mp);
 		mp = mp->m_mp;
@@ -237,9 +237,9 @@ lookup(id)
 char *id;
 {
 	register struct sym *sp;
-	register h;
+	register int h;
 
-	h = hash(id);
+	h = hash(id, zflag);
 	sp = symhash[h];
 	while (sp) {
 		if(symeq(id, sp->s_id, zflag))
@@ -284,7 +284,7 @@ VOID
 symglob()
 {
 	register struct sym *sp;
-	register i;
+	register int i;
 
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
@@ -321,7 +321,7 @@ VOID
 allglob()
 {
 	register struct sym *sp;
-	register i;
+	register int i;
 
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
@@ -365,7 +365,7 @@ symeq(p1, p2, cflag)
 register char *p1, *p2;
 int cflag;
 {
-	register n;
+	register int n;
 
 	n = strlen(p1) + 1;
 	if(cflag) {
@@ -381,23 +381,26 @@ int cflag;
 		 * Case Insensitive Compare
 		 */
 		do {
-			if (ccase[*p1++] != ccase[*p2++])
+			if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])
 				return (0);
 		} while (--n);
 	}
 	return (1);
 }
 
-/*)Function	int	hash(p)
+/*)Function	int	hash(p, cflag)
  *
  *		char *	p		pointer to string to hash
+ *		int	cflag		case sensitive flag
  *
  *	The function hash() computes a hash code using the sum
  *	of all characters mod table size algorithm.
  *
+ *		cflag == 0	case insensitve hash
+ *		cflag != 0	case sensitive hash
+ *
  *	local variables:
  *		int	h		accumulated character sum
- *		int	n		loop counter
  *
  *	global variables:
  *		char	ccase[]		an array of characters which
@@ -411,19 +414,25 @@ int cflag;
  */
  
 int
-hash(p)
+hash(p, cflag)
 register char *p;
+register int cflag;
 {
-	register h;
+	register int h;
 
 	h = 0;
 	while (*p) {
-		/*
-		 * JLH: case insensitive hash:
-		 * Doesn't much affect hashing, and allows
-		 * same function for mnemonics and symbols.
-		 */
-		h += ccase[*p++];
+		if(cflag) {
+			/*
+			 * Case Sensitive Hash
+			 */
+			h += *p++;
+		} else {
+			/*
+			 * Case Insensitive Hash
+			 */
+			h += ccase[*p++ & 0x007F];
+		}
 	}
 	return (h&HMASK);
 }
@@ -533,7 +542,7 @@ unsigned int n;
 
 	if ((p = (VOID *) malloc(n)) == NULL) {
 		fprintf(stderr, "Out of space!\n");
-		asexit(1);
+		asexit(ER_FATAL);
 	}
 	return (p);
 }

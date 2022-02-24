@@ -1,7 +1,7 @@
 /* lkdata.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -96,14 +96,16 @@ int	gcntr;		/*	LST file relocation active
 
 /*
  *	The structure lfile contains a pointer to a
- *	file specification string, the file type, and
- *	a link to the next lfile structure.
+ *	file specification string, an index which points
+ *	to the file name (past the 'path'), the file type,
+ *	and a link to the next lfile structure.
  *
  *	struct	lfile
  *	{
- *		struct	lfile	*f_flp;		lfile link
+ * 		struct	lfile	*f_flp;		lfile link
  *		int	f_type;			File type
  *		char	*f_idp;			Pointer to file spec
+ *		int	f_idx;			Index to file name
  *	};
  */
 struct	lfile	*filep;	/*	The pointers (lfile *) filep,

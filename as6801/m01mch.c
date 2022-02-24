@@ -1,7 +1,7 @@
 /* m01mch.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -23,7 +23,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register op, t1;
+	register int op, t1;
 	struct expr e1, e2;
 	struct area *espa;
 	char id[NCPS];
@@ -233,7 +233,7 @@ struct mne *mp;
 	case S_TYP4:
 		t1 = addr(&e1);
 		if (t1 == S_IMMED) {
-			if (op&0x0D == 0x0D)
+			if ((op&0x0D) == 0x0D)
 				aerr();
 			outab(op);
 			outrw(&e1, 0);

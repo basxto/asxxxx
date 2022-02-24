@@ -461,6 +461,8 @@
 	neg	-2,pc		;60 DE
 	neg	-1,pc		;60 DF
 
+	neg	0x0F,x		;60 0F
+	neg	0xFFF0,x	;60 10
 	neg	0xFF,x		;60 E0 FF
 	neg	0xFF00,x	;60 E1 00
 	neg	0x1000,x	;60 E2 10 00
@@ -469,6 +471,8 @@
 	neg	b,x		;60 E5
 	neg	d,x		;60 E6
 	neg	[d,x]		;60 E7
+	neg	0x0F,y		;60 4F
+	neg	0xFFF0,y	;60 50
 	neg	0xFF,y		;60 E8 FF
 	neg	0xFF00,y	;60 E9 00
 	neg	0x1000,y	;60 EA 10 00
@@ -477,6 +481,8 @@
 	neg	b,y		;60 ED
 	neg	d,y		;60 EE
 	neg	[d,y]		;60 EF
+	neg	0x0F,sp		;60 8F
+	neg	0xFFF0,sp	;60 90
 	neg	0xFF,sp		;60 F0 FF
 	neg	0xFF00,sp	;60 F1 00
 	neg	0x1000,sp	;60 F2 10 00
@@ -485,6 +491,8 @@
 	neg	b,sp		;60 F5
 	neg	d,sp		;60 F6
 	neg	[d,sp]		;60 F7
+	neg	0x0F,pc		;60 CF
+	neg	0xFFF0,pc	;60 D0
 	neg	0xFF,pc		;60 F8 FF
 	neg	0xFF00,pc	;60 F9 00
 	neg	0x1000,pc	;60 FA 10 00
@@ -729,6 +737,8 @@
 	neg	-num2,pc	;60 DE
 	neg	-num1,pc	;60 DF
 
+	neg	snn,x		;60 0F
+	neg	smnn,x		;60 10
 	neg	nn,x		;60 E0 FF
 	neg	mnn,x		;60 E1 00
 	neg	mmnn,x		;60 E2 10 00
@@ -737,6 +747,8 @@
 	neg	b,x		;60 E5
 	neg	d,x		;60 E6
 	neg	[d,x]		;60 E7
+	neg	snn,y		;60 4F
+	neg	smnn,y		;60 50
 	neg	nn,y		;60 E8 FF
 	neg	mnn,y		;60 E9 00
 	neg	mmnn,y		;60 EA 10 00
@@ -745,6 +757,8 @@
 	neg	b,y		;60 ED
 	neg	d,y		;60 EE
 	neg	[d,y]		;60 EF
+	neg	snn,sp		;60 8F
+	neg	smnn,sp		;60 90
 	neg	nn,sp		;60 F0 FF
 	neg	mnn,sp		;60 F1 00
 	neg	mmnn,sp		;60 F2 10 00
@@ -753,6 +767,8 @@
 	neg	b,sp		;60 F5
 	neg	d,sp		;60 F6
 	neg	[d,sp]		;60 F7
+	neg	snn,pc		;60 CF
+	neg	smnn,pc		;60 D0
 	neg	nn,pc		;60 F8 FF
 	neg	mnn,pc		;60 F9 00
 	neg	mmnn,pc		;60 FA 10 00
@@ -766,6 +782,8 @@
 	.page
 	.sbttl	Defined constants
 
+	snn	=	0x0F
+	smnn	=	0xFFF0
 	nn	=	0xFF
 	mnn	=	0xFF00
 	mmnn	=	0x1000
@@ -1023,6 +1041,8 @@
 	neg	-num2,pc	;60 DE
 	neg	-num1,pc	;60 DF
 
+	neg	snn,x		;60 0F
+	neg	smnn,x		;60 10
 	neg	nn,x		;60 E0 FF
 	neg	mnn,x		;60 E1 00
 	neg	mmnn,x		;60 E2 10 00
@@ -1031,6 +1051,8 @@
 	neg	b,x		;60 E5
 	neg	d,x		;60 E6
 	neg	[d,x]		;60 E7
+	neg	snn,y		;60 4F
+	neg	smnn,y		;60 50
 	neg	nn,y		;60 E8 FF
 	neg	mnn,y		;60 E9 00
 	neg	mmnn,y		;60 EA 10 00
@@ -1039,6 +1061,8 @@
 	neg	b,y		;60 ED
 	neg	d,y		;60 EE
 	neg	[d,y]		;60 EF
+	neg	snn,sp		;60 8F
+	neg	smnn,sp		;60 90
 	neg	nn,sp		;60 F0 FF
 	neg	mnn,sp		;60 F1 00
 	neg	mmnn,sp		;60 F2 10 00
@@ -1047,6 +1071,8 @@
 	neg	b,sp		;60 F5
 	neg	d,sp		;60 F6
 	neg	[d,sp]		;60 F7
+	neg	snn,pc		;60 CF
+	neg	smnn,pc		;60 D0
 	neg	nn,pc		;60 F8 FF
 	neg	mnn,pc		;60 F9 00
 	neg	mmnn,pc		;60 FA 10 00
@@ -1380,11 +1406,16 @@
 	.page
 	.sbttl	External Modes
 
+
+;	xsnn	=	0x0F
+;	xsmnn	=	0xFFF0
 ;	xnn	=	0xFF
 ;	xmnn	=	0xFF00
 ;	xmmnn	=	0x1000
 
 
+	neg	xsnn,x		;60 E2s00r00
+	neg	xsmnn,x		;60 E2s00r00
 	neg	xnn,x		;60 E2s00r00
 	neg	xmnn,x		;60 E2s00r00
 	neg	xmmnn,x		;60 E2s00r00
@@ -1393,6 +1424,8 @@
 	neg	b,x		;60 E5
 	neg	d,x		;60 E6
 	neg	[d,x]		;60 E7
+	neg	xsnn,y		;60 EAs00r00
+	neg	xsmnn,y		;60 EAs00r00
 	neg	xnn,y		;60 EAs00r00
 	neg	xmnn,y		;60 EAs00r00
 	neg	xmmnn,y		;60 EAs00r00
@@ -1401,6 +1434,8 @@
 	neg	b,y		;60 ED
 	neg	d,y		;60 EE
 	neg	[d,y]		;60 EF
+	neg	sxnn,sp		;60 F2s00r00
+	neg	sxmnn,sp	;60 F2s00r00
 	neg	xnn,sp		;60 F2s00r00
 	neg	xmnn,sp		;60 F2s00r00
 	neg	xmmnn,sp	;60 F2s00r00
@@ -1409,6 +1444,8 @@
 	neg	b,sp		;60 F5
 	neg	d,sp		;60 F6
 	neg	[d,sp]		;60 F7
+	neg	sxnn,pc		;60 FAs00r00
+	neg	sxmnn,pc	;60 FAs00r00
 	neg	xnn,pc		;60 FAs00r00
 	neg	xmnn,pc		;60 FAs00r00
 	neg	xmmnn,pc	;60 FAs00r00

@@ -1,7 +1,7 @@
 /* lkarea.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -100,7 +100,7 @@
 VOID
 newarea()
 {
-	register i, narea;
+	register int i, narea;
 	struct areax *taxp;
 	struct areax **halp;
 	char id[NCPS];
@@ -139,7 +139,7 @@ newarea()
 	 */
 	if (headp == NULL) {
 		fprintf(stderr, "No header defined\n");
-		lkexit(1);
+		lkexit(ER_FATAL);
 	}
 	narea = hp->h_narea;
 	halp = hp->a_list;
@@ -150,7 +150,7 @@ newarea()
 		}
 	}
 	fprintf(stderr, "Header area list overflow\n");
-	lkexit(1);
+	lkexit(ER_FATAL);
 }
 
 /*)Function	VOID	lkparea(id)
@@ -312,7 +312,7 @@ char *id;
 VOID
 lnkarea()
 {
-	register rloc;
+	register int rloc;
 	char temp[NCPS+2];
 	struct sym *sp;
 

@@ -1,7 +1,7 @@
 /* m6809.h */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -84,7 +84,7 @@
 #define	S_SDP	80
 
 
-extern int index;
+extern	int	aindx;
 
 struct	sdp
 {
@@ -121,14 +121,15 @@ extern struct opdata mc6800[];
 	/* m09adr.c */
 extern	int		addr();
 extern	int		addr1();
-extern	int		amode();
+extern	int		admode();
 extern	int		any();
 extern	int		srch();
 
 	/* m09mch.c */
-extern	VOID		machin();
+extern	VOID		machine();
 extern	VOID		genout();
 extern	VOID		m68out();
+extern	int		mchpcr();
 extern	VOID		minit();
 extern	int		setbit();
 extern	int		getbit();

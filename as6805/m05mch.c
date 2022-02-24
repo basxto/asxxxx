@@ -1,7 +1,7 @@
 /* m05mch.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,7 +21,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register op, t1, t2, type;
+	register int op, t1, t2, type;
 	struct expr e1, e2, e3;
 	addr_t espv;
 	struct area *espa;

@@ -1,7 +1,7 @@
 /* i51adr.c */
 
 /*
- * (C) Copyright 1998
+ * (C) Copyright 1998-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,20 +21,20 @@
 
 
 struct adsym reg51[] = {	/* R0 thru R7 registers */
-	"R0",	R0,
-	"R1",	R1,
-	"R2",	R2,
-	"R3",	R3,
-	"R4",	R4,
-	"R5",	R5,
-	"R6",	R6,
-	"R7",	R7,
-	"A",	A,
-	"DPTR", DPTR,
-	"PC",	PC,
-	"C",	C,
-	"AB",	AB,
-	"",	0x00
+    {	"R0",	R0	},
+    {	"R1",	R1	},
+    {	"R2",	R2	},
+    {	"R3",	R3	},
+    {	"R4",	R4	},
+    {	"R5",	R5	},
+    {	"R6",	R6	},
+    {	"R7",	R7	},
+    {	"A",	A	},
+    {	"DPTR", DPTR	},
+    {	"PC",	PC	},
+    {	"C",	C	},
+    {	"AB",	AB	},
+    {	"",	0x00	}
 };
 
 /*  Classify argument as to address mode */
@@ -159,7 +159,7 @@ register struct adsym *sp;
 	register int i;
 	unget(getnb());
 	i = 0;
-	while ( *(ptr = (char *) &sp[i]) ) {
+	while ( *(ptr = &sp[i].a_str[0]) ) {
 		if (srch(ptr)) {
 			return(sp[i].a_val);
 		}
@@ -179,12 +179,12 @@ register char *str;
 	ptr = ip;
 
 	while (*ptr && *str) {
-		if(ccase[*ptr] != ccase[*str])
+		if(ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
 			break;
 		ptr++;
 		str++;
 	}
-	if (ccase[*ptr] == ccase[*str]) {
+	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
 		ip = ptr;
 		return(1);
 	}

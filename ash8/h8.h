@@ -1,7 +1,7 @@
 /* h8.h */
 
 /*
- * (C) Copyright 1994-1998
+ * (C) Copyright 1994-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -80,7 +80,7 @@
 /*
  * Variables
  */
-extern int index;
+extern int aindx;
 
 extern char *dpcode[];
 
@@ -108,16 +108,17 @@ extern struct adsym ccr_reg[];
 	/* h8adr.c */
 extern	int		addr();
 extern	int		addr1();
-extern	int		amode();
+extern	int		admode();
 extern	int		any();
 extern	int		srch();
 
 	/* h8mch.c */
-extern	VOID		machin();
+extern	VOID		machine();
 extern	VOID		normbyte();
 extern	VOID		usgnbyte();
 extern	VOID		pagebyte();
 extern	int		abstype();
+extern	int		mchpcr();
 extern	VOID		minit();
 extern	int		setbit();
 extern	int		getbit();

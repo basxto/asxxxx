@@ -170,22 +170,22 @@ dirpag:				;
 	bsr	.		;8D FE
 	lds	#1		;8E 00 01
 				;8F
-	suba	*dirpag		;90 12
-	cmpa	*dirpag		;91 12
-	sbca	*dirpag		;92 12
+	suba	*dirpag		;90*12
+	cmpa	*dirpag		;91*12
+	sbca	*dirpag		;92*12
 				;93
-	anda	*dirpag		;94 12
-	bita	*dirpag		;95 12
-	ldaa	*dirpag		;96 12
-	staa	*dirpag		;97 12
-	eora	*dirpag		;98 12
-	adca	*dirpag		;99 12
-	oraa	*dirpag		;9A 12
-	adda	*dirpag		;9B 12
-	cpx	*dirpag		;9C 12
+	anda	*dirpag		;94*12
+	bita	*dirpag		;95*12
+	ldaa	*dirpag		;96*12
+	staa	*dirpag		;97*12
+	eora	*dirpag		;98*12
+	adca	*dirpag		;99*12
+	oraa	*dirpag		;9A*12
+	adda	*dirpag		;9B*12
+	cpx	*dirpag		;9C*12
 				;9D
-	lds	*dirpag		;9E 12
-	sts	*dirpag		;9F 12
+	lds	*dirpag		;9E*12
+	sts	*dirpag		;9F*12
 
 
 	.page
@@ -242,42 +242,42 @@ dirpag:				;
 				;CD
 	ldx	#1		;CE 00 01
 				;CF
-	subb	*dirpag		;D0 12
-	cmpb	*dirpag		;D1 12
-	sbcb	*dirpag		;D2 12
+	subb	*dirpag		;D0*12
+	cmpb	*dirpag		;D1*12
+	sbcb	*dirpag		;D2*12
 				;D3
-	andb	*dirpag		;D4 12
-	bitb	*dirpag		;D5 12
-	ldab	*dirpag		;D6 12
-	stab	*dirpag		;D7 12
-	eorb	*dirpag		;D8 12
-	adcb	*dirpag		;D9 12
-	orab	*dirpag		;DA 12
-	addb	*dirpag		;DB 12
+	andb	*dirpag		;D4*12
+	bitb	*dirpag		;D5*12
+	ldab	*dirpag		;D6*12
+	stab	*dirpag		;D7*12
+	eorb	*dirpag		;D8*12
+	adcb	*dirpag		;D9*12
+	orab	*dirpag		;DA*12
+	addb	*dirpag		;DB*12
 				;DC
 				;DD
-	ldx	*dirpag		;DE 12
-	stx	*dirpag		;DF 12
+	ldx	*dirpag		;DE*12
+	stx	*dirpag		;DF*12
 
 
 	.page
 
-	subb	dirpag,x	;E0 12
-	cmpb	dirpag,x	;E1 12
-	sbcb	dirpag,x	;E2 12
+	subb	dirpag,x	;E0u12
+	cmpb	dirpag,x	;E1u12
+	sbcb	dirpag,x	;E2u12
 				;E3
-	andb	dirpag,x	;E4 12
-	bitb	dirpag,x	;E5 12
-	ldab	dirpag,x	;E6 12
-	stab	dirpag,x	;E7 12
-	eorb	dirpag,x	;E8 12
-	adcb	dirpag,x	;E9 12
-	orab	dirpag,x	;EA 12
-	addb	dirpag,x	;EB 12
+	andb	dirpag,x	;E4u12
+	bitb	dirpag,x	;E5u12
+	ldab	dirpag,x	;E6u12
+	stab	dirpag,x	;E7u12
+	eorb	dirpag,x	;E8u12
+	adcb	dirpag,x	;E9u12
+	orab	dirpag,x	;EAu12
+	addb	dirpag,x	;EBu12
 				;EC
 				;ED
-	ldx	dirpag,x	;EE 12
-	stx	dirpag,x	;EF 12
+	ldx	dirpag,x	;EEu12
+	stx	dirpag,x	;EFu12
 	subb	ext		;F0 12 34
 	cmpb	ext		;F1 12 34
 	sbcb	ext		;F2 12 34

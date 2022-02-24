@@ -1,7 +1,7 @@
 /* z80adr.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -33,7 +33,7 @@ int
 addr(esp)
 register struct expr *esp;
 {
-	register c, mode, indx;
+	register int c, mode, indx;
 
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
@@ -54,11 +54,12 @@ register struct expr *esp;
 			mode = S_R16X;
 			aerr();
 		} else {
+			mode = S_INDM;
 			expr(esp, 0);
-			esp->e_mode = S_INDM;
+			esp->e_mode = mode;
 		}
 		if (indx) {
-			esp->e_mode = mode + indx&0xFF;
+			esp->e_mode = mode + (indx&0xFF);
 			esp->e_base.e_ap = NULL;
 		}
 		if ((c = getnb()) != RTIND)
@@ -77,8 +78,9 @@ register struct expr *esp;
 		if ((indx = admode(R16X)) != 0) {
 			mode = S_R16X;
 		} else {
+			mode = S_USER;
 			expr(esp, 0);
-			esp->e_mode = S_USER;
+			esp->e_mode = mode;
 		}
 		if (indx) {
 			esp->e_addr = indx&0xFF;
@@ -118,7 +120,7 @@ register struct adsym *sp;
 	unget(getnb());
 
 	i = 0;
-	while ( *(ptr = (char *) &sp[i]) ) {
+	while ( *(ptr = &sp[i].a_str[0]) ) {
 		if (srch(ptr)) {
 			return(sp[i].a_val);
 		}
@@ -139,12 +141,12 @@ register char *str;
 	ptr = ip;
 
 	while (*ptr && *str) {
-		if (ccase[*ptr] != ccase[*str])
+		if (ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
 			break;
 		ptr++;
 		str++;
 	}
-	if (ccase[*ptr] == ccase[*str]) {
+	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
 		ip = ptr;
 		return(1);
 	}
@@ -175,36 +177,36 @@ char    c, *str;
  */
 
 struct	adsym	R8[] = {
-	"b",	B|0400,
-	"c",	C|0400,
-	"d",	D|0400,
-	"e",	E|0400,
-	"h",	H|0400,
-	"l",	L|0400,
-	"a",	A|0400,
-	"",	0000
+    {	"b",	B|0400	},
+    {	"c",	C|0400	},
+    {	"d",	D|0400	},
+    {	"e",	E|0400	},
+    {	"h",	H|0400	},
+    {	"l",	L|0400	},
+    {	"a",	A|0400	},
+    {	"",	0000	}
 };
 
 struct	adsym	R8X[] = {
-	"i",	I|0400,
-	"r",	R|0400,
-	"",	0000
+    {	"i",	I|0400	},
+    {	"r",	R|0400	},
+    {	"",	0000	}
 };
 
 struct	adsym	R16[] = {
-	"bc",	BC|0400,
-	"de",	DE|0400,
-	"hl",	HL|0400,
-	"sp",	SP|0400,
-	"ix",	IX|0400,
-	"iy",	IY|0400,
-	"",	0000
+    {	"bc",	BC|0400	},
+    {	"de",	DE|0400	},
+    {	"hl",	HL|0400	},
+    {	"sp",	SP|0400	},
+    {	"ix",	IX|0400	},
+    {	"iy",	IY|0400	},
+    {	"",	0000	}
 };
 
 struct	adsym	R16X[] = {
-	"af",	AF|0400,
-	"af'",	AF|0400,
-	"",	0000
+    {	"af",	AF|0400	},
+    {	"af'",	AF|0400	},
+    {	"",	0000	}
 };
 
 /*
@@ -212,13 +214,13 @@ struct	adsym	R16X[] = {
  */
 
 struct	adsym	CND[] = {
-	"NZ",	NZ|0400,
-	"Z",	Z |0400,
-	"NC",	NC|0400,
-	"C",	CS|0400,
-	"PO",	PO|0400,
-	"PE",	PE|0400,
-	"P",	P |0400,
-	"M",	M |0400,
-	"",	0000
+    {	"NZ",	NZ|0400	},
+    {	"Z",	Z |0400	},
+    {	"NC",	NC|0400	},
+    {	"C",	CS|0400	},
+    {	"PO",	PO|0400	},
+    {	"PE",	PE|0400	},
+    {	"P",	P |0400	},
+    {	"M",	M |0400	},
+    {	"",	0000	}
 };

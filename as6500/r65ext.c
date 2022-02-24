@@ -1,7 +1,7 @@
 /* r65ext.c */
 
 /*
- * (C) Copyright 1995-1998
+ * (C) Copyright 1995-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -27,4 +27,4 @@
 
 char *cpu  = "Rockwell 6502/6510/65C02";
 int hilo   = 0;
-char *dsft = "ASM";
+char *dsft = "asm";

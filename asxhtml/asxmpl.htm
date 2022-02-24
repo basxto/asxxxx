@@ -37,20 +37,20 @@ equipment.)
 </B></H3><H4>
 
 <B><PRE>
-  The project files included eleven .ASM modules and
-four .DEF include files:
+  the project files included eleven .asm modules and
+four .def include files:
 
-        PHS.ASM                 SYSTEM.DEF
-        ACIA.ASM                AREA.DEF
-        ACQ.ASM                 DEFINE.DEF
-        HVCTRL.ASM              DATA.DEF
-        TERMIO.ASM
-        SELECT.ASM
-        STATUS.ASM
-        HISTOS.ASM
-        HELP.ASM
-        AICONV.ASM
-        PHSMON.ASM
+        phs.asm                 system.def
+        acia.asm                area.def
+        acq.asm                 define.def
+        hvctrl.asm              data.def
+        termio.asm
+        select.asm
+        status.asm
+        histos.asm
+        help.asm
+        aiconv.asm
+        phsmon.asm
 
   Each of the modules was assembled individually.  This was done
 by creating a command file containing the assembly command lines:
@@ -67,9 +67,9 @@ by creating a command file containing the assembly command lines:
         as6809 -gloaxzsff aiconv
         as6809 -gloaxzsff phsmon
 
-The assembly process produced an object (.REL) file (-s), a listing
-(.LST) file (-l), and a symbol (.SYM) file (-s) for each individual
-.ASM file.  The assembly process made all undefined labels
+the assembly process produced an object (.rel) file (-s), a listing
+(.lst) file (-l), and a symbol (.sym) file (-s) for each individual
+.asm file.  the assembly process made all undefined labels
 global (-g), all internal labels global (-a), the output in HEX
 format (-x), and the listing files to have relocations flagged (-ff).
 This project required the case sensitive option, -z.
@@ -109,8 +109,8 @@ and was invoked by the command line:
 
         aslink -f phs
 
-The linking process produced a map (.MAP) file (-m) in HEX format (-x)
-and a Motorola (.S19) loader file (-s).  The -b options specify the
+The linking process produced a map (.map) file (-m) in HEX format (-x)
+and a Motorola (.s19) loader file (-s).  The -b options specify the
 memory addresses for certain program sections as defined in the
 assembled modules.  The file input was terminated by the -e option.
 

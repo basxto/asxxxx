@@ -1,7 +1,7 @@
 /* m08ext.c */
 
 /*
- * (C) Copyright 1993-1998
+ * (C) Copyright 1993-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,4 +16,4 @@
 
 char	*cpu	= "Motorola 68HC08";
 int	hilo	= 1;
-char	*dsft	= "ASM";
+char	*dsft	= "asm";

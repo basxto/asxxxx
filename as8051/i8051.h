@@ -1,7 +1,7 @@
 /* i8051.h */
 
 /*
- * (C) Copyright 1998
+ * (C) Copyright 1998-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -124,6 +124,6 @@ extern	int		reg();
 
 	/* i51mch.c */
 extern	int		comma();
-extern	VOID		machin();
+extern	VOID		machine();
+extern	int		mchpcr();
 extern	VOID		minit();
-

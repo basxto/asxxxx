@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,7 +14,7 @@
  *
  */
 
-#define	VERSION	"V02.00"
+#define	VERSION	"V02.10"
 
 /*)Module	aslink.h
  *
@@ -67,6 +67,14 @@
 #define	FSEPX	'.'
 #define	OTHERSYSTEM
 #endif
+
+/*
+ * Error definitions
+ */
+#define	ER_NONE		0	/* No error */
+#define	ER_WARNING	1	/* Warning */
+#define	ER_ERROR	2	/* Assembly error */
+#define	ER_FATAL	3	/* Fatal error */
 
 /*
  * This file defines the format of the
@@ -284,14 +292,16 @@ struct	sym
 
 /*
  *	The structure lfile contains a pointer to a
- *	file specification string, the file type, and
- *	a link to the next lfile structure.
+ *	file specification string, an index which points
+ *	to the file name (past the 'path'), the file type,
+ *	and a link to the next lfile structure.
  */
 struct	lfile
 {
 	struct	lfile	*f_flp;	/* lfile link */
 	int	f_type;		/* File type */
 	char	*f_idp;		/* Pointer to file spec */
+	int	f_idx;		/* Index to file name */
 };
 
 /*
@@ -617,6 +627,7 @@ extern	char		putc();
 extern	char *		strcpy();
 extern	int		strlen();
 extern	char *		strncpy();
+extern	char *		strrchr();
 */
 
 /* Program function definitions */
@@ -624,24 +635,26 @@ extern	char *		strncpy();
 /* lkmain.c */
 extern	FILE *		afile();
 extern	VOID		bassav();
+extern	int		fndidx();
 extern	VOID		gblsav();
 extern	VOID		link();
 extern	VOID		lkexit();
-extern	VOID		main();
+extern	int		main();
 extern	VOID		map();
 extern	int		parse();
+extern	VOID		doparse();
 extern	VOID		setbas();
 extern	VOID		setgbl();
 extern	VOID		usage();
 
 /* lklex.c */
 extern	char		endline();
-extern	char		get();
+extern	int		get();
 extern	VOID		getfid();
 extern	VOID		getid();
 extern	int		getline();
 extern	int		getmap();
-extern	char		getnb();
+extern	int		getnb();
 extern	int		more();
 extern	VOID		skip();
 extern	VOID		unget();

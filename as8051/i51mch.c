@@ -1,7 +1,7 @@
 /* i51mch.c */
 
 /*
- * (C) Copyright 1998
+ * (C) Copyright 1998-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -26,8 +26,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register unsigned op, rd, rs;
-	register t, t1, v1;
+	register int op, t, t1, v1;
 	struct expr e, e1;
 
 	clrexpr(&e);
@@ -692,7 +691,7 @@ comma()
   * Machine specific initialization
   */
 
- static beenHere=0;	/* set non-zero if we have done that... */
+ static int beenHere = 0;	/* set non-zero if we have done that... */
 
  VOID
  minit()
@@ -703,7 +702,7 @@ comma()
 	 /* First time only, add the pre-defined symbols to the table */
 	 if (beenHere == 0) {
 		 pd = preDef;
-		 while (*pd->id) {
+		 while (pd->id) {
 			 sp = lookup(pd->id);
 			 if (sp->s_type == S_NEW) {
 				 sp->s_addr = pd->value;

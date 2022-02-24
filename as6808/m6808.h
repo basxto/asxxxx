@@ -1,7 +1,7 @@
 /* m6808.h */
 
 /*
- * (C) Copyright 1993-1995
+ * (C) Copyright 1993-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -91,7 +91,8 @@ extern	int		any();
 extern	int		srch();
 
 	/* m08mch.c */
-extern	VOID		machin();
+extern	VOID		machine();
+extern	int		chkindx();
+extern	int		mchpcr();
 extern	VOID		minit();
 extern	int		comma();
-

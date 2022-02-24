@@ -1,7 +1,7 @@
 /* asdata.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -52,13 +52,23 @@ int	iflvl[MAXIF+1];	/*	array of IF-ELSE-ENDIF flevel
 			 *	values indexed by tlevel
 			 */
 
-char	afn[FILSPC];		/*	afile temporary file name
+char	afn[FILSPC];		/*	current input file specification
+				 */
+int	afp;			/*	current input file path length
+				 */
+char	afntmp[FILSPC];		/*	temporaryr input file specification
+				 */
+int	afptmp;			/*	temporary input file path length
 				 */
 char	srcfn[MAXFIL][FILSPC];	/*	array of source file names
+				 */
+int	srcfp[MAXFIL];		/*	array of source file path lengths
 				 */
 int	srcline[MAXFIL];	/*	source line number
 				 */
 char	incfn[MAXINC][FILSPC];	/*	array of include file names
+				 */
+int	incfp[MAXINC];		/*	array of include file path lengths
 				 */
 int	incline[MAXINC];	/*	include line number
 				 */
@@ -134,7 +144,7 @@ char	stb[NSBTL];	/*	Subtitle string buffer
 char	symtbl[] = { "Symbol Table" };
 char	aretbl[] = { "Area Table" };
 
-char	module[NCPS];	/*	module name string
+char	module[NCPS+2];	/*	module name string
 			 */
 
 /*
@@ -187,8 +197,8 @@ struct	mne	*mnehash[NHASH];
  *	};
  */
 struct	sym	sym[] = {
-	NULL,	NULL,	".",	    S_USER, 0,			NULL,0,0,
-	NULL,	NULL,	".__.ABS.", S_USER, S_ASG|S_GBL|S_END,	NULL,0,0
+    {	NULL,	NULL,	".",	    S_USER, 0,			NULL,0,0    },
+    {	NULL,	NULL,	".__.ABS.", S_USER, S_ASG|S_GBL|S_END,	NULL,0,0    }
 };
 
 struct	sym	*symp;		/*	pointer to a symbol structure
@@ -222,7 +232,7 @@ struct	sym *symhash[NHASH];	/*	array of pointers to NHASH
  *	};
  */
 struct	area	area[] = {
-	NULL,	"_CODE",	0,	0,	0,	A_CON|A_REL
+    {	NULL,	"_CODE",	0,	0,	0,	A_CON|A_REL	}
 };
 
 struct	area	*areap;	/*	pointer to an area structure

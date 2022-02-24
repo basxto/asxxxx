@@ -1,7 +1,7 @@
 /* m6801.h */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -92,7 +92,7 @@ extern	int		any();
 extern	int		srch();
 
 	/* m01mch.c */
-extern	VOID		machin();
+extern	VOID		machine();
+extern	int		mchpcr();
 extern	VOID		minit();
 extern	int		comma();
-

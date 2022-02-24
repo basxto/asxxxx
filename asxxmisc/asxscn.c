@@ -1,7 +1,7 @@
-/* ASXSCN.C */
+/* asxscn.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -18,7 +18,7 @@
 
 static int inpfil;		/* Input File Counter	*/
 static int xflag;		/* Radix Flag		*/
-static int asserr;		/* Error Counter	*/
+static int aserr;		/* Error Counter	*/
 
 static FILE *sfp[MAXFIL];	/* Input File Handle	*/
 
@@ -74,27 +74,32 @@ char	ccase[128] = {
 };
 
 
-/*)Function	VOID	main(argc, argv)
+extern	VOID	asexit();
+extern	VOID	usage();
+
+
+/*)Function	int	main(argc, argv)
  *
  *		int	argc		argument count
  *		char *	argv		array of pointers to argument strings
  */
 
-VOID
+int
 main(argc, argv)
+int argc;
 char *argv[];
 {
 	register char *p, *q;
-	register c, i, n;
+	register int c, i, n;
 
 	/*
 	 * Set Defaults
 	 */
 	xflag = 0;
 	inpfil = 0;
-	asserr = 0;
+	aserr = 0;
 
-	fprintf(stdout, "\n");
+	printf("\n");
 
 	for (i=1; i<argc; ++i) {
 		p = argv[i];
@@ -119,24 +124,24 @@ char *argv[];
 					break;
 
 				default:
-					usage();
+					usage(ER_FATAL);
 				}
 		} else {
 			if (++inpfil > 1) {
 				fprintf(stderr, "too many input files\n");
-				asexit(1);
+				asexit(ER_FATAL);
 			}
 			sfp[0] = fopen(p, "r");
 			if (sfp[0] != NULL) {
 				strcpy(scfile, p);
 			} else {
-				printf("\r\nFile %s not found\r\n");
-				asexit(1);
+				fprintf(stderr, "\r\nFile %s not found\r\n", p);
+				asexit(ER_FATAL);
 			}
 		}
 	}
 	if (inpfil == 0)
-		usage();
+		usage(ER_WARNING);
 
 	printf("\r\nASxxxx Assembler Listing Scanner %s\r\n\r\n", VERSION);
 
@@ -158,13 +163,13 @@ loop:
 		{ goto loop; }
 
 		for (i=0; i<n; i++) {
-			if ((ctype[*p++] & RAD16) != RAD16)
+			if ((ctype[*p++ & 0x007F] & RAD16) != RAD16)
 				goto loop;
 		}
 
-		if ((ctype[*(p+1)] & RAD16) != RAD16)
+		if ((ctype[*(p+1) & 0x007F] & RAD16) != RAD16)
 			goto loop;
-		if ((ctype[*(p+2)] & RAD16) != RAD16)
+		if ((ctype[*(p+2) & 0x007F] & RAD16) != RAD16)
 			goto loop;
 
 		if (*p == ' ')
@@ -189,15 +194,16 @@ loop:
 		 */
 		n = strlen(q);
 		for (i=0; i<n; i++) {
-			if (ccase[*p++] != ccase[*q++]) {
+			if (ccase[*p++ & 0x007F] != ccase[*q++ & 0x007F]) {
 				printf("%s\r\n", scline);
-				asserr += 1;
+				aserr += 1;
 				goto loop;
 			}
 		}
 	}
-	printf("%d code error(s) found in file %s\r\n", asserr, scfile);
-	asexit(1);
+	printf("%d code error(s) found in file %s\r\n", aserr, scfile);
+	asexit(aserr ? ER_ERROR : ER_NONE);
+	return(0);
 }
 
 /*)Function	VOID	asexit(i)
@@ -239,7 +245,9 @@ char *usetxt[] = {
 	0
 };
 
-/*)Function	VOID	usage()
+/*)Function	VOID	usage(n)
+ *
+ *		int	n		exit code
  *
  *	The function usage() outputs to the stderr device the
  *	program name and version and a list of valid assembler options.
@@ -260,13 +268,14 @@ char *usetxt[] = {
  */
 
 VOID
-usage()
+usage(n)
+int n;
 {
 	register char   **dp;
 
 	fprintf(stderr, "\nASxxxx Assembler Listing Scanner %s\n\n", VERSION);
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
-	asexit(1);
+	asexit(n);
 }
 

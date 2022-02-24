@@ -1,7 +1,7 @@
 /* aslex.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -23,11 +23,11 @@
  *
  *	aslex.c contains the following functions:
  *		char	endline()
- *		char	get()
+ *		int	get()
  *		VOID	getid()
  *		int	getline()
  *		int	getmap()
- *		char	getnb()
+ *		int	getnb()
  *		VOID	getst()
  *		int	more()
  *		VOID	unget()
@@ -68,8 +68,8 @@
  *					being processed.
  *
  *	called functions:
- *		char	get()		aslex.c
- *		char	getnb()		aslex.c
+ *		int	get()		aslex.c
+ *		int	getnb()		aslex.c
  *		VOID	unget()		aslex.c
  *
  *	side effects:
@@ -80,7 +80,7 @@
 
 VOID
 getid(id, c)
-register c;
+register int c;
 char *id;
 {
 	register char *p;
@@ -132,8 +132,8 @@ char *id;
  *					being processed.
  *
  *	called functions:
- *		char	get()		aslex.c
- *		char	getnb()		aslex.c
+ *		int	get()		aslex.c
+ *		int	getnb()		aslex.c
  *		VOID	unget()		aslex.c
  *
  *	side effects:
@@ -144,7 +144,7 @@ char *id;
 
 VOID
 getst(id, c)
-register c;
+register int c;
 char *id;
 {
 	register char *p;
@@ -163,7 +163,7 @@ char *id;
 	*p++ = 0;
 }
 
-/*)Function	char	getnb()
+/*)Function	int	getnb()
  *
  *	The function getnb() scans the current assembler-source
  *	text line returning the first character not a SPACE or TAB.
@@ -176,24 +176,24 @@ char *id;
  *		none
  *
  *	called functions:
- *		char	get()		aslex.c
+ *		int	get()		aslex.c
  *
  *	side effects:
  *		use of get() updates the global pointer ip, the position
  *		in the current assembler-source text line
  */
 
-char
+int
 getnb()
 {
-	register c;
+	register int c;
 
 	while ((c=get()) == ' ' || c == '\t')
 		;
 	return (c);
 }
 
-/*)Function	char	get()
+/*)Function	int	get()
  *
  *	The function get() returns the next character in the
  *	assembler-source text line, at the end of the line a
@@ -216,14 +216,14 @@ getnb()
  *		line, ip is not updated.
  */
 
-char
+int
 get()
 {
-	register c;
+	register int c;
 
 	if ((c = *ip) != 0)
 		++ip;
-	return (c);
+	return (c & 0x007F);
 }
 
 /*)Function	VOID	unget(c)
@@ -256,6 +256,7 @@ get()
 
 VOID
 unget(c)
+int c;
 {
 	if (c)
 		if (ip != ib)
@@ -285,7 +286,7 @@ unget(c)
  *		none
  *
  *	called functions:
- *		char	get()		aslex.c
+ *		int	get()		aslex.c
  *
  *	side effects:
  *		use of get() updates the global pointer ip the position
@@ -294,8 +295,9 @@ unget(c)
 
 int
 getmap(d)
+int d;
 {
-	register c, n, v;
+	register int c, n, v;
 
 	if ((c=get()) == '\0')
 		qerr();
@@ -364,6 +366,8 @@ getmap(d)
  *		int	i		string length
  *
  *	global variables:
+ *		char	afn[]		afile() constructed filespec
+ *		int	afp		afile constructed path length
  *		char	ib[]		string buffer containing
  *					assembler-source text line
  *		char	ifp[]		array of file handles for
@@ -372,12 +376,16 @@ getmap(d)
  *					active include file
  *		int	incline[]	array of include file
  *					line numbers
+ *		char	incfn[][]	array of include file names
+ *		int	incfp[]		array of include file path lengths
  *		char	sfp[]		array of file handles for
  *					assembler source files
  *		int	cfile		index for sfp[] specifies
  *					active source file
  *		int	srcline[]	array of source file
  *					line numbers
+ *		char	srcfn[][]	array of source file names
+ *		int	srcfp[]		array of source file path lengths
  *		int	inpfil		maximum input file index
  *
  *	called functions:
@@ -389,6 +397,8 @@ getmap(d)
  *		include file will be closed at detection of end of file.
  *		the next sequential source file may be selected.
  *		the global file indexes incfil or cfile may be changed.
+ *		The current file specification afn[] and the path
+ *		length afp may be changed.
  *		The respective source line or include line counter
  *		will be updated.
  */
@@ -396,11 +406,18 @@ getmap(d)
 int
 getline()
 {
-register i;
+register int i;
 
 loop:	if (incfil >= 0) {
 		if (fgets(ib, sizeof ib, ifp[incfil]) == NULL) {
 			fclose(ifp[incfil--]);
+			if (incfil >= 0) {
+				strcpy(afn, incfn[incfil]);
+				afp = incfp[incfil];
+			} else {
+				strcpy(afn, srcfn[cfile]);
+				afp = srcfp[cfile];
+			}
 			lop = NLPP;
 			goto loop;
 		} else {
@@ -409,6 +426,8 @@ loop:	if (incfil >= 0) {
 	} else {
 		if (fgets(ib, sizeof ib, sfp[cfile]) == NULL) {
 			if (++cfile <= inpfil) {
+				strcpy(afn, srcfn[cfile]);
+				afp = srcfp[cfile];
 				srcline[cfile] = 0;
 				goto loop;
 			}
@@ -438,7 +457,7 @@ loop:	if (incfil >= 0) {
  *		none
  *
  *	called functions:
- *		char	getnb()		aslex.c
+ *		int	getnb()		aslex.c
  *		VOID	unget()		aslex.c
  *
  *	side effects:
@@ -449,7 +468,7 @@ loop:	if (incfil >= 0) {
 int
 more()
 {
-	register c;
+	register int c;
 
 	c = getnb();
 	unget(c);
@@ -471,7 +490,7 @@ more()
  *		none
  *
  *	called functions:
- *		char	getnb()		aslex.c
+ *		int	getnb()		aslex.c
  *
  *	side effects:
  *		use of getnb() updates the global pointer ip the
@@ -481,7 +500,7 @@ more()
 char
 endline()
 {
-	register c;
+	register int c;
 
 	c = getnb();
 	return( (c == '\0' || c == ';') ? 0 : c );

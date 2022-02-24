@@ -38,30 +38,14 @@ Produce an updated listing file with the relocated addresses and data
 
 .header level 1;INVOKING ASLINK
 
-The linker may run in the command line mode or command file modes.
-The allowed startup linker commands are:
-
-.skip
-.left margin +16
-.indent -16
--c/-f###########command line#/#command file modes
-.skip
-.indent -16
--p/-n###########enable/disable echo file.lnk input to stdout
-.left margin -16
-
-If command line mode is selected, all linker commands come from stdin,
-if the command file mode is selected the commands are input from
-the specified file (extension must be .lnk).
-
 .skip
 .left margin +3
-Most sytems require the initial options to be entered on the command line:
+Most sytems require the options to be entered on the command line:
 .left margin -3
    
 .skip
 .indent +8
-ASLINK  -[cfpn] 
+aslink  -[options] -[option arg] files
 .skip
 
 .left margin +3
@@ -71,14 +55,29 @@ started at a system specific prompt:
 
 .skip
 .indent +8
-ASLINK
+aslink
 .indent +8
-argv:   -[cfpn]
+argv:   -[options] -[option arg] files
 
 .skip
-After invoking the linker the valid options are:
+The allowed linker commands are:
 
 .list 1
+.list element
+-c#########ASlink#>> prompt mode.
+.break
+The ASlink#>> prompt mode reads linker commands
+from stdin.
+.list element
+-f##file###Command file mode.
+.break
+The command file mode imports linker commands from the
+specified file (extension must be .lnk), imported -c and -f commands
+are ignored.  If the directory path, for a file to be linked,
+is not specified in the command file then the path defaults to the .lnk
+file directory path.
+.list element
+-p/-n###enable/disable echoing commands to stdout.
 .list element
 -i/-s###Intel Hex (file.ihx) or Motorola S19 (file.s19) image output
 file.
@@ -95,18 +94,18 @@ areas, and other linking information.
 or Octal).
 .list element
 -u######Generate an updated listing file (file.rst) derived from
-the relocated addresses and data from the linker
+the relocated addresses and data from the linker.
 .list element
-fileN###Files to be linked. Files may be on the same line as the above
+file####File(s) to be linked. Files may be on the same line as the above
 options or on a separate line(s) one file per line or multiple files
 separated by spaces or tabs.
 .list element
--b##area#=#expression (one definition per line)
+-b##area=expression (one definition per line)
 .break
 This specifies an area base address where the expression may contain
 constants and/or defined symbols from the linked files.
 .list element
--g##symbol#=#expression (one definition per line)
+-g##symbol=expression (one definition per line)
 .break
 This specifies the value for the symbol where the expression may contain
 constants and/or defined symbols from the linked files.
@@ -151,14 +150,14 @@ If the library file contained an absolute
 path/file specification then this is the
 object module's path/file.
 .break
-(i.e. C:_\...)
+(i.e. C:_\... or C:_/...)
 .list element
 If the library file contains a relative path/file
 specification then the concatenation of the path
 and this file specification becomes the object module's
 path/file.
 .break
-(i.e. _\...)
+(i.e. _\... or _/...)
 .end list
 
 As an example, assume there exists a library file termio.lib

@@ -1,7 +1,7 @@
 /* lklist.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -67,7 +67,7 @@ VOID
 slew(xp)
 register struct area *xp;
 {
-	register i;
+	register int i;
 	register char *ptr;
  	addr_t	ai, aj;
 
@@ -110,8 +110,8 @@ register struct area *xp;
 		} else {
 			fprintf(mfp, "%-8.8s", ptr);
 		}
-		ai = xp->a_addr;
-		aj = xp->a_size;
+		ai = xp->a_addr & 0xFFFF;
+		aj = xp->a_size & 0xFFFF;
 		if (xflag == 0) {
 			fprintf(mfp, "   %04X   %04X", ai, aj);
 		} else
@@ -213,7 +213,6 @@ FILE *fp;
  *
  *	local variables:
  *		areax *	oxp		pointer to an area extension structure
- *		int	c		character value
  *		int	i		loop counter
  *		int	j		bubble sort update status
  *		char *	ptr		pointer to an id string
@@ -248,7 +247,7 @@ lstarea(xp)
 struct area *xp;
 {
 	register struct areax *oxp;
-	register c, i, j;
+	register int i, j;
 	register char *ptr;
 	int nmsym;
 	addr_t a0, ai, aj;
@@ -332,7 +331,7 @@ struct area *xp;
 			fprintf(mfp, "     ");
 		}
 		sp = p[i];
-		aj = sp->s_addr + sp->s_axp->a_addr;
+		aj = (sp->s_addr + sp->s_axp->a_addr) & 0xFFFF;
 		if (xflag == 0) {
 			fprintf(mfp, "  %04X  ", aj);
 		} else
@@ -517,6 +516,11 @@ addr_t pc;
 	int i;
 
 	/*
+	 * Truncate (int) to 2-Bytes
+	 */
+	 pc &= 0xFFFF;
+
+	/*
 	 * Exit if listing file is not open
 	 */
 loop:	if (tfp == NULL)
@@ -645,6 +649,11 @@ int v;
 	int i;
 
 	/*
+	 * Truncate (int) to 2-Bytes
+	 */
+	 pc &= 0xFFFF;
+
+ 	/*
 	 * Exit if listing file is not open
 	 */
 loop:	if (tfp == NULL)
@@ -855,7 +864,7 @@ char *str;
 	int i;
 
 	for (i=0; i<n; i++) {
-		if ((ctype[*str++] & rdx) == 0)
+		if ((ctype[*str++ & 0x007F] & rdx) == 0)
 			return(0);
 	}
 	return(1);

@@ -1,7 +1,7 @@
 /* m04mch.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,7 +21,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register op, t1, t2, type;
+	register int op, t1, t2, type;
 	struct expr e1, e2, e3;
 	struct area *espa;
 	int c, v1, v2, v3;
@@ -72,7 +72,7 @@ struct mne *mp;
 			aerr();
 		if (e1.e_base.e_ap != dot.s_area)
 			rerr();
-		outab(op | v1&0x1F);
+		outab(op | (v1&0x1F));
 		break;
 
 	case S_TYP1:
@@ -87,7 +87,7 @@ struct mne *mp;
 	case S_TYP2:
 	case S_TYP3:
 		t1 = addr(&e1);
-		if (type == S_TYP3 & t1 == S_IMMED) {
+		if ((type == S_TYP3) & (t1 == S_IMMED)) {
 			outab(op|0x08);
 			outrb(&e1, 0);
 			break;
@@ -95,7 +95,7 @@ struct mne *mp;
 		if (t1 == S_DIR) {
 			v1 = e1.e_addr;
 			if ((e1.e_base.e_ap == NULL) &
-			    v1 >= 0x80 & v1 <= 0x83) {
+			    (v1 >= 0x80) & (v1 <= 0x83)) {
 				v1 &= 0x03;
 				if (op == 0xE0) {
 					outab(0xAC | v1);
@@ -167,14 +167,13 @@ struct mne *mp;
 	case S_BPM:
 	case S_BXPM:
 	case S_BYPM:
-		expr(&e2, 0);
-		outab(op);
-		if (type == S_BPM)
-			v1 = 0xFF;
+		v1 = 0xFF;
 		if (type == S_BXPM)
 			v1 = 0x80;
 		if (type == S_BYPM)
 			v1 = 0x81;
+		expr(&e2, 0);
+		outab(op);
 		outab(v1);
 		if (mchpcr(&e2)) {
 			v2 = e2.e_addr - dot.s_addr - 1;

@@ -1,7 +1,7 @@
 /* lklex.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,12 +21,12 @@
  *
  *	lklex.c contains the fllowing functions:
  *		char	endline()
- *		char	get()
+ *		int	get()
  *		VOID	getfid()
  *		VOID	getid()
  *		int	getline()
  *		int	getmap()
- *		char	getnb()
+ *		int	getnb()
  *		int	more()
  *		VOID	skip()
  *		VOID	unget()
@@ -64,8 +64,8 @@
  *					being processed.
  *
  *	called functions:
- *		char	get()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	get()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -76,7 +76,7 @@
 
 VOID
 getid(id, c)
-register c;
+register int c;
 char *id;
 {
 	register char *p;
@@ -100,26 +100,17 @@ char *id;
  *		int	c		this is first character to
  *					copy to the string buffer
  *
- *	The function getfid() scans the current input text line
- *	from the current position copying the next string
- *	into the external string buffer (str).  The string ends when a
- *	non SPACE type character is found. The maximum number of
- *	characters copied is FILSPC-1. If the input string is larger than
- *	FILSPC-1 characters then the string is truncated, if the input string
- *	is shorter than FILSPC-1 characters then the string is NULL filled.
+ *	The function getfid() copies a string of characters from
+ *	the current text line into the external string buffer (str).
+ *	The maximum number of characters copied is FILSPC-1.  The
+ *	string is terminated by a 'space', 'tab' or end of string.
  *
  *	local variables:
  *		char *	p		pointer to external string buffer
  *		int	c		current character value
  *
- *	global variables:
- *		char	ctype[]		a character array which defines the
- *					type of character being processed.
- *					This index is the character
- *					being processed.
- *
  *	called functions:
- *		char	get()		lklex.c
+ *		int	get()		lklex.c
  *
  *	side effects:
  *		use of get() updates the global pointer ip
@@ -128,7 +119,7 @@ char *id;
 
 VOID
 getfid(str, c)
-register c;
+register int c;
 char *str;
 {
 	register char *p;
@@ -137,13 +128,12 @@ char *str;
 	do {
 		if (p < &str[FILSPC-1])
 			*p++ = c;
-		c = get();
-	} while (c && (ctype[c] != SPACE));
-	while (p < &str[FILSPC])
-		*p++ = 0;
+		c = get();		
+	} while ((c != 0) && (c != ' ') && (c != '\t'));
+	*p++ = 0;
 }
 
-/*)Function	char	getnb()
+/*)Function	int	getnb()
  *
  *	The function getnb() scans the current input text
  *	line returning the first character not a SPACE or TAB.
@@ -155,17 +145,17 @@ char *str;
  *		none
  *
  *	called functions:
- *		char	get()		lklex.c
+ *		int	get()		lklex.c
  *
  *	side effects:
  *		use of get() updates the global pointer ip, the position
  *		in the current input text line
  */
 
-char
+int
 getnb()
 {
-	register c;
+	register int c;
 
 	while ((c=get())==' ' || c=='\t')
 		;
@@ -185,8 +175,8 @@ getnb()
  *				 	ASCII character
  *		
  *	functions called:
- *		char	get()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	get()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -195,7 +185,7 @@ getnb()
 
 VOID
 skip(c)
-register c;
+register int c;
 {
 	if (c < 0)
 		c = getnb();
@@ -203,7 +193,7 @@ register c;
 	unget(c);
 }
 
-/*)Function	char	get()
+/*)Function	int	get()
  *
  *	The function get() returns the next character in the
  *	input text line, at the end of the line a
@@ -226,14 +216,14 @@ register c;
  *		line, ip is not updated.
  */
 
-char
+int
 get()
 {
-	register c;
+	register int c;
 
 	if ((c = *ip) != 0)
 		++ip;
-	return (c);
+	return (c & 0x007F);
 }
 
 /*)Function	VOID	unget(c)
@@ -266,6 +256,7 @@ get()
 
 VOID
 unget(c)
+int c;
 {
 	if (c != 0)
 		--ip;
@@ -294,7 +285,7 @@ unget(c)
  *		none
  *
  *	called functions:
- *		char	get()		lklex.c
+ *		int	get()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -304,8 +295,9 @@ unget(c)
 
 int
 getmap(d)
+int d;
 {
-	register c, n, v;
+	register int c, n, v;
 
 	if ((c = get()) == '\0')
 		return (-1);
@@ -413,15 +405,16 @@ getmap(d)
 int
 getline()
 {
-	register i, ftype;
+	register int i, ftype;
 	register char *fid;
 
-loop:	if (pflag && cfp && cfp->f_type == F_STD)
+loop:	if (cfp && cfp->f_type == F_STD)
 		fprintf(stdout, "ASlink >> ");
 
 	if (sfp == NULL || fgets(ib, sizeof ib, sfp) == NULL) {
 		if (sfp) {
-			fclose(sfp);
+			if(sfp != stdin)
+				fclose(sfp);
 			lkulist(0);
 		}
 		if (cfp == NULL) {
@@ -436,13 +429,13 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 				sfp = stdin;
 			} else
 			if (ftype == F_LNK) {
-				sfp = afile(fid, "LNK", 0);
+				sfp = afile(fid, "lnk", 0);
 			} else
 			if (ftype == F_REL) {
-				sfp = afile(fid, "REL", 0);
+				sfp = afile(fid, "rel", 0);
 				if (uflag && pass != 0) {
-				 if ((tfp = afile(fid, "LST", 0)) != NULL) {
-				  if ((rfp = afile(fid, "RST", 1)) == NULL) {
+				 if ((tfp = afile(fid, "lst", 0)) != NULL) {
+				  if ((rfp = afile(fid, "rst", 1)) == NULL) {
 					fclose(tfp);
 					tfp = NULL;
 				  }
@@ -451,10 +444,10 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 				gline = 1;
 			} else {
 				fprintf(stderr, "Invalid file type\n");
-				lkexit(1);
+				lkexit(ER_FATAL);
 			}
 			if (sfp == NULL) {
-				lkexit(1);
+				lkexit(ER_FATAL);
 			}
 			goto loop;
 		} else {
@@ -483,7 +476,7 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
  *		none
  *
  *	called functions:
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -494,7 +487,7 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 int
 more()
 {
-	register c;
+	register int c;
 
 	c = getnb();
 	unget(c);
@@ -516,7 +509,7 @@ more()
  *		none
  *
  *	called functions:
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *
  *	side effects:
  *		Use of getnb() updates the global pointer ip the
@@ -526,7 +519,7 @@ more()
 char
 endline()
 {
-	register c;
+	register int c;
 
 	c = getnb();
 	return( (c == '\0' || c == ';') ? 0 : c );

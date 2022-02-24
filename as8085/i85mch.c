@@ -1,7 +1,7 @@
 /* i85mch.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -130,6 +130,8 @@ comma()
  */
 VOID
 out3(a, b)
+int a;
+int b;
 {
 	outab(a | (b<<3));
 }
@@ -141,6 +143,8 @@ out3(a, b)
  */
 int
 regpair(r, s)
+int r;
+int s;
 {
 	if (r < M) {
 		if (r&01)

@@ -1,7 +1,7 @@
 /* h8adr.c */
 
 /*
- * (C) Copyright 1994-1998
+ * (C) Copyright 1994-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,15 +14,15 @@
 #include "asxxxx.h"
 #include "h8.h"
 
-int index;
+int aindx;
 
 int
 addr(esp)
 register struct expr *esp;
 {
-	register c;
+	register int c;
 
-	index = 0;
+	aindx = 0;
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
 		if (esp->e_flag || esp->e_base.e_ap) {
@@ -65,7 +65,7 @@ register struct expr *esp;
 			switch(esp->e_mode) {
 			case S_BREG:	/* Register Indirect */
 				aerr();
-				index &= ~0x0008;
+				aindx &= ~0x0008;
 				esp->e_mode = S_INDR;
 				break;
 			
@@ -148,8 +148,6 @@ int
 addr1(esp)
 register struct expr *esp;
 {
-	register c;
-
 	if (admode(bytereg)) {
 		esp->e_mode = S_BREG;
 	} else
@@ -175,7 +173,7 @@ register struct expr *esp;
 /*
  * Enter admode() to search a specific addressing mode table
  * for a match. Return (1) for a match, (0) for no match.
- * 'index' contains the value of the addressing mode.
+ * 'aindx' contains the value of the addressing mode.
  */
 int
 admode(sp)
@@ -189,9 +187,9 @@ register struct adsym *sp;
 	unget(getnb());
 
 	i = 0;
-	while ( *(ptr = (char *) &sp[i]) ) {
+	while ( *(ptr = &sp[i].a_str[0]) ) {
 		if (srch(ptr)) {
-			index = sp[i].a_val;
+			aindx = sp[i].a_val;
 			return(1);
 		}
 		i++;
@@ -211,12 +209,12 @@ register char *str;
 	ptr = ip;
 
 	while (*ptr && *str) {
-		if (ccase[*ptr] != ccase[*str])
+		if (ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
 			break;
 		ptr++;
 		str++;
 	}
-	if (ccase[*ptr] == ccase[*str]) {
+	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
 		ip = ptr;
 		return(1);
 	}
@@ -243,68 +241,68 @@ char    c, *str;
 }
 
 struct adsym	bytereg[] = {	/* any byte register */
-	"r0h",	0x00,
-	"r0l",	0x08,
-	"r1h",	0x01,
-	"r1l",	0x09,
-	"r2h",	0x02,
-	"r2l",	0x0A,
-	"r3h",	0x03,
-	"r3l",	0x0B,
-	"r4h",	0x04,
-	"r4l",	0x0C,
-	"r5h",	0x05,
-	"r5l",	0x0D,
-	"r6h",	0x06,
-	"r6l",	0x0E,
-	"r7h",	0x07,
-	"r7l",	0x0F,
-	"sph",	0x07,
-	"spl",	0x0F,
-	"",	0x00
+    {	"r0h",	0x00	},
+    {	"r0l",	0x08	},
+    {	"r1h",	0x01	},
+    {	"r1l",	0x09	},
+    {	"r2h",	0x02	},
+    {	"r2l",	0x0A	},
+    {	"r3h",	0x03	},
+    {	"r3l",	0x0B	},
+    {	"r4h",	0x04	},
+    {	"r4l",	0x0C	},
+    {	"r5h",	0x05	},
+    {	"r5l",	0x0D	},
+    {	"r6h",	0x06	},
+    {	"r6l",	0x0E	},
+    {	"r7h",	0x07	},
+    {	"r7l",	0x0F	},
+    {	"sph",	0x07	},
+    {	"spl",	0x0F	},
+    {	"",	0x00	}
 };
 
 struct adsym	wordreg[] = {	/* any word register */
-	"r0",	0x00,
-	"r1",	0x01,
-	"r2",	0x02,
-	"r3",	0x03,
-	"r4",	0x04,
-	"r5",	0x05,
-	"r6",	0x06,
-	"r7",	0x07,
-	"sp",	0x07,
-	"",	0x00
+    {	"r0",	0x00	},
+    {	"r1",	0x01	},
+    {	"r2",	0x02	},
+    {	"r3",	0x03	},
+    {	"r4",	0x04	},
+    {	"r5",	0x05	},
+    {	"r6",	0x06	},
+    {	"r7",	0x07	},
+    {	"sp",	0x07	},
+    {	"",	0x00	}
 };
 
 struct adsym	autoinc[] = {	/* autoincrement any word register */
-	"r0+",	0x00,
-	"r1+",	0x01,
-	"r2+",	0x02,
-	"r3+",	0x03,
-	"r4+",	0x04,
-	"r5+",	0x05,
-	"r6+",	0x06,
-	"r7+",	0x07,
-	"sp+",	0x07,
-	"",	0x00
+    {	"r0+",	0x00	},
+    {	"r1+",	0x01	},
+    {	"r2+",	0x02	},
+    {	"r3+",	0x03	},
+    {	"r4+",	0x04	},
+    {	"r5+",	0x05	},
+    {	"r6+",	0x06	},
+    {	"r7+",	0x07	},
+    {	"sp+",	0x07	},
+    {	"",	0x00	}
 };
 
 struct adsym	autodec[] = {	/* autodecrement any word register */
-	"-r0",	0x00,
-	"-r1",	0x01,
-	"-r2",	0x02,
-	"-r3",	0x03,
-	"-r4",	0x04,
-	"-r5",	0x05,
-	"-r6",	0x06,
-	"-r7",	0x07,
-	"-sp",	0x07,
-	"",	0x00
+    {	"-r0",	0x00	},
+    {	"-r1",	0x01	},
+    {	"-r2",	0x02	},
+    {	"-r3",	0x03	},
+    {	"-r4",	0x04	},
+    {	"-r5",	0x05	},
+    {	"-r6",	0x06	},
+    {	"-r7",	0x07	},
+    {	"-sp",	0x07	},
+    {	"",	0x00	}
 };
 
 struct adsym	ccr_reg[] = {	/* CCR register */
-	"ccr",	0x00,
-	"",	0x00
+    {	"ccr",	0x00	},
+    {	"",	0x00	}
 };
 

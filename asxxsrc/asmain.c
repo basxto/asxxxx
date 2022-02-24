@@ -1,7 +1,7 @@
 /* asmain.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -23,10 +23,11 @@
  *	assembler parsing code.
  *
  *	asmain.c contains the following functions:
- *		VOID	main(argc, argv)
- *		VOID	asexit()
+ *		int	main(argc, argv)
+ *		VOID	asexit(n)
  *		VOID	asmbl()
  *		FILE *	afile(fn, ft, wf)
+ *		int	fndidx(str)
  *		VOID	newdot(nap)
  *		VOID	phase(ap, a)
  *		VOID	usage()
@@ -35,7 +36,7 @@
  *	references the usage text strings printed by usage().
  */
 
-/*)Function	VOID	main(argc, argv)
+/*)Function	int	main(argc, argv)
  *
  *		int	argc		argument count
  *		char *	argv		array of pointers to argument strings
@@ -65,6 +66,7 @@
  *	global variables:
  *		int	aflag		-a, make all symbols global flag
  *		char	afn[]		afile() constructed filespec
+ *		int	afp		afile constructed path length
  *		area *	areap		pointer to an area structure
  *		int	aserr		assembler error counter
  *		int	cb[]		array of assembler output values
@@ -110,6 +112,7 @@
  *					16 (hexadecimal)
  *		int	sflag		-s, generate symbol table flag
  *		char	srcfn[][]	array of source file names
+ *		int	srcfp[]		array of source file path lengths
  *		int	srcline[]	current source file line
  *		char	stb[]		Subtitle string buffer
  *		sym *	symp		pointer to a symbol structure
@@ -148,12 +151,13 @@
  *		REL, LST, and/or SYM files may be generated.
  */
 
-VOID
+int
 main(argc, argv)
+int argc;
 char *argv[];
 {
 	register char *p;
-	register c, i;
+	register int c, i;
 	struct area *ap;
 
 	fprintf(stdout, "\n");
@@ -163,7 +167,7 @@ char *argv[];
 		p = argv[i];
 		if (*p == '-') {
 			if (inpfil >= 0)
-				usage();
+				usage(ER_FATAL);
 			++p;
 			while ((c = *p++) != 0)
 				switch(c) {
@@ -229,27 +233,28 @@ char *argv[];
 					break;
 
 				default:
-					usage();
+					usage(ER_FATAL);
 				}
 		} else {
 			if (++inpfil == MAXFIL) {
 				fprintf(stderr, "too many input files\n");
-				asexit(1);
+				asexit(ER_FATAL);
 			}
 			sfp[inpfil] = afile(p, "", 0);
 			strcpy(srcfn[inpfil],afn);
+			srcfp[inpfil] = afp;
 			if (inpfil == 0) {
 				if (lflag)
-					lfp = afile(p, "LST", 1);
+					lfp = afile(p, "lst", 1);
 				if (oflag)
-					ofp = afile(p, "REL", 1);
+					ofp = afile(p, "rel", 1);
 				if (sflag)
-					tfp = afile(p, "SYM", 1);
+					tfp = afile(p, "sym", 1);
 			}
 		}
 	}
 	if (inpfil < 0)
-		usage();
+		usage(ER_WARNING);
 	syminit();
 	for (pass=0; pass<3; ++pass) {
 		aserr = 0;
@@ -269,6 +274,8 @@ char *argv[];
 		stb[0] = 0;
 		lop  = NLPP;
 		cfile = 0;
+		strcpy(afn, srcfn[cfile]);
+		afp = srcfp[cfile];
 		incfil = -1;
 		for (i = 0; i <= inpfil; i++)
 			rewind(sfp[i]);
@@ -309,7 +316,8 @@ char *argv[];
 	if (lflag) {
 		lstsym(lfp);
 	}
-	asexit(aserr);
+	asexit(aserr ? ER_ERROR : ER_NONE);
+	return(0);
 }
 
 /*)Function	VOID	asexit(i)
@@ -397,6 +405,7 @@ int i;
  *					values indexed by tlevel
  *		FILE *	ifp[]		array of include-file file handles
  *		char	incfn[][]	array of include file names
+ *		int	incfp[]		array of include file path lengths
  *		int	incline[]	current include file line
  *		int	incfil		current file handle index
  *					for include files
@@ -422,11 +431,12 @@ int i;
  *		char	endline()	aslex.c
  *		VOID	err()		assubr.c
  *		VOID	expr()		asexpr.c
+ *		int	fndidx()	asmain.c
  *		FILE *	fopen()		c-library
- *		char	get()		aslex.c
+ *		int	get()		aslex.c
  *		VOID	getid()		aslex.c
  *		int	getmap()	aslex.c
- *		char	getnb()		aslex.c
+ *		int	getnb()		aslex.c
  *		VOID	getst()		aslex.c
  *		sym *	lookup()	assym.c
  *		VOID	machin()	___mch.c
@@ -453,12 +463,12 @@ asmbl()
 	register struct mne *mp;
 	register struct sym *sp;
 	register struct tsym *tp;
-	register c;
+	register int c;
 	struct area  *ap;
 	struct expr e1;
 	char id[NCPS];
 	char opt[NCPS];
-	char fn[FILSPC];
+	char fn[FILSPC+FILSPC];
 	char *p;
 	int d, n, uaf, uf;
 
@@ -538,12 +548,13 @@ loop:
 	 * symbol, assembler directive, or assembler mnemonic is
 	 * being processed.
 	 */
-	if ((ctype[c] & LETTER) == 0)
+	if ((ctype[c] & LETTER) == 0) {
 		if (flevel) {
 			return;
 		} else {
 			qerr();
 		}
+	}
 	getid(id, c);
 	c = getnb();
 	/*
@@ -882,26 +893,54 @@ loop:
 		break;
 
 	case S_INCL:
+		lmode = SLIST;
+    		if (++incfil == MAXINC) {
+			--incfil;
+			err('i');
+			break;
+		}
+		/*
+		 * Copy path of file opening the include file
+		 */
+		strncpy(fn,afn,afp);
+		p = fn + afp;
+		/*
+		 * Concatenate the .include file specification
+		 */
 		d = getnb();
-		p = fn;
 		while ((c = get()) != d) {
-			if (p < &fn[FILSPC-1]) {
+			if (p < &fn[FILSPC+FILSPC-1]) {
 				*p++ = c;
 			} else {
 				break;
 			}
 		}
 		*p = 0;
-		if (++incfil == MAXINC ||
-		   (ifp[incfil] = fopen(fn, "r")) == NULL) {
+		/*
+		 * If .include specifies a path
+		 * 	use it
+		 * else
+		 *	use path of file opening the include file
+		 */
+		if (fndidx(fn + afp) != 0) {
+			afilex(fn + afp, "");
+		} else {
+			afilex(fn, "");
+		}
+		/*
+		 * Open File
+		 */
+    		if ((ifp[incfil] = fopen(afntmp, "r")) == NULL) {
 			--incfil;
 			err('i');
 		} else {
 			lop = NLPP;
 			incline[incfil] = 0;
-			strcpy(incfn[incfil],fn);
+			strcpy(afn, afntmp);
+			afp = afptmp;
+			strcpy(incfn[incfil],afn);
+			incfp[incfil] = afp;
 		}
-		lmode = SLIST;
 		break;
 
 	/*
@@ -922,35 +961,25 @@ loop:
  *		int	wf		read(0)/write(1) flag
  *
  *	The function afile() opens a file for reading or writing.
- *		(1)	If the file type specification string ft
- *			is not NULL then a file specification is
- *			constructed with the file path\name in fn
- *			and the extension in ft.
- *		(2)	If the file type specification string ft
- *			is NULL then the file specification is
- *			constructed from fn.  If fn does not have
- *			a file type then the default source file
- *			type dsft is appended to the file specification.
  *
  *	afile() returns a file handle for the opened file or aborts
  *	the assembler on an open error.
  *
  *	local variables:
- *		int	c		character value
- *		FILE *	fp		filehandle for opened file
- *		char *	p1		pointer to filespec string fn
- *		char *	p2		pointer to filespec string fb
- *		char *	p3		pointer to filetype string ft
+ *		FILE *	fp		file handle for opened file
  *
  *	global variables:
  *		char	afn[]		afile() constructed filespec
- *		char	dsft[]		default assembler file type string
- *		char	afn[]		constructed file specification string
+ *		int	afp		afile() constructed path length
+ *		char	afntmp[]	afilex() constructed filespec
+ *		int	afptmp		afilex() constructed path length
  *
  *	functions called:
- *		VOID	asexit()	asmain.c
+ *		VOID	afilex()	asmain.c
+ *		int	fndidx()	asmain.c
  *		FILE *	fopen()		c_library
  *		int	fprintf()	c_library
+ *		char *	strcpy()	c_library
  *
  *	side effects:
  *		File is opened for read or write.
@@ -962,35 +991,147 @@ char *fn;
 char *ft;
 int wf;
 {
-	register char *p1, *p2, *p3;
-	register c;
 	FILE *fp;
 
-	p1 = fn;
-	p2 = afn;
-	p3 = ft;
-	while ((c = *p1++) != 0 && c != FSEPX) {
-		if (p2 < &afn[FILSPC-4])
-			*p2++ = c;
+	afilex(fn, ft);
+
+	if ((fp = fopen(afntmp, wf?"w":"r")) == NULL) {
+	    fprintf(stderr, "%s: cannot %s.\n", afntmp, wf?"create":"open");
+	    asexit(ER_FATAL);
 	}
-	*p2++ = FSEPX;
-	if (*p3 == 0) {
+
+	strcpy(afn, afntmp);
+	afp = afptmp;
+
+	return (fp);
+}
+
+/*)Function	VOID	afilex(fn, ft)
+ *
+ *		char *	fn		file specification string
+ *		char *	ft		file type string
+ *
+ *	The function afilex() processes the file specification string:
+ *		(1)	If the file type specification string ft
+ *			is not NULL then a file specification is
+ *			constructed with the file path\name in fn
+ *			and the extension in ft.
+ *		(2)	If the file type specification string ft
+ *			is NULL then the file specification is
+ *			constructed from fn.  If fn does not have
+ *			a file type then the default source file
+ *			type dsft is appended to the file specification.
+ *
+ *	afilex() aborts the assembler on a file specification length error.
+ *
+ *	local variables:
+ *		int	c		character value
+ *		char *	p1		pointer into filespec string afntmp
+ *		char *	p2		pointer into filespec string fn
+ *		char *	p3		pointer to filetype string ft
+ *
+ *	global variables:
+ *		char	afntmp[]	afilex() constructed filespec
+ *		int	afptmp		afilex() constructed path length
+ *		char	dsft[]		default assembler file type string
+ *
+ *	functions called:
+ *		VOID	asexit()	asmain.c
+ *		int	fndidx()	asmain.c
+ *		int	fprintf()	c_library
+ *		char *	strcpy()	c_library
+ *
+ *	side effects:
+ *		File specification string may be modified.
+ */
+
+VOID
+afilex(fn, ft)
+char *fn;
+char *ft;
+{
+	register char *p1, *p2, *p3;
+	register int c;
+
+	if (strlen(fn) > (FILSPC-5)) {
+		fprintf(stderr, "File Specification %s is too long.", fn);
+		asexit(ER_FATAL);
+	}
+
+	/*
+	 * Save the File Name Index
+	 */
+	strcpy(afntmp, fn);
+	afptmp = fndidx(afntmp);
+	p1 = afntmp + afptmp;
+
+	/*
+	 * Skip to File Extension Seperator
+	 */
+	p2 = &fn[afptmp];
+	while (((c = *p2++) != 0) && (c != FSEPX)) {
+		p1++;
+	}
+	*p1++ = FSEPX;
+
+	/*
+	 * Copy File Extension
+	 */
+	 p3 = ft;
+	 if (*p3 == 0) {
 		if (c == FSEPX) {
-			p3 = p1;
+			p3 = p2;
 		} else {
 			p3 = dsft;
 		}
 	}
 	while ((c = *p3++) != 0) {
-		if (p2 < &afn[FILSPC-1])
-			*p2++ = c;
+		if (p1 < &afntmp[FILSPC-1])
+			*p1++ = c;
 	}
-	*p2++ = 0;
-	if ((fp = fopen(afn, wf?"w":"r")) == NULL) {
-		fprintf(stderr, "%s: cannot %s.\n", afn, wf?"create":"open");
-		asexit(1);
-	}
-	return (fp);
+	*p1++ = 0;
+}
+
+/*)Function	int	fndidx(str)
+ *
+ *		char *	str		file specification string
+ *
+ *	The function fndidx() scans the file specification string
+ *	to find the index to the file name.  If the file
+ *	specification contains a 'path' then the index will
+ *	be non zero.
+ *
+ *	fndidx() returns the index value.
+ *
+ *	local variables:
+ *		char *	p1		temporary pointer
+ *		char *	p2		temporary pointer
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		char *	strrchr()	c_library
+ *
+ *	side effects:
+ *		none
+ */
+
+int
+fndidx(str)
+char *str;
+{
+	register char *p1, *p2;
+
+	/*
+	 * Skip Path Delimiters
+	 */
+	p1 = str;
+	if ((p2 = strrchr(p1,  ':')) != NULL) { p1 = p2 + 1; }
+	if ((p2 = strrchr(p1,  '/')) != NULL) { p1 = p2 + 1; }
+	if ((p2 = strrchr(p1, '\\')) != NULL) { p1 = p2 + 1; }
+
+	return(p1 - str);
 }
 
 /*)Function	VOID	newdot(nap)
@@ -1088,7 +1229,9 @@ char *usetxt[] = {
 	0
 };
 
-/*)Function	VOID	usage()
+/*)Function	VOID	usage(n)
+ *
+ *		int	n		exit code
  *
  *	The function usage() outputs to the stderr device the
  *	assembler name and version and a list of valid assembler options.
@@ -1110,12 +1253,13 @@ char *usetxt[] = {
  */
 
 VOID
-usage()
+usage(n)
+int n;
 {
 	register char   **dp;
 
 	fprintf(stderr, "\nASxxxx Assembler %s  (%s)\n\n", VERSION, cpu);
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
-	asexit(1);
+	asexit(n);
 }

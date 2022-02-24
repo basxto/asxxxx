@@ -1,7 +1,7 @@
 /* m04ext.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,4 +16,4 @@
 
 char	*cpu	= "Motorola 6804";
 int	hilo	= 1;
-char	*dsft	= "ASM";
+char	*dsft	= "asm";

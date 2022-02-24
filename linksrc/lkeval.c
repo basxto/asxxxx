@@ -1,7 +1,7 @@
 /* lkeval.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -40,6 +40,13 @@
  *	The function eval() evaluates a character string to a
  *	numerical value.
  *
+ *	Notes about the arithmetic:
+ *		The coding emulates 16-Bit unsigned
+ *		arithmetic operations.  This allows
+ *		program compilation without regard to the
+ *		intrinsic integer length of the host
+ *		machine.
+ *
  *	local variables:
  *		int	c		character from input string
  *		int	v		value of character in current radix
@@ -50,8 +57,8 @@
  *
  *	functions called:
  *		int	digit()		lkeval.c
- *		char	get()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	get()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
@@ -62,7 +69,7 @@
 addr_t
 eval()
 {
-	register c, v;
+	register int c, v;
 	register addr_t n;
 
 	c = getnb();
@@ -72,7 +79,7 @@ eval()
 		c = get();
 	}
 	unget(c);
-	return(n);
+	return((n & 0x8000) ? n | ~0x7FFF : n & 0x7FFF);
 }
 
 /*)Function	addr_t	expr(n)
@@ -83,6 +90,13 @@ eval()
  *
  *	The function expr() evaluates an expression and
  *	returns the value.
+ *
+ *	Notes about the arithmetic:
+ *		The coding emulates 16-Bit unsigned
+ *		arithmetic operations.  This allows
+ *		program compilation without regard to the
+ *		intrinsic integer length of the host
+ *		machine.
  *
  *	local variables:
  *		int	c		current input text character
@@ -113,8 +127,9 @@ eval()
 
 addr_t
 expr (n)
+int n;
 {
-	register c, p;
+	register int c, p;
 	register addr_t v, ve;
 
 	v = term();
@@ -127,6 +142,13 @@ expr (n)
 			return(v);
 		}
 		ve = expr(p);
+
+		/*
+		 * 16-Bit Unsigned Aritmetic
+		 */
+		v  &= 0xFFFF;
+		ve &= 0xFFFF;
+
 		if (c == '+') {
 			v += ve;
 		} else
@@ -140,7 +162,11 @@ expr (n)
 				break;
 
 			case '/':
-				v /= ve;
+				if (ve == 0) {
+					v = 0;
+				} else {
+					v /= ve;
+				}
 				break;
 
 			case '&':
@@ -152,7 +178,11 @@ expr (n)
 				break;
 
 			case '%':
-				v %= ve;
+				if (ve == 0) {
+					v = 0;
+				} else {
+					v %= ve;
+				}
 				break;
 
 			case '^':
@@ -168,6 +198,7 @@ expr (n)
 				break;
 			}
 		}
+		v = (v & 0x8000) ? v | ~0x7FFF : v & 0x7FFF;
 	}
 	unget(c);
 	return(v);
@@ -178,6 +209,13 @@ expr (n)
  *	The function term() evaluates a single constant
  *	or symbol value prefaced by any unary operator
  *	( +, -, ~, ', ", >, or < ).
+ *
+ *	Notes about the arithmetic:
+ *		The coding emulates 16-Bit unsigned
+ *		arithmetic operations.  This allows
+ *		program compilation without regard to the
+ *		intrinsic integer length of the host
+ *		machine.
  *
  *	local variables:
  *		int	c		current character
@@ -211,7 +249,7 @@ expr (n)
 addr_t
 term()
 {
-	register c, r, n;
+	register int c, r, n;
 	register addr_t v;
 	struct sym *sp;
 	char id[NCPS];
@@ -243,7 +281,7 @@ term()
 			v  =  getmap(-1)&0377;
 			v |= (getmap(-1)&0377)<<8;
 		}
-		return(v);
+		return((v & 0x8000) ? v | ~0x7FFF : v & 0x7FFF);
 	}
 	if (c == '>' || c == '<') {
 		v = expr(100);
@@ -291,7 +329,7 @@ term()
 			c = get();
 		}
 		unget(c);
-		return(v);
+		return((v & 0x8000) ? v | ~0x7FFF : v & 0x7FFF);
 	}
 	if (ctype[c] & LETTER) {
 		getid(id, c);
@@ -303,6 +341,9 @@ term()
 			return(symval(sp));
 		}
 	}
+	fprintf(stderr, "Unknown operator %c\n", c);
+	lkerr++;
+	return(0);
 }
 
 /*)Function	int	digit(c, r)
@@ -330,7 +371,7 @@ term()
 
 int
 digit(c, r)
-register c, r;
+register int c, r;
 {
 	if (r == 16) {
 		if (ctype[c] & RAD16) {
@@ -378,7 +419,7 @@ register c, r;
  
 int
 oprio(c)
-register c;
+register int c;
 {
 	if (c == '*' || c == '/' || c == '%')
 		return (10);

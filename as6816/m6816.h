@@ -1,7 +1,7 @@
 /* m6816.h */
 
 /*
- * (C) Copyright 1991-1998
+ * (C) Copyright 1991-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -102,16 +102,18 @@ extern struct adsym pulm[];
 
 	/* m16adr.c */
 extern	int		addr();
-extern	int		amode();
+extern	int		admode();
 extern	int		any();
 extern	int		srch();
 
 	/* m16mch.c */
-extern	VOID		machin();
+extern	VOID		machine();
 extern	int		mchabs();
 extern	VOID		mchubyt();
 extern	int		mchindx();
 extern	int		mchimm();
+extern	int		mchcon();
+extern	int		mchpcr();
 extern	VOID		minit();
 extern	int		setbit();
 extern	int		getbit();

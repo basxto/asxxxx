@@ -1,7 +1,7 @@
 /* M16EXT:C */
 
 /*
- * (C) Copyright 1991-1998
+ * (C) Copyright 1991-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,5 +14,5 @@
 #include "asxxxx.h"
 
 char	*cpu	= "Motorola 68HC16";
-char	*dsft	= "ASM";
 int	hilo	= 1;
+char	*dsft	= "asm";

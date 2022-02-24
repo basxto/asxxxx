@@ -1,7 +1,7 @@
 /* lkmain.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -26,11 +26,13 @@
  *		FILE *	afile()
  *		VOID	bassav()
  *		VOID	gblsav()
-  *		VOID	link()
+ *		VOID	link()
  *		VOID	lkexit()
- *		VOID	main()
+ *		int	fndidx()
+ *		int	main()
  *		VOID	map()
  *		int	parse()
+ *		VOID	doparse()
  *		VOID	setbas()
  *		VOID	setgbl()
  *		VOID	usage()
@@ -41,7 +43,7 @@
  *
  */
 
-/*)Function	VOID	main(argc,argv)
+/*)Function	int	main(argc,argv)
  *
  *		int	argc		number of command line arguments + 1
  *		char *	argv[]		array of pointers to the command line
@@ -64,6 +66,7 @@
  *		char *	p		pointer to an argument string
  *		int	c		character from argument string
  *		int	i		loop counter
+ *		int	j		loop counter
  *
  *	global variables:
  *				 	text line in ib[]
@@ -96,7 +99,6 @@
  *		FILE	*sfp		The file handle sfp points to the
  *				 	currently open file
  *		lfile	*startp		asmlnk startup file structure
- *		FILE *	stdin		c_library
  *		FILE *	stdout		c_library
  *
  *	functions called:
@@ -115,6 +117,7 @@
  *		VOID	search()	lklibr.c
  *		VOID	setbas()	lkmain.c
  *		VOID	setgbl()	lkmain.c
+ *		char *	sprintf()	c_library
  *		VOID	symdef()	lksym.c
  *		VOID	usage()		lkmain.c
  *
@@ -125,34 +128,53 @@
  *		relocated listing files (.rst).
  */
 
-VOID
+int
 main(argc, argv)
+int argc;
 char *argv[];
 {
-	register char *p;
-	register c, i;
+	register int c, i, j, k;
 
 	fprintf(stdout, "\n");
 
 	startp = (struct lfile *) new (sizeof (struct lfile));
 
 	pflag = 1;
-	for (i=1; i<argc; ++i) {
-		p = argv[i];
-		if (*p == '-') {
-			while (ctype[c = *(++p)] & LETTER) {
+
+	for(i=1; i<argc; i++) {
+		ip = ib;
+		if(argv[i][0] == '-') {
+			j = i;
+			k = 1;
+			while((c = argv[j][k]) != '\0') {
+				ip = ib;
+				sprintf(ip, "-%c", c);
 				switch(c) {
 
-				case 'c':
-				case 'C':
-					startp->f_type = F_STD;
-					break;
+				/*
+				 * Options with arguments
+				 */
+				case 'b':
+				case 'B':
+
+				case 'g':
+				case 'G':
+
+				case 'k':
+				case 'K':
+
+				case 'l':
+				case 'L':
 
 				case 'f':
 				case 'F':
-					startp->f_type = F_LNK;
+					strcat(ip, " ");
+					strcat(ip, argv[++i]);
 					break;
-					
+
+				/*
+				 * Preprocess these commands
+				 */
 				case 'n':
 				case 'N':
 					pflag = 0;
@@ -163,36 +185,27 @@ char *argv[];
 					pflag = 1;
 					break;
 
+				/*
+				 * Options without arguments
+				 */
 				default:
-					usage();
+					break;
 				}
+				if(pflag)
+					fprintf(stdout, "ASlink >> %s\n", ip);
+				parse();
+				k++;
 			}
 		} else {
-			if (startp->f_type == F_LNK) {
-				startp->f_idp = p;
-			}
+			strcpy(ip, argv[i]);
+			if(pflag)
+				fprintf(stdout, "ASlink >> %s\n", ip);
+			parse();
 		}
 	}
-	if (startp->f_type == NULL)
-		usage();
-	if (startp->f_type == F_LNK && startp->f_idp == NULL)
-		usage();
 
-	cfp = NULL;
-	sfp = NULL;
-	filep = startp;
-	while (1) {
-		ip = ib;					
-		if (getline() == 0)
-			break;
-		if (pflag && sfp != stdin)
-			fprintf(stdout, "%s\n", ip);
-		if (*ip == NULL || parse())
-			break;
-	}
-	fclose(sfp);
 	if (linkp == NULL)
-		usage();
+		usage(ER_FATAL);
 
 	syminit();
 	for (pass=0; pass<2; ++pass) {
@@ -236,15 +249,15 @@ char *argv[];
 			 * Open output file
 			 */
 			if (oflag == 1) {
-				ofp = afile(linkp->f_idp, "IHX", 1);
+				ofp = afile(linkp->f_idp, "ihx", 1);
 				if (ofp == NULL) {
-					lkexit(1);
+					lkexit(ER_FATAL);
 				}
 			} else
 			if (oflag == 2) {
-				ofp = afile(linkp->f_idp, "S19", 1);
+				ofp = afile(linkp->f_idp, "s19", 1);
 				if (ofp == NULL) {
-					lkexit(1);
+					lkexit(ER_FATAL);
 				}
 			}
 		} else {
@@ -255,7 +268,8 @@ char *argv[];
 			reloc('E');
 		}
 	}
-	lkexit(lkerr);
+	lkexit(lkerr ? ER_ERROR : ER_NONE);
+	return(0);
 }
 
 /*)Function	VOID	lkexit(i)
@@ -315,6 +329,7 @@ int i;
  *
  *	functions called:
  *		char	endline()	lklex.c
+ *		int	get()		lklex.c
  *		VOID	module()	lkhead.c
  *		VOID	newarea()	lkarea.c
  *		VOID	newhead()	lkhead.c
@@ -329,7 +344,7 @@ int i;
 VOID
 link()
 {
-	register c;
+	register int c;
 
 	if ((c=endline()) == 0) { return; }
 	switch (c) {
@@ -460,16 +475,16 @@ link()
 VOID
 map()
 {
-	register i;
+	register int i;
 	register struct head *hdp;
 	register struct lbfile *lbfh;
 
 	/*
 	 * Open Map File
 	 */
-	mfp = afile(linkp->f_idp, "MAP", 1);
+	mfp = afile(linkp->f_idp, "map", 1);
 	if (mfp == NULL) {
-		lkexit(1);
+		lkexit(ER_FATAL);
 	}
 
 	/*
@@ -553,6 +568,9 @@ map()
  *
  *	local variables:
  *		int	c		character value
+ *		int	idx		string index
+ *		int	sv_type		save type of processing
+ *		char	*p;		string pointer
  *		char	fid[]		file id string
  *
  *	global variables:
@@ -576,10 +594,12 @@ map()
  *		VOID	addlib()	lklibr.c
  *		VOID	addpath()	lklibr.c
  *		VOID	bassav()	lkmain.c
+ *		VOID	doparse()	lkmain.c
  *		int	fprintf()	c_library
  *		VOID	gblsav()	lkmain.c
  *		VOID	getfid()	lklex.c
- *		char	getnb()		lklex.c
+ *		int	get()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	lkexit()	lkmain.c
  *		char *	strsto()	lksym.c
  *		int	strlen()	c_library
@@ -592,14 +612,44 @@ map()
 int
 parse()
 {
-	register c;
-	char fid[NINPUT];
+	register int c, idx;
+	register char *p;
+	int sv_type;
+	char fid[FILSPC+FILSPC];
 
 	while ((c = getnb()) != 0) {
 		if ( c == '-') {
 			while (ctype[c=get()] & LETTER) {
 				switch(c) {
 
+				case 'c':
+				case 'C':
+					if (startp->f_type != 0)
+						break;
+					startp->f_type = F_STD;
+					doparse();
+					return(0);
+
+				case 'f':
+				case 'F':
+					if (startp->f_type == F_LNK)
+						return(0);
+					unget(getnb());
+					if (*ip == 0)
+						usage(ER_FATAL);
+					sv_type = startp->f_type;
+					startp->f_idp = ip;
+					startp->f_idx = fndidx(ip);
+					startp->f_type = F_LNK;
+					doparse();
+					if (sv_type == F_STD) {
+						cfp = NULL;
+						sfp = NULL;
+						startp->f_type = F_STD;
+						filep = startp;
+					}
+					return(0);
+					
 				case 'i':
 				case 'I':
 					oflag = 1;
@@ -696,15 +746,96 @@ parse()
 						new (sizeof (struct lfile));
 				lfp = lfp->f_flp;
 			}
-			getfid(fid, c);
-			lfp->f_idp = strsto(fid);
+			/*
+			 * Copy Path from .LNK file
+			 */
+			idx = startp->f_idx;
+			strncpy(fid, startp->f_idp, idx);
+			/*
+			 * Concatenate the .REL file spec
+			 */
+			getfid(fid + idx, c);
+			/*
+			 * If .REL file spec has a path
+			 * 	use it
+			 * else
+			 *	use path of .LNK file
+			 */
+			if (fndidx(fid + idx) != 0) {
+				p = fid + idx;
+			} else {
+				p = fid;
+			}
+			/*
+			 * Save .REL file specification
+			 */
+			lfp->f_idp = strsto(p);
+			lfp->f_idx = fndidx(p);
 			lfp->f_type = F_REL;
 		} else {
 			fprintf(stderr, "Invalid input");
-			lkexit(1);
+			lkexit(ER_FATAL);
 		}
 	}
 	return(0);
+}
+
+/*)Function	VOID	doparse()
+ *
+ *	The function doparse() evaluates all interactive
+ *	command line or file input linker directives and
+ *	updates the appropriate variables.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		FILE *	stdin		standard input
+ *		FILE *	stdout		standard output
+ *		lfile	*cfp		The pointer *cfp points to the
+ *				 	current lfile structure
+ *		FILE	*sfp		The file handle sfp points to the
+ *				 	currently open file
+ *		char	ib[NINPUT]	.rel file text line
+ *		char	*ip		pointer into the .rel file
+ *		lfile	*filep	 	The pointer *filep points to the
+ *				 	beginning of a linked list of
+ *				 	lfile structures.
+ *		lfile	*startp		asmlnk startup file structure
+ *		int	pflag		print linker command file flag
+ *
+ *	Functions called:
+ *		int	fclose()	c_library
+ *		int	fprintf()	c_library
+ *		VOID	getfid()	lklex.c
+ *		int	getline()	lklex.c
+ *		int	parse()		lkmain.c
+ *
+ *	side effects:
+ *		Various linker flags are updated and the linked
+ *		structure lfile may be updated.
+ */
+
+VOID
+doparse()
+{
+	cfp = NULL;
+	sfp = NULL;
+	filep = startp;
+	while (1) {
+		ip = ib;					
+		if (getline() == 0)
+			break;
+		if (pflag && cfp->f_type != F_STD)
+			fprintf(stdout, "ASlink >> %s\n", ip);
+		if (*ip == 0 || parse())
+			break;
+	}
+	if(sfp != stdin)
+		fclose(sfp);
+	startp->f_idp = NULL;
+	startp->f_idx = 0;
+	startp->f_type = 0;
 }
 
 /*)Function	VOID	bassav()
@@ -724,7 +855,7 @@ parse()
  *				 	text line in ib[]
  *
  *	 functions called:
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID *	new()		lksym.c
  *		int	strlen()	c_library
  *		char *	strcpy()	c_library
@@ -778,7 +909,7 @@ bassav()
  *		addr_t	expr()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		int	symeq()		lksym.c
  *
  *	side effects:
@@ -788,7 +919,7 @@ bassav()
 VOID
 setbas()
 {
-	register v;
+	register int v;
 	char id[NCPS];
 
 	bsp = basep;
@@ -834,7 +965,7 @@ setbas()
  *		int	lkerr		error flag
  *
  *	functions called:
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID *	new()		lksym.c
  *		int	strlen()	c_library
  *		char *	strcpy()	c_library
@@ -886,7 +1017,7 @@ gblsav()
  *		addr_t	expr()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	getnb()		lklex.c
  *		sym *	lkpsym()	lksym.c
  *
  *	side effects:
@@ -896,7 +1027,7 @@ gblsav()
 VOID
 setgbl()
 {
-	register v;
+	register int v;
 	register struct sym *sp;
 	char id[NCPS];
 
@@ -961,6 +1092,7 @@ setgbl()
  *		int	lkerr		error flag
  *
  *	functions called:
+ *		int	fndidx()	lkmain.c
  *		FILE *	fopen()		c_library
  *		int	fprintf()	c_library
  *
@@ -972,32 +1104,51 @@ FILE *
 afile(fn, ft, wf)
 char *fn;
 char *ft;
+int wf;
 {
 	register char *p1, *p2, *p3;
-	register c;
+	register int c;
 	FILE *fp;
 	char fb[FILSPC];
 
-	p1 = fn;
-	p2 = fb;
-	p3 = ft;
-	while ((c = *p1++) != 0 && c != FSEPX) {
-		if (p2 < &fb[FILSPC-4])
-			*p2++ = c;
+	if (strlen(fn) > (FILSPC-5)) {
+		fprintf(stderr, "File Specification %s is too long.", fn);
+		lkerr++;
+		return(NULL);
 	}
-	*p2++ = FSEPX;
-	if (*p3 == 0) {
+
+	/*
+	 * Skip The Path
+	 */
+	strcpy(fb, fn);
+	c = fndidx(fb);
+	p1 = fb + c;
+
+	/*
+	 * Skip to File Extension Seperator
+	 */
+	p2 = &fn[c];
+	while ((c = *p2++) != 0 && c != FSEPX) {
+		p1++;
+	}
+	*p1++ = FSEPX;
+
+	/*
+	 * Copy File Extension
+	 */
+	 p3 = ft;
+	 if (*p3 == 0) {
 		if (c == FSEPX) {
-			p3 = p1;
+			p3 = p2;
 		} else {
 			p3 = "REL";
 		}
 	}
 	while ((c = *p3++) != 0) {
-		if (p2 < &fb[FILSPC-1])
-			*p2++ = c;
+		if (p1 < &fb[FILSPC-1])
+			*p1++ = c;
 	}
-	*p2++ = 0;
+	*p1++ = 0;
 	if ((fp = fopen(fb, wf?"w":"r")) == NULL) {
 		fprintf(stderr, "%s: cannot %s.\n", fb, wf?"create":"open");
 		lkerr++;
@@ -1005,22 +1156,64 @@ char *ft;
 	return (fp);
 }
 
+/*)Function	int	fndidx(str)
+ *
+ *		char *	str		file specification string
+ *
+ *	The function fndidx() scans the file specification string
+ *	to find the index to the file name.  If the file
+ *	specification contains a 'path' then the index will
+ *	be non zero.
+ *
+ *	fndidx() returns the index value.
+ *
+ *	local variables:
+ *		char *	p1		temporary pointer
+ *		char *	p2		temporary pointer
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		char *	strrchr()	c_library
+ *
+ *	side effects:
+ *		none
+ */
+
+int
+fndidx(str)
+char *str;
+{
+	register char *p1, *p2;
+
+	/*
+	 * Skip Path Delimiters
+	 */
+	p1 = str;
+	if ((p2 = strrchr(p1,  ':')) != NULL) { p1 = p2 + 1; }
+	if ((p2 = strrchr(p1,  '/')) != NULL) { p1 = p2 + 1; }
+	if ((p2 = strrchr(p1, '\\')) != NULL) { p1 = p2 + 1; }
+
+	return(p1 - str);
+}
+
 char *usetxt[] = {
-	"Startup:",
-	"  -c                           Command line input",
-	"  -f   file[LNK]               File input",
-	"  -p   Prompt and echo of file[LNK] to stdout (default)",
-	"  -n   No echo of file[LNK] to stdout",
-	"Usage: [-Options] file [file ...]",
+	"Usage: [-Options] [-Option with arg] file [file ...]",
+	"  -p   Echo commands to stdout (default)",
+	"  -n   No echo of commands to stdout",
+	"Alternates to Command Line Input:",
+	"  -c                   ASlink >> prompt input",
+	"  -f   file[LNK]       Command File input",
 	"Librarys:",
-	"  -k	Library path specification, one per -k",
-	"  -l	Library file specification, one per -l",
+	"  -k   Library path specification, one per -k",
+	"  -l   Library file specification, one per -l",
 	"Relocation:",
 	"  -b   area base address = expression",
 	"  -g   global symbol = expression",
 	"Map format:",
 	"  -m   Map output generated as file[MAP]",
-	"  -w	Wide listing format for map file",
+	"  -w   Wide listing format for map file",
 	"  -x   Hexidecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
@@ -1028,16 +1221,18 @@ char *usetxt[] = {
 	"  -i   Intel Hex as file[IHX]",
 	"  -s   Motorola S19 as file[S19]",
 	"List:",
-	"  -u	Update listing file(s) with link data as file(s)[.RST]",
+	"  -u   Update listing file(s) with link data as file(s)[.RST]",
 	"Case Sensitivity:",
-	"  -z	Enable Case Sensitivity for Symbols",
+	"  -z   Enable Case Sensitivity for Symbols",
 	"End:",
 	"  -e   or null line terminates input",
 	"",
 	0
 };
 
-/*)Function	VOID	usage()
+/*)Function	VOID	usage(n)
+ *
+ *		int	n		exit code
  *
  *	The function usage() outputs to the stderr device the
  *	linker name and version and a list of valid linker options.
@@ -1057,12 +1252,13 @@ char *usetxt[] = {
  */
 
 VOID
-usage()
+usage(n)
+int n;
 {
 	register char	**dp;
 
 	fprintf(stderr, "\nASxxxx Linker %s\n\n", VERSION);
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
-	lkexit(1);
+	lkexit(n);
 }

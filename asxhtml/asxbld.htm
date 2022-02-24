@@ -26,17 +26,20 @@
 <H4><B><PRE>
    The assemblers and linker have been successfully compiled us-
 ing  the  DECUS C  (PDP-11)  compiler  (patch  level   9)   with
-RT-11/TSX+,  Eyring  Research  Institute,  Inc.   PDOS (680x0) C
-V5.4b compiler, and Symantec C/C++ V6.1/V7.2.  
+RT-11/TSX+,  GCC  2.7.2 with Linux, Symantec C/C++ V6.1/V7.2 and
+DJGPP (GCC 2.8.2) with MS-DOS and Windows 3.x/95/98.  
 
    The  device  specific  header  file  (i.e.  m6800.h, m6801.h,
 etc.) contains the DECUS C 'BUILD' directives for  generating  a
 command  file to compile, assemble, and link the necessary files
-to prepare an executable image for a particular assembler.  
+to prepare an executable image for a  particular  assembler.
 
    The required option, definition, and .mak files for building
 the assemblers with the Symantec C/C++ V6.1/V7.2 Compilers are
-included in the \asxmak directory of the PC distribution.
+included in the \asxmak\symantec\build directory.
+
+   The makefile for Linux and DJGPP are in the /asxmak/linux/build
+and \asxmak\djgpp\build directories respectively.
 
 </PRE></B></H4>
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -49,20 +52,20 @@ included in the \asxmak directory of the PC distribution.
    The  building  of  a typical assembler (6809 for example) re-
 quires the following files:  
 
-     1.  M6809.H 
-     2.  M09EXT.C 
-     3.  M09MCH.C 
-     4.  M09ADR.C 
-     5.  M09PST.C 
-     6.  ASXXXX.H 
-     7.  ASMAIN.C 
-     8.  ASLEX.C 
-     9.  ASSYM.C 
-    10.  ASSUBR.C 
-    11.  ASEXPR.C 
-    12.  ASDATA.C 
-    13.  ASLIST.C 
-    14.  ASOUT.C 
+     1.  m6809.h 
+     2.  m09ext.c 
+     3.  m09mch.c 
+     4.  m09adr.c 
+     5.  m09pst.c 
+     6.  asxxxx.h 
+     7.  asmain.c 
+     8.  aslex.c 
+     9.  assym.c 
+    10.  assubr.c 
+    11.  asexpr.c 
+    12.  asdata.c 
+    13.  aslist.c 
+    14.  asout.c 
 
 
    The  first  five  files are the 6809 processor dependent sec-
@@ -101,19 +104,19 @@ assembler directive processing.
 <H4><B><PRE>
    The building of the linker requires the following files:  
 
-     1.  ASLINK.H 
-     2.  LKMAIN.C 
-     3.  LKLEX.C 
-     4.  LKAREA.C 
-     5.  LKHEAD.C 
-     6.  LKSYM.C 
-     7.  LKEVAL.C 
-     8.  LKDATA.C 
-     9.  LKLIST.C 
-    10.  LKRLOC.C 
-    11.  LKLIBR.C 
-    12.  LKS19.C 
-    13.  LKIHX.C 
+     1.  aslink.h 
+     2.  lkmain.c 
+     3.  lklex.c 
+     4.  lkarea.c 
+     5.  lkhead.c 
+     6.  lksym.c 
+     7.  lkeval.c 
+     8.  lkdata.c 
+     9.  lklist.c 
+    10.  lkrloc.c 
+    11.  lklibr.c 
+    12.  lks19.c 
+    13.  lkihx.c 
 
 <H5><A HREF= #Index> =&gt; Section Index</A></H5>
 </PRE></B></H4>

@@ -1,7 +1,7 @@
 /* lkrloc.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -249,7 +249,7 @@ relt()
 VOID
 relr()
 {
-	register mode;
+	register int mode;
 	register addr_t reli, relv;
 	int aindex, rindex, rtp, error;
 	addr_t r, rtbase, rtofst, paga, pags, pc;
@@ -296,6 +296,7 @@ relr()
 	 */
 	while (more()) {
 		error = 0;
+		relv = 0;
 		mode = eval();
 		rtp = eval();
 		rindex = evword();
@@ -334,6 +335,8 @@ relr()
 		 * Standard Modes
 		 */
 		if ((mode & R_ECHEK) != R_EXTND) {
+			paga = 0;
+			pags = 0;
 			/*
 			 * R_PAG0 or R_PAG addressing
 			 */
@@ -514,7 +517,7 @@ char *errmsg[] = {
 VOID
 relp()
 {
-	register aindex, rindex;
+	register int aindex, rindex;
 	int mode, rtp;
 	addr_t relv;
 	struct areax **a;

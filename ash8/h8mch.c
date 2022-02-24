@@ -1,7 +1,7 @@
 /* h8mch.c */
 
 /*
- * (C) Copyright 1994-1998
+ * (C) Copyright 1994-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -27,7 +27,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register op, opflag;
+	register int op, opflag;
 	int oplb, ophb;
 	int rf, opcode, c;
 	struct expr e1, e2;
@@ -75,10 +75,10 @@ struct mne *mp;
 
 	case S_OPS:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 		if ((t1 != S_IMMB) || (t2 != S_WREG)) {
 			aerr();
 		}
@@ -95,10 +95,10 @@ struct mne *mp;
 
 	case S_OPX:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 		if (t2 != S_BREG) {
 			aerr();
 		}
@@ -122,10 +122,10 @@ struct mne *mp;
 
 	case S_OP:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 		switch(t1) {
 		default:
 			aerr();
@@ -162,10 +162,10 @@ struct mne *mp;
 
 	case S_MOV:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 		/*
 		 * Evaluate Byte/Word Errors
 		 */
@@ -364,10 +364,10 @@ struct mne *mp;
 	case S_CMP:
 	case S_SUB:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 		if ((rf != S_SUB) && ((t1 == S_IMMB) || (t1 == S_IMMW))) {
 			if (t2 != S_BREG) {
 				aerr();
@@ -420,7 +420,7 @@ struct mne *mp;
 
 	case S_SOP:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		if ( t1 != S_BREG) {
 			aerr();
 		}
@@ -429,7 +429,7 @@ struct mne *mp;
 
 	case S_CCR:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		/*
 		 * #xx (,ccr)		andc, ldc, orc, xorc
 		 */
@@ -474,7 +474,7 @@ struct mne *mp;
 		if ((opflag == 2) && (t1 == S_CREG)) {
 			comma();
 			t2 = addr(&e1);
-			v2 = index;
+			v2 = aindx;
 			outab(0x02);
 			outab(v2 & 0x000F);
 			if (t2 != S_BREG) {
@@ -503,10 +503,10 @@ struct mne *mp;
 
 	case S_MLDV:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 		if (t1 != S_BREG) {
 			aerr();
 		}
@@ -518,7 +518,7 @@ struct mne *mp;
 
 	case S_ROSH:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		if ( t1 != S_BREG) {
 			aerr();
 		}
@@ -527,7 +527,7 @@ struct mne *mp;
 
 	case S_PP:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		if ( t1 != S_WREG) {
 			aerr();
 		}
@@ -536,10 +536,10 @@ struct mne *mp;
 
 	case S_MVFPE:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 		if ((t1 != S_EXT) && (t1 != S_DIR)) {
 			aerr();
 		}
@@ -552,10 +552,10 @@ struct mne *mp;
 
 	case S_MVTPE:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 		if (t1 != S_BREG) {
 			aerr();
 		}
@@ -573,7 +573,7 @@ struct mne *mp;
 
 	case S_JXX:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		switch(t1) {
 		case S_INDR:	/* @Rn */
 			outaw(op | ((v1 & 0x0007) << 4));
@@ -600,10 +600,10 @@ struct mne *mp;
 
 	case S_BIT1:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 		switch(t1) {
 		default:
 		case S_WREG:		/* Rn(word),xxx */
@@ -670,10 +670,10 @@ struct mne *mp;
 
 	case S_BIT2:
 		t1 = addr(&e1);
-		v1 = index;
+		v1 = aindx;
 		comma();
 		t2 = addr(&e2);
-		v2 = index;
+		v2 = aindx;
 		switch(t1) {
 		default:
 			aerr();
@@ -747,7 +747,7 @@ VOID
 normbyte(esp)
 register struct expr *esp;
 {
-	register v;
+	register int v;
 
 	if (esp->e_flag == 0 && esp->e_base.e_ap == NULL) {
 		v = esp->e_addr;
@@ -761,8 +761,6 @@ VOID
 usgnbyte(esp)
 register struct expr *esp;
 {
-	register v;
-
 	if (esp->e_flag == 0 && esp->e_base.e_ap == NULL) {
 		if (esp->e_addr & ~0x00FF) {
 			aerr();
@@ -826,8 +824,7 @@ minit()
 		cpt = cbt;
 		ep = eb;
 		ip = ib;
-		if (setjmp(jump_env) == 0)
-			asmbl();
+		asmbl();
 	}
 }
 
@@ -847,6 +844,7 @@ char *dpcode[] = {
  */
 int
 setbit(b)
+int b;
 {
 	if (bp >= &bb[NB])
 		return(1);
@@ -868,7 +866,7 @@ setbit(b)
 int
 getbit()
 {
-	register f;
+	register int f;
 
 	if (bp >= &bb[NB])
 		return (1);

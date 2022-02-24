@@ -1,7 +1,7 @@
 /* lksym.c */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -47,7 +47,6 @@
  *	The function syminit() is called to clear the hashtable.
  *
  *	local variables:
- *		int	h		computed hash value
  *		sym **	spp		pointer to an array of
  *					sym structure pointers
  *
@@ -65,7 +64,6 @@
 VOID
 syminit()
 {
-	register h;
 	struct sym **spp;
 
 	spp = &symhash[0];
@@ -108,8 +106,8 @@ syminit()
  *		addr_t	eval()		lkeval.c
  *		VOID	exit()		c_library
  *		int	fprintf()	c_library
- *		char	get()		lklex.c
- *		char	getnb()		lklex.c
+ *		int	get()		lklex.c
+ *		int	getnb()		lklex.c
  *		sym *	lkpsym()	lksym.c
  *
  *	side effects:
@@ -133,7 +131,7 @@ syminit()
 struct sym *
 newsym()
 {
-	register c, i, nglob;
+	register int c, i, nglob;
 	struct sym *tsp;
 	struct sym **s;
 	char id[NCPS];
@@ -167,14 +165,14 @@ newsym()
 		}
 	} else {
 		fprintf(stderr, "Invalid symbol type %c for %s\n", c, id);
-		lkexit(1);
+		lkexit(ER_FATAL);
 	}
 	/*
 	 * Place pointer in header symbol list
 	 */
 	if (headp == NULL) {
 		fprintf(stderr, "No header defined\n");
-		lkexit(1);
+		lkexit(ER_FATAL);
 	}
 	nglob = hp->h_nglob;
 	s = hp->s_list;
@@ -185,7 +183,8 @@ newsym()
 		}
 	}
 	fprintf(stderr, "Header symbol list overflow\n");
-	lkexit(1);
+	lkexit(ER_FATAL);
+	return(NULL);
 }
 
 /*)Function	sym *	lkpsym(id,f)
@@ -225,9 +224,9 @@ char *id;
 int f;
 {
 	register struct sym *sp;
-	register h;
+	register int h;
 
-	h = hash(id);
+	h = hash(id, zflag);
 	sp = symhash[h];
 	while (sp != NULL) {
 		if (symeq(id, sp->s_id, zflag))
@@ -309,7 +308,7 @@ symdef(fp)
 FILE *fp;
 {
 	register struct sym *sp;
-	register i;
+	register int i;
 
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
@@ -358,7 +357,7 @@ symmod(fp, tsp)
 FILE *fp;
 struct sym *tsp;
 {
-	register i, j;
+	register int i;
 	struct sym **p;
 
 	if ((hp = headp) != NULL) {
@@ -412,7 +411,7 @@ symeq(p1, p2, cflag)
 register char *p1, *p2;
 int cflag;
 {
-	register n;
+	register int n;
 
 	n = strlen(p1) + 1;
 	if(cflag) {
@@ -428,23 +427,26 @@ int cflag;
 		 * Case Insensitive Compare
 		 */
 		do {
-			if (ccase[*p1++] != ccase[*p2++])
+			if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])
 				return (0);
 		} while (--n);
 	}
 	return (1);
 }
 
-/*)Function	int	hash(p)
+/*)Function	int	hash(p, cflag)
  *
  *		char *	p		pointer to string to hash
+ *		int	cflag		case sensitive flag
  *
  *	The function hash() computes a hash code using the sum
  *	of all characters mod table size algorithm.
  *
+ *		cflag == 0	case insensitve hash
+ *		cflag != 0	case sensitive hash
+ *
  *	local variables:
  *		int	h		accumulated character sum
- *		int	n		loop counter
  *
  *	global variables:
  *		char	ccase[]		an array of characters which
@@ -458,19 +460,25 @@ int cflag;
  */
  
 int
-hash(p)
+hash(p, cflag)
 register char *p;
+register int cflag;
 {
-	register h;
+	register int h;
 
 	h = 0;
 	while (*p) {
-		/*
-		 * JLH: case insensitive hash:
-		 * Doesn't much affect hashing, and allows
-		 * same function for mnemonics and symbols.
-		 */
-		h += ccase[*p++];
+		if(cflag) {
+			/*
+			 * Case Sensitive Hash
+			 */
+			h += *p++;
+		} else {
+			/*
+			 * Case Insensitive Hash
+			 */
+			h += ccase[*p++ & 0x007F];
+		}
 	}
 	return (h&HMASK);
 }
@@ -622,7 +630,7 @@ unsigned int n;
 	}
 	if (p == NULL) {
 		fprintf(stderr, "Out of space!\n");
-		lkexit(1);
+		lkexit(ER_FATAL);
 	}
 	for (i=0,q=p; i<n; i++) {
 		*q++ = 0;
@@ -738,7 +746,7 @@ unsigned int n;
 
 	if ((p = (char *) malloc(n)) == NULL) {
 		fprintf(stderr, "Out of space!\n");
-		lkexit(1);
+		lkexit(ER_FATAL);
 	}
 	for (i=0,q=p; i<n; i++) {
 		*q++ = 0;

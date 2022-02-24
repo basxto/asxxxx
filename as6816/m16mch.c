@@ -1,7 +1,7 @@
 /* M16MCH:C */
 
 /*
- * (C) Copyright 1991-1998
+ * (C) Copyright 1991-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -27,7 +27,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register op, rf, cpg;
+	register int op, rf, cpg;
 	struct expr e1, e2, e3;
 	char id[NCPS];
 	struct area *espa;
@@ -758,6 +758,7 @@ minit()
  */
 int
 setbit(b)
+int b;
 {
 	if (bp >= &bb[NB])
 		return(1);
@@ -779,7 +780,7 @@ setbit(b)
 int
 getbit()
 {
-	register f;
+	register int f;
 
 	if (bp >= &bb[NB])
 		return (1);

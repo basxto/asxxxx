@@ -1,7 +1,7 @@
 /* m16adr.c */
 
 /*
- * (C) Copyright 1991-1998
+ * (C) Copyright 1991-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -18,8 +18,7 @@ int
 addr(esp)
 register struct expr *esp;
 {
-	register c;
-	register struct area *espa;
+	register int c;
 	register char *tcp;
 
 	if ((c = getnb()) == '#') {
@@ -81,7 +80,7 @@ register struct adsym *sp;
 	unget(getnb());
 
 	i = 0;
-	while ( *(ptr = (char *) &sp[i]) ) {
+	while ( *(ptr = &sp[i].a_str[0]) ) {
 		if (srch(ptr)) {
 			return(sp[i].a_val);
 		}
@@ -102,12 +101,12 @@ register char *str;
 	ptr = ip;
 
 	while (*ptr && *str) {
-		if(ccase[*ptr] != ccase[*str])
+		if(ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
 			break;
 		ptr++;
 		str++;
 	}
-	if (ccase[*ptr] == ccase[*str]) {
+	if (ccase[*ptr & 0x007F] == ccase[*str & 0x007F]) {
 		ip = ptr;
 		return(1);
 	}
@@ -134,42 +133,42 @@ char    c, *str;
 }
 
 struct adsym	xyz[] = {	/* all indexed modes */
-	"x",	0x00 | T_INDX,
-	"y",	0x10 | T_INDX,
-	"z",	0x20 | T_INDX,
-	"x8",	0x00 | T_INDX | T_IND8,
-	"y8",	0x10 | T_INDX | T_IND8,
-	"z8",	0x20 | T_INDX | T_IND8,
-	"x16",	0x00 | T_INDX | T_IND16,
-	"y16",	0x10 | T_INDX | T_IND16,
-	"z16",	0x20 | T_INDX | T_IND16,
-	"",	0x00
+    {	"x",	0x00 | T_INDX	},
+    {	"y",	0x10 | T_INDX	},
+    {	"z",	0x20 | T_INDX	},
+    {	"x8",	0x00 | T_INDX | T_IND8	},
+    {	"y8",	0x10 | T_INDX | T_IND8	},
+    {	"z8",	0x20 | T_INDX | T_IND8	},
+    {	"x16",	0x00 | T_INDX | T_IND16	},
+    {	"y16",	0x10 | T_INDX | T_IND16	},
+    {	"z16",	0x20 | T_INDX | T_IND16	},
+    {	"",	0x00	}
 };
 
 struct adsym	e[] = {		/* e register */
-	"e",	0x01,
-	"",	0x00
+    {	"e",	0x01	},
+    {	"",	0x00	}
 };
 
 struct adsym	pshm[] = {	/* push on system stack */
-	"d",	0x01,
-	"e",	0x02,
-	"x",	0x04,
-	"y",	0x08,
-	"z",	0x10,
-	"k",	0x20,
-	"ccr",	0x40,
-	"",	0x00
+    {	"d",	0x01	},
+    {	"e",	0x02	},
+    {	"x",	0x04	},
+    {	"y",	0x08	},
+    {	"z",	0x10	},
+    {	"k",	0x20	},
+    {	"ccr",	0x40	},
+    {	"",	0x00	}
 };
 
 struct adsym	pulm[] = {	/* pull from on system stack */
-	"ccr",	0x01,
-	"k",	0x02,
-	"z",	0x04,
-	"y",	0x08,
-	"x",	0x10,
-	"e",	0x20,
-	"d",	0x40,
-	"",	0x00
+    {	"ccr",	0x01	},
+    {	"k",	0x02	},
+    {	"z",	0x04	},
+    {	"y",	0x08	},
+    {	"x",	0x10	},
+    {	"e",	0x20	},
+    {	"d",	0x40	},
+    {	"",	0x00	}
 };
 

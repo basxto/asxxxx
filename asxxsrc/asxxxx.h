@@ -1,7 +1,7 @@
 /* asxxxx.h */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,7 +14,7 @@
  *
  */
 
-#define	VERSION	"V02.00"
+#define	VERSION	"V02.10"
 
 /*)Module	asxxxx.h
  *
@@ -53,6 +53,14 @@
 #define	FSEPX	'.'
 #define	OTHERSYSTEM
 #endif
+
+/*
+ * Error definitions
+ */
+#define	ER_NONE		0	/* No error */
+#define	ER_WARNING	1	/* Warning */
+#define	ER_ERROR	2	/* Assembly error */
+#define	ER_FATAL	3	/* Fatal error */
 
 /*
  * Assembler definitions.
@@ -347,17 +355,28 @@ extern	int	ifcnd[MAXIF+1];	/*	array of IF statement condition
 extern	int	iflvl[MAXIF+1];	/*	array of IF-ELSE-ENDIF flevel
 				 *	values indexed by tlevel
 				 */
-extern	char
-	afn[FILSPC];		/*	afile() temporary filespec
+extern	char	afn[FILSPC];	/*	current input file specification
+				 */
+extern	int	afp;		/*	current input file path length
+				 */
+extern	char	afntmp[FILSPC];	/*	temporary input file specification
+				 */
+extern	int	afptmp;		/*	temporary input file path length
 				 */
 extern	char
 	srcfn[MAXFIL][FILSPC];	/*	array of source file names
+				 */
+extern	int
+	srcfp[MAXFIL];		/*	array of source file path lengths
 				 */
 extern	int
 	srcline[MAXFIL];	/*	current source file line
 				 */
 extern	char
 	incfn[MAXINC][FILSPC];	/*	array of include file names
+				 */
+extern	int
+	incfp[MAXINC];		/*	array of include file path lengths
 				 */
 extern	int
 	incline[MAXINC];	/*	current include file line
@@ -395,8 +414,8 @@ extern	int	xflag;		/*	-x, listing radix flag
 				 */
 extern	int	fflag;		/*	-f(f), relocations flagged flag
 				 */
-extern	addr_t	laddr;		/*	address of current assembler line
-				 *	or value of .if argument
+extern	addr_t	laddr;		/*	address of current assembler line,
+				 *	equate, or value of .if argument
 				 */
 extern	addr_t	fuzz;		/*	tracks pass to pass changes in the
 				 *	address of symbols caused by
@@ -447,7 +466,7 @@ extern	char	symtbl[];	/*	string "Symbol Table"
 				 */
 extern	char	aretbl[];	/*	string "Area Table"
 				 */
-extern	char	module[NCPS];	/*	module name string
+extern	char	module[NCPS+2];	/*	module name string
 				 */
 extern	FILE	*lfp;		/*	list output file handle
 				 */
@@ -529,26 +548,29 @@ extern	int		strcmp();
 extern	char *		strcpy();
 extern	int		strlen();
 extern	char *		strncpy();
+extern	char *		strrchr();
 */
 
 /* Machine independent functions */
 
 /* asmain.c */
 extern	FILE *		afile();
+extern	VOID		afilex();
 extern	VOID		asexit();
 extern	VOID		asmbl();
-extern	VOID		main();
+extern	int		fndidx();
+extern	int		main();
 extern	VOID		newdot();
 extern	VOID		phase();
 extern	VOID		usage();
 
 /* aslex.c */
 extern	char		endline();
-extern	char		get();
+extern	int		get();
 extern	VOID		getid();
 extern	int		getline();
 extern	int		getmap();
-extern	char		getnb();
+extern	int		getnb();
 extern	VOID		getst();
 extern	int		more();
 extern	VOID		unget();
@@ -597,6 +619,7 @@ extern	VOID		out();
 extern	VOID		outab();
 extern	VOID		outarea();
 extern	VOID		outaw();
+extern	VOID		outdp();
 extern	VOID		outall();
 extern	VOID		outdot();
 extern	VOID		outbuf();
@@ -620,6 +643,6 @@ extern	struct	mne	mne[];
 
 /* Machine dependent functions */
 
-extern	VOID		machin();
+extern	VOID		machine();
 extern	VOID		minit();
 

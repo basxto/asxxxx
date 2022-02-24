@@ -1,7 +1,7 @@
 /* m6812.h */
 
 /*
- * (C) Copyright 1989-1998
+ * (C) Copyright 1989-1999
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -95,7 +95,7 @@
 #define	S_SDP		80
 
 
-extern	int	index;
+extern	int	aindx;
 
 struct	sdp
 {
@@ -136,12 +136,12 @@ extern	int		any();
 extern	int		srch();
 
 	/* m12mch.c */
-extern	VOID		machin();
+extern	VOID		machine();
 extern	VOID		genout();
 extern	VOID		movout();
 extern	VOID		m68out();
 extern	int		setbit();
 extern	int		getbit();
+extern	int		mchpcr();
 extern	VOID		minit();
 extern	int		comma();
-
