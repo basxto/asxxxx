@@ -3,7 +3,7 @@
 #		Cygwin 'GNU make' Version
 #		=========================
 #
-#   3  March  2010
+#   25  October  2010
 #
 ####################################################################
 
@@ -36,6 +36,9 @@ ASXXXX =	as1802		\
 		aspic		\
 		asrab		\
 		asscmp		\
+		asst6		\
+		asst7		\
+		asst8		\
 		asz8		\
 		asz80		\
 		aslink		\
@@ -98,6 +101,9 @@ SRCM8C=		$(ASXBAS)asm8c/
 SRCPIC=		$(ASXBAS)aspic/
 SRCRAB=		$(ASXBAS)asrab/
 SRCSCMP=	$(ASXBAS)asscmp/
+SRCST6=		$(ASXBAS)asst6/
+SRCST7=		$(ASXBAS)asst7/
+SRCST8=		$(ASXBAS)asst8/
 SRCZ8=		$(ASXBAS)asz8/
 SRCZ80=		$(ASXBAS)asz80/
 
@@ -694,6 +700,63 @@ asscmp :	$(ASXX) $(ASSCMP)
 		$(LD) $(LDFLAGS) -o asscmp $(ASXX) $(ASSCMP)
 		cp asscmp.exe $(DSTEXE)asscmp.exe
 		strip $(DSTEXE)asscmp.exe
+
+
+####################################################################
+# ASST6
+####################################################################
+
+ASST6 =		st6pst.o st6mch.o st6adr.o
+
+st6pst.o :	$(SRCST6)st6pst.c $(SRCST6)st6.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+st6mch.o :	$(SRCST6)st6mch.c $(SRCST6)st6.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+st6adr.o :	$(SRCST6)st6adr.c $(SRCST6)st6.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+asst6 :		$(ASXX) $(ASST6)
+		$(LD) $(LDFLAGS) -o asst6 $(ASXX) $(ASST6)
+		cp asst6.exe $(DSTEXE)asst6.exe
+		strip $(DSTEXE)asst6.exe
+
+
+####################################################################
+# ASST7
+####################################################################
+
+ASST7 =		st7pst.o st7mch.o st7adr.o
+
+st7pst.o :	$(SRCST7)st7pst.c $(SRCST7)st7.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+st7mch.o :	$(SRCST7)st7mch.c $(SRCST7)st7.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+st7adr.o :	$(SRCST7)st7adr.c $(SRCST7)st7.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+asst7 :		$(ASXX) $(ASST7)
+		$(LD) $(LDFLAGS) -o asst7 $(ASXX) $(ASST7)
+		cp asst7.exe $(DSTEXE)asst7.exe
+		strip $(DSTEXE)asst7.exe
+
+
+####################################################################
+# ASST8
+####################################################################
+
+ASST8 =		st8pst.o st8mch.o st8adr.o
+
+st8pst.o :	$(SRCST8)st8pst.c $(SRCST8)st8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+st8mch.o :	$(SRCST8)st8mch.c $(SRCST8)st8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+st8adr.o :	$(SRCST8)st8adr.c $(SRCST8)st8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+asst8 :		$(ASXX) $(ASST8)
+		$(LD) $(LDFLAGS) -o asst8 $(ASXX) $(ASST8)
+		cp asst8.exe $(DSTEXE)asst8.exe
+		strip $(DSTEXE)asst8.exe
 
 
 ####################################################################

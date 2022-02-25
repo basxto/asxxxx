@@ -1,7 +1,7 @@
 /* asxxxx.h */
 
 /*
- *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *  Copyright (C) 1989-2010  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@
  * Local Definitions
  */
 
-#define	VERSION	"V05.00"
+#define	VERSION	"V05.03"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -1005,7 +1005,9 @@ extern	int	sflag;		/*	-s, generate symbol table flag
 				 */
 extern	int	uflag;		/*	-u, disable .list/.nlist processing flag
 				 */
-extern	int	wflag;		/*	-w, enable wide format listing
+extern	int	vflag;		/*	-v, enable out of range signed / unsigned errors
+				 */
+extern	int	wflag;		/*	-w, enable wide listing format
 				 */
 extern	int	xflag;		/*	-x, listing radix flag
 				 */
@@ -1224,9 +1226,10 @@ extern	a_uint		absexpr(void);
 extern	VOID		clrexpr(struct expr *esp);
 extern	int		digit(int c, int r);
 extern	VOID		exprmasks(int n);
-extern	int		is_abs(struct expr *esp);
 extern	VOID		expr(struct expr *esp, int n);
+extern	int		is_abs(struct expr *esp);
 extern	int		oprio(int c);
+extern	a_uint		rngchk(a_uint n);
 extern	VOID		term(struct expr *esp);
 
 /* asdbg */
@@ -1401,9 +1404,10 @@ extern	a_uint		absexpr();
 extern	VOID		clrexpr();
 extern	int		digit();
 extern	VOID		exprmasks();
-extern	int		is_abs();
 extern	VOID		expr();
+extern	int		is_abs();
 extern	int		oprio();
+extern	a_uint		rngchk();
 extern	VOID		term();
 
 /* asdbg */

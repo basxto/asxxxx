@@ -13,10 +13,60 @@
 
 <H4><B><PRE>
    Summary  of  changes/additions  to the ASxxxx Assemblers from
-Version 4.11 to Version 5.00.  
+Version 4.11 to Version 5.03.  
+
+2010_10_31 Version 5.00 Update 3
+
+   This  update  for  Version  5.00  of the  ASxxxx Cross
+Assemblers rolls up updates 1 and 2 with the addition of
+three new assemblers and fixes:
+
+   (1)  New cross assemblers for STMicroelectronics
+        ST6, ST7, and STM8 microprocessors.
+
+   (2)  An ASlink list file update error fix (-u option)
+        causing some errors not to be inserted into the
+        created .rst file.
+
+   (3)  An additional ASxxxx assembler option (-v) which
+        enables checking for out of range signed / unsigned
+        values in symbol equates and arithmetic operations.
+        This option has some ambiguities as internally the
+        assemblers use unsigned arithmetic for calculations.
+        (e.g. for a 2-byte machine -32768 and 32768 are both
+        represented as 0x8000)
+
+
+   Update 2 Items
+
+   (1)  When using the assembler directive .end to specify
+        the code entry address the assembler fails to set
+        the variable .__.END. as a global.  Therefor the
+        value of .__.END. is not passed to the linker and
+        the start address frame is always zero.
+
+   (2)  The linker will fail to create a start address frame
+        when there is no code generated within the area/bank
+        referenced by the .__.END. variable.
+
+
+   Update 1 Items
+
+   (1)  The newest versions of gcc (and perhaps other
+        compilers) give warnings about missing arguments
+        in the fprintf() function.  This update replaces
+        fprintf(arg1, arg2) with fprintf(arg1, "%s", arg2)
+        in each affected line of code.
+
+   (2)  The newest versions of gcc (and perhaps other
+        compilers) have defined 'getline' as a standard
+        function in 'stdio.h'.  This conflicts with the
+        function 'getline()' in the ASxxxx package.
+        All references to 'getline()' have been changed
+        to 'nxtline()'.
+
 
 2009_04_01 (Version 5.00)
-
 
    Added  a general purpose macro processor to the ASxxxx assem-
 blers with the following mnemonics:  
@@ -198,16 +248,19 @@ e.g.    .org    0
 
 
 2009_02
+
    Added the Cypress PSoc (M8C) ASM8C assembler
    to ASxxxx.
 
 
 2008_09
+
    Added the 8048 (8021, 8022, and 8041) AS8048
    assembler to Asxxxx.
 
 
 2008_02
+
    Added the SC/MP ASSCMP assembler to ASxxxx.
 
 

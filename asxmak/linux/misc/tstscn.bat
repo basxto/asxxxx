@@ -121,6 +121,18 @@ rm -f ../../../asxtst/asmt2bhi.lst
 ../exe/asxscn ../../../asxtst/asmt2bhi.lst
 
 rm -f ../../../asxtst/asmt2bhi.lst
+../exe/asst6 -glacxff ../../../asxtst/asmt2bhi.asm
+../exe/asxscn ../../../asxtst/asmt2bhi.lst
+
+rm -f ../../../asxtst/asmt2bhi.lst
+../exe/asst7 -glacxff ../../../asxtst/asmt2bhi.asm
+../exe/asxscn ../../../asxtst/asmt2bhi.lst
+
+rm -f ../../../asxtst/asmt3bhi.lst
+../exe/asst8 -glacxff ../../../asxtst/asmt3bhi.asm
+../exe/asxscn -3 ../../../asxtst/asmt3bhi.lst
+
+rm -f ../../../asxtst/asmt2bhi.lst
 ../exe/asz8 -glacxff ../../../asxtst/asmt2bhi.asm
 ../exe/asxscn ../../../asxtst/asmt2bhi.lst
 
@@ -343,6 +355,42 @@ rm -f ../../../asscmp/tscmp.rst
 ../exe/asxscn ../../../asscmp/tscmp.lst
 ../exe/aslink -nxu -g xdat1=0 -g xdat2=0 -g xdat4=0 -g xdat8=0 ../../../asscmp/tscmp.rel
 ../exe/asxscn -i ../../../asscmp/tscmp.rst
+
+rm -f ../../../asst6/tst6.rel
+rm -f ../../../asst6/tst6.lst
+rm -f ../../../asst6/tst6.rst
+../exe/asst6 -gloacxff ../../../asst6/tst6.asm
+../exe/asxscn ../../../asst6/tst6.lst
+rm -f ../../../asst6/st6gbl.rel
+rm -f ../../../asst6/st6gbl.lst
+rm -f ../../../asst6/st6gbl.rst
+../exe/asst6 -gloacxff ../../../asst6/st6gbl.asm
+../exe/aslink -nxu ../../../asst6/tst6.rel ../../../asst6/tst6.rel ../../../asst6/st6gbl.rel
+../exe/asxscn -i ../../../asst6/tst6.rst
+
+rm -f ../../../asst7/tst7.rel
+rm -f ../../../asst7/tst7.lst
+rm -f ../../../asst7/tst7.rst
+../exe/asst7 -gloacxff ../../../asst7/tst7.asm
+../exe/asxscn ../../../asst7/tst7.lst
+rm -f ../../../asst7/st7gbl.rel
+rm -f ../../../asst7/st7gbl.lst
+rm -f ../../../asst7/st7gbl.rst
+../exe/asst7 -gloacxff ../../../asst7/st7gbl.asm
+../exe/aslink -nxu ../../../asst7/tst7.rel ../../../asst7/tst7.rel ../../../asst7/st7gbl.rel
+../exe/asxscn -i ../../../asst7/tst7.rst
+
+rm -f ../../../asst8/tst8.rel
+rm -f ../../../asst8/tst8.lst
+rm -f ../../../asst8/tst8.rst
+../exe/asst8 -gloacxff ../../../asst8/tst8.asm
+../exe/asxscn -3 ../../../asst8/tst8.lst
+rm -f ../../../asst8/st8gbl.rel
+rm -f ../../../asst8/st8gbl.lst
+rm -f ../../../asst8/st8gbl.rst
+../exe/asst8 -gloacxff ../../../asst8/st8gbl.asm
+../exe/aslink -nxu ../../../asst8/tst8.rel ../../../asst8/tst8.rel ../../../asst8/st8gbl.rel
+../exe/asxscn -3 -i ../../../asst8/tst8.rst
 
 rm -f ../../../asz8/tz8.rel
 rm -f ../../../asz8/tz8.lst

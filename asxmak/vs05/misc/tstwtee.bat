@@ -1,1 +1,1 @@
-tstscn.bat | ..\..\tee32.exe tstwtee.lst
+tstscn.bat 2>&1 | ..\..\tee32.exe tstwtee.lst

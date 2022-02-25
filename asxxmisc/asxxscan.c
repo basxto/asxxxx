@@ -1,7 +1,7 @@
 /* asxscn.c */
 
 /*
- *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *  Copyright (C) 1989-2010  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -250,8 +250,9 @@ loop:
 
 		/*
 		 * Check for 'SPACE' at beginning of line
+		 * (Skipping NERR error characters)
 		 */
-		for (i=0; i<n; i++) {
+		for (i=NERR,p+=NERR; i<n; i++) {
 			if (*p++ != ' ')
 				goto loop;
 		}
@@ -283,12 +284,10 @@ loop:
 		}
 
 		/*
-		 * Scan until ';' is found
+		 * Scan for last ';'
 		 */
-		q = p;
-		while (*q && (*q != ';')) {
-			q++;
-		}
+		if ((q = strrchr(p, ';')) == NULL)
+			goto loop;
 		if (*q++ != ';')
 			goto loop;
 		if (*q == '\0')

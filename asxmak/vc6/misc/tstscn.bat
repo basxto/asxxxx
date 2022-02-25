@@ -121,6 +121,18 @@ del ..\..\..\asxtst\asmt2bhi.lst
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 
 del ..\..\..\asxtst\asmt2bhi.lst
+..\exe\asst6.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+
+del ..\..\..\asxtst\asmt2bhi.lst
+..\exe\asst7.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+
+del ..\..\..\asxtst\asmt3bhi.lst
+..\exe\asst8.exe -glacxff ..\..\..\asxtst\asmt3bhi.asm
+..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3bhi.lst
+
+del ..\..\..\asxtst\asmt2bhi.lst
 ..\exe\asz8.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 
@@ -343,6 +355,42 @@ del ..\..\..\asscmp\tscmp.rst
 ..\exe\asxscn.exe ..\..\..\asscmp\tscmp.lst
 ..\exe\aslink.exe -nxu -g xdat1=0 -g xdat2=0 -g xdat4=0 -g xdat8=0 ..\..\..\asscmp\tscmp.rel
 ..\exe\asxscn.exe -i ..\..\..\asscmp\tscmp.rst
+
+del ..\..\..\asst6\tst6.rel
+del ..\..\..\asst6\tst6.lst
+del ..\..\..\asst6\tst6.rst
+..\exe\asst6.exe -gloacxff ..\..\..\asst6\tst6.asm
+..\exe\asxscn.exe ..\..\..\asst6\tst6.lst
+del ..\..\..\asst6\st6gbl.rel
+del ..\..\..\asst6\st6gbl.lst
+del ..\..\..\asst6\st6gbl.rst
+..\exe\asst6.exe -gloacxff ..\..\..\asst6\st6gbl.asm
+..\exe\aslink.exe -nxu ..\..\..\asst6\tst6.rel ..\..\..\asst6\tst6.rel ..\..\..\asst6\st6gbl.rel
+..\exe\asxscn.exe -i ..\..\..\asst6\tst6.rst
+
+del ..\..\..\asst7\tst7.rel
+del ..\..\..\asst7\tst7.lst
+del ..\..\..\asst7\tst7.rst
+..\exe\asst7.exe -gloacxff ..\..\..\asst7\tst7.asm
+..\exe\asxscn.exe ..\..\..\asst7\tst7.lst
+del ..\..\..\asst7\st7gbl.rel
+del ..\..\..\asst7\st7gbl.lst
+del ..\..\..\asst7\st7gbl.rst
+..\exe\asst7.exe -gloacxff ..\..\..\asst7\st7gbl.asm
+..\exe\aslink.exe -nxu ..\..\..\asst7\tst7.rel ..\..\..\asst7\tst7.rel ..\..\..\asst7\st7gbl.rel
+..\exe\asxscn.exe -i ..\..\..\asst7\tst7.rst
+
+del ..\..\..\asst8\tst8.rel
+del ..\..\..\asst8\tst8.lst
+del ..\..\..\asst8\tst8.rst
+..\exe\asst8.exe -gloacxff ..\..\..\asst8\tst8.asm
+..\exe\asxscn.exe -3 ..\..\..\asst8\tst8.lst
+del ..\..\..\asst8\st8gbl.rel
+del ..\..\..\asst8\st8gbl.lst
+del ..\..\..\asst8\st8gbl.rst
+..\exe\asst8.exe -gloacxff ..\..\..\asst8\st8gbl.asm
+..\exe\aslink.exe -nxu ..\..\..\asst8\tst8.rel ..\..\..\asst8\tst8.rel ..\..\..\asst8\st8gbl.rel
+..\exe\asxscn.exe -3 -i ..\..\..\asst8\tst8.rst
 
 del ..\..\..\asz8\tz8.rel
 del ..\..\..\asz8\tz8.lst

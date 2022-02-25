@@ -34,8 +34,8 @@
 
 
 
-                                 Version   5.00
-                                   April 2009
+                                 Version   5.03
+                                  October 2010
 
 
         CHAPTER 1  THE ASSEMBLER                                     1-1 
@@ -749,34 +749,73 @@
           BC.3.8    Single-Byte Miscellaneous Instructions          BC-4 
           BC.3.9    Double-Byte Miscellaneous Instruction           BC-4 
 
-        APPENDIX BD  ASZ8 ASSEMBLER                                 BD-1 
-          BD.1    Z8 REGISTER SET                                   BD-1 
-          BD.2    Z8 INSTRUCTION SET                                BD-1 
-          BD.2.1    Load Instructions                               BD-2 
-          BD.2.2    Arithmetic Instructions                         BD-2 
-          BD.2.3    Logical Instructions                            BD-3 
-          BD.2.4    Program Control Instructions                    BD-3 
-          BD.2.5    Bit Manipulation Instructions                   BD-3 
-          BD.2.6    Block Transfer Instructions                     BD-3 
-          BD.2.7    Rotate and Shift Instructions                   BD-3 
-          BD.2.8    Cpu Control Instructions                        BD-3 
+        APPENDIX BD  ASST6 ASSEMBLER                                BD-1 
+          BD.1    ST6 REGISTER SET                                  BD-1 
+          BD.2    ST6 INSTRUCTION SET                               BD-1 
+          BD.2.1    Inherent Instructions                           BD-2 
+          BD.2.2    Conditional Branch Instructions                 BD-2 
+          BD.2.3    Bit Manipulation Instructions                   BD-2 
+          BD.2.4    Single Operand Instructions                     BD-2 
+          BD.2.5    Double Operand Instructions                     BD-2 
+          BD.2.6    Call to Subroutine and Jump Instructions        BD-3 
+          BD.2.7    Load and Store Instructions                     BD-3 
 
-        APPENDIX BE  ASZ80 ASSEMBLER                                BE-1 
-          BE.1    .z80 DIRECTIVE                                    BE-1 
-          BE.2    .hd64 DIRECTIVE                                   BE-1 
-          BE.3    THE .__.CPU.  VARIABLE                            BE-2 
-          BE.4    Z80 REGISTER SET AND CONDITIONS                   BE-2 
-          BE.5    Z80 INSTRUCTION SET                               BE-3 
-          BE.5.1    Inherent Instructions                           BE-4 
-          BE.5.2    Implicit Operand Instructions                   BE-4 
-          BE.5.3    Load Instruction                                BE-5 
-          BE.5.4    Call/Return Instructions                        BE-5 
-          BE.5.5    Jump and Jump to Subroutine Instructions        BE-5 
-          BE.5.6    Bit Manipulation Instructions                   BE-6 
-          BE.5.7    Interrupt Mode and Reset Instructions           BE-6 
-          BE.5.8    Input and Output Instructions                   BE-6 
-          BE.5.9    Register Pair Instructions                      BE-6 
-          BE.5.10   HD64180/Z180 Specific Instructions              BE-7 
+        APPENDIX BE  ASST7 ASSEMBLER                                BE-1 
+          BE.1    ST7 REGISTER SET                                  BE-1 
+          BE.2    ST7 INSTRUCTION SET                               BE-1 
+          BE.2.1    Inherent Instructions                           BE-4 
+          BE.2.2    Conditional Branch Instructions                 BE-4 
+          BE.2.3    Bit Test and Branch Instructions                BE-4 
+          BE.2.4    Bit Manipulation Instructions                   BE-5 
+          BE.2.5    Single Operand Instructions                     BE-5 
+          BE.2.6    Double Operand Instructions                     BE-5 
+          BE.2.7    Call to Subroutine and Jump Instructions        BE-5 
+
+        APPENDIX BF  ASST8 ASSEMBLER                                BF-1 
+          BF.1    ST8 REGISTER SET                                  BF-1 
+          BF.2    ST8 INSTRUCTION SET                               BF-1 
+          BF.2.1    Inherent Instructions                           BF-5 
+          BF.2.2    Conditional Branch Instructions                 BF-5 
+          BF.2.3    Bit Test and Branch Instructions                BF-5 
+          BF.2.4    Bit Manipulation Instructions                   BF-5 
+          BF.2.5    Single Operand Instructions                     BF-6 
+          BF.2.6    Double Operand Instructions                     BF-6 
+          BF.2.7    Call to Subroutine and Jump Instructions        BF-7 
+
+        APPENDIX BG  ASZ8 ASSEMBLER                                 BG-1 
+          BG.1    Z8 REGISTER SET                                   BG-1 
+          BG.2    Z8 INSTRUCTION SET                                BG-1 
+          BG.2.1    Load Instructions                               BG-2 
+          BG.2.2    Arithmetic Instructions                         BG-2 
+          BG.2.3    Logical Instructions                            BG-3 
+          BG.2.4    Program Control Instructions                    BG-3 
+          BG.2.5    Bit Manipulation Instructions                   BG-3 
+
+
+                                                                Page xiv
+        
+
+
+          BG.2.6    Block Transfer Instructions                     BG-3 
+          BG.2.7    Rotate and Shift Instructions                   BG-3 
+          BG.2.8    Cpu Control Instructions                        BG-3 
+
+        APPENDIX BH  ASZ80 ASSEMBLER                                BH-1 
+          BH.1    .z80 DIRECTIVE                                    BH-1 
+          BH.2    .hd64 DIRECTIVE                                   BH-1 
+          BH.3    THE .__.CPU.  VARIABLE                            BH-2 
+          BH.4    Z80 REGISTER SET AND CONDITIONS                   BH-2 
+          BH.5    Z80 INSTRUCTION SET                               BH-3 
+          BH.5.1    Inherent Instructions                           BH-4 
+          BH.5.2    Implicit Operand Instructions                   BH-4 
+          BH.5.3    Load Instruction                                BH-5 
+          BH.5.4    Call/Return Instructions                        BH-5 
+          BH.5.5    Jump and Jump to Subroutine Instructions        BH-5 
+          BH.5.6    Bit Manipulation Instructions                   BH-6 
+          BH.5.7    Interrupt Mode and Reset Instructions           BH-6 
+          BH.5.8    Input and Output Instructions                   BH-6 
+          BH.5.9    Register Pair Instructions                      BH-6 
+          BH.5.10   HD64180/Z180 Specific Instructions              BH-7 
 
 
                                                                   Page 2
@@ -819,7 +858,6 @@
                 http://shop-pdp.kent.edu/ 
 
                 baldwin@kent.edu 
-                baldwin@shop-pdp.kent.edu 
                 tel:  (330) 672 2531 
                 fax:  (330) 672 2959 
 
@@ -835,7 +873,7 @@
 
 
 
-           Copyright (C) 1989-2009 Alan R.  Baldwin 
+           Copyright (C) 1989-2010 Alan R.  Baldwin 
 
            This  program  is  free  software:   you  can redistribute it
         and/or modify it under the  terms  of  the  GNU  General  Public
@@ -1007,7 +1045,7 @@
         
 
 
-        ASxxxx Cross Assemblers, Version 5.00, April 2009 
+        ASxxxx Cross Assemblers, Version 5.03, October 2010 
 
         Submitted by Alan R.  Baldwin, 
         Kent State University, Kent, Ohio 
@@ -1026,13 +1064,13 @@
         68HC(S)08,     6809,    68HC11,    68HC(S)12,    68HC16,    740,
         8048(8041/8022/8021)  8051,  8085(8080),  DS8xCxxx,  AVR,  EZ80,
         F2MC8L/FX,  GameBoy(Z80), H8/3xx, Cypress PSoC(M8C), PIC, Rabbit
-        2000/3000, Z8, and Z80(HD64180)  series  microprocessors.   Each
-        assembler  has  a  device  specific section which includes:  (1)
-        device description, byte order, and file extension  information,
-        (2) a table of assembler general directives, special directives,
-        assembler mnemonics and associated operation codes, (3)  machine
-        specific  code  for  processing the device mnemonics, addressing
-        modes, and special directives.  
+        2000/3000, asst6, asst7,  asst8,  Z8,  and  Z80(HD64180)  series
+        microprocessors.   Each  assembler has a device specific section
+        which includes:  (1) device description, byte  order,  and  file
+        extension  information,  (2) a table of assembler general direc-
+        tives, special directives, assembler  mnemonics  and  associated
+        operation  codes,  (3)  machine specific code for processing the
+        device mnemonics, addressing modes, and special directives.  
 
            The assemblers have a common device independent section which
         handles the details of file input/output, symbol  table  genera-
@@ -2265,7 +2303,7 @@
         are only available in assemblers supporting 32-bit addressing.) 
 
 
-        1.4.12  .blkb, .ds, ,rmb, and .rs Directives 
+        1.4.12  .blkb, .ds, .rmb, and .rs Directives 
 
         Format:  
 
@@ -3161,7 +3199,7 @@
         true  condition  will be processed if the symbol 'sym' is blank.
         The range of true condition is optional as is the  .else  direc-
         tive  and  the  range of false condition.  The following are all
-        valid .ifb/.ifnb/.else/.endif constructions:  
+        valid .ifb/.else/.endif constructions:  
 
                 .ifb    sym$1           ;argument is not blank
                 .byte   1,2             ;insert bytes if argument
@@ -7833,7 +7871,103 @@
 
 
            Summary  of  changes/additions  to the ASxxxx Assemblers from
-        Version 4.11 to Version 5.00.  
+        Version 4.11 to Version 5.03.  
+
+        2010_10_31 Version 5.00 Update 3
+        
+           This  update  for  Version  5.00  of the  ASxxxx Cross
+        Assemblers rolls up updates 1 and 2 with the addition of
+        three new assemblers and fixes:
+        
+           (1)  New cross assemblers for STMicroelectronics
+                ST6, ST7, and STM8 microprocessors.
+        
+           (2)  An ASlink list file update error fix (-u option)
+                causing some errors not to be inserted into the
+                created .rst file.
+        
+           (3)  An additional ASxxxx assembler option (-v) which
+                enables checking for out of range signed / unsigned
+                values in symbol equates and arithmetic operations.
+                This option has some ambiguities as internally the
+                assemblers use unsigned arithmetic for calculations.
+                (e.g. for a 2-byte machine -32768 and 32768 are both
+                represented as 0x8000)
+        
+        
+           Update 2 Items
+        
+           (1)  When using the assembler directive .end to specify
+                the code entry address the assembler fails to set
+                the variable .__.END. as a global.  Therefor the
+                value of .__.END. is not passed to the linker and
+                the start address frame is always zero.
+        
+           (2)  The linker will fail to create a start address frame
+                when there is no code generated within the area/bank
+                referenced by the .__.END. variable.
+        
+        
+           Update 1 Items
+        
+           (1)  The newest versions of gcc (and perhaps other
+                compilers) give warnings about missing arguments
+                in the fprintf() function.  This update replaces
+                fprintf(arg1, arg2) with fprintf(arg1, "%s", arg2)
+                in each affected line of code.
+        
+           (2)  The newest versions of gcc (and perhaps other
+                compilers) have defined 'getline' as a standard
+                function in 'stdio.h'.  This conflicts with the
+                function 'getline()' in the ASxxxx package.
+                All references to 'getline()' have been changed
+                to 'nxtline()'.
+
+
+        CHANGE LOG                                              Page D-3
+        
+
+
+
+
+
+        2010_04_01 Version 5.00 Update 2
+        
+           This  update  for  Version  5.00  of the  ASxxxx Cross
+        Assemblers includes fixes for the following errors:
+        
+           (1)  When using the assembler directive .end to specify
+                the code entry address the assembler fails to set
+                the variable .__.END. as a global.  Therefor the
+                value of .__.END. is not passed to the linker and
+                the start address frame is always zero.
+        
+           (2)  The linker will fail to create a start address frame
+                when there is no code generated within the area/bank
+                referenced by the .__.END. variable.
+
+
+
+        2010_03_03 Version 5.00 Update 1
+        
+           This  update  for  Version  5.00  of the  ASxxxx Cross
+        Assemblers includes fixes for the following errors:
+        
+           (1)  The newest versions of gcc (and perhaps other
+                compilers) give warnings about missing arguments
+                in the fprintf() function.  This update replaces
+                fprintf(arg1, arg2) with fprintf(arg1, "%s", arg2)
+                in each affected line of code.
+        
+        
+           (2)  The newest versions of gcc (and perhaps other
+                compilers) have defined 'getline' as a standard
+                function in 'stdio.h'.  This conflicts with the
+                function 'getline()' in the ASxxxx package.
+                All references to 'getline()' have been changed
+                to 'nxtline()'.
+
+
 
         2009_04_01 (Version 5.00)
 
@@ -7846,6 +7980,12 @@
             .irpc       define an indefinite repeat macro by characters
             .rept       define a repeating macro
             .mexit      exit to end of macro
+
+
+        CHANGE LOG                                              Page D-4
+        
+
+
             .endm       end of macro
             .nchr       assign number of characters to a symbol
             .narg       assign number of expansion arguments to a symbol
@@ -7884,12 +8024,6 @@
             .if    le,...       if argument <= 0
             .if    gt,...       if argument >  0
         
-
-
-        CHANGE LOG                                              Page D-3
-        
-
-
             .if    def,...      if argument is defined
             .if    ndef,...     if argument is not defined
         
@@ -7901,6 +8035,12 @@
             .if    t            if condition is true
             .if    f            if condition is false
             .if    tf           if condition is true or false
+
+
+
+
+        CHANGE LOG                                              Page D-5
+        
 
 
            The  immediate  conditional statements have been added to the
@@ -7942,12 +8082,6 @@
             .iif   le,...       if argument <= 0
             .iif   gt,...       if argument >  0
         
-
-
-        CHANGE LOG                                              Page D-4
-        
-
-
             .iif   def,...      if argument is defined
             .iif   ndef,...     if argument is not defined
         
@@ -7959,6 +8093,12 @@
             .iif    t           if condition is true
             .iif    f           if condition is false
             .iif    tf          if condition is true or false
+
+
+
+
+        CHANGE LOG                                              Page D-6
+        
 
 
            The  listing  options  for the ASxxxx assemblers has been up-
@@ -8000,12 +8140,6 @@
         or  if  you  wish  to suppress the listing of the .list / .nlist
         directives:  
 
-
-
-        CHANGE LOG                                              Page D-5
-        
-
-
             .nlist              ; disables all listing
             .nlist  (!,lst)     ; enables  all listing except
                                 : .list (...) and .nlist
@@ -8018,6 +8152,12 @@
 
             .nlist   1,(!,lst)  ; enables listing even within
                                 ; a FALSE conditional block
+
+
+        CHANGE LOG                                              Page D-7
+        
+
+
 
 
 
@@ -8049,7 +8189,7 @@
            Added the SC/MP ASSCMP assembler to ASxxxx.
 
 
-        CHANGE LOG                                              Page D-6
+        CHANGE LOG                                              Page D-8
         
 
 
@@ -8095,7 +8235,7 @@
            wrong object code. Changed from 37 2A  to  37 3A.
 
 
-        CHANGE LOG                                              Page D-7
+        CHANGE LOG                                              Page D-9
         
 
 
@@ -8141,7 +8281,7 @@
                compile the s19os9 program.
 
 
-        CHANGE LOG                                              Page D-8
+        CHANGE LOG                                             Page D-10
         
 
 
@@ -8193,7 +8333,7 @@
                 aspic
 
 
-        CHANGE LOG                                              Page D-9
+        CHANGE LOG                                             Page D-11
         
 
 
@@ -8250,7 +8390,7 @@
 
 
 
-        CHANGE LOG                                             Page D-10
+        CHANGE LOG                                             Page D-12
         
 
 
@@ -8308,7 +8448,7 @@
                  containing the .end directive.  
 
 
-        CHANGE LOG                                             Page D-11
+        CHANGE LOG                                             Page D-13
         
 
 
@@ -18794,13 +18934,693 @@
 
                                    APPENDIX BD
 
+                                 ASST6 ASSEMBLER
+
+
+
+
+
+        BD.1  ST6 REGISTER SET 
+
+        The following is a list of the ST6 registers used by ASST6:  
+
+                a       -       8-bit accumulator
+                x,y     -       8-bit index registers
+                v,w     -       8-bit scratch registers
+
+
+        BD.2  ST6 INSTRUCTION SET 
+
+
+             The following list specifies the format for each addressing
+        mode supported by ASST6:  
+
+                r               register (a,x,y,w,v) addressing
+        
+                #data           immediate data byte
+        
+                dir or *dir     8-bit zero page addressing
+                                0 <= dir <= 255 
+        
+                ext             12-bit extended addressing
+        
+                (x) or (y)      register indirect addressing
+        
+                label           pc-relative branch addressing
+
+        The  terms  data, dir, offset, ext, and label may all be expres-
+        sions.  
+
+             Note that not all addressing modes are valid with every in-
+        struction, refer to the ST6 technical data for valid modes.  
+        The  following  tables  list all ST6 mnemonics recognized by the
+        ASST6 assembler.  
+
+
+        ASST6 ASSEMBLER                                        PAGE BD-2
+        ST6 INSTRUCTION SET
+
+
+        BD.2.1  Inherent Instructions 
+
+                nop                     ret
+                reti                    stop
+                wait
+
+
+        BD.2.2  Conditional Branch Instructions 
+
+                jrc     label           jrnc    label
+                jrz     label           jrnz    label
+                jrr     #,*dir,label
+                jrs     #,*dir,label
+
+
+        BD.2.3  Bit Manipulation Instructions 
+
+                set     #,*dir          res     #,*dir
+
+
+        BD.2.4  Single Operand Instructions 
+
+                clr     a               clr     *dir
+                com     a
+        
+                dec     r               dec     *dir
+                dec     (x)             dec     (y)
+                inc     r               inc     *dir
+                inc     (x)             inc     (y)
+        
+                rlc     a               sla     a
+
+
+        BD.2.5  Double Operand Instructions 
+
+                add     a,(x)           add     a,(y)
+                add     a,*dir          addi    a,#
+        
+                and     a,(x)           and     a,(y)
+                and     a,*dir          andi    a,#
+        
+                cp      a,(x)           cp      a,(y)
+                cp      a,*dir          cpi     a,#
+        
+                sub     a,(x)           sub     a,(y)
+                sub     a,*dir          subi    a,#
+
+
+
+
+        ASST6 ASSEMBLER                                        PAGE BD-3
+        ST6 INSTRUCTION SET
+
+
+        BD.2.6  Call to Subroutine and Jump Instructions 
+
+                call    ext             jmp     ext
+
+
+        BD.2.7  Load and Store Instructions 
+
+                ld      a,x             ld      a,y
+                ld      a,v             ld      a,w
+        
+                ld      x,a             ld      y,a
+                ld      v,a             ld      w,a
+        
+                ld      a,*dir          ld      *dir,a
+        
+                ld      a,(x)           ld      a,(y)
+                ld      (x),a           ld      (y),a
+        
+                ldi     a,#             ld      *dir,#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   APPENDIX BE
+
+                                 ASST7 ASSEMBLER
+
+
+
+
+
+        BE.1  ST7 REGISTER SET 
+
+        The following is a list of the ST7 registers used by ASST7:  
+
+                a       -       8-bit accumulator
+                x,y     -       8-bit index registers
+                cc      -       8-bit condition code register
+                s       -       16-bit stack pointer
+
+
+        BE.2  ST7 INSTRUCTION SET 
+
+
+             The following list specifies the format for each addressing
+        mode supported by ASST7:  
+
+                reg             register addressing
+                                (a,x,y,s,cc)
+        
+                #data           immediate data byte
+        
+                *saddr          8-bit zero page addressing
+                                0x00 <= dir <= 0xFF
+        
+                laddr           16-bit addressing
+        
+                (x)             register indirect addressing
+
+
+        ASST7 ASSEMBLER                                        PAGE BE-2
+        ST7 INSTRUCTION SET
+
+
+                (*sofst,r)      short indexed (r = x,y)
+                (sofst,r).b
+        
+                (lofst,r).w     long indexed (r = x,y)
+        
+                (ofst,r)        if ofst is relocatable or
+                                an external value then
+                                the (lofst,r).w mode is
+                                selected by default
+                                else
+        
+                (ofst,r)        if ofst is a locally
+                                defined constant then
+                                the (sofst,r).b mode
+                                is selected when
+                                0x00 <= ofst <= 0xFF else
+                                the (lofst,r).w mode
+                                is selected
+        
+                                Instructions supporting
+                                only a single form will
+                                use the appropriate form
+                                but will report an error.
+        
+        
+                [*saddr]        short indirect
+                [saddr].b
+        
+                [laddr].w       long indexed
+        
+                [addr]          if addr is relocatable or
+                                an external value then
+                                the [laddr].w mode is
+                                selected by default
+                                else
+        
+                [addr]          if addr is a locally
+                                defined constant then
+                                the [saddr].b mode
+                                is selected when
+                                0x00 <= addr <= 0xFF else
+                                the [laddr].w mode
+                                is selected
+        
+                                Instructions supporting
+                                only a single form will
+                                use the appropriate form
+                                but will report an error.
+
+
+        ASST7 ASSEMBLER                                        PAGE BE-3
+        ST7 INSTRUCTION SET
+
+
+                ([*saddr],r)    short indirect indexed
+                ([saddr].b,r)   (r = x,y)
+                ([saddr],r).b
+        
+                ([laddr].w,r)   long indirect indexed
+                ([laddr],r).w   (r = x,y)
+        
+                ([addr],r)      if addr is relocatable or
+                                an external value then
+                                the ([laddr],r).w mode is
+                                selected by default
+                                else
+        
+                ([addr],r)      if addr is a locally
+                                defined constant then
+                                the ([saddr],r).b mode
+                                is selected when
+                                0x00 <= addr <= 0xFF else
+                                the ([laddr],r).w mode
+                                is selected
+        
+                                Instructions supporting
+                                only a single form will
+                                use the appropriate form
+                                but will report an error.
+        
+        
+                label           pc-relative branch addressing
+
+
+
+        The  terms  data,  saddr,  laddr,  addr, sofst, lofst, ofst, and
+        label may all be expressions.  
+
+             Note that not all addressing modes are valid with every in-
+        struction, refer to the ST7 technical data for valid modes.  
+        The  following  tables  list all ST7 mnemonics recognized by the
+        ASST7 assembler.  The designation [] refers to  a  required  ad-
+        dressing mode argument.  
+
+
+
+
+        ASST7 ASSEMBLER                                        PAGE BE-4
+        ST7 INSTRUCTION SET
+
+
+        BE.2.1  Inherent Instructions 
+
+                nop                     trap
+                wfi                     halt
+                ret                     iret
+                sim                     rim
+                scf                     rcf
+                rsp
+
+
+        BE.2.2  Conditional Branch Instructions 
+
+                jra     label
+                jrt     label           jrf     label
+                jrih    label           jril    label
+                jrh     label           jrnh    label
+                jrm     label           jrnm    label
+                jrmi    label           jrpl    label
+                jreq    label           jrne    label
+                jrc     label           jrnc    label
+                jrult   label           jruge   label
+                jrugt   label           jrule   label
+        
+                jra     [saddr]
+                jrt     [saddr]         jrf     [saddr]
+                jrih    [saddr]         jril    [saddr]
+                jrh     [saddr]         jrnh    [saddr]
+                jrm     [saddr]         jrnm    [saddr]
+                jrmi    [saddr]         jrpl    [saddr]
+                jreq    [saddr]         jrne    [saddr]
+                jrc     [saddr]         jrnc    [saddr]
+                jrult   [saddr]         jruge   [saddr]
+                jrugt   [saddr]         jrule   [saddr]
+
+
+        BE.2.3  Bit Test and Branch Instructions 
+
+                btjt    saddr,#,label
+                btjf    saddr,#,label
+                btjt    [saddr],#,label
+                btjf    [saddr],#,label
+
+
+
+
+        ASST7 ASSEMBLER                                        PAGE BE-5
+        ST7 INSTRUCTION SET
+
+
+        BE.2.4  Bit Manipulation Instructions 
+
+                bset    saddr,#
+                bres    saddr,#
+                bset    [saddr],#
+                bres    [saddr],#
+
+
+        BE.2.5  Single Operand Instructions 
+
+                neg     []              cpl     []
+                srl     []              rrc     []
+                sra     []              rlc     []
+                sll     []              sla     []
+                dec     []              inc     []
+                tnz     []              swap    []
+                clr     []
+        
+                pop     reg             push    reg
+
+
+        BE.2.6  Double Operand Instructions 
+
+                add     a,[]            adc     a,[]
+                and     a,[]            bcp     a,[]
+                or      a,[]            sbc     a,[]
+                sub     a,[]            xor     a,[]
+        
+                mul     x,a             mul     y,a
+        
+                cp      reg,[]
+        
+                ld      [],[]
+
+
+        BE.2.7  Call to Subroutine and Jump Instructions 
+
+                call    []              jp      []
+        
+                callr   label           callr   [saddr]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   APPENDIX BF
+
+                                 ASST8 ASSEMBLER
+
+
+
+
+
+        BF.1  ST8 REGISTER SET 
+
+        The following is a list of the ST8 registers used by ASST8:  
+
+                a       -       8-bit accumulator
+                xl,yl   -       LSB of index registers
+                xh,yh   -       MSB of index registers
+                x,y     -       16-Bit index registers
+                sp      -       16-bit stack pointer
+                cc      -       8-bit condition code register
+
+
+        BF.2  ST8 INSTRUCTION SET 
+
+
+             The following list specifies the format for each addressing
+        mode supported by ASST8:  
+
+                reg             register addressing
+                                (a,x,xl,xh,y,yl,yh,sp,cc)
+        
+                #data           immediate data
+        
+                *saddr          8-bit zero page addressing
+                                0x00 <= saddr <= 0xFF
+        
+                laddr           16-bit addressing
+                                0x0000 <= laddr <= 0xFFFF
+        
+                eaddr           24-bit addressing
+                                0x000000 <= eaddr <= 0xFFFFFF
+        
+                (x)             register indirect addressing
+
+
+        ASST8 ASSEMBLER                                        PAGE BF-2
+        ST8 INSTRUCTION SET
+
+
+                (*sofst,r)      short indexed (r = x,y,sp)
+                (sofst,r).b
+        
+                (lofst,r).w     long indexed (r = x,y)
+        
+                (eofst,r).e     extended indexed (r = x,y)
+                                eofst is a lofst value,
+                                i.e. a 16-bit value where
+                                (eofst,r).e points to a
+                                24-bit address
+        
+                (ofst,r)        for the ldf instruction the
+                                (eofst,r).e mode is selected
+                                else
+        
+                (ofst,r)        if ofst is relocatable or
+                                an external value then
+                                the (lofst,r).w mode is
+                                selected by default
+                                else
+        
+                (ofst,r)        if ofst is a locally
+                                defined constant then
+                                the (sofst,r).b mode
+                                is selected when
+                                0x00 <= ofst <= 0xFF else
+                                the (lofst,r).w mode
+                                is selected
+        
+                                Instructions supporting
+                                only a single form will
+                                use the appropriate form
+                                but will report an error.
+        
+        
+                [*saddr]        short indirect
+                [saddr].b
+        
+                [laddr].w       long indexed
+        
+                [eaddr].e       extended indexed
+        
+                [addr]          for the callf, jpf, and ldf
+                                instructions the [eaddr].e
+                                mode is selected
+                                else
+        
+                [addr]          if addr is relocatable or
+                                an external value then
+                                the [laddr].w mode is
+                                selected by default
+                                else
+
+
+        ASST8 ASSEMBLER                                        PAGE BF-3
+        ST8 INSTRUCTION SET
+
+
+        
+                [addr]          if addr is a locally
+                                defined constant then
+                                the [saddr].b mode
+                                is selected when
+                                0x00 <= addr <= 0xFF else
+                                the [laddr].w mode
+                                is selected
+        
+                                Instructions supporting
+                                only a single form will
+                                use the appropriate form
+                                but will report an error.
+
+
+        ASST8 ASSEMBLER                                        PAGE BF-4
+        ST8 INSTRUCTION SET
+
+
+                ([*saddr],r)    short indirect indexed
+                ([saddr].b,r)   (r = x,y)
+                ([saddr],r).b
+        
+                ([laddr].w,r)   long indirect indexed
+                ([laddr],r).w   (r = x,y)
+        
+                ([eaddr].e,r)   extended indirect indexed
+                ([eaddr],r).e   (r = x,y)
+        
+                ([addr],r)      for the ldf instruction the
+                                ([eaddr],r).e mode is selected
+                                else
+        
+                ([addr],r)      if addr is relocatable or
+                                an external value then
+                                the ([laddr],r).w mode is
+                                selected by default
+                                else
+        
+                ([addr],r)      if addr is a locally
+                                defined constant then
+                                the ([saddr],r).b mode
+                                is selected when
+                                0x00 <= addr <= 0xFF else
+                                the ([laddr],r).w mode
+                                is selected
+        
+                                Instructions supporting
+                                only a single form will
+                                use the appropriate form
+                                but will report an error.
+        
+        
+                label           pc-relative branch addressing
+
+
+
+        The  terms data, saddr, laddr, eaddr, addr, sofst, lofst, eofst,
+        ofst, and label may all be expressions.  
+
+             Note that not all addressing modes are valid with every in-
+        struction, refer to the ST8 technical data for valid modes.  
+        The  following  tables  list all ST8 mnemonics recognized by the
+        ASST8 assembler.  The designation [] refers to  a  required  ad-
+        dressing mode argument.  
+
+
+        ASST8 ASSEMBLER                                        PAGE BF-5
+        ST8 INSTRUCTION SET
+
+
+        BF.2.1  Inherent Instructions 
+
+                nop                     trap
+                wfi                     wfi
+                halt                    ret
+                retf                    iret
+                sim                     rim
+                scf                     rcf
+                rvf                     ccf
+
+
+        BF.2.2  Conditional Branch Instructions 
+
+                jra     label
+                jrt     label           jrf     label
+                jrugt   label           jrule   label
+                jruge   label           jrult   label
+                jrnc    label           jrc     label
+                jrne    label           jreq    label
+                jrnv    label           jrv     label
+                jrpl    label           jrmi    label
+                jrsgt   label           jrsle   label
+                jrsge   label           jrslt   label
+                jrnh    label           jrh     label
+                jrnm    label           jrm     label
+                jril    label           jrih    label
+
+
+        BF.2.3  Bit Test and Branch Instructions 
+
+                btjt    laddr,#,label
+                btjf    laddr,#,label
+
+
+        BF.2.4  Bit Manipulation Instructions 
+
+                bccm    laddr,#
+                bcpl    laddr,#
+                bset    laddr,#
+                bres    laddr,#
+
+
+        ASST8 ASSEMBLER                                        PAGE BF-6
+        ST8 INSTRUCTION SET
+
+
+        BF.2.5  Single Operand Instructions 
+
+                neg     []              cpl     []
+                srl     []              rrc     []
+                sra     []              rlc     []
+                sll     []              sla     []
+                dec     []              inc     []
+                tnz     []              swap    []
+                clr     []
+        
+                negw    reg             cplw    reg
+                srlw    reg             rrcw    reg
+                sraw    reg             rlcw    reg
+                sllw    reg             slaw    reg
+                decw    reg             incw    reg
+                tnzw    reg             swapw   reg
+                clrw    reg
+        
+                pop     reg             push    reg
+
+
+        BF.2.6  Double Operand Instructions 
+
+                add     a,[]            adc     a,[]
+                and     a,[]            bcp     a,[]
+                cp      a,[]            or      a,[]
+                sbc     a,[]            sub     a,[]
+                xor     a,[]
+        
+                add     sp,#            sub     sp,#
+        
+                addw    reg,[]          subw    reg,[]
+                cpw     reg,[]
+        
+                mul     x,a             mul     y,a
+                div     x,a             div     y,a
+                divw    x,y
+        
+                exg     a,reg           exg     a,laddr
+                exgw    x,y
+        
+                rrwa    x,a             rrwa    y,a
+                rlwa    x,a             rlwa    y,a
+        
+                ld      [],[]
+                ldf     a,[]            ldf     [],a
+                ldw     reg,[]          ldw     [],reg
+        
+                mov     saddr,saddr
+                mov     laddr,laddr     mov     laddr,#
+
+
+        ASST8 ASSEMBLER                                        PAGE BF-7
+        ST8 INSTRUCTION SET
+
+
+        BF.2.7  Call to Subroutine and Jump Instructions 
+
+                call    []              jp      []
+                callf   eaddr           callf   [eaddr].e
+                jpf     eaddr           jpf     [eaddr].e
+        
+                callr   label
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   APPENDIX BG
+
                                  ASZ8 ASSEMBLER
 
 
 
 
 
-        BD.1  Z8 REGISTER SET 
+        BG.1  Z8 REGISTER SET 
 
         The following is a list of the Z8 registers used by ASZ8:  
 
@@ -18808,7 +19628,7 @@
                 rr0 ... rr15    -       16-bit accumulators
 
 
-        BD.2  Z8 INSTRUCTION SET 
+        BG.2  Z8 INSTRUCTION SET 
 
 
              The  following  tables  list all Z8 mnemonics recognized by
@@ -18838,7 +19658,7 @@
         The terms data, addr, and offset may all be expressions.  
 
 
-        ASZ8 ASSEMBLER                                         PAGE BD-2
+        ASZ8 ASSEMBLER                                         PAGE BG-2
         Z8 INSTRUCTION SET
 
 
@@ -18874,14 +19694,14 @@
         tion, refer to the Z8 technical data for valid modes.  
 
 
-        BD.2.1  Load Instructions 
+        BG.2.1  Load Instructions 
 
                 clr     []
                 ld      [],[]           ldc     [],[]
                 pop     []              push    []
 
 
-        BD.2.2  Arithmetic Instructions 
+        BG.2.2  Arithmetic Instructions 
 
                 adc     [],[]           add     [],[]
                 cp      [],[]           da      []
@@ -18892,43 +19712,43 @@
 
 
 
-        ASZ8 ASSEMBLER                                         PAGE BD-3
+        ASZ8 ASSEMBLER                                         PAGE BG-3
         Z8 INSTRUCTION SET
 
 
-        BD.2.3  Logical Instructions 
+        BG.2.3  Logical Instructions 
 
                 and     [],[]           com     []
                 or      [],[]           xor     [],[]
 
 
-        BD.2.4  Program Control Instructions 
+        BG.2.4  Program Control Instructions 
 
                 call    []              djnz    [],[]
                 iret                    jp      CC,[]
                 jr      CC,[]           ret
 
 
-        BD.2.5  Bit Manipulation Instructions 
+        BG.2.5  Bit Manipulation Instructions 
 
                 tcm     [],[]           tm      [],[]
                 and     [],[]           or      [],[]
                 xor     [],[]
 
 
-        BD.2.6  Block Transfer Instructions 
+        BG.2.6  Block Transfer Instructions 
 
                 ldci    [],[]
 
 
-        BD.2.7  Rotate and Shift Instructions 
+        BG.2.7  Rotate and Shift Instructions 
 
                 rl      []              rlc     []
                 rr      []              rrc     []
                 sra     []              swap    []
 
 
-        BD.2.8  Cpu Control Instructions 
+        BG.2.8  Cpu Control Instructions 
 
                 ccf
                 di                      ei
@@ -18950,7 +19770,7 @@
 
 
 
-                                   APPENDIX BE
+                                   APPENDIX BH
 
                                  ASZ80 ASSEMBLER
 
@@ -18958,7 +19778,7 @@
 
 
 
-        BE.1  .z80 DIRECTIVE 
+        BH.1  .z80 DIRECTIVE 
 
         Format:  
 
@@ -18972,7 +19792,7 @@
         count to be output.  
 
 
-        BE.2  .hd64 DIRECTIVE 
+        BH.2  .hd64 DIRECTIVE 
 
         Format:  
 
@@ -18989,11 +19809,11 @@
 
 
 
-        ASZ80 ASSEMBLER                                        PAGE BE-2
+        ASZ80 ASSEMBLER                                        PAGE BH-2
         THE .__.CPU.  VARIABLE
 
 
-        BE.3  THE .__.CPU.  VARIABLE 
+        BH.3  THE .__.CPU.  VARIABLE 
 
 
              The  value of the pre-defined symbol '.__.CPU.' corresponds
@@ -19022,7 +19842,7 @@
         multiple non equal definitions.  
 
 
-        BE.4  Z80 REGISTER SET AND CONDITIONS 
+        BH.4  Z80 REGISTER SET AND CONDITIONS 
 
 
              The  following  is a complete list of register designations
@@ -19044,11 +19864,11 @@
 
 
 
-        ASZ80 ASSEMBLER                                        PAGE BE-3
+        ASZ80 ASSEMBLER                                        PAGE BH-3
         Z80 INSTRUCTION SET
 
 
-        BE.5  Z80 INSTRUCTION SET 
+        BH.5  Z80 INSTRUCTION SET 
 
 
              The following list specifies the format for each addressing
@@ -19086,11 +19906,11 @@
         a required addressing mode argument.  
 
 
-        ASZ80 ASSEMBLER                                        PAGE BE-4
+        ASZ80 ASSEMBLER                                        PAGE BH-4
         Z80 INSTRUCTION SET
 
 
-        BE.5.1  Inherent Instructions 
+        BH.5.1  Inherent Instructions 
 
                 ccf             cpd
                 cpdr            cpi
@@ -19105,7 +19925,7 @@
                 rrd             scf
 
 
-        BE.5.2  Implicit Operand Instructions 
+        BH.5.2  Implicit Operand Instructions 
 
                 adc     a,[]            adc     []
                 add     a,[]            add     []
@@ -19126,11 +19946,11 @@
                 xor     a,[]            xor     []
 
 
-        ASZ80 ASSEMBLER                                        PAGE BE-5
+        ASZ80 ASSEMBLER                                        PAGE BH-5
         Z80 INSTRUCTION SET
 
 
-        BE.5.3  Load Instruction 
+        BH.5.3  Load Instruction 
 
                 ld      rg,[]           ld      [],rg
                 ld      (bc),a          ld      a,(bc)
@@ -19146,7 +19966,7 @@
                 ldi                     ldir
 
 
-        BE.5.4  Call/Return Instructions 
+        BH.5.4  Call/Return Instructions 
 
                 call    C,label         ret     C
                 call    M,label         ret     M
@@ -19159,7 +19979,7 @@
                 call    label           ret
 
 
-        BE.5.5  Jump and Jump to Subroutine Instructions 
+        BH.5.5  Jump and Jump to Subroutine Instructions 
 
                 jp      C,label         jp      M,label
                 jp      NC,label        jp      NZ,label
@@ -19176,18 +19996,18 @@
                 jr      label
 
 
-        ASZ80 ASSEMBLER                                        PAGE BE-6
+        ASZ80 ASSEMBLER                                        PAGE BH-6
         Z80 INSTRUCTION SET
 
 
-        BE.5.6  Bit Manipulation Instructions 
+        BH.5.6  Bit Manipulation Instructions 
 
                 bit     n,[]
                 res     n,[]
                 set     n,[]
 
 
-        BE.5.7  Interrupt Mode and Reset Instructions 
+        BH.5.7  Interrupt Mode and Reset Instructions 
 
                 im      n
                 im      n
@@ -19195,7 +20015,7 @@
                 rst     n
 
 
-        BE.5.8  Input and Output Instructions 
+        BH.5.8  Input and Output Instructions 
 
                 in      a,(n)           in      rg,(c)
                 ind                     indr
@@ -19206,7 +20026,7 @@
                 outi                    otir
 
 
-        BE.5.9  Register Pair Instructions 
+        BH.5.9  Register Pair Instructions 
 
                 add     hl,rp           add     ix,rp
                 add     iy,rp
@@ -19221,11 +20041,11 @@
                 push    rp              pop     rp
 
 
-        ASZ80 ASSEMBLER                                        PAGE BE-7
+        ASZ80 ASSEMBLER                                        PAGE BH-7
         Z80 INSTRUCTION SET
 
 
-        BE.5.10  HD64180/Z180 Specific Instructions 
+        BH.5.10  HD64180/Z180 Specific Instructions 
 
                 in0     rg,(n)
                 out0    (n),rg

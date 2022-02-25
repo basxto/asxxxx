@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#   3 March 2010			Created for LINUX     / make /
+#   25 October 2010			Created for LINUX     / make /
 #
 ######################################################################
 
@@ -38,6 +38,9 @@ all:	as1802		\
 	asrab		\
 	asscmp		\
 	ascheck		\
+	asst6		\
+	asst7		\
+	asst8		\
 	asz8		\
 	asz80		\
 	aslink		\
@@ -79,6 +82,9 @@ clean:
 	rm -f $(SRCPIC)*.o
 	rm -f $(SRCRAB)*.o
 	rm -f $(SRCSCMP)*.o
+	rm -f $(SRCST6)*.o
+	rm -f $(SRCST7)*.o
+	rm -f $(SRCST8)*.o
 	rm -f $(SRCZ8)*.o
 	rm -f $(SRCZ80)*.o
 	rm -f as1802
@@ -110,6 +116,9 @@ clean:
 	rm -f asrab
 	rm -f asscmp
 	rm -f ascheck
+	rm -f asst6
+	rm -f asst7
+	rm -f asst8
 	rm -f asz8
 	rm -f asz80
 	rm -f aslink
@@ -152,6 +161,9 @@ prep:
 	rm -f $(SRCPIC)*.o
 	rm -f $(SRCRAB)*.o
 	rm -f $(SRCSCMP)*.o
+	rm -f $(SRCST6)*.o
+	rm -f $(SRCST7)*.o
+	rm -f $(SRCST8)*.o
 	rm -f $(SRCZ8)*.o
 	rm -f $(SRCZ80)*.o
 	rm -f as1802
@@ -183,6 +195,9 @@ prep:
 	rm -f asrab
 	rm -f asscmp
 	rm -f ascheck
+	rm -f asst6
+	rm -f asst7
+	rm -f asst8
 	rm -f asz8
 	rm -f asz80
 	rm -f aslink
@@ -237,6 +252,9 @@ SRCM8C=		$(ASXBAS)asm8c/
 SRCPIC=		$(ASXBAS)aspic/
 SRCRAB=		$(ASXBAS)asrab/
 SRCSCMP=	$(ASXBAS)asscmp/
+SRCST6=		$(ASXBAS)asst6/
+SRCST7=		$(ASXBAS)asst7/
+SRCST8=		$(ASXBAS)asst8/
 SRCZ8=		$(ASXBAS)asz8/
 SRCZ80=		$(ASXBAS)asz80/
 
@@ -267,7 +285,7 @@ $(AS1802SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC1802)1802.h
 
 as1802:	$(ASXXSRC) $(AS1802SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS1802SRC) -o as1802
-	cp as1802 $(DSTEXE)as1802
+	cp as1802 -T $(DSTEXE)as1802
 	strip $(DSTEXE)as1802
 	chmod 777 $(DSTEXE)as1802
 
@@ -745,6 +763,57 @@ asscmp:	$(ASXXSRC) $(ASSCMPSRC)
 	cp asscmp $(DSTEXE)asscmp
 	strip $(DSTEXE)asscmp
 	chmod 777 $(DSTEXE)asscmp
+
+
+####################################################################
+# ASST6
+####################################################################
+
+ASST6 =		st6adr.o st6mch.o st6pst.o
+
+ASST6SRC =	$(addprefix $(SRCST6),$(ASST6))
+
+$(ASST6SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCST6)st6.h
+
+asst6:	$(ASXXSRC) $(ASST6SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASST6SRC) -o asst6
+	cp asst6 $(DSTEXE)asst6
+	strip $(DSTEXE)asst6
+	chmod 777 $(DSTEXE)asst6
+
+
+####################################################################
+# ASST7
+####################################################################
+
+ASST7 =		st7adr.o st7mch.o st7pst.o
+
+ASST7SRC =	$(addprefix $(SRCST7),$(ASST7))
+
+$(ASST7SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCST7)st7.h
+
+asst7:	$(ASXXSRC) $(ASST7SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASST7SRC) -o asst7
+	cp asst7 $(DSTEXE)asst7
+	strip $(DSTEXE)asst7
+	chmod 777 $(DSTEXE)asst7
+
+
+####################################################################
+# ASST8
+####################################################################
+
+ASST8 =		st8adr.o st8mch.o st8pst.o
+
+ASST8SRC =	$(addprefix $(SRCST8),$(ASST8))
+
+$(ASST8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCST8)st8.h
+
+asst8:	$(ASXXSRC) $(ASST8SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASST8SRC) -o asst8
+	cp asst8 $(DSTEXE)asst8
+	strip $(DSTEXE)asst8
+	chmod 777 $(DSTEXE)asst8
 
 
 ####################################################################

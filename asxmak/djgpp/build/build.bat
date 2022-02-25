@@ -28,6 +28,9 @@ make ash8
 make asavr
 make aspic
 make asscmp
+make asst6
+make asst7
+make asst8
 make ascheck
 make aslink
 make asxscn
