@@ -1,4 +1,4 @@
-.sbttl	/* T80C390.SFR */
+.sbttl	/* t80c390.sfr */
 .nlist
 
 ;	Include this file to select the processor SFR definitions.
@@ -18,7 +18,7 @@
 ;		.DS87C530
 ;		.DS87C550
 ;
-;	then the cpu type should not be selected here.
+;	then the cpu type and SFR registers should not be selected here.
 ;
 ;	If no processor specific assembler directive is
 ;	specified in you assembler file then select a
@@ -148,6 +148,10 @@
 	.error	DSCpuType + 1	; CPU Type not Selected
 .endif
 
+.if DSCpuType
+	SFR_BITS	=:	__SFR_BITS
+.endif
+
 .page
 .sbttl	Conditional Value Definitions
 
@@ -160,45 +164,77 @@
 	C530 =: DS83C530 | DS87C530
 	C550 =: DS83C550 | DS87C550
 
-.if SFR_BITS
-	SFR_BITS =: 1
-.endif
-
 .page
 .sbttl	Special Function Register and Bit Definitions
 
-.if DS8xCxxx
-	.sbttl	DS8xCxxx Special Function Register and Bit Definitions
-.endif
-.if DS80C310
-	.sbttl	DS80C310 Special Function Register and Bit Definitions
-.endif
-.if DS80C320
-	.sbttl	DS80C320 Special Function Register and Bit Definitions
-.endif
-.if DS80C323
-	.sbttl	DS80C323 Special Function Register and Bit Definitions
-.endif
-.if DS80C390
-	.sbttl	DS80C390 Special Function Register and Bit Definitions
-.endif
-.if DS83C520
-	.sbttl	DS83C520 Special Function Register and Bit Definitions
-.endif
-.if DS83C530
-	.sbttl	DS83C530 Special Function Register and Bit Definitions
-.endif
-.if DS83C550
-	.sbttl	DS83C550 Special Function Register and Bit Definitions
-.endif
-.if DS87C520
-	.sbttl	DS87C520 Special Function Register and Bit Definitions
-.endif
-.if DS87C530
-	.sbttl	DS87C530 Special Function Register and Bit Definitions
-.endif
-.if DS87C550
-	.sbttl	DS87C550 Special Function Register and Bit Definitions
+.if SFR_BITS
+	.if DS8xCxxx
+		.sbttl	DS8xCxxx Special Function Register and Bit Definitions
+	.endif
+	.if DS80C310
+		.sbttl	DS80C310 Special Function Register and Bit Definitions
+	.endif
+	.if DS80C320
+		.sbttl	DS80C320 Special Function Register and Bit Definitions
+	.endif
+	.if DS80C323
+		.sbttl	DS80C323 Special Function Register and Bit Definitions
+	.endif
+	.if DS80C390
+		.sbttl	DS80C390 Special Function Register and Bit Definitions
+	.endif
+	.if DS83C520
+		.sbttl	DS83C520 Special Function Register and Bit Definitions
+	.endif
+	.if DS83C530
+		.sbttl	DS83C530 Special Function Register and Bit Definitions
+	.endif
+	.if DS83C550
+		.sbttl	DS83C550 Special Function Register and Bit Definitions
+	.endif
+	.if DS87C520
+		.sbttl	DS87C520 Special Function Register and Bit Definitions
+	.endif
+	.if DS87C530
+		.sbttl	DS87C530 Special Function Register and Bit Definitions
+	.endif
+	.if DS87C550
+		.sbttl	DS87C550 Special Function Register and Bit Definitions
+	.endif
+.else
+	.if DS8xCxxx
+		.sbttl	DS8xCxxx Special Function Register
+	.endif
+	.if DS80C310
+		.sbttl	DS80C310 Special Function Register
+	.endif
+	.if DS80C320
+		.sbttl	DS80C320 Special Function Register
+	.endif
+	.if DS80C323
+		.sbttl	DS80C323 Special Function Register
+	.endif
+	.if DS80C390
+		.sbttl	DS80C390 Special Function Register
+	.endif
+	.if DS83C520
+		.sbttl	DS83C520 Special Function Register
+	.endif
+	.if DS83C530
+		.sbttl	DS83C530 Special Function Register
+	.endif
+	.if DS83C550
+		.sbttl	DS83C550 Special Function Register
+	.endif
+	.if DS87C520
+		.sbttl	DS87C520 Special Function Register
+	.endif
+	.if DS87C530
+		.sbttl	DS87C530 Special Function Register
+	.endif
+	.if DS87C550
+		.sbttl	DS87C550 Special Function Register
+	.endif
 .endif
 
 .page

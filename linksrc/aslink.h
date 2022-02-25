@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,7 +13,19 @@
  *	jhartman@compuserve.com
  */
 
-#define	VERSION	"V04.00"
+/*
+ * System Include Files
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+/*
+ * Local Definitions
+ */
+
+#define	VERSION	"V04.10"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -25,16 +37,37 @@
  */
 #define	SDCDB	1
 
-
 /*
  * The assembler requires certain variables to have
  * at least 32 bits to allow correct address processing.
  *
  * The type INT32 is defined so that compiler dependent
  * variable sizes may be specified in one place.
+ *
+ * LONGINT is defined when INT32 is 'long' to
+ * select the 'l' forms for format strings.
  */
 
+/* Turbo C++ 3.0 for DOS */
+/* 'int' is 16-bits, 'long' is 32-bits */
+
+#ifdef	__TURBOC__
+#define		INT32	long
+#define		LONGINT
+#endif
+
+/* Symantec C++ V6.x/V7.x for DOS (not DOSX) */
+/* 'int' is 16-bits, 'long' is 32-bits */
+
+#ifdef	__SC__
+#define		INT32	long
+#define		LONGINT
+#endif
+
+/* The DEFAULT is 'int' is 32 bits */
+#ifndef	INT32
 #define		INT32	int
+#endif
 
 
 /*)Module	aslink.h
@@ -58,17 +91,22 @@
 		LKDATA.C
 		LKLIST.C
 		LKNOICE.C
+		LKSDCDB.C
 		LKRLOC.C
+		LKRLOC3.C
+		LKRLOC4.C
 		LKLIBR.C
 		LKOUT.C
 	}
 	$(STACK) = 2000
 */
 
+#undef	VOID
+
 /* DECUS C void definition */
 /* File/extension seperator */
 
-#ifdef	decus
+#ifdef	DECUS
 #define	VOID	char
 #define	FSEPX	'.'
 #endif
@@ -126,7 +164,10 @@
 #define	NHASH	     (1 << 6)	/* Buckets in hash table */
 #define	HMASK	    (NHASH - 1)	/* Hash mask */
 #define	NLPP		60	/* Lines per page */
-#define	NMAX		78	/* Maximum S19/IHX line length */
+#define	NMAX		78	/* IXX/SXX/DBX Buffer Length */
+#define		IXXMAXBYTES	32	/* NMAX > (2 * IXXMAXBYTES) */
+#define		SXXMAXBYTES	32	/* NMAX > (2 * SXXMAXBYTES) */
+#define		DBXMAXBYTES	64	/* NMAX > (  DBXMAXBYTES  ) */
 #define	FILSPC		80	/* File spec length */
 
 /*
@@ -138,6 +179,12 @@
  * is 16.  It should not be changed.
  */
 #define	NTXT		16	/* T values */
+
+/*
+ * Opcode Cycle definitions (Must Be The Same In ASxxxx / ASLink)
+ */
+#define	CYCNT_BGN	'['	/* Cycle count begin delimiter */
+#define	CYCNT_END	']'	/* Cycle count end   delimiter */
 
 /*
  * Internal ASxxxx Version Variable
@@ -280,6 +327,8 @@ extern	int	ASxxxx_VERSION;
 #define A4_NOBNK	0x8000		/* Non-Banked */
 #define A4_BNK		0x8080		/* Banked */
 
+#define	A4_OUT		0x0100		/* Output Code Flag */
+
 /*
  *	The "R4_" relocation constants define values used in
  *	generating the assembler relocation output data for
@@ -365,9 +414,20 @@ extern	int	ASxxxx_VERSION;
 
 
 /*
- *	General assembler address type
+ *	The defined type 'a_uint' is used for all address and
+ *	unsigned variable value calculations.  Its size is
+ *	required to be at least 32-bits to allow upto
+ *	32-bit addressing or 32-bit value manipulation.
  */
-typedef unsigned INT32 a_uint;
+typedef	unsigned INT32 a_uint;
+
+/*
+ *	The defined type 'v_sint' is used for address and
+ *	variable value calculations requiring a sign.
+ *	Its size is required to be at least 32-bits to allow
+ *	upto 32-bit addressing or 32-bit value manipulation.
+ */
+typedef	signed INT32 v_sint;
 
 /*
  *	The structures of head, mode, bank, area, areax, and sym
@@ -478,6 +538,8 @@ struct	bank
 	int	b_flag;		/* Bank flags */
 	char *	b_fspec;	/* Bank File Specification */
 	FILE *	b_ofp;		/* Bank File Handle */
+	char *	b_ofspec;	/* Bank Output File Specification */
+	int	b_oflag;	/* Bank has output flag */
 	int	b_rtaflg;	/* Bank First Output flag */
 };
 
@@ -510,7 +572,7 @@ struct	area
 	a_uint	a_addr;		/* Beginning address of area */
 	a_uint	a_size;		/* Total size of the area */
 	int	a_bset;		/* Area base address set */
-	int	a_flag;		/* Flag */
+	int	a_flag;		/* Flags */
 	char *	a_id;		/* Name */
 };
 
@@ -751,6 +813,8 @@ extern	char	ctype[];	/*	array of character types, one per
 #define	DGT10	DIGIT|RAD16|RAD10
 #define	LTR16	LETTER|RAD16
 
+extern	char	afspec[];	/*	The filespec created by afile()
+				 */
 extern	char	ccase[];	/*	an array of characters which
 				 *	perform the case translation function
 				 */
@@ -969,6 +1033,7 @@ extern	char *		strrchr();
 #ifdef	OTHERSYSTEM
 
 /* C Library */
+extern	int		delete(char *str);
 extern	VOID		exit(int n);
 
 /* lkmain.c */
@@ -977,6 +1042,7 @@ extern	VOID		bassav(void);
 extern	int		fndidx(char *str);
 extern	int		fndext(char *str);
 extern	VOID		gblsav(void);
+extern	int		intsiz(void);
 extern	VOID		link(void);
 extern	VOID		lkexit(int i);
 extern	int		main(int argc, char *argv[]);
@@ -1008,7 +1074,7 @@ extern	VOID		lnkserr(char *frmt, char *str);
 extern	VOID		newarea(void);
 
 /* lkbank.c */
-extern	VOID		chkbank(void);
+extern	VOID		chkbank(FILE *fp);
 extern	VOID		lkfclose(void);
 extern	VOID		lkfopen(void);
 extern	VOID		lkpbank(char * id);
@@ -1101,7 +1167,7 @@ extern	a_uint		gtb_2b(int i);
 extern	a_uint		gtb_3b(int i);
 extern	a_uint		gtb_4b(int i);
 extern	a_uint		gtb_xb(int i);
-extern	int		lkmerge(int esp, int r, int v);
+extern	a_uint		lkmerge(a_uint val, int r, a_uint v);
 extern	a_uint		ptb_1b(a_uint v, int i);
 extern	a_uint		ptb_2b(a_uint v, int i);
 extern	a_uint		ptb_3b(a_uint v, int i);
@@ -1131,10 +1197,13 @@ extern	VOID		ixx(int i);
 extern	VOID		iflush(void);
 extern	VOID		sxx(int i);
 extern	VOID		sflush(void);
+extern	VOID		dbx(int i);
+extern	VOID		dflush(void);
 
 #else
 
 /* C Library */
+extern	int		delete();
 extern	VOID		exit();
 
 /* lkmain.c */
@@ -1143,6 +1212,7 @@ extern	VOID		bassav();
 extern	int		fndext();
 extern	int		fndidx();
 extern	VOID		gblsav();
+extern	int		intsiz();
 extern	VOID		link();
 extern	VOID		lkexit();
 extern	int		main();
@@ -1301,6 +1371,8 @@ extern	VOID		ixx();
 extern	VOID		iflush();
 extern	VOID		sxx();
 extern	VOID		sflush();
+extern	VOID		dbx();
+extern	VOID		dflush();
 
 #endif
 

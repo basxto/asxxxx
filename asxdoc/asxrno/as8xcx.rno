@@ -21,11 +21,14 @@ by John Hartman.
 .end lit
 
 
-.header level 1;DS8XCXXX Assembler Directives
+.header level 1;AS8XCXXX Assembler Directives
 
-The AS8XCXXX assembler contains directives to specify the particular
-SFR (Special Function Registers) to be enabled during the assembly
-process.  The following directives are supported:
+.header level 2;Processor Selection Directives
+
+The AS8XCXXX assembler contains directives to specify the processor
+core SFR (Special Function Registers) and enable the SFR Bit Register
+values during the assembly process.  The following directives
+are supported:
 
 .skip
 .literal
@@ -43,19 +46,53 @@ process.  The following directives are supported:
 .end literal
 
 .skip
-If the microprocessor selector directive is followed by a non-zero
-argument then the SFR register bit values will also be defined.
+The invocation of one of the processor directives creates a
+processor specific symbol and an SFR-Bits symbol.  For example
+the directive
 
-If a microprocessor selector directive is not specified then no
-SFR or SFR register bit values will be defined.  This mode
-allows the SFR to be defined by an external assembly source
-file.  The file DS8XCXXX.SFR contains the SFR and SFR register
-bit values for all the microprocessor selector directives.
-This file may be modified to create a new SFR for other microprocessor
-types.
+.skip
+.literal
+	.DS80C390
+.end literal
 
-Also, if a microprocessor selector directive is not specified then
-the following address length assembler directives are accepted:
+.skip
+creates the global symbols '____DS80C390' and  '____SFR__BITS' each with
+a value of 1.  If the microprocessor core selection directive is
+followed by an optional argument then the symbol '____SFR__BITS' is
+given the value of the argument.  The file DS8XCXXX.SFR contains
+the SFR and SFR register bit values for all the microprocessor
+selector directives. This file may be modified to create a new
+SFR for other microprocessor types.
+
+  If a microprocessor selection directive is not specified then no
+processor symbols will be defined.  This mode allows the SFR
+and SFR register bit values to be defined by the assembly source
+file.
+
+
+.header level 2;.\c\p\u Directive
+
+  The .cpu directive is similar to the processor selection
+directives.  This directive defines a new processor type and
+creates a user defined symbol:
+
+.skip
+.literal
+	.cpu	"CP84C331"	2
+.end literal
+
+creates the symbol '____CP84C331' with a value of 1 and the
+symbol '____SFR__BITS' with a value of 2.  These values can
+be used to select the processor SFR and SFR register bits
+from an include file.  If the optional final argument, 2,
+is omitted then the value of the symbol '____SFR__BITS' is 1.
+
+
+.header level 2;Processor Addressing Range Directives
+
+  If one of the .DS8... microprocessor selection directives
+is not specified then the following address range assembler
+directives are accepted:
 
 .skip
 .literal
@@ -70,7 +107,53 @@ effect the output format for the .lst, .sym, and .rel files.
 
 The default addressing space for defined microprocessors is
 16-Bit except for the DS80C390 microprocessor which is 24-Bit.
+
+The .cpu directive defaults to the 16-Bit addressing range but
+this can be changed using these directives.
 	
+
+.header level 2;The .____.CPU. Variable
+
+The value of the pre-defined symbol '.____.CPU.' corresponds
+to the selected processor type.  The default value is 0
+which corresponds to the default processor type.  The
+following table lists the processor types and associated
+values for the AS8XCXXX assembler:
+
+.skip 1
+.literal
+	Processor Type		  .__.CPU. Value
+	--------------		  --------------
+	  .cpu				 0
+
+	  .DS8XCXXX			 1
+	  .DS80C310			 2
+	  .DS80C320			 3
+	  .DS80C323			 4
+	  .DS80C390			 5
+	  .DS83C520			 6
+	  .DS83C530			 7
+	  .DS83C550			 8
+	  .DS87C520			 9
+	  .DS87C530			10
+	  .DS87C550			11
+.end literal
+
+.skip 1
+  The variable '.____.CPU.' is by default defined as local
+and will not be output to the created .rel file.  The
+assembler command line options -g or -a will not cause the
+local symbol to be output to the created .rel file.
+
+  The assembler .globl directive may be used to change the
+variable type to global causing its definition to be
+output to the .rel file.  The inclusion of the definition
+of the variable '.____.CPU.' might be a useful means of
+validating that seperately assembled files have been
+compiled for the same processor type.  The linker will
+report an error for variables with multiple non equal
+definitions.
+
 
 .header level 2;DS80C390 Addressing Mode Directive
 
@@ -104,7 +187,7 @@ location loading the mode bits into the ACON register:
 
 .header level 2;The .\m\s\b Directive 
 
-The .msb directive is available in the ASEZ80 assembler.
+The .msb directive is available in the AS8XCXXX assembler.
 
 The assembler operator '>' selects the upper byte (MSB) when
 included in an assembler instruction.  The default assembler
@@ -114,7 +197,7 @@ allows the programmer to specify a particular byte as the
 
   The assembler directive ##.msb#n## configures the assembler
 to select a particular byte as MSB. Given a 24-bit address
-of Mmn (N(2) is <23:16>, m(1) is <15:8>, and n(0) is <7:0>)
+of Nmn (N(2) is <23:16>, m(1) is <15:8>, and n(0) is <7:0>)
 the following examples show how to select a particular
 address byte:
 .skip
@@ -307,10 +390,10 @@ Refer to  the  DS8XCXXX technical  data  for  valid modes.
 
 
 .page
-.header level 1;DS8xCxxx Special Function Registers
+.header level 1;DS8XCXXX Special Function Registers
 
 The 80C32 core Special Function Registers are selected
-using the .DS8xCxxx  assembler directive.
+using the .DS8XCXXX  assembler directive.
 
 .header level 2;SFR Map
 

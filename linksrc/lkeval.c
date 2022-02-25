@@ -1,22 +1,13 @@
 /* lkeval.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -75,8 +66,8 @@
 a_uint
 eval()
 {
-	register int c, v;
-	register a_uint n;
+	int c, v;
+	a_uint n;
 
 	c = getnb();
 	n = 0;
@@ -135,8 +126,8 @@ a_uint
 expr (n)
 int n;
 {
-	register int c, p;
-	register a_uint v, ve;
+	int c, p;
+	a_uint v, ve;
 
 	v = term();
 	while (ctype[c = getnb()] & BINOP) {
@@ -255,8 +246,8 @@ int n;
 a_uint
 term()
 {
-	register int c, r, n;
-	register a_uint v;
+	int c, r, n;
+	a_uint v;
 	struct sym *sp;
 	char id[NCPS];
 
@@ -377,7 +368,7 @@ term()
 
 int
 digit(c, r)
-register int c, r;
+int c, r;
 {
 	if (r == 16) {
 		if (ctype[c] & RAD16) {
@@ -425,7 +416,7 @@ register int c, r;
  
 int
 oprio(c)
-register int c;
+int c;
 {
 	if (c == '*' || c == '/' || c == '%')
 		return (10);

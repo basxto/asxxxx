@@ -5,7 +5,7 @@
  * Bill McKinnon
  * w_mckinnon at conknet dot com
  *
- * (C) Copyright 1998-2003
+ * (C) Copyright 1998-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -18,14 +18,55 @@
  *
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "ds8.h"
 
 static int amode;
 static char buff[80];
-static int ptype;
+static int ds8_bytes;
+static int mchtyp;
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	OPCY_CPU	((char) (0xFD))
+#define	OPCY_AMODE	((char) (0xFC))
+#define	OPCY_BITS	((char) (0xFB))
+
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+
+/*
+ * ds8xcxxx Cycle Count
+ *
+ *	opcycles = ds8pg1[opcode]
+ */
+static char ds8pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   4,12,16, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*10*/  12,12,16, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*20*/  12,12,16, 4, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*30*/  12,12,16, 4, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*40*/  12,12, 8,12, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*50*/  12,12, 8,12, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*60*/  12,12, 8,12, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*70*/  12,12, 8,12, 8,12, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+/*80*/  12,12, 8,12,20,12, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+/*90*/  12,12, 8,12, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*A0*/   8,12, 8,12,20,UN, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+/*B0*/   8,12, 8, 4,16,16,16,16,16,16,16,16,16,16,16,16,
+/*C0*/   8,12, 8, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*D0*/   8,12, 8, 4, 4,16, 4, 4,12,12,12,12,12,12,12,12,
+/*E0*/   8,12, 8, 8, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*F0*/   8,12, 8, 8, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+};
 
 /*
  * Process machine ops.
@@ -36,7 +77,8 @@ struct mne *mp;
 {
 	char *p, *str;
 	char pid[NINPUT], id[NINPUT];
-	register int c, d, op, t, t1, v1;
+	int c, d, t, t1, v1;
+	a_uint op;
 	struct sym *sp;
 	struct expr e, e1;
 
@@ -46,25 +88,30 @@ struct mne *mp;
 	op = mp->m_valu;
 	switch (mp->m_type) {
 
-	case X_PTYPE:
+	case S_CPU:
+		opcycles = OPCY_CPU;
+		lmode = SLIST;
 		switch(op) {
-		default: op = DS8xCxxx;
-		case DS8xCxxx: v1 = 2; str = "DS8xCxxx"; break;
-		case DS80C310: v1 = 2; str = "DS80C310"; break;
-		case DS80C320: v1 = 2; str = "DS80C320"; break;
-		case DS80C323: v1 = 2; str = "DS80C323"; break;
-		case DS80C390: v1 = 3; str = "DS80C390"; break;
-		case DS83C520: v1 = 2; str = "DS83C520"; break;
-		case DS83C530: v1 = 2; str = "DS83C530"; break;
-		case DS83C550: v1 = 2; str = "DS83C550"; break;
-		case DS87C520: v1 = 2; str = "DS87C520"; break;
-		case DS87C530: v1 = 2; str = "DS87C530"; break;
-		case DS87C550: v1 = 2; str = "DS87C550"; break;
-		case DS______: v1 = 2; str = "DS______";
+		default: op = DS8XCXXX;
+		case DS8XCXXX: v1 = 2; str = "DS8XCXXX"; sym[2].s_addr = X_DS8XCXXX; break;
+		case DS80C310: v1 = 2; str = "DS80C310"; sym[2].s_addr = X_DS80C310; break;
+		case DS80C320: v1 = 2; str = "DS80C320"; sym[2].s_addr = X_DS80C320; break;
+		case DS80C323: v1 = 2; str = "DS80C323"; sym[2].s_addr = X_DS80C323; break;
+		case DS80C390: v1 = 3; str = "DS80C390"; sym[2].s_addr = X_DS80C390; break;
+		case DS83C520: v1 = 2; str = "DS83C520"; sym[2].s_addr = X_DS83C520; break;
+		case DS83C530: v1 = 2; str = "DS83C530"; sym[2].s_addr = X_DS83C530; break;
+		case DS83C550: v1 = 2; str = "DS83C550"; sym[2].s_addr = X_DS83C550; break;
+		case DS87C520: v1 = 2; str = "DS87C520"; sym[2].s_addr = X_DS87C520; break;
+		case DS87C530: v1 = 2; str = "DS87C530"; sym[2].s_addr = X_DS87C530; break;
+		case DS87C550: v1 = 2; str = "DS87C550"; sym[2].s_addr = X_DS87C550; break;
+		case DS______: v1 = 2; str = "DS______"; sym[2].s_addr = X_DS______;
 			if (more()) {
 				str = p = pid;
 				d = getnb();
 				while ((c = get()) != d) {
+					if (c == '\0') {
+						qerr();
+					}
 					if (p < &pid[sizeof(pid)-3]) {
 						*p++ = c;
 					} else {
@@ -76,9 +123,10 @@ struct mne *mp;
 			break;
 		}
 		if (op != 0) {
+			ds8_bytes = v1;
 			exprmasks(v1);
 		}
-		ptype = op;
+		mchtyp = (int) op;
 
 		sprintf(id, "__%s", str);
 		sp = lookup(id);
@@ -91,21 +139,36 @@ struct mne *mp;
 
 		sprintf(buff, "%s %s", DS_CPU, str);
 		cpu = buff;
-		lmode = SLIST;
+
+		sp = lookup("__SFR_BITS");
+		if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
+			err('m');
+		}
+		sp->s_type = S_USER;
+		sp->s_flag |= S_ASG;
+
+		if (more()) {
+			expr(&e, 0);
+			abscheck(&e);
+			sp->s_addr = e.e_addr;
+		} else {
+			sp->s_addr = 1;
+		}
 		break;
 
-	case X_AMODE:
-		if ((ptype != 0) && (ptype != DS80C390)) {
+	case S_AMODE:
+		opcycles = OPCY_AMODE;
+		if ((mchtyp != 0) && (mchtyp != DS80C390)) {
 			err('o');
 			break;
 		} else
-		if ((ptype == 0) && ((a_bytes < 2) || (a_bytes > 3))) {
+		if ((mchtyp == 0) && ((a_bytes < 2) || (a_bytes > 3))) {
 			err('o');
 			break;
 		}
 		expr(&e, 0);
 		abscheck(&e);
-		amode = e.e_addr;
+		amode = (int) e.e_addr;
 		if ((amode < 0) || (amode > 2)) {
 			amode = 0;
 			err('o');
@@ -127,11 +190,14 @@ struct mne *mp;
 		break;
 
 	case S_BITS:
-		if (ptype) {
-			err('o');
-			break;
+		if (ds8_bytes == 0) {
+			ds8_bytes = (int) op;
+			exprmasks(ds8_bytes);
+		} else
+		if (ds8_bytes != (int) op) {
+			err('m');
 		}
-		exprmasks(mp->m_valu);
+		opcycles = OPCY_BITS;
 		lmode = SLIST;
 		break;
 
@@ -496,7 +562,7 @@ struct mne *mp;
 		comma();
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -512,7 +578,7 @@ struct mne *mp;
 		outab(op);
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -564,7 +630,7 @@ struct mne *mp;
 		comma();
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -598,7 +664,7 @@ struct mne *mp;
 		comma();
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -754,7 +820,12 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+	if (opcycles == OPCY_NONE) {
+		opcycles = ds8pg1[cb[0] & 0xFF];
 	}
 }
 
@@ -763,7 +834,7 @@ struct mne *mp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);
@@ -802,5 +873,10 @@ VOID
 minit()
 {
 	amode = 0;
+	if (pass == 0) {
+		ds8_bytes = 0;
+		mchtyp = X_DS8XCXXX;
+		sym[2].s_addr = X_DS8XCXXX;
+	}
 }
 

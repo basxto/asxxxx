@@ -10,7 +10,7 @@
 <H2>The Assembler Description</H2>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
-<BR><BR>
+<BR>
 <A NAME = "Directives"> </A>
 <H3><B>
 <IMG SRC = "green.gif" ALT = "-">... General Assembler Directives</A>
@@ -29,6 +29,7 @@ operands.  Legal operands differ with each directive.
 <LI><A HREF= #title>  .title Directive </A>
 <LI><A HREF= #sbttl>  .sbttl Directive </A>
 <LI><A HREF= #page>  .page Directive </A>
+<LI><A HREF= #msg>  .msg Directive </A>
 <LI><A HREF= #error>  .error Directive </A>
 <LI><A HREF= #byte>  .byte, .db, and .fcb Directives </A>
 <LI><A HREF= #word>  .word, .dw, and .fdb Directives </A>
@@ -50,12 +51,14 @@ operands.  Legal operands differ with each directive.
 <LI><A HREF= #local>  .local Directive </A>
 <LI><A HREF= #alt>  .equ, .gblequ, and .lclequ Directives </A>
 <LI><A HREF= #if>  .if, .else, and .endif Directives </A>
+<LI><A HREF= #ifxx>  .ifxx, .else, and .endif Directives </A>
 <LI><A HREF= #ifdef>  .ifdef, .else, and .endif Directives </A>
 <LI><A HREF= #ifndef>  .ifndef, .else, and .endif Directives </A>
 <LI><A HREF= #include>  .include Directive </A>
 <LI><A HREF= #define>  .define and .undefine Directives </A>
 <LI><A HREF= #setdp>  .setdp Directive </A>
 <LI><A HREF= #bits>  .16bit, .24bit, and .32bit Directives </A>
+<LI><A HREF= #msb>  .msb Directive </A>
 <LI><A HREF= #end>  .end Directive </A>
 <BR><BR>
 <LI><A HREF="asmblr.htm#Index">  Return to the Assembler Index</A>
@@ -67,15 +70,16 @@ operands.  Legal operands differ with each directive.
 
 Format:  
 
-        .module string 
+        .module name 
 
-   The .module directive causes the string to be included in the
+   The  .module  directive causes the name to be included in the
 assemblers output file as an identifier for this particular  ob-
-ject  module.   The  string  may  be  from 1 to 79 characters in
-length.  Only one identifier is allowed  per  assembled  module.
-The  main use of this directive is to allow the linker to report
-a modules' use of undefined symbols.  At link time all undefined
-symbols  are  reported  and  the  modules  referencing  them are
+ject module.  The name may be from 1 to 79 characters in length.
+The name may not have any embedded white space (spaces or tabs).
+Only  one  identifier is allowed per assembled module.  The main
+use of this directive  is  to  allow  the  linker  to  report  a
+modules'  use  of undefined symbols.  At link time all undefined
+symbols are  reported  and  the  modules  referencing  them  are
 listed.  
 
 </PRE></B></H4>
@@ -89,7 +93,9 @@ Format:
         .title  string 
 
    The .title directive provides a character string to be placed
-on the second line of each page during listing.  
+on the second line of each page during listing.  The string  be-
+gins  with  the first non white space character (after any space
+or tab) and ends with the end of the line.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -102,7 +108,9 @@ Format:
         .sbttl  string 
 
    The .sbttl directive provides a character string to be placed
-on the third line of each page during listing.  
+on the third line of each page during listing.  The  string  be-
+gins  with  the first non white space character (after any space
+or tab) and ends with the end of the line.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -120,6 +128,30 @@ source  program is processed, this allows an immediately follow-
 ing .sbttl directive to appear  on  the  new  page.   The  .page
 source  line will not appear in the file listing.  Paging may be
 disabled by invoking the -p directive.  
+
+</PRE></B></H4>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
+<HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
+<A NAME = "msg"></A><FONT COLOR="#FF0000">.error</FONT> Directive 
+
+Format:  
+
+        .msg /string/ 
+
+where:  string  represents a text string.  The string is printed
+                to the console during the final assembly pass.  
+
+        /  /    represent   the  delimiting  characters.   These
+                delimiters   may   be   any   paired    printing
+                characters,  as  long  as the characters are not
+                contained within  the  string  itself.   If  the
+                delimiting  characters  do  not  match, the .msg
+                directive will give the (q) error.  
+
+
+   The  .msg  directive  is  useful to report assembly status or
+other information during the assembly process.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -328,6 +360,11 @@ where:  string  is a string of printable ascii characters.
                 delimiting  characters  do not match, the .ascis
                 and .strs directives will give the (q) error.  
 
+
+   The .ascis and .strs directives place one binary byte of data
+for each character in the string into the  object  module.   The
+last character in the string will have the high order bit set.  
+
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
@@ -386,8 +423,8 @@ Format:
         .radix  character 
 
 where:  character  represents  a single character specifying the
-                default radix to be used for succeeding numbers.
-                The character may be any one of the following:  
+        default radix to be used for  succeeding  numbers.   The
+        character may be any one of the following:  
 
                 B,b     Binary
 
@@ -660,6 +697,19 @@ they will be considered undefined.  The assembly directive  (-g)
 can  be  be  invoked to make all undefined symbols global at the
 end of pass 1.  
 
+   Naming  a  symbol  not  existing in the current assembly in a
+.globl directive will cause a 'u' error.  
+
+   The  .globl directive and == construct can be overridden by a
+following .local directive.  
+
+
+                              NOTE
+
+     The  ASxxxx  assemblers  use the last occurring symbol
+     specification in the source file(s) as the type  shown
+     in the symbol table and output to the .rel file.  
+
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
@@ -686,14 +736,25 @@ In defining local symbols the directive .local J is similar to:
 
    The  .local directive and the =:  construct are useful in de-
 fining symbols and constants within a header or definition  file
-that  contains  many  symbols  specific  to the current assembly
-process that should not be exported into the .rel  output  file.
-
-A  typical  usage is in the definition of SFRs (Special Function
+that contains many symbols specific to the current assembly pro-
+cess that should not be exported into the .rel output  file.   A
+typical  usage  is  in  the definition of SFRs (Special Function
 Registers) for a microprocessor.  
 
-   The  .local  directive and =:  construct can be overridden by
-the .globl directive.  
+   The .local directive and =:  construct can be overridden by a
+following .globl directive.  
+
+   A  defined  symbol  that  has  not been given a value is con-
+sidered an external variable and will cause an 'r'  error  in  a
+.local  directive  and  its symbol type will not be changed.  An
+undefined symbol in a .local directive causes a 'u' error.  
+
+
+                              NOTE
+
+     The  ASxxxx  assemblers  use the last occurring symbol
+     specification in the source file(s) as the type  shown
+     in the symbol table and output to the .rel file.
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -777,6 +838,62 @@ delimiter (;):
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <H4><B><PRE>
+<A NAME = "ifxx"></A><FONT COLOR="#FF0000">.ifxx</FONT>, <FONT COLOR="#FF0000">.else</FONT>, and <FONT COLOR="#FF0000">.endif</FONT> Directives 
+   Additional  conditional  directives are available to test the
+value of an evaluated expression:  
+
+        .ifne   expr            ; true if expr != 0
+        .ifeq   expr            ; true if expr == 0
+        .ifgt   expr            ; true if expr >  0
+        .iflt   expr            ; true if expr <  0
+        .ifge   expr            ; true if expr >= 0
+        .ifle   expr            ; true if expr <= 0
+
+   Format:  
+
+        .ifxx   expr
+        .                       ;}
+        .                       ;} range of true condition
+        .                       ;}
+        .else
+        .                       ;}
+        .                       ;} range of false condition
+        .                       ;}
+        .endif
+
+
+   The  conditional  assembly directives allow you to include or
+exclude blocks of source code during the assembly process, based
+on the evaluation of the test condition.  
+
+   The  range of true condition will be processed if the expres-
+sion 'expr' is not zero (i.e.  true) and the range of false con-
+dition  will  be processed if the expression 'expr' is zero (i.e
+false).  The range of true condition is optional as is the .else
+directive  and  the range of false condition.  The following are
+all valid .if/.else/.endif constructions:  
+
+        .ifne   A-4             ;evaluate A-4
+        .byte   1,2             ;insert bytes if A-4 is
+        .endif                  ;not zero
+
+        .ifeq   K+3             ;evaluate K+3
+        .byte   3,4             ;insert bytes if K+3
+        .endif                  ;is zero
+
+        .ifne   J&3             ;evaluate J masked by 3
+        .byte   12              ;insert this byte if J&3
+        .else                   ;is not zero
+        .byte   13              ;insert this byte if J&3
+        .endif                  ;is zero
+
+
+The .ifxx/.else/.endif directives may be nested upto 10 levels. 
+
+</PRE></B></H4>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
+<HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
 <A NAME = "ifdef"></A><FONT COLOR="#FF0000">.ifdef</FONT>, <FONT COLOR="#FF0000">.else</FONT>, and <FONT COLOR="#FF0000">.endif</FONT> Directives 
 
 Format:  
@@ -796,11 +913,11 @@ exclude blocks of source code during the assembly process, based
 on the evaluation of the condition test.  
 
    The  range  of true condition will be processed if the symbol
-'sym' is defined (i.e.  true) and the range of  false  condition
-will  be  processed  if  the  symbol  'sym'  is not defined (i.e
-false).  The range of true condition is optional as is the .else
-directive  and  the range of false condition.  The following are
-all valid .ifdef/.else/.endif constructions:  
+'sym' has been defined with a .define directive or  'sym'  is  a
+variable  with  an  assigned  value else the false range will be
+processed.  The range of true condition is optional  as  is  the
+.else directive and the range of false condition.  The following
+are all valid .ifdef/.else/.endif constructions:  
 
         .ifdef  sym$1           ;lookup symbol sym$1
         .byte   1,2             ;insert bytes if sym$1 is
@@ -843,11 +960,11 @@ exclude blocks of source code during the assembly process, based
 on the evaluation of the condition test.  
 
    The  range  of true condition will be processed if the symbol
-'sym' is not defined (i.e.  true) and the range of false  condi-
-tion  will  be  processed  if  the  symbol 'sym' is defined (i.e
-false).  The range of true condition is optional as is the .else
-directive  and  the range of false condition.  The following are
-all valid .ifndef/.else/.endif constructions:  
+'sym' is not defined by a .define directive and a variable 'sym'
+has  not been assigned a value else the range of false condition
+will be processed.  The range of true condition is  optional  as
+is  the  .else  directive and the range of false condition.  The
+following are all valid .ifndef/.else/.endif constructions:  
 
         .ifndef sym$1           ;lookup symbol sym$1
         .byte   1,2             ;insert bytes if sym$1 is
@@ -876,10 +993,17 @@ els.
 
 Format:  
 
-        .include        string 
+        .include        /string/ 
 
-where:  string  represents  a  delimited string that is the file
-                specification of an ASxxxx source file.  
+where:  string  represents  a string that is the file specifica-
+                tion of an ASxxxx source file.  
+
+        /  /    represent   the  delimiting  characters.   These
+                delimiters   may   be   any   paired    printing
+                characters,  as  long  as the characters are not
+                contained within  the  string  itself.   If  the
+                delimiting characters do not match, the .include
+                directive will give the (q) error.  
 
    The .include directive is used to insert a source file within
 the source file currently being assembled.  When this  directive
@@ -888,7 +1012,7 @@ end of the specified source file is reached, an  implicit  .page
 directive is issued and input continues from the previous source
 file.  The maximum nesting level of source files specified by  a
 .include directive is five.  
- 
+
    The  total  number  of separately specified .include files is
 unlimited as each .include file is opened and then closed during
 each pass made by the assembler.  
@@ -897,8 +1021,8 @@ each pass made by the assembler.
 .include file is the directory path of the  current  file.   For
 example:   if  the  current  source file, D:\proj\file1.asm, in-
 cludes  a  file  specified   as   "include1"   then   the   file
-D:\proj\include1.asm is opened.
-  
+D:\proj\include1.asm is opened.  
+
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
@@ -907,18 +1031,24 @@ D:\proj\include1.asm is opened.
 
 Format:  
 
-        .define        keyword  string 
+        .define        keyword  /string/ 
 
         .undefine      keyword 
 
-where:  keyword  is  the  substitutable  string which must start
+where:  keyword is  the  substitutable  string  which must start
                 with a letter and may contain any combination of
                 digits and letters.  
 
-where:  string   represents  a  delimited string that is substi-
-                tuted for the keyword.  The string  may  contain
-                any   sequence  of  characters  including  white
-                space.  
+where:  string  represents  a string that is substituted for the
+                keyword.  The string may contain any sequence of
+                characters including white space.  
+
+        /  /    represent   the  delimiting  characters.   These
+                delimiters   may   be   any   paired    printing
+                characters,  as  long  as the characters are not
+                contained within  the  string  itself.   If  the
+                delimiting  characters do not match, the .define
+                directive will give the (q) error.  
 
    The  .define  directive specifies a user defined string which
 is substituted for the keyword.  The substitution string may it-
@@ -998,7 +1128,8 @@ direct page:
 Both  the  area address and offset value must be specified (area
 and variable names are independent).   The  linker  will  verify
 that  the  relocated  direct page accesses are within the direct
-page.  
+page.
+  
 The  preceeding  sequence  could  be repeated for multiple paged
 areas, however an alternate method is to define a non-paged area
 and use the .setdp directive to specify the offset value:  
@@ -1048,9 +1179,49 @@ Format:
 
    The  .16bit, .24bit, and .32bit directives are special direc-
 tives for assembler configuration when default  values  are  not
-used.  (Currently only the as8xCxxx and aspic assemblers can use
-the .16bit, .24bit, and .32bit directives in special mode.)
- 
+used.  
+
+</PRE></B></H4>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
+<HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
+<A NAME = "msb"></A><FONT COLOR="#FF0000">.msb</FONT> Directive
+
+Format:  
+
+        .msb    n 
+
+
+   The  .msb  directive is only available in selected assemblers
+which support 24- or 32-bit addressing.  
+
+   The  assembler operator '&gt;' selects the upper byte (MSB) when
+included in an assembler instruction.  The default assembler mode
+is  to select bits &lt;15:8&gt; as the MSB.  The .msb directive allows
+the programmer to specify a particular byte as  the  'MSB'  when
+the address space is larger than 16-bits.  
+
+   The  assembler  directive  .msb n  configures the assembler to
+select a particular byte as MSB.  Given a 32-bit address of MNmn
+(M(3)  is  &lt;31:24&gt;, N(2) is &lt;23:16&gt;, m(1) is &lt;15:8&gt;, and n(0) is
+&lt;7:0&gt;) the following examples show how to  select  a  particular
+address byte:  
+
+        .msb 1          ;select byte 1 of address
+                        ;&lt;M(3):N(2):m(1):n(0)&gt;
+        LD A,&gt;MNmn      ;byte m &lt;15:8&gt; ==&gt;&gt; A
+        ...
+        
+        .msb 2          ;select byte 2 of address
+                        ;&lt;M(3):N(2):m(1):n(0)&gt;
+        LD A,&gt;MNmn      ;byte N &lt;23:16&gt; ==&gt;&gt; A
+        ...
+        
+        .msb 3          ;select byte 3 of address
+                        ;&lt;M(3):N(2):m(1):n(0)&gt;
+        LD A,&gt;MNmn      ;byte M &lt;31:24&gt; ==&gt;&gt; A
+        ...
+
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
@@ -1088,6 +1259,7 @@ record formats described in the linker section for details.
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>
 

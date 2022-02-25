@@ -15,20 +15,7 @@ of the ASEZ80 cross assembler.
 assembler can process EZ80 code in Z80 and ADL modes in any
 combination within the source file. The following processor
 specific assembler directives specify which mode the assembler
-is to process the assembler source code.
-
-
-.header level 2;.\a\d\l Directive 
-.break
-Format:
-.skip;.indent 8
-_.adl	[n]
-.skip
-The assembler is informed by the .adl directive to assemble the
-subsequent code using the full 24-Bit addressing capabilities of
-the EZ80 processor.  The optional argument, n, allows the assembly
-mode to be controlled by a varaible.  A non-zero value for n
-enables ADL mode and a zero value enables the Z80 mode.  The
+is to process the assembler source code. The
 default mode of the assembler is Z80.
 
 
@@ -36,15 +23,29 @@ default mode of the assembler is Z80.
 .break
 Format:
 .skip;.indent 8
-_.z80	[n]
+_.z80	(value)
 .skip
-The assembler is informed by the .z80 directive to assemble the
-subsequent code using the banked 16-Bit addressing capabilities of
-the EZ80 processor.  The optional argument, n, allows the assembly
-mode to be controlled by a varaible.  A non-zero value for n
-enables Z80 mode and a zero value enables the ADL mode.  The
-default mode of the assembler is Z80.
+The .z80 directive without an argument selects the
+16-bit Z80 compatible mode of the EZ80 processor.
+The .z80 directive with the optional argument may be used
+to select the Z80 16-Bit mode (value#!=#0)
+or the EZ80 24-bit mode (value#==#0).
+Mnemonics not allowed in the selected mode will generate
+m (mode) and/or a (addressing) errors.
 
+.header level 2;.\a\d\l Directive 
+.break
+Format:
+.skip;.indent 8
+_.adl	(value)
+.skip
+The .adl directive without an argument selects the
+24-bit EZ80 mode of the EZ80 processor.
+The .adl directive with the optional argument may be used
+to select the EZ80 24-Bit mode (value#!=#0)
+or the Z80 16-bit mode (value#==#0).
+Mnemonics not allowed in the selected mode will generate
+m (mode) and/or a (addressing) errors.
 
 .header level 2;.\m\s\b Directive 
 .break
@@ -65,13 +66,11 @@ and n is <7:0>) the following examples show how to select
 a particular address byte:
 .skip
 .literal
-	.msb 1		;select byte 1 of address
-			;<M(2):m(1):n(0)>
+	.msb 1		;select byte 1 of address <M(2):m(1):n(0)>
 	LD A,>Mmn	;byte m <15:8> ==>> A
 	...
 
-	.msb 2		;select byte 2 of address
-			;<M(2):m(1):n(0)>
+	.msb 2		;select byte 2 of address <M(2):m(1):n(0)>
 	LD A,>Mmn	;byte M <23:16> ==>> A
 	LD MB,A	        ;place in MBASE register
 .end literal
@@ -128,7 +127,7 @@ SP         Stack Pointer, Can indicate either the
 	PO -	parity odd
 .end literal 
 .skip 2
-The terms b, d, Mmn, mn, and n may all be expressions.
+The terms b, d, Mmn, mn, n, and ss may all be expressions.
 
 .page
 .header level 2; EZ80 Instructions 
@@ -251,7 +250,7 @@ SRL r			TST A,r
 .end literal
 
 
-.skip 4
+.skip
   The accumulator 'A' argument is optional in all of the
 following instructions:
 .skip
@@ -261,3 +260,149 @@ ADD A,...		OR A,...		TST A,...
 AND A,...		SBC A,...		XOR A,...
 .end literal
 
+
+The following tables, organized by instruction type, lists all
+possible EZ80/Z80 mnemonic extensions recognized by the ASEZ80
+assembler. The designation [] refers to a
+required addressing mode argument shown in the table above.
+The allowed mnemonic suffixes are denoted within the
+enclosing delimiters ().  Mnemonics specified with illegal
+or unrecognized suffixs will be flagged with q or a errors.
+
+.test page 13
+.header level 2;Arithmetic Instructions
+
+.literal
+	adc (.l, .s)	[],[]
+	add (.l, .s)	[],[]
+	cp  (.l, .s)	[],[]
+	daa
+	dec (.l, .s)	[]
+	inc (.l, .s)	[]
+	mlt (.l, .s)	[]
+	neg
+	sbc (.l, .s)	[],[]
+	sub (.l, .s)	[],[]
+.end literal
+
+
+.test page 6
+.header level 2;Bit Manipulation Instructions
+
+.literal
+	bit (.l, .s)	[],[]
+	res (.l, .s)	[],[]
+	set (.l, .s)	[],[]
+.end literal
+
+
+.test page 7
+.header level 2;Block Transfer and Compare Instructions
+
+.literal
+	cpd (.l, .s)		cpdr (.l, .s)
+	cpi (.l, .s)		cpir (.l, .s)
+	ldd (.l, .s)		lddr (.l, .s)
+	ldi (.l, .s)		ldir (.l, .s)
+.end literal
+
+
+.test page 5
+.header level 2;Exchange Instructions
+
+.literal
+	ex (.l, .s)	[],[]
+	exx
+.end literal
+
+
+.test page 21
+.header level 2;Input/Output Instructions
+
+.literal
+	in	[],[]		in0	[],[]
+	ind   (.l, .s)		indr  (.l, .s)
+	indx  (.l, .s)
+	ind2  (.l, .s)		ind2r (.l, .s)
+	indm  (.l, .s)		indmr (.l, .s)
+	ini   (.l, .s)		inir  (.l, .s)
+	inim  (.l, .s)		inimr (.l, .s)
+	otdm  (.l, .s)		otdmr (.l, .s)
+	otdrx (.l, .s)
+	otim  (.l, .s)		otimr (.l, .s)
+	otirx (.l, .s)
+	out   (.l, .s)	[],[]
+	out0  (.l, .s)	[],[]
+	outd  (.l, .s)		otdr  (.l, .s)
+	outd2 (.l, .s)		otdr2 (.l, .s)
+	outi  (.l, .s)		otir  (.l, .s)
+	outi2 (.l, .s)		oti2r (.l, .s)
+	tstio	[]
+.end literal
+
+
+.test page 6
+.header level 2;Load Instructions
+
+.literal
+	ld   (.l, .s, .il, .is, .lil, .sis)	[],[]
+	lea  (.l, .s)	[]	pea  (.l, .s)	[]
+	pop  (.l, .s)	[]	push (.l, .s)	[]
+.end literal
+
+
+.test page 8
+.header level 2;Logical Instructions
+
+.literal
+	and (.l, .s)	[],[]
+	cpl (.l, .s)
+	or  (.l, .s)	[],[]
+	tst (.l, .s)	[],[]
+	xor (.l, .s)	[],[]
+.end literal
+
+
+.test page 7
+.header level 2;Processor Control Instructions
+
+.literal
+	ccf		di		ei
+	halt		im		nop
+	rsmix		stmix
+	scf		slp
+.end literal
+
+
+.test page 15
+.header level 2;Program Flow Instructions
+
+.literal
+	call (.il, .is)		[]
+	call (.il, .is)		CC,[]
+	djnz	[]
+	jp   (.l, .s, .lil, .sis)	[]
+	jp   (.l, .s, .lil, .sis)	CC,[]
+	jr	[]
+	jr	CC,[]
+	ret  (.l)
+	ret  (.l)	CC
+	reti (.l)
+	retn (.l)
+	rst  (.l, .s)	[]
+.end literal
+
+
+.test page 11
+.header level 2;Shift and Rotate Instructions
+
+.literal
+	rl  (.l, .s)	[]	rla
+	rlc (.l, .s)	[]	rlca
+	rld			rrd
+	rr  (.l, .s)	[]	rra
+	rrc (.1, .s)	[]	rrca
+	sla (.l, .s)	[]
+	sra (.l, .s)	[]
+	srl (.l, .s)	[]
+.end literal

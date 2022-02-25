@@ -1,7 +1,7 @@
 /* M09EXT:C */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,9 +9,8 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
+#include "m6809.h"
 
 char	*cpu	= "Motorola 6809";
 int	hilo	= 1;

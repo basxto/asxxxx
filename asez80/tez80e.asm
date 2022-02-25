@@ -16,7 +16,7 @@
 	.radix h
 
 	;var1=10
-	.define	var1,varx + 10
+	.define	var1, "varx + 10"
 
 	var2==20
 
@@ -119,7 +119,7 @@
 	adc.s	iyl		;a
 	adc.s	(ix+var2)	; 52 DD 8E 20
 	adc.s	(iy+var2)	; 52 FD 8E 20
-	adc.s	var2		; 52 CE 20
+	adc.s	var2		;a
 	adc.s	#var2		;a
 	adc.s	a		;a
 	adc.s	b		;a
@@ -659,13 +659,13 @@
 
 	.adl
 	ccf			; 3F
-	ccf.s			;o
-	ccf.l			;o
+	ccf.s			;q
+	ccf.l			;q
 
 	.z80
 	ccf			; 3F
-	ccf.s			;o
-	ccf.l			;o
+	ccf.s			;q
+	ccf.l			;q
 
 	.page
 	.sbttl	Modes of INH2 Instructions
@@ -684,25 +684,25 @@
 
 	.adl
 	reti			; ED 4D
-	reti.s			;o
+	reti.s			;q
 	reti.l			; 5B ED 4D
 	retn			; ED 45
-	retn.s			;o
+	retn.s			;q
 	retn.l			; 5B ED 45
 	slp			; ED 76
-	slp.s			;o
-	slp.l			;o
+	slp.s			;q
+	slp.l			;q
 
 	.z80
 	reti			; ED 4D
-	reti.s			;o
+	reti.s			;q
 	reti.l			; 49 ED 4D
 	retn			; ED 45
-	retn.s			;o
+	retn.s			;q
 	retn.l			; 49 ED 45
 	slp			; ED 76
-	slp.s			;o
-	slp.l			;o
+	slp.s			;q
+	slp.l			;q
 
 	.page
 	.sbttl	Modes Common to DEC and INC
@@ -2072,16 +2072,16 @@
 	.adl
 	ret			; C9
 	ret	nz		; C0
-	ret.s			;o
-	ret.s	nz		;o
+	ret.s			;q
+	ret.s	nz		;q
 	ret.l			; 5B C9
 	ret.l	nz		; 5B C0
 
 	.z80
 	ret			; C9
 	ret	nz		; C0
-	ret.s			;o
-	ret.s	nz		;o
+	ret.s			;q
+	ret.s	nz		;q
 	ret.l			; 49 C9
 	ret.l	nz		; 49 C0
  

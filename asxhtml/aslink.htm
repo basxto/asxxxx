@@ -29,13 +29,18 @@
     <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "asls01.htm#MotorolaS1">Motorola S1-S9 Output Format (16-Bit)</A>
     <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "asls01.htm#MotorolaS2">Motorola S2-S8 Output Format (24-Bit)</A>
     <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "asls01.htm#MotorolaS3">Motorola S3-S7 Output Format (32-Bit)</A>
+    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "asls01.htm#CoCoDiskBasic">Tandy Color Computer Disk Basic Binary Output Format</A>
 
     <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "asxdoc.htm#TOP">Go to the Documentation Index</A>
 
 </PRE></H4>
 
 <H4><B><PRE>
-   ASLINK is the companion linker for the ASxxxx assemblers.  
+   ASLINK  is  the  companion  linker for the ASxxxx assemblers.
+The linker supports versions 3.xx and 4.xx of the ASxxxx  assem-
+blers.   Object  files  from version 3 and 4 may be freely mixed
+while linking.  Note that version 3 object files contain only  a
+subset of the options available in version 4.  
 
    The  program ASLINK is a general relocating linker performing
 the following functions:  
@@ -57,7 +62,8 @@ the following functions:
 
      7.  Define absolute area base address values at link time 
 
-     8.  Produce Intel Hex or Motorola S output file 
+     8.  Produce Intel Hex, Motorola S, or Tandy CoCo Disk Basic
+         output files 
 
      9.  Produce a map of the linked memory image 
 
@@ -79,5 +85,6 @@ the following functions:
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

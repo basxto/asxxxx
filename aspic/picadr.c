@@ -1,7 +1,7 @@
 /* picadr.c */
 
 /*
- * (C) Copyright 2001-2003
+ * (C) Copyright 2001-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "pic.h"
 
@@ -24,9 +22,9 @@ struct adsym regfw[] = {	/* f and w */
 /*  Classify argument as to address mode */
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c;
+	int c;
 
 	if ((c = getnb()) == '#') {
 		/*  Immediate mode */
@@ -58,10 +56,10 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-	register char *ptr;
-	register int i;
+	char *ptr;
+	int i;
 	unget(getnb());
 	i = 0;
 	while ( *(ptr = &sp[i].a_str[0]) ) {
@@ -78,9 +76,9 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-	register char *ptr;
+	char *ptr;
 	ptr = ip;
 
 	while (*ptr && *str) {

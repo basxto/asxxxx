@@ -1,7 +1,7 @@
 /* ez80adr.c */
 
 /*
- * (C) Copyright 1989-2004
+ * (C) Copyright 1989-2005
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,8 +15,6 @@
  * patrick at phead dot net
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "ez80.h"
 
@@ -38,9 +36,9 @@
  */
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c, mode, indx;
+	int c, mode, indx;
 
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
@@ -138,11 +136,11 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-	register char *ptr;
-	register int i;
-	register char *ips;
+	char *ptr;
+	int i;
+	char *ips;
 
 	ips = ip;
 	unget(getnb());
@@ -163,9 +161,9 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-	register char *ptr;
+	char *ptr;
 	ptr = ip;
 
 	while (*ptr && *str) {

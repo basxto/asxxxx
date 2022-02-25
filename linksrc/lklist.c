@@ -1,7 +1,7 @@
 /* lklist.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,15 +9,6 @@
  * Kent, Ohio  44240
  *
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -141,11 +132,11 @@ char *str;
 
 VOID
 slew(xp,yp)
-register struct area *xp;
-register struct bank *yp;
+struct area *xp;
+struct bank *yp;
 {
-	register int i, n;
-	register char *frmta, *frmtb, *ptr;
+	int i, n;
+	char *frmta, *frmtb, *ptr;
  	a_uint	ai, aj;
 
        	if (lop++ >= NLPP) {
@@ -179,6 +170,35 @@ register struct bank *yp;
 		 */
 		ptr = &xp->a_id[0];
 		fprintf(mfp, "%-19.19s", ptr);
+#ifdef	LONGINT
+		switch(a_bytes) {
+		default:
+		case 2:
+			switch(xflag) {
+			default:
+			case 0: frmta = "        %04lX        %04lX"; break;
+			case 1: frmta = "      %06lo      %06lo"; break;
+			case 2: frmta = "       %05lu       %05lu"; break;
+			}
+			frmtb = " =      %6lu. bytes "; break;
+		case 3:
+			switch(xflag) {
+			default:
+			case 0: frmta = "      %06lX      %06lX"; break;
+			case 1: frmta = "    %08lo    %08lo"; break;
+			case 2: frmta = "    %08lu    %08lu"; break;
+			}
+			frmtb = " =    %8lu. bytes "; break;
+		case 4:
+			switch(xflag) {
+			default:
+			case 0: frmta = "    %08lX    %08lX"; break;
+			case 1: frmta = " %011lo %011lo"; break;
+			case 2: frmta = "  %010lu  %010lu"; break;
+			}
+			frmtb = " =  %10lu. bytes "; break;
+		}
+#else
 		switch(a_bytes) {
 		default:
 		case 2:
@@ -206,6 +226,7 @@ register struct bank *yp;
 			}
 			frmtb = " =  %10u. bytes "; break;
 		}
+#endif
 		fprintf(mfp, frmta, ai, aj);
 		fprintf(mfp, frmtb, aj);
 
@@ -324,9 +345,9 @@ lstarea(xp, yp)
 struct area *xp;
 struct bank *yp;
 {
-	register struct areax *oxp;
-	register int i, j, n;
-	register char *frmt, *ptr;
+	struct areax *oxp;
+	int i, j, n;
+	char *frmt, *ptr;
 	int nmsym;
 	a_uint a0, ai, aj;
 	struct sym *sp;
@@ -441,6 +462,35 @@ struct bank *yp;
 
 		sp = p[i];
 		aj = (sp->s_addr + sp->s_axp->a_addr) & a_mask;
+#ifdef	LONGINT
+		switch(a_bytes) {
+		default:
+		case 2:
+			switch(xflag) {
+			default:
+			case 0: frmt = "  %04lX  "; break;
+			case 1: frmt = "%06lo  "; break;
+			case 2: frmt = " %05lu  "; break;
+			}
+			break;
+		case 3:
+			switch(xflag) {
+			default:
+			case 0: frmt = "     %06lX  "; break;
+			case 1: frmt = "   %08lo  "; break;
+			case 2: frmt = "   %08lu  "; break;
+			}
+			break;
+		case 4:
+			switch(xflag) {
+			default:
+			case 0: frmt = "   %08lX  "; break;
+			case 1: frmt = "%011lo  "; break;
+			case 2: frmt = " %010lu  "; break;
+			}
+			break;
+		}
+#else
 		switch(a_bytes) {
 		default:
 		case 2:
@@ -468,6 +518,7 @@ struct bank *yp;
 			}
 			break;
 		}
+#endif
 		fprintf(mfp, frmt, aj);
 
 		ptr = &sp->s_id[0];
@@ -591,7 +642,7 @@ int i;
 			cbytes = 0;
 			for (i=a_bytes; i < rtcnt; i++) {
 				if (rtflg[i]) {
-					lkglist(cpc, rtval[i] & 0xFF, rterr[i]);
+					lkglist(cpc, (int) (rtval[i] & 0xFF), rterr[i]);
 					cbytes += 1;
 					cpc += (cbytes % pcb) ? 0 : 1;
 				}
@@ -662,7 +713,7 @@ int i;
  *		updated to reflect the program relocation.
  */
 
-/* The Output Formats
+/* The Output Formats,  No Cycle Count
 | Tabs- |       |       |       |       |       |
           11111111112222222222333333333344444-----
 012345678901234567890123456789012345678901234-----
@@ -692,6 +743,41 @@ ee   DDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(24)
 ee  XXXXXXXX xx xx xx xx xx xx xx LLLLL *********	HEX(32)
 eeOOOOO000000 ooo ooo ooo ooo ooo LLLLL *********	OCTAL(32)
 ee DDDDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(32)
+                         XXXXXXXX
+		      OOOOOOOOOOO
+		       DDDDDDDDDD
+*/
+
+/* The Output Formats,  With Cycle Count [nn]
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+   |    |               |     | |
+ee XXXX xx xx xx xx xx[nn]LLLLL *************	HEX(16)
+ee 000000 ooo ooo ooo [nn]LLLLL *************	OCTAL(16)
+ee  DDDDD ddd ddd ddd [nn]LLLLL *************	DECIMAL(16)
+                     XXXX
+		   OOOOOO
+		    DDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+     |       |                  |     | |
+ee    XXXXXX xx xx xx xx xx xx[nn]LLLLL *********	HEX(24)
+ee   OO000000 ooo ooo ooo ooo [nn]LLLLL *********	OCTAL(24)
+ee   DDDDDDDD ddd ddd ddd ddd [nn]LLLLL *********	DECIMAL(24)
+                           XXXXXX
+			 OOOOOOOO
+			 DDDDDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+  |          |                  |     | |
+ee  XXXXXXXX xx xx xx xx xx xx[nn]LLLLL *********	HEX(32)
+eeOOOOO000000 ooo ooo ooo ooo [nn]LLLLL *********	OCTAL(32)
+ee DDDDDDDDDD ddd ddd ddd ddd [nn]LLLLL *********	DECIMAL(32)
                          XXXXXXXX
 		      OOOOOOOOOOO
 		       DDDDDDDDDD
@@ -759,6 +845,38 @@ loop:	if (tfp == NULL)
 	/*
 	 * Must have an address in the expected radix
 	 */
+#ifdef	LONGINT
+	switch(radix) {
+	default:
+	case 16:
+		r = RAD16;
+		switch(a_bytes) {
+		default:
+		case 2: n = 3; m = 4; frmt = "%04lX"; break;
+		case 3: n = 6; m = 6; frmt = "%06lX"; break;
+		case 4: n = 4; m = 8; frmt = "%08lX"; break;
+		}
+		break;
+	case 10:
+		r = RAD10;
+		switch(a_bytes) {
+		default:
+		case 2: n = 4; m = 5; frmt = "%05lu"; break;
+		case 3: n = 5; m = 8; frmt = "%08lu"; break;
+		case 4: n = 3; m = 10; frmt = "%010lu"; break;
+		}
+		break;
+	case 8:
+		r = RAD8;
+		switch(a_bytes) {
+		default:
+		case 2: n = 3; m = 6; frmt = "%06lo"; break;
+		case 3: n = 5; m = 8; frmt = "%08lo"; break;
+		case 4: n = 2; m = 11; frmt = "%011lo"; break;
+		}
+		break;
+	}
+#else
 	switch(radix) {
 	default:
 	case 16:
@@ -789,6 +907,7 @@ loop:	if (tfp == NULL)
 		}
 		break;
 	}
+#endif
 	if (!dgt(r, &rb[n], m)) {
 		fprintf(rfp, "%s", rb);
 		goto loop;
@@ -859,7 +978,7 @@ loop:	if (tfp == NULL)
  *		with updated data values and code addresses.
  */
 
-/* The Output Formats
+/* The Output Formats, No Cycle Count
 | Tabs- |       |       |       |       |       |
           11111111112222222222333333333344444-----
 012345678901234567890123456789012345678901234-----
@@ -889,6 +1008,41 @@ ee   DDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(24)
 ee  XXXXXXXX xx xx xx xx xx xx xx LLLLL *********	HEX(32)
 eeOOOOO000000 ooo ooo ooo ooo ooo LLLLL *********	OCTAL(32)
 ee DDDDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(32)
+                         XXXXXXXX
+		      OOOOOOOOOOO
+		       DDDDDDDDDD
+*/
+
+/* The Output Formats,  With Cycle Count [nn]
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+   |    |               |     | |
+ee XXXX xx xx xx xx xx[nn]LLLLL *************	HEX(16)
+ee 000000 ooo ooo ooo [nn]LLLLL *************	OCTAL(16)
+ee  DDDDD ddd ddd ddd [nn]LLLLL *************	DECIMAL(16)
+                     XXXX
+		   OOOOOO
+		    DDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+     |       |                  |     | |
+ee    XXXXXX xx xx xx xx xx xx[nn]LLLLL *********	HEX(24)
+ee   OO000000 ooo ooo ooo ooo [nn]LLLLL *********	OCTAL(24)
+ee   DDDDDDDD ddd ddd ddd ddd [nn]LLLLL *********	DECIMAL(24)
+                           XXXXXX
+			 OOOOOOOO
+			 DDDDDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+  |          |                  |     | |
+ee  XXXXXXXX xx xx xx xx xx xx[nn]LLLLL *********	HEX(32)
+eeOOOOO000000 ooo ooo ooo ooo [nn]LLLLL *********	OCTAL(32)
+ee DDDDDDDDDD ddd ddd ddd ddd [nn]LLLLL *********	DECIMAL(32)
                          XXXXXXXX
 		      OOOOOOOOOOO
 		       DDDDDDDDDD
@@ -959,6 +1113,38 @@ loop:	if (tfp == NULL)
 	/*
 	 * Hex Listing
 	 */
+#ifdef	LONGINT
+	 switch(radix) {
+	 default:
+	 case 16:
+		r = RAD16;
+		switch(a_bytes) {
+		default:
+		case 2:	a = 8; s = 3; n = 3; m = 4; u = 6; afrmt = "%04lX"; break;
+		case 3: a = 13; s = 3; n = 6; m = 6; u = 7; afrmt = "%06lX"; break;
+		case 4: a = 13; s = 3; n = 4; m = 8; u = 7; afrmt = "%08lX"; break;
+		}
+		frmt = " %02X"; break;
+	case 10:
+		r = RAD10;
+		switch(a_bytes) {
+		default:
+		case 2:	a = 10; s = 4; n = 4; m = 5; u = 4; afrmt = "%05lu"; break;
+		case 3: a = 14; s = 4; n = 5; m = 8; u = 5; afrmt = "%08lu"; break;
+		case 4: a = 14; s = 4; n = 3; m = 10; u = 5; afrmt = "%010lu"; break;
+		}
+		frmt = " %03u"; break;
+	case 8:
+		r = RAD8;
+		switch(a_bytes) {
+		default:
+		case 2:	a = 10; s = 4; n = 3; m = 6; u = 4; afrmt = "%06lo"; break;
+		case 3: a = 14; s = 4; n = 5; m = 8; u = 5; afrmt = "%08lo"; break;
+		case 4: a = 14; s = 4; n = 2; m = 11; u = 5; afrmt = "%011lo"; break;
+		}
+		frmt = " %03o"; break;
+	}
+#else
 	 switch(radix) {
 	 default:
 	 case 16:
@@ -989,6 +1175,7 @@ loop:	if (tfp == NULL)
 		}
 		frmt = " %03o"; break;
 	}
+#endif
 	/*
 	 * Data Byte Pointer
 	 */
@@ -1038,6 +1225,12 @@ loop:	if (tfp == NULL)
 		default:
 			break;
 		}
+	}
+	/*
+	 * Fix 'u' if [nn], cycles, is specified
+	 */
+	 if (rb[a + (s*u) - 1] == CYCNT_END) {
+	 	u -= 1;
 	}
 	/*
 	 * Output text line when updates finished

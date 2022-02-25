@@ -1,7 +1,7 @@
 /* gb.h */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2005
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -105,6 +105,8 @@
 #define HL	2
 #define SP	3
 #define AF	4
+#define	HLD	5
+#define	HLI	6
 
 /*
  * Conditional definitions
@@ -134,6 +136,9 @@
 #define	S_IDDE	51
 #define	S_IDHL	52
 #define	S_IDSP	53
+#define	S_IDAF	54
+#define	S_IDHLD	55
+#define	S_IDHLI	56
 #define	S_INDM	57
 
 /*
@@ -152,14 +157,15 @@
 #define	S_AND	70
 #define	S_EX	71
 #define	S_PUSH	72
-#define	S_IN	73	/* Loads from zero page */
-#define	S_OUT	74	/* Stores to zero page */
-#define	S_RL	75
-#define	S_RST	76
-#define	S_IM	77
-#define	S_INH1	78
-#define	S_SUB	81
-#define	S_SBC	82
+#define	S_LDH	73
+#define	S_IN	74	/* Loads from zero page */
+#define	S_OUT	75	/* Stores to zero page */
+#define	S_RL	76
+#define	S_RST	77
+#define	S_IM	78
+#define	S_INH1	79
+#define	S_SUB	80
+#define	S_SBC	81
 #define S_LDHL	90	/* LDHL SP,offset */
 #define S_LDX	91	/* Loads which increment/decrement HL */
 #define S_SWAP	92	/* SWAP A, nybble swaps the accumulator */

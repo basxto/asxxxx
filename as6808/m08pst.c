@@ -1,7 +1,7 @@
 /* m08pst.c */
 
 /*
- * (C) Copyright 1993-2003
+ * (C) Copyright 1993-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6808.h"
 
@@ -55,7 +53,7 @@ char	mode0[32] = {	/* R_NORM */
  *	m_mask contains the active bit positions for the output.
  *	m_mbro contains the active bit positions for the input.
  *
- *	struct	vsd
+ *	struct	mode
  *	{
  *		char *	m_def;		Bit Relocation Definition
  *		int	m_flag;		Bit Swapping Flag
@@ -68,7 +66,7 @@ struct	mode	mode[1] = {
 };
 
 /*
- * Array of Pointers to VSD Structures
+ * Array of Pointers to mode Structures
  */
 struct	mode	*modep[16] = {
 	&mode[0],	NULL,		NULL,		NULL,
@@ -120,6 +118,12 @@ struct	mne	mne[] = {
     {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
+    {	NULL,	".iflt",	S_CONDITIONAL,	0,	O_IFLT	},
+    {	NULL,	".ifge",	S_CONDITIONAL,	0,	O_IFGE	},
+    {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
+    {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
+    {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},
@@ -162,6 +166,13 @@ struct	mne	mne[] = {
 /*    {	NULL,	".24bit",	S_BITS,		0,	O_3BYTE	},	*/
 /*    {	NULL,	".32bit",	S_BITS,		0,	O_4BYTE	},	*/
     {	NULL,	".end",		S_END,		0,	0	},
+
+	/* Machines */
+
+    {	NULL,	".hc08",	S_CPU,		0,	X_HC08	},
+    {	NULL,	".hcs08",	S_CPU,		0,	X_HCS08	},
+    {	NULL,	".6805",	S_CPU,		0,	X_6805	},
+    {	NULL,	".hc05",	S_CPU,		0,	X_HC05	},
 
 	/* 68HC08 */
 
@@ -236,10 +247,10 @@ struct	mne	mne[] = {
     {	NULL,	"bms",		S_BRA,		0,	0x2D	},
     {	NULL,	"bil",		S_BRA,		0,	0x2E	},
     {	NULL,	"bih",		S_BRA,		0,	0x2F	},
-    {	NULL,	"bge",		S_BRA,		0,	0x90	},
-    {	NULL,	"blt",		S_BRA,		0,	0x91	},
-    {	NULL,	"bgt",		S_BRA,		0,	0x92	},
-    {	NULL,	"ble",		S_BRA,		0,	0x93	},
+    {	NULL,	"bge",		S_BRA8,		0,	0x90	},
+    {	NULL,	"blt",		S_BRA8,		0,	0x91	},
+    {	NULL,	"bgt",		S_BRA8,		0,	0x92	},
+    {	NULL,	"ble",		S_BRA8,		0,	0x93	},
     {	NULL,	"bsr",		S_BRA,		0,	0xAD	},
 
     {	NULL,	"nega",		S_INH,		0,	0x40	},
@@ -257,7 +268,7 @@ struct	mne	mne[] = {
     {	NULL,	"clra",		S_INH,		0,	0x4F	},
 
     {	NULL,	"negx",		S_INH,		0,	0x50	},
-    {	NULL,	"div",		S_INH,		0,	0x52	},
+    {	NULL,	"div",		S_INH8,		0,	0x52	},
     {	NULL,	"comx",		S_INH,		0,	0x53	},
     {	NULL,	"lsrx",		S_INH,		0,	0x54	},
     {	NULL,	"rorx",		S_INH,		0,	0x56	},
@@ -270,27 +281,28 @@ struct	mne	mne[] = {
     {	NULL,	"tstx",		S_INH,		0,	0x5D	},
     {	NULL,	"clrx",		S_INH,		0,	0x5F	},
 
-    {	NULL,	"nsa",		S_INH,		0,	0x62	},
+    {	NULL,	"nsa",		S_INH8,		0,	0x62	},
 
-    {	NULL,	"daa",		S_INH,		0,	0x72	},
+    {	NULL,	"daa",		S_INH8,		0,	0x72	},
 
     {	NULL,	"rti",		S_INH,		0,	0x80	},
     {	NULL,	"rts",		S_INH,		0,	0x81	},
+    {	NULL,	"bgnd",		S_INH8S,	0,	0x82	},
     {	NULL,	"swi",		S_INH,		0,	0x83	},
-    {	NULL,	"tap",		S_INH,		0,	0x84	},
-    {	NULL,	"tpa",		S_INH,		0,	0x85	},
-    {	NULL,	"pula",		S_INH,		0,	0x86	},
-    {	NULL,	"psha",		S_INH,		0,	0x87	},
-    {	NULL,	"pulx",		S_INH,		0,	0x88	},
-    {	NULL,	"pshx",		S_INH,		0,	0x89	},
-    {	NULL,	"pulh",		S_INH,		0,	0x8A	},
-    {	NULL,	"pshh",		S_INH,		0,	0x8B	},
-    {	NULL,	"clrh",		S_INH,		0,	0x8C	},
+    {	NULL,	"tap",		S_INH8,		0,	0x84	},
+    {	NULL,	"tpa",		S_INH8,		0,	0x85	},
+    {	NULL,	"pula",		S_INH8,		0,	0x86	},
+    {	NULL,	"psha",		S_INH8,		0,	0x87	},
+    {	NULL,	"pulx",		S_INH8,		0,	0x88	},
+    {	NULL,	"pshx",		S_INH8,		0,	0x89	},
+    {	NULL,	"pulh",		S_INH8,		0,	0x8A	},
+    {	NULL,	"pshh",		S_INH8,		0,	0x8B	},
+    {	NULL,	"clrh",		S_INH8,		0,	0x8C	},
     {	NULL,	"stop",		S_INH,		0,	0x8E	},
     {	NULL,	"wait",		S_INH,		0,	0x8F	},
 
-    {	NULL,	"txs",		S_INH,		0,	0x94	},
-    {	NULL,	"tsx",		S_INH,		0,	0x95	},
+    {	NULL,	"txs",		S_INH8,		0,	0x94	},
+    {	NULL,	"tsx",		S_INH8,		0,	0x95	},
     {	NULL,	"tax",		S_INH,		0,	0x97	},
     {	NULL,	"clc",		S_INH,		0,	0x98	},
     {	NULL,	"sec",		S_INH,		0,	0x99	},

@@ -1,22 +1,13 @@
 /* lkarea.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -62,8 +53,9 @@
  *
  *	local variables:
  *		areax **halp		pointer to an array of pointers
- *		int	i		counter, loop variable, value
+ *		a_uint	i		value
  *		char	id[]		id string
+ *		int	k		counter, loop variable
  *		int	narea		number of areas in this head structure
  *		areax *	taxp		pointer to an areax structure
  *					to areax structures
@@ -108,7 +100,8 @@
 VOID
 newarea()
 {
-	register int i, narea;
+	a_uint i;
+	int k, narea;
 	int aflags, iflags;
 	struct areax *taxp;
 	struct areax **halp;
@@ -151,7 +144,7 @@ newarea()
 			taxp = ap->a_axp;
 			if (taxp->a_axp) {
 				aflags = ap->a_flag;
-				iflags = (i & A4_OVR);
+				iflags = (int) (i & A4_OVR);
 				if (iflags) {
 			 		if (aflags & A4_OVR) {
 						if (iflags != (aflags & A4_OVR)) {
@@ -162,7 +155,7 @@ newarea()
 						ap->a_flag |= iflags;
 					}
 				}
-				iflags = (i & A4_ABS);
+				iflags = (int) (i & A4_ABS);
 				if (iflags) {
 			 		if (aflags & A4_ABS) {
 						if (iflags != (aflags & A4_ABS)) {
@@ -173,7 +166,7 @@ newarea()
 						ap->a_flag |= iflags;
 					}
 				}
-				iflags = (i & A4_PAG);
+				iflags = (int) (i & A4_PAG);
 				if (iflags) {
 			 		if (aflags & A4_PAG) {
 						if (iflags != (aflags & A4_PAG)) {
@@ -185,7 +178,7 @@ newarea()
 					}
 				}
 				if (i & A4_DSEG) {
-					iflags = (i & (A4_DSEG | A4_WLMSK));
+					iflags = (int) (i & (A4_DSEG | A4_WLMSK));
 				 	if (aflags & A4_DSEG) {
 						if (iflags != (aflags & (A4_DSEG | A4_WLMSK))) {
 							fprintf(stderr, "Conflicting CSEG/DSEG flags in area %s\n", id);
@@ -195,8 +188,12 @@ newarea()
 						ap->a_flag |= iflags;
 					}
 				}
+				/*
+				 * Merge Output Code Flag
+				 */
+				ap->a_flag |= (int) (i & A4_OUT);
 			} else {
-				ap->a_flag = i;
+				ap->a_flag = (int) i;
 			}
 		} else
 		/*
@@ -208,22 +205,22 @@ newarea()
 				fprintf(stderr, "No banks defined\n");
 				lkexit(ER_FATAL);
 			}
-			if (i >= hp->h_nbank) {
+			if (i >= (unsigned) hp->h_nbank) {
 				fprintf(stderr, "Invalid bank number\n");
 				lkexit(ER_FATAL);
 			}
-			if (hblp[i] == NULL) {
+			if (hblp[(int) i] == NULL) {
 				fprintf(stderr, "Bank not defined\n");
 				lkexit(ER_FATAL);
 			}
 			if (ap->a_bp != NULL) {
-				if (ap->a_bp != hblp[i]) {
+				if (ap->a_bp != hblp[(int) i]) {
 					fprintf(stderr, "Multiple Bank assignments for area %s ( %s / %s )\n",
-						id, ap->a_bp->b_id, hblp[i]->b_id);
+						id, ap->a_bp->b_id, hblp[(int) i]->b_id);
 					lkerr++;
 				}
 			} else {
-				ap->a_bp = hblp[i];
+				ap->a_bp = hblp[(int) i];
 			}
 		}
 	}
@@ -237,9 +234,9 @@ newarea()
 	}
 	narea = hp->h_narea;
 	halp = hp->a_list;
-	for (i=0; i < narea ;++i) {
-		if (halp[i] == NULL) {
-			halp[i] = taxp;
+	for (k=0; k < narea ;++k) {
+		if (halp[k] == NULL) {
+			halp[k] = taxp;
 			return;
 		}
 	}
@@ -285,8 +282,8 @@ VOID
 lkparea(id)
 char *id;
 {
-	register struct area *tap;
-	register struct areax *taxp;
+	struct area *tap;
+	struct areax *taxp;
 
 	ap = areap;
 	axp = (struct areax *) new (sizeof(struct areax));
@@ -406,7 +403,7 @@ char *id;
 VOID
 lnkarea()
 {
-	register int rloc;
+	a_uint rloc;
 	int bytes;
 	char temp[NCPS+2];
 	struct sym *sp;
@@ -488,10 +485,10 @@ lnkarea()
 
 VOID
 lnksect(tap)
-register struct area *tap;
+struct area *tap;
 {
-	register a_uint size, addr;
-	register struct areax *taxp;
+	a_uint size, addr;
+	struct areax *taxp;
 
 	size = 0;
 	addr = tap->a_addr;
@@ -540,7 +537,7 @@ register struct area *tap;
  *	address of the specified areas.
  *
  *	local variables:
- *		int	v		expression value
+ *		a_uint	v		expression value
  *		char	id[]		base id string
  *
  *	global variables:
@@ -570,7 +567,7 @@ register struct area *tap;
 VOID
 setarea()
 {
-	register int v;
+	a_uint v;
 	char id[NCPS];
 
 	bsp = basep;

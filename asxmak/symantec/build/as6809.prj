@@ -3,8 +3,8 @@ R:\ASXV4PXX\asxmak\Symantec\build\as6809.prj
 as6809.OPN
 novcs
 as6809.DEF
-8
-1040092226
+6
+1092880172
 0 0 0 0 0 "..\..\..\ASXXSRC\asdata.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asdbg.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asexpr.c"

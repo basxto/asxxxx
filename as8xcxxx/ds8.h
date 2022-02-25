@@ -5,7 +5,7 @@
  * Bill McKinnon
  * w_mckinnon at conknet dot com
  *
- * (C) Copyright 1998-2003
+ * (C) Copyright 1998-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -42,6 +42,24 @@
 	$(STACK) = 3000
 */
 
+/* Addressing modes */
+#define S_A	 30		/* A */
+/* #define S_B	 31 */		/* B */
+#define S_C	 32		/* C (carry) */
+#define S_RAB	 33		/* AB */
+#define	S_DPTR	 34		/* DPTR */
+#define	S_REG	 35		/* Register R0-R7 */
+#define S_IMMED  36             /* immediate */
+#define S_DIR    37		/* direct */
+#define S_EXT	 38		/* extended */
+#define S_PC	 39		/* PC (for addressing mode) */
+
+#define S_AT_R   40             /* @R0 or @R1 */
+#define S_AT_DP  41             /* @DPTR */
+#define S_AT_APC 42             /* @A+PC */
+#define S_AT_ADP 43             /* @A+DPTR */
+#define S_NOT_BIT 44             /* /BIT (/DIR) */
+
 /*
  * Symbol types.
  */
@@ -68,29 +86,25 @@
 #define S_DIRECT 70             /* DIRECT (pusha and pop) */
 #define S_XCHD  71              /* XCHD */
 
-/* Addressing modes */
-#define S_A	 30		/* A */
-/* #define S_B	 31 */		/* B */
-#define S_C	 32		/* C (carry) */
-#define S_RAB	 33		/* AB */
-#define	S_DPTR	 34		/* DPTR */
-#define	S_REG	 35		/* Register R0-R7 */
-#define S_IMMED  36             /* immediate */
-#define S_DIR    37		/* direct */
-#define S_EXT	 38		/* extended */
-#define S_PC	 39		/* PC (for addressing mode) */
+#define S_AMODE	90		/* address mode directive */
 
-#define S_AT_R   40             /* @R0 or @R1 */
-#define S_AT_DP  41             /* @DPTR */
-#define S_AT_APC 42             /* @A+PC */
-#define S_AT_ADP 43             /* @A+DPTR */
-#define S_NOT_BIT 44             /* /BIT (/DIR) */
+#define	S_CPU	91		/* Machines */
 
-#define X_AMODE	90		/* address mode directive */
-
-#define	X_PTYPE	91		/* Processor Type */
-
-extern int amode;
+/*
+ * Processor Types (S_CPU)
+ */
+#define	X_DS______	0
+#define	X_DS8XCXXX	1
+#define	X_DS80C310	2
+#define	X_DS80C320	3
+#define	X_DS80C323	4
+#define	X_DS80C390	5
+#define	X_DS83C520	6
+#define	X_DS83C530	7
+#define	X_DS83C550	8
+#define	X_DS87C520	9
+#define	X_DS87C530	10
+#define	X_DS87C550	11
 
 /*
  * Registers.  Value  == address in RAM, except for PC
@@ -134,7 +148,7 @@ extern struct PreDef preDef[];
  * Assembler Types
  */
 #define	DS______	(0x00000000)
-#define DS8xCxxx	(0x00000001)
+#define DS8XCXXX	(0x00000001)
 #define DS80C310	(0x00000002)
 #define DS80C320	(0x00000004)
 #define DS80C323	(0x00000008)

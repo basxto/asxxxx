@@ -1,7 +1,7 @@
 /* IncToDef.c */
 
 /*
- * (C) Copyright 2002-2003
+ * (C) Copyright 2002-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin

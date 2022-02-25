@@ -22,7 +22,7 @@ dirval:	.blkb	0d256
 
 	sub	#20		;error
 
-	jmp	*dir		;error
+	jmp	*dir		;OK
 	jmp	#2211		;error
 	jsr	#1122		;error
 
@@ -33,7 +33,7 @@ dirval:	.blkb	0d256
 
 	lda a	*dirval		;OK
 	lda a	dirval		;OK
-	lda a	*dirval+0x100	;error / error at link time
+	lda a	*dirval+0x100	;error at link time
 	lda a	*1$		;error at link time
 
 	.setdp	1,DIRECT	;error / error at link time

@@ -1,7 +1,7 @@
 /* M09ADR:C */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6809.h"
 
@@ -18,9 +16,9 @@ int aindx;
 
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c;
+	int c;
 
 	aindx = 0;
 	if ((c = getnb()) == '#') {
@@ -42,9 +40,9 @@ register struct expr *esp;
 
 int
 addr1(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c;
+	int c;
 
 	if (admode(abd)) {
 		comma();
@@ -115,11 +113,11 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-	register char *ptr;
-	register int i, v;
-	register char *ips;
+	char *ptr;
+	int i, v;
+	char *ips;
 
 	ips = ip;
 	unget(getnb());
@@ -142,9 +140,9 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-	register char *ptr;
+	char *ptr;
 	ptr = ip;
 
 	while (*ptr && *str) {

@@ -1,7 +1,7 @@
 /* m12pst.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6812.h"
 
@@ -63,7 +61,7 @@ char	mode1[32] = {	/* M_XBRA 9-Bit Branching Instructions */
  *	m_mask contains the active bit positions for the output.
  *	m_mbro contains the active bit positions for the input.
  *
- *	struct	vsd
+ *	struct	mode
  *	{
  *		char *	m_def;		Bit Relocation Definition
  *		int	m_flag;		Bit Swapping Flag
@@ -77,7 +75,7 @@ struct	mode	mode[2] = {
 };
 
 /*
- * Array of Pointers to VSD Structures
+ * Array of Pointers to mode Structures
  */
 struct	mode	*modep[16] = {
 	&mode[0],	&mode[1],	NULL,		NULL,
@@ -129,6 +127,12 @@ struct	mne	mne[] = {
     {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
+    {	NULL,	".iflt",	S_CONDITIONAL,	0,	O_IFLT	},
+    {	NULL,	".ifge",	S_CONDITIONAL,	0,	O_IFGE	},
+    {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
+    {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
+    {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},
@@ -171,6 +175,11 @@ struct	mne	mne[] = {
 /*    {	NULL,	".24bit",	S_BITS,		0,	O_3BYTE	},	*/
 /*    {	NULL,	".32bit",	S_BITS,		0,	O_4BYTE	},	*/
     {	NULL,	".end",		S_END,		0,	0	},
+
+	/* Machines */
+
+    {	NULL,	".hc12",	S_CPU,		0,	X_HC12	},
+    {	NULL,	".hcs12",	S_CPU,		0,	X_HCS12	},
 
 	/* 6811 Compatibility */
 

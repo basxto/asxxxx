@@ -172,73 +172,73 @@ data:	.byte	0x10		;10
 
 	bst	#xx03,r0L	;67 58
 	bst	#xx03,@r1	;7D 10 67 50
-	bst	#xx03,@xx08	;7F 5A 67 50
+	bst	#xx03,@xx08	;7F*5A 67 50
 
 	bist	#xx03,r0L	;67 D8
 	bist	#xx03,@r1	;7D 10 67 D0
-	bist	#xx03,@xx08	;7F 5A 67 D0
+	bist	#xx03,@xx08	;7F*5A 67 D0
 
 	bor	#xx03,r0L	;74 58
 	bor	#xx03,@r1	;7C 10 74 50
-	bor	#xx03,@xx08	;7E 5A 74 50
+	bor	#xx03,@xx08	;7E*5A 74 50
 
 	bior	#xx03,r0L	;74 D8
 	bior	#xx03,@r1	;7C 10 74 D0
-	bior	#xx03,@xx08	;7E 5A 74 D0
+	bior	#xx03,@xx08	;7E*5A 74 D0
 
 	bxor	#xx03,r0L	;75 58
 	bxor	#xx03,@r1	;7C 10 75 50
-	bxor	#xx03,@xx08	;7E 5A 75 50
+	bxor	#xx03,@xx08	;7E*5A 75 50
 
 	bixor	#xx03,r0L	;75 D8
 	bixor	#xx03,@r1	;7C 10 75 D0
-	bixor	#xx03,@xx08	;7E 5A 75 D0
+	bixor	#xx03,@xx08	;7E*5A 75 D0
 
 	band	#xx03,r0L	;76 58
 	band	#xx03,@r1	;7C 10 76 50
-	band	#xx03,@xx08	;7E 5A 76 50
+	band	#xx03,@xx08	;7E*5A 76 50
 
 	biand	#xx03,r0L	;76 D8
 	biand	#xx03,@r1	;7C 10 76 D0
-	biand	#xx03,@xx08	;7E 5A 76 D0
+	biand	#xx03,@xx08	;7E*5A 76 D0
 
 	bld	#xx03,r0L	;77 58
 	bld	#xx03,@r1	;7C 10 77 50
-	bld	#xx03,@xx08	;7E 5A 77 50
+	bld	#xx03,@xx08	;7E*5A 77 50
 
 	bild	#xx03,r0L	;77 D8
 	bild	#xx03,@r1	;7C 10 77 D0
-	bild	#xx03,@xx08	;7E 5A 77 D0
+	bild	#xx03,@xx08	;7E*5A 77 D0
 
 	; Extended Bit Manipulation Instructions
 
 	bset	#xx03,r0L	;70 58
 	bset	#xx03,@r1	;7D 10 70 50
-	bset	#xx03,@xx08	;7F 5A 70 50
+	bset	#xx03,@xx08	;7F*5A 70 50
 	bset	r0L,r2L		;60 8A
 	bset	r1L,@r3		;7D 30 60 90
-	bset	r2L,@xx08	;7F 5A 60 A0
+	bset	r2L,@xx08	;7F*5A 60 A0
 
 	bnot	#xx03,r0L	;71 58
 	bnot	#xx03,@r1	;7D 10 71 50
-	bnot	#xx03,@xx08	;7F 5A 71 50
+	bnot	#xx03,@xx08	;7F*5A 71 50
 	bnot	r0L,r2L		;61 8A
 	bnot	r1L,@r3		;7D 30 61 90
-	bnot	r2L,@xx08	;7F 5A 61 A0
+	bnot	r2L,@xx08	;7F*5A 61 A0
 
 	bclr	#xx03,r0L	;72 58
 	bclr	#xx03,@r1	;7D 10 72 50
-	bclr	#xx03,@xx08	;7F 5A 72 50
+	bclr	#xx03,@xx08	;7F*5A 72 50
 	bclr	r0L,r2L		;62 8A
 	bclr	r1L,@r3		;7D 30 62 90
-	bclr	r2L,@xx08	;7F 5A 62 A0
+	bclr	r2L,@xx08	;7F*5A 62 A0
 
 	btst	#xx03,r0L	;73 58
 	btst	#xx03,@r1	;7D 10 73 50
-	btst	#xx03,@xx08	;7F 5A 73 50
+	btst	#xx03,@xx08	;7F*5A 73 50
 	btst	r0L,r2L		;63 8A
 	btst	r1L,@r3		;7D 30 63 90
-	btst	r2L,@xx08	;7F 5A 63 A0
+	btst	r2L,@xx08	;7F*5A 63 A0
 
 	; Single Operand byte forms
 
@@ -369,13 +369,13 @@ data:	.byte	0x10		;10
 	mov.b	@r1,r2L		;68 1A
 	mov.b	@[xx16,r2],r3L	;6E 2B A5 A5
 	mov.b	@r3+,r4L	;6C 3C
-	mov.b	@xx08,r5L	;2D 5A
+	mov.b	@xx08,r5L	;2D*5A
 	mov.b	@xx16,r6L	;6A 0E A5 A5
 
 	mov.b	r0H,@r0		;68 80
 	mov.b	r1H,@[xx16,r1]	;6E 91 A5 A5
 	mov.b	r2H,@-r2	;6C A2
-	mov.b	r3H,@xx08	;33 5A
+	mov.b	r3H,@xx08	;33*5A
 	mov.b	r4H,@xx16	;6A 84 A5 A5
 
 	; MOV - free form byte modes
@@ -385,13 +385,13 @@ data:	.byte	0x10		;10
 	mov	@r1,r2L		;68 1A
 	mov	@[xx16,r2],r3L	;6E 2B A5 A5
 	mov	@r3+,r4L	;6C 3C
-	mov	@xx08,r5L	;2D 5A
+	mov	@xx08,r5L	;2D*5A
 	mov	@xx16,r6L	;6A 0E A5 A5
 
 	mov	r0H,@r0		;68 80
 	mov	r1H,@[xx16,r1]	;6E 91 A5 A5
 	mov	r2H,@-r2	;6C A2
-	mov	r3H,@xx08	;33 5A
+	mov	r3H,@xx08	;33*5A
 	mov	r4H,@xx16	;6A 84 A5 A5
 
 	; MOV - word modes
@@ -568,13 +568,13 @@ data:	.byte	0x10		;10
 	mov	@[xx16,r0],spH	;6E 07 A5 A5
 	mov	@[xx16,sp],spL	;6E 7F A5 A5
 
-	mov	@xx08,r0H	;20 5A
-	mov	@xx08,r7H	;27 5A
-	mov	@xx08,r0L	;28 5A
-	mov	@xx08,r7L	;2F 5A
+	mov	@xx08,r0H	;20*5A
+	mov	@xx08,r7H	;27*5A
+	mov	@xx08,r0L	;28*5A
+	mov	@xx08,r7L	;2F*5A
 
-	mov	@xx08,spH	;27 5A
-	mov	@xx08,spL	;2F 5A
+	mov	@xx08,spH	;27*5A
+	mov	@xx08,spL	;2F*5A
 
 	mov	@xx16,r0H	;6A 00 A5 A5
 	mov	@xx16,r7H	;6A 07 A5 A5
@@ -608,13 +608,13 @@ data:	.byte	0x10		;10
 	mov	spH,@[xx16,r0]	;6E 87 A5 A5
 	mov	spL,@[xx16,sp]	;6E FF A5 A5
 
-	mov	r0H,@xx08	;30 5A
-	mov	r7H,@xx08	;37 5A
-	mov	r0L,@xx08	;38 5A
-	mov	r7L,@xx08	;3F 5A
+	mov	r0H,@xx08	;30*5A
+	mov	r7H,@xx08	;37*5A
+	mov	r0L,@xx08	;38*5A
+	mov	r7L,@xx08	;3F*5A
 
-	mov	spH,@xx08	;37 5A
-	mov	spL,@xx08	;3F 5A
+	mov	spH,@xx08	;37*5A
+	mov	spL,@xx08	;3F*5A
 
 	mov	r0H,@xx16	;6A 80 A5 A5
 	mov	r7H,@xx16	;6A 87 A5 A5
@@ -811,13 +811,13 @@ data:	.byte	0x10		;10
 	bset	spH,@r0		;7D 00 60 70
 	bset	spL,@sp		;7D 70 60 F0
 
-	bset	r0H,@xx08	;7F 5A 60 00
-	bset	r7H,@xx08	;7F 5A 60 70
-	bset	r0L,@xx08	;7F 5A 60 80
-	bset	r7L,@xx08	;7F 5A 60 F0
+	bset	r0H,@xx08	;7F*5A 60 00
+	bset	r7H,@xx08	;7F*5A 60 70
+	bset	r0L,@xx08	;7F*5A 60 80
+	bset	r7L,@xx08	;7F*5A 60 F0
 
-	bset	spH,@xx08	;7F 5A 60 70
-	bset	spL,@xx08	;7F 5A 60 F0
+	bset	spH,@xx08	;7F*5A 60 70
+	bset	spL,@xx08	;7F*5A 60 F0
 
 	; S_BIT2
 

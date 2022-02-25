@@ -1,7 +1,7 @@
 /* rab.h */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,7 +13,7 @@
  * PS Division
  * CERN
  * CH-1211 Geneva-23
- * email: Ulrich.Raich@cern.ch
+ * email: Ulrich dot Raich at cern dot ch
  */
 
 /*)BUILD
@@ -39,13 +39,6 @@
 	}
 	$(STACK) = 3000
 */
-
-/*
- * Machine Selection
- */
-#define	X_R2K		122
-#define	X_HD64		121
-#define	X_Z80		120
 
 /*
  * Indirect Addressing delimeters
@@ -150,17 +143,25 @@
 #define	S_SUB		85
 #define	S_SBC		86
 #define S_OR    	87
+#define	S_CPU		88
+
+/*
+ * Processor Types (S_CPU)
+ */
+#define	X_R2K		0
+#define	X_HD64		1
+#define	X_Z80		2
+
 
 /*
  * HD64180 Instructions
  */
-#define	HD_HD64		90
-#define	HD_INH2		91
-#define	HD_IN		92
-#define	HD_OUT		93
-#define	HD_MLT		94
-#define	HD_TST		95
-#define	HD_TSTIO	96
+#define	HD_INH2		90
+#define	HD_IN		91
+#define	HD_OUT		92
+#define	HD_MLT		93
+#define	HD_TST		94
+#define	HD_TSTIO	95
 
 /*
  * Rabbit 2000 specific instructions

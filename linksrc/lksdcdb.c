@@ -1,23 +1,13 @@
 /* lksdcdb.c */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2001-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -167,7 +157,11 @@ a_uint value;
 	}
 
 	if (j > 2) {
+#ifdef	LONGINT
+		fprintf(yfp, "L:%s:%lX\n", name ,value);
+#else
 		fprintf(yfp, "L:%s:%X\n", name ,value);
+#endif
 	}
 
 }

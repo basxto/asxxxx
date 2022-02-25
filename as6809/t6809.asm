@@ -4,11 +4,11 @@
 
 	abx			;3a
 	adca	#0x01		;89 01
-	adcb	*0x02		;d9 02
+	adcb	*0x02		;d9*02
 	adda	#0x03		;8b 03
-	addb	*0x04		;db 04
+	addb	*0x04		;db*04
 	addd	#0x05		;c3 00 05
-	anda	*0x06		;94 06
+	anda	*0x06		;94*06
 	andb	#0x07		;c4 07
 	andcc	#0x08		;1c 08
 	asl	,x		;68 84
@@ -26,7 +26,7 @@
 	bhis	.+0x12		;24 10
 	bhs	.+0x12		;24 10
 	bita	#0x09		;85 09
-	bitb	*0x0a		;d5 0a
+	bitb	*0x0a		;d5*0a
 	ble	.+0x12		;2f 10
 	blo	.+0x12		;25 10
 	blos	.+0x12		;23 10
@@ -44,11 +44,11 @@
 	clra			;4f
 	clrb			;5f
 	cmpa	#0x0b		;81 0b
-	cmpb	*0x0c		;d1 0c
+	cmpb	*0x0c		;d1*0c
 	cmpd	#0x0d		;10 83 00 0d
-	cmps	*0x0e		;11 9c 0e
+	cmps	*0x0e		;11 9c*0e
 	cmpu	#0x0f		;11 83 00 0f
-	cmpx	*0x10		;9c 10
+	cmpx	*0x10		;9c*10
 	cmpy	#0x11		;10 8C 00 11
 	com	,x		;63 84
 	coma			;43
@@ -59,7 +59,7 @@
 	deca			;4a
 	decb			;5a
 	eora	#0x13		;88 13
-	eorb	*0x14		;d8 14
+	eorb	*0x14		;d8*14
 	exg	a,b		;1e 89
 	inc	,x		;6c 84
 	inca			;4c
@@ -88,13 +88,13 @@
 	lbvc	.+0x14		;10 28 00 10
 	lbvs	.+0x14		;10 29 00 10
 	lda	#0x15		;86 15
-	ldaa	*0x16		;96 16
+	ldaa	*0x16		;96*16
 	ldab	#0x17		;c6 17
-	ldb	*0x18		;d6 18
+	ldb	*0x18		;d6*18
 	ldd	#0x19		;cc 00 19
-	lds	*0x1a		;10 de 1a
+	lds	*0x1a		;10 de*1a
 	ldu	#0x1b		;ce 00 1b
-	ldx	*0x1c		;9e 1c
+	ldx	*0x1c		;9e*1c
 	ldy	#0x1d		;10 8e 00 1d
 	leas	-1,s		;32 7f
 	leau	-1,u		;33 5f
@@ -111,9 +111,9 @@
 	nega			;40
 	negb			;50
 	nop			;12
-	ora	*0x1e		;9a 1e
+	ora	*0x1e		;9a*1e
 	oraa	#0x1f		;8a 1f
-	orab	*0x20		;da 20
+	orab	*0x20		;da*20
 	orb	#0x21		;ca 21
 	orcc	#0x22		;1a 22
 	pshs	a		;34 02
@@ -129,7 +129,7 @@
 	rti			;3b
 	rts			;39
 	sbca	#0x23		;82 23
-	sbcb	*0x24		;d2 24
+	sbcb	*0x24		;d2*24
 	sex			;1d
 	sta	,x		;a7 84
 	staa	,x		;a7 84
@@ -141,7 +141,7 @@
 	stx	,x		;af 84
 	sty	,x		;10 af 84
 	suba	#0x25		;80 25
-	subb	*0x26		;d0 26
+	subb	*0x26		;d0*26
 	subd	#0x27		;83 00 27
 	swi			;3f
 	swi1			;3f

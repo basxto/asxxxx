@@ -1,7 +1,7 @@
 /* m05mch.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,10 +9,76 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6805.h"
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	OPCY_CPU	((char) (0xFD))
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+
+/*
+ * 6805 Cycle Count
+ *
+ *	opcycles = m05cyc[opcode]
+ */
+char m05cyc[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*10*/   7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+/*20*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*30*/   6,UN,UN, 6, 6,UN, 6, 6, 6, 6, 6,UN, 6, 6,UN, 6,
+/*40*/   4,UN,UN, 4, 4,UN, 4, 4, 4, 4, 4,UN, 4, 4,UN, 4,
+/*50*/   4,UN,UN, 4, 4,UN, 4, 4, 4, 4, 4,UN, 4, 4,UN, 4,
+/*60*/   7,UN,UN, 7, 7,UN, 7, 7, 7, 7, 7,UN, 7, 7,UN, 7,
+/*70*/   6,UN,UN, 6, 6,UN, 6, 6, 6, 6, 6,UN, 6, 6,UN, 6,
+/*80*/   9, 6,UN,11,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 2, 2,
+/*90*/  UN,UN,UN,UN,UN,UN,UN, 2, 2, 2, 2, 2, 2, 2,UN, 2,
+/*A0*/   2, 2, 2, 2, 2, 2, 2,UN, 2, 2, 2, 2,UN, 8, 2,UN,
+/*B0*/   4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 7, 4, 5,
+/*C0*/   5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 8, 5, 6,
+/*D0*/   6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 5, 9, 6, 7,
+/*E0*/   5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 8, 5, 6,
+/*F0*/   4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 7, 4, 5
+};
+
+/*
+ * 146805 CMOS Cycle Count
+ *
+ *	opcycles = mcmcyc[opcode]
+ */
+char mcmcyc[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+/*10*/   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+/*20*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*30*/   5,UN,UN, 5, 5,UN, 5, 5, 5, 5, 5,UN, 5, 4,UN, 5,
+/*40*/   3,UN,UN, 3, 3,UN, 3, 3, 3, 3, 3,UN, 3, 3,UN, 3,
+/*50*/   3,UN,UN, 3, 3,UN, 3, 3, 3, 3, 3,UN, 3, 3,UN, 3,
+/*60*/   6,UN,UN, 6, 6,UN, 6, 6, 6, 6, 6,UN, 6, 5,UN, 6,
+/*70*/   5,UN,UN, 5, 5,UN, 5, 5, 5, 5, 5,UN, 5, 4,UN, 5,
+/*80*/   9, 6,UN,10,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 2, 2,
+/*90*/  UN,UN,UN,UN,UN,UN,UN, 2, 2, 2, 2, 2, 2, 2,UN, 2,
+/*A0*/   2, 2, 2, 2, 2, 2, 2,UN, 2, 2, 2, 2,UN, 6, 2,UN,
+/*B0*/   3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 5, 3, 4,
+/*C0*/   4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 6, 4, 5,
+/*D0*/   5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 7, 5, 6,
+/*E0*/   4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 6, 4, 5,
+/*F0*/   3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 5, 3, 4
+};
+
+int mchtyp;
+
 
 /*
  * Process a machine op.
@@ -21,7 +87,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, t1, t2, type;
+	int op, t1, t2, type;
 	struct expr e1, e2, e3;
 	a_uint espv;
 	struct area *espa;
@@ -31,11 +97,12 @@ struct mne *mp;
 	clrexpr(&e1);
 	clrexpr(&e2);
 	clrexpr(&e3);
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	type = mp->m_type;
 	switch (type) {
 
 	case S_SDP:
+		opcycles = OPCY_SDP;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -62,6 +129,13 @@ struct mne *mp;
 		lmode = SLIST;
 		break;
 
+	case S_CPU:
+		opcycles = OPCY_CPU;
+		mchtyp = op;
+		sym[2].s_addr = op;
+		lmode = SLIST;
+		break;
+
 	case S_INH:
 		outab(op);
 		break;
@@ -70,7 +144,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(op);
 		if (e1.e_base.e_ap == dot.s_area) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -175,7 +249,7 @@ struct mne *mp;
 		outab(op + 2*(espv&0x07));
 		outrb(&e2, R_PAG0);
 		if (mchpcr(&e3)) {
-			v1 = e3.e_addr - dot.s_addr - 1;
+			v1 = (int) (e3.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -187,7 +261,17 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+
+	if (opcycles == OPCY_NONE) {
+		if (mchtyp != 0) {
+			opcycles = mcmcyc[cb[0] & 0xFF];
+		} else {
+			opcycles = m05cyc[cb[0] & 0xFF];
+		}
 	}
 }
 
@@ -196,7 +280,7 @@ struct mne *mp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);
@@ -234,4 +318,8 @@ comma()
 VOID
 minit()
 {
+	if (pass == 0) {
+		mchtyp = X_6805;
+		sym[2].s_addr = X_6805;
+	}
 }

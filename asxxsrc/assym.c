@@ -1,7 +1,7 @@
 /* assym.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,18 +11,8 @@
  *   With enhancements from
  *
  *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *	jhartman at compuserve dot com
  */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "asxxxx.h"
 
@@ -80,7 +70,8 @@
  *
  *	side effects:
  *		(1)	The symbol hash tables are initialized,
- *			the predefined symbols are '.' and '.__.ABS.'.
+ *			the predefined symbols are '.', '.__.ABS.',
+ *			and '.__.CPU.'.
  *		(2)	The mnemonic/directive hash tables are
  *			initialized with the assembler directives
  *			and mnemonics found in the machine dependent
@@ -90,11 +81,11 @@
 VOID
 syminit()
 {
-	register struct mne  *mp;
+	struct mne  *mp;
 	struct mne **mpp;
-	register struct sym  *sp;
+	struct sym  *sp;
 	struct sym **spp;
-	register int h;
+	int h;
 
 	mpp = &mnehash[0];
 	while (mpp < &mnehash[NHASH])
@@ -148,7 +139,7 @@ struct area *
 alookup(id)
 char *id;
 {
-	register struct area *ap;
+	struct area *ap;
 
 	ap = areap;
 	while (ap) {
@@ -187,7 +178,7 @@ struct bank *
 blookup(id)
 char *id;
 {
-	register struct bank *bp;
+	struct bank *bp;
 
 	bp = bankp;
 	while (bp) {
@@ -226,7 +217,7 @@ struct def *
 dlookup(id)
 char *id;
 {
-	register struct def *dp;
+	struct def *dp;
 
 	dp = defp;
 	while (dp) {
@@ -265,8 +256,8 @@ struct mne *
 mlookup(id)
 char *id;
 {
-	register struct mne *mp;
-	register int h;
+	struct mne *mp;
+	int h;
 
 	/*
 	 * JLH: case insensitive lookup always
@@ -310,8 +301,8 @@ struct sym *
 slookup(id)
 char *id;
 {
-	register struct sym *sp;
-	register int h;
+	struct sym *sp;
+	int h;
 
 	h = hash(id, zflag);
 	sp = symhash[h];
@@ -357,8 +348,8 @@ struct sym *
 lookup(id)
 char *id;
 {
-	register struct sym *sp;
-	register int h;
+	struct sym *sp;
+	int h;
 
 	h = hash(id, zflag);
 	sp = symhash[h];
@@ -404,8 +395,8 @@ char *id;
 VOID
 symglob()
 {
-	register struct sym *sp;
-	register int i;
+	struct sym *sp;
+	int i;
 
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
@@ -441,8 +432,8 @@ symglob()
 VOID
 allglob()
 {
-	register struct sym *sp;
-	register int i;
+	struct sym *sp;
+	int i;
 
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
@@ -483,10 +474,10 @@ allglob()
 
 int
 symeq(p1, p2, flag)
-register char *p1, *p2;
+char *p1, *p2;
 int flag;
 {
-	register int n;
+	int n;
 
 	n = strlen(p1) + 1;
 	if(flag) {
@@ -536,10 +527,10 @@ int flag;
  
 int
 hash(p, flag)
-register char *p;
-register int flag;
+char *p;
+int flag;
 {
-	register int h;
+	int h;
 
 	h = 0;
 	while (*p) {
@@ -567,7 +558,7 @@ register int flag;
  *
  *	This function based on code by
  *		John L. Hartman
- *		jhartman@compuserve.com
+ *		jhartman at compuserve dot com
  *
  *	local variables:
  *		int	l		string length + 1
@@ -659,7 +650,7 @@ char *
 new(n)
 unsigned int n;
 {
-	register VOID *p;
+	VOID *p;
 
 	if ((p = (VOID *) malloc(n)) == NULL) {
 		fprintf(stderr, "Out of space!\n");

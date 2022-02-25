@@ -1,22 +1,13 @@
 /* lklex.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -83,10 +74,10 @@
 
 VOID
 getid(id, c)
-register int c;
+int c;
 char *id;
 {
-	register char *p;
+	char *p;
 
 	if (c < 0) {
 		c = getnb();
@@ -126,10 +117,10 @@ char *id;
 
 VOID
 getfid(str, c)
-register int c;
+int c;
 char *str;
 {
-	register char *p;
+	char *p;
 
 	p = str;
 	do {
@@ -162,7 +153,7 @@ char *str;
 int
 getnb()
 {
-	register int c;
+	int c;
 
 	while ((c=get())==' ' || c=='\t')
 		;
@@ -193,7 +184,7 @@ getnb()
 
 VOID
 skip(c)
-register int c;
+int c;
 {
 	if (c < 0)
 		c = getnb();
@@ -227,7 +218,7 @@ register int c;
 int
 get()
 {
-	register int c;
+	int c;
 
 	if ((c = *ip) != 0)
 		++ip;
@@ -305,7 +296,7 @@ int
 getmap(d)
 int d;
 {
-	register int c, n, v;
+	int c, n, v;
 
 	if ((c = get()) == '\0')
 		return (-1);
@@ -413,8 +404,8 @@ int d;
 int
 getline()
 {
-	register int ftype;
-	register char *fid;
+	int ftype;
+	char *fid;
 
 loop:	if (cfp && cfp->f_type == F_STD)
 		fprintf(stdout, "ASlink >> ");
@@ -506,7 +497,7 @@ loop:	if (cfp && cfp->f_type == F_STD)
 int
 more()
 {
-	register int c;
+	int c;
 
 	c = getnb();
 	unget(c);
@@ -538,7 +529,7 @@ more()
 char
 endline()
 {
-	register int c;
+	int c;
 
 	c = getnb();
 	return( (c == '\0' || c == ';') ? 0 : c );
@@ -569,8 +560,8 @@ VOID
 chopcrlf(str)
 char *str;
 {
-	register char *p;
-	register char c;
+	char *p;
+	char c;
 
 	p = str;
 	do {

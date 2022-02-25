@@ -1,7 +1,7 @@
 /* m430ext.c */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2003-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,10 +9,8 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
 #include "asxxxx.h"
+#include "m430.h"
 
 char	*cpu	= "Texas Instruments MSP430";
 int	hilo	= 0;

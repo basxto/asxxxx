@@ -1,7 +1,7 @@
 /* m04mch.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,10 +9,45 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6804.h"
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+
+/*
+ * 6804 Cycle Count
+ *
+ *	opcycles = m04cyc[opcode]
+ */
+char m04cyc[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*10*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*20*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*30*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*40*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*50*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*60*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*70*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*80*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*90*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*A0*/  UN,UN,UN,UN,UN,UN,UN,UN, 4, 4, 4, 4, 4, 4, 4, 4,
+/*B0*/   4,UN, 2, 2, 4, 4,UN,UN, 4, 4, 4, 4, 4, 4, 4, 4,
+/*C0*/   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+/*D0*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*E0*/   4, 4, 4, 4, 4, 4, 4, 4, 4,UN, 4, 4, 4, 4,UN,UN,
+/*F0*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+};
 
 /*
  * Process a machine op.
@@ -21,7 +56,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, t1, t2, type;
+	int op, t1, t2, type;
 	struct expr e1, e2, e3;
 	struct area *espa;
 	int c, v1, v2, v3;
@@ -30,11 +65,12 @@ struct mne *mp;
 	clrexpr(&e1);
 	clrexpr(&e2);
 	clrexpr(&e3);
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	type = mp->m_type;
 	switch (type) {
 
 	case S_SDP:
+		opcycles = OPCY_SDP;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -67,7 +103,7 @@ struct mne *mp;
 
 	case S_BRA:
 		expr(&e1, 0);
-		v1 = e1.e_addr - dot.s_addr - 1;
+		v1 = (int) (e1.e_addr - dot.s_addr - 1);
 		if ((v1 < -16) || (v1 > 15))
 			aerr();
 		if (e1.e_base.e_ap != dot.s_area)
@@ -77,7 +113,7 @@ struct mne *mp;
 
 	case S_TYP1:
 		expr(&e1, 0);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		if ((v1 < -4096) || (v1 > 4095))
 			aerr();
 		e1.e_addr += op;
@@ -93,7 +129,7 @@ struct mne *mp;
 			break;
 		}
 		if (t1 == S_DIR) {
-			v1 = e1.e_addr;
+			v1 = (int) e1.e_addr;
 			if ((e1.e_base.e_ap == NULL) &
 			    (v1 >= 0x80) & (v1 <= 0x83)) {
 				v1 &= 0x03;
@@ -155,7 +191,7 @@ struct mne *mp;
 		if (t2 != S_IMMED)
 			aerr();
 		outab(op);
-		outrb(&e1, 0);
+		outrb(&e1, R_PAG0);
 		outrb(&e2, 0);
 		break;
 
@@ -176,7 +212,7 @@ struct mne *mp;
 		outab(op);
 		outab(v1);
 		if (mchpcr(&e2)) {
-			v2 = e2.e_addr - dot.s_addr - 1;
+			v2 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v2 < -128) || (v2 > 127))
 				aerr();
 			outab(v2);
@@ -201,10 +237,10 @@ struct mne *mp;
 			expr(&e3, 0);
 		}
 		outab(op + (e1.e_addr & 0x07));
-		outrb(&e2, R_USGN);
+		outrb(&e2, R_PAG0);
 		if (type == S_BTB) {
 			if (e3.e_base.e_ap == dot.s_area) {
-				v3 = e3.e_addr - dot.s_addr - 1;
+				v3 = (int) (e3.e_addr - dot.s_addr - 1);
 				if ((v3 < -128) || (v3 > 127))
 					aerr();
 				outab(v3);
@@ -217,7 +253,13 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+
+	if (opcycles == OPCY_NONE) {
+		opcycles = m04cyc[cb[0] & 0xFF];
 	}
 }
 
@@ -226,7 +268,7 @@ struct mne *mp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);

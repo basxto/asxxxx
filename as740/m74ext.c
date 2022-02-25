@@ -1,7 +1,7 @@
 /* m74ext.c */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2005-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,8 +15,6 @@
  * Uwe Steller
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m740.h"
 

@@ -1,7 +1,7 @@
 /* m740.h */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2005-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin

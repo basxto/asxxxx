@@ -5,7 +5,7 @@
  * Bill McKinnon
  * w_mckinnon at conknet dot com
  *
- * (C) Copyright 1998-2003
+ * (C) Copyright 1998-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -18,8 +18,6 @@
  *
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "ds8.h"
 

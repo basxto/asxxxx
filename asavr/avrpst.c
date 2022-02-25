@@ -1,7 +1,7 @@
 /* avrpst.c */
 
 /*
- * (C) Copyright 2001-2003
+ * (C) Copyright 2001-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "avr.h"
 
@@ -124,6 +122,19 @@ char mode8[32] = {	/* S_RJMP instructions */
  *		int	m_mbro;		Bit Range Overflow Mask
  *	};
  */
+#ifdef	LONGINT
+struct	mode	mode[9] = {
+    {	&mode0[0],	0l,	0xFFFFFFFFl,	0xFFFFFFFFl	},	/* R_NORM  */
+    {	&mode1[0],	1l,	0x00000F0Fl,	0x000000FFl	},	/* S_IBYTE */
+    {	&mode2[0],	1l,	0x000000CFl,	0x0000003Fl	},	/* S_IWORD */
+    {	&mode3[0],	1l,	0x000003F8l,	0x0000007Fl	},	/* S_BRA   */
+    {	&mode4[0],	1l,	0xFFFF01F1l,	0x003FFFFFl	},	/* S_JMP  */
+    {	&mode5[0],	1l,	0x0000060Fl,	0x0000003Fl	},	/* S_IOP   */
+    {	&mode6[0],	1l,	0x000000F8l,	0x0000001Fl	},	/* S_IOR   */
+    {	&mode7[0],	1l,	0x00002C07l,	0x0000003Fl	},	/* S_ILDST */
+    {	&mode8[0],	0l,	0x00000FFFl,	0x00000FFFl	},	/* S_RJMP  */
+};
+#else
 struct	mode	mode[9] = {
     {	&mode0[0],	0,	0xFFFFFFFF,	0xFFFFFFFF	},	/* R_NORM  */
     {	&mode1[0],	1,	0x00000F0F,	0x000000FF	},	/* S_IBYTE */
@@ -135,6 +146,7 @@ struct	mode	mode[9] = {
     {	&mode7[0],	1,	0x00002C07,	0x0000003F	},	/* S_ILDST */
     {	&mode8[0],	0,	0x00000FFF,	0x00000FFF	},	/* S_RJMP  */
 };
+#endif
 
 /*
  * Array of Pointers to mode Structures
@@ -158,28 +170,28 @@ struct	mne	mne[] = {
 
     {	NULL,	".avr_4k",	S_4K,		0,	0	},
 
-    {	NULL,	".AT90SXXXX",	X_PTYPE,	0,	AT90Sxxxx	},
-    {	NULL,	".AT90S1200",	X_PTYPE,	0,	AT90S1200	},
-    {	NULL,	".AT90S2313",	X_PTYPE,	0,	AT90S2313	},
-    {	NULL,	".AT90S2323",	X_PTYPE,	0,	AT90S2323	},
-    {	NULL,	".AT90S2343",	X_PTYPE,	0,	AT90S2343	},
-    {	NULL,	".AT90S2333",	X_PTYPE,	0,	AT90S2333	},
-    {	NULL,	".AT90S4433",	X_PTYPE,	0,	AT90S4433	},
-    {	NULL,	".AT90S4414",	X_PTYPE,	0,	AT90S4414	},
-    {	NULL,	".AT90S4434",	X_PTYPE,	0,	AT90S4434	},
-    {	NULL,	".AT90S8515",	X_PTYPE,	0,	AT90S8515	},
-    {	NULL,	".AT90C8534",	X_PTYPE,	0,	AT90C8534	},
-    {	NULL,	".AT90S8535",	X_PTYPE,	0,	AT90S8535	},
-    {	NULL,	".ATmega103",	X_PTYPE,	0,	ATmega103	},
-    {	NULL,	".ATmega603",	X_PTYPE,	0,	ATmega603	},
-    {	NULL,	".ATmega161",	X_PTYPE,	0,	ATmega161	},
-    {	NULL,	".ATmega163",	X_PTYPE,	0,	ATmega163	},
-    {	NULL,	".ATtiny10",	X_PTYPE,	0,	ATtiny10	},
-    {	NULL,	".ATtiny11",	X_PTYPE,	0,	ATtiny11	},
-    {	NULL,	".ATtiny12",	X_PTYPE,	0,	ATtiny12	},
-    {	NULL,	".ATtiny15",	X_PTYPE,	0,	ATtiny15	},
-    {	NULL,	".ATtiny22",	X_PTYPE,	0,	ATtiny22	},
-    {	NULL,	".ATtiny28",	X_PTYPE,	0,	ATtiny28	},
+    {	NULL,	".AT90SXXXX",	S_CPU,		0,	AT90Sxxxx	},
+    {	NULL,	".AT90S1200",	S_CPU,		0,	AT90S1200	},
+    {	NULL,	".AT90S2313",	S_CPU,		0,	AT90S2313	},
+    {	NULL,	".AT90S2323",	S_CPU,		0,	AT90S2323	},
+    {	NULL,	".AT90S2343",	S_CPU,		0,	AT90S2343	},
+    {	NULL,	".AT90S2333",	S_CPU,		0,	AT90S2333	},
+    {	NULL,	".AT90S4433",	S_CPU,		0,	AT90S4433	},
+    {	NULL,	".AT90S4414",	S_CPU,		0,	AT90S4414	},
+    {	NULL,	".AT90S4434",	S_CPU,		0,	AT90S4434	},
+    {	NULL,	".AT90S8515",	S_CPU,		0,	AT90S8515	},
+    {	NULL,	".AT90C8534",	S_CPU,		0,	AT90C8534	},
+    {	NULL,	".AT90S8535",	S_CPU,		0,	AT90S8535	},
+    {	NULL,	".ATmega103",	S_CPU,		0,	ATmega103	},
+    {	NULL,	".ATmega603",	S_CPU,		0,	ATmega603	},
+    {	NULL,	".ATmega161",	S_CPU,		0,	ATmega161	},
+    {	NULL,	".ATmega163",	S_CPU,		0,	ATmega163	},
+    {	NULL,	".ATtiny10",	S_CPU,		0,	ATtiny10	},
+    {	NULL,	".ATtiny11",	S_CPU,		0,	ATtiny11	},
+    {	NULL,	".ATtiny12",	S_CPU,		0,	ATtiny12	},
+    {	NULL,	".ATtiny15",	S_CPU,		0,	ATtiny15	},
+    {	NULL,	".ATtiny22",	S_CPU,		0,	ATtiny22	},
+    {	NULL,	".ATtiny28",	S_CPU,		0,	ATtiny28	},
 
 	/* system */
 
@@ -212,6 +224,12 @@ struct	mne	mne[] = {
     {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
+    {	NULL,	".iflt",	S_CONDITIONAL,	0,	O_IFLT	},
+    {	NULL,	".ifge",	S_CONDITIONAL,	0,	O_IFGE	},
+    {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
+    {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
+    {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},
@@ -250,7 +268,7 @@ struct	mne	mne[] = {
     {	NULL,	".error",	S_ERROR,	0,	O_ERROR	},
     {	NULL,	".msb",		S_MSB,		0,	0	},
 /*    {	NULL,	".8bit",	S_BITS,		0,	O_1BYTE	},	*/
-/*    {	NULL,	".16bit",	S_BITS,		0,	O_2BYTE	},	*/
+    {	NULL,	".16bit",	S_BITS,		0,	O_2BYTE	},
 /*    {	NULL,	".24bit",	S_BITS,		0,	O_3BYTE	},	*/
     {	NULL,	".32bit",	S_BITS,		0,	O_4BYTE	},
     {	NULL,	".end",		S_END,		0,	0	},
@@ -393,6 +411,7 @@ struct	mne	mne[] = {
 
     {	NULL,	"nop",		S_INH,		0,	0x0000	},
     {	NULL,	"sleep",	S_INH,		0,	0x9588	},
+    {	NULL,	"break",	S_INH,		0,	0x9598	},
     {	NULL,	"spm",		S_INH,		0,	0x95E8	},
     {	NULL,	"wdr",		S_INH,		S_EOL,	0x95A8	}
 };

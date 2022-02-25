@@ -1,7 +1,7 @@
 /* M16MCH:C */
 
 /*
- * (C) Copyright 1991-2003
+ * (C) Copyright 1991-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6816.h"
 
@@ -21,13 +19,115 @@ int	bm;
 int	bb[NB];
 
 /*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+#define	P1	((char) (OPCY_NONE | 0x01))
+#define	P2	((char) (OPCY_NONE | 0x02))
+#define	P3	((char) (OPCY_NONE | 0x03))
+
+static char  m16pg0[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   8, 8, 8, 8, 8, 4, 6,UN, 8, 8,14,14, 8, 8, 8, 8,
+/*10*/   8, 8, 8, 8, 8, 4, 6,P1, 8, 8,14,14, 8, 8, 8, 8,
+/*20*/   8, 8, 8, 8, 8, 4, 6,P2, 8, 8,14,14, 8, 8, 8, 8,
+/*30*/   8, 8, 8, 8, 4, 4,10,P3, 8, 8,14,14, 2, 2, 2, 2,
+/*40*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 8, 6, 6, 6, 6,
+/*50*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 8, 6, 6, 6, 6,
+/*60*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 8, 6, 6, 6, 6,
+/*70*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6,12, 2,UN,UN,UN,
+/*80*/   6, 6, 6, 6, 6, 6, 6, 6, 6,12, 4,12, 4, 4, 4, 4,
+/*90*/   6, 6, 6, 6, 6, 6, 6, 6, 6,12, 4,12, 4, 4, 4, 4,
+/*A0*/   6, 6, 6, 6, 6, 6, 6, 6, 6,12, 4,12, 4, 4, 4, 4,
+/*B0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+/*C0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4,12, 6, 6, 6, 6,
+/*D0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4,12, 6, 6, 6, 6,
+/*E0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4,12, 6, 6, 6, 6,
+/*F0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2,10, 6, 2,UN,UN,UN
+};
+
+static char  m16pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   8, 8, 8, 8, 8, 6, 6,UN, 8, 8,UN,UN, 8, 8, 8, 8,
+/*10*/   8, 8, 8, 8, 8, 6, 6,UN, 8, 8,UN,UN, 8, 8, 8, 8,
+/*20*/   8, 8, 8, 8, 8, 6, 6,UN, 8, 8,UN,UN, 8, 8, 8, 8,
+/*30*/   8, 8, 8, 8, 8, 6, 6,UN,UN,UN,UN,UN, 8, 8, 8, 8,
+/*40*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6, 6, 6, 6,
+/*50*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6, 6, 6, 6,
+/*60*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6, 6, 6, 6,
+/*70*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6, 6, 6, 6,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 6, 6, 6, 6,
+/*90*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 6, 6, 6, 6,
+/*A0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 6, 6, 6, 6,
+/*B0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 6, 6, 6, 6,
+/*C0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6, 6, 6, 6,
+/*D0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6, 6, 6, 6,
+/*E0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6, 6, 6, 6,
+/*F0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6, 6, 6, 6
+};
+
+static char  m16pg2[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   8, 8, 8, 8, 8, 6, 6,UN,10,10,UN,UN, 8, 8, 8, 8,
+/*10*/   8, 8, 8, 8, 8, 6, 6,UN,10,10,UN,UN, 8, 8, 8, 8,
+/*20*/   8, 8, 8, 8, 8, 6, 6,UN,10,10,UN,UN, 8, 8, 8, 8,
+/*30*/   8, 8, 8, 8, 8, 6, 6,UN,10,10,UN,UN, 8, 8, 8, 8,
+/*40*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4,UN, 2, 2, 2, 2,
+/*50*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4,UN, 2,UN, 2, 2,
+/*60*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4,UN, 2, 2,UN, 2,
+/*70*/   2, 8, 2, 8, 2, 2, 2,12, 2, 2, 2, 2, 2, 2, 2, 2,
+/*80*/   6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6,UN,UN,UN,UN,UN,
+/*90*/   6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6,UN,UN,UN,UN,UN,
+/*A0*/   6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6,UN,UN,UN,UN,UN,
+/*B0*/   8, 4, 4, 6, 6, 2, 4, 2,14,16, 4, 2,UN,UN,UN,UN,
+/*C0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4,UN,UN,UN,UN,UN,
+/*D0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4,UN,UN,UN,UN,UN,
+/*E0*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4,UN,UN,UN,UN,UN,
+/*F0*/   2,20, 2, 8, 2, 2, 2,12, 2,10, 2, 2, 2, 2, 2, 2
+};
+
+static char  m16pg3[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   2, 2, 2, 2, 2, 2, 2, 2, 4, 6, 2, 2, 2, 2, 2, 2,
+/*10*/   2, 2, 2, 2, 2, 2, 2, 2, 4, 6, 2, 2, 2, 2, 2, 2,
+/*20*/  16, 2, 2, 4,10,10, 8, 8,24,38,22,22, 2, 4,UN, 2,
+/*30*/   4, 4, 4, 4, 4, 4, 4, 4, 4,UN, 4, 4, 4, 4, 4, 4,
+/*40*/   6, 6, 6, 6, 6, 6, 6, 6, 4,UN, 6,UN, 2, 2, 2, 2,
+/*50*/   6, 6, 6, 6, 6, 6, 6, 6, 4,UN, 6,UN, 2, 2, 2, 2,
+/*60*/   6, 6, 6, 6, 6, 6, 6, 6, 4,UN, 6,UN, 2, 2, 2, 2,
+/*70*/   6, 6, 6, 6, 6, 6, 6, 6, 4,UN, 6,UN, 4, 4, 4, 4,
+/*80*/   6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+/*90*/   6, 6,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 2, 2, 2, 2,
+/*A0*/  UN,UN,UN,UN,UN,UN, 0,UN,UN,UN,UN,UN, 2, 2, 2, 2,
+/*B0*/   4, 4, 4, 4, 4, 4, 4, 4, 4,UN,UN,UN, 4, 4, 4, 4,
+/*C0*/   6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6,UN, 2, 2,UN,UN,
+/*D0*/   6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6,UN, 2, 2,UN,UN,
+/*E0*/   6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6,UN, 2, 2,UN,UN,
+/*F0*/   6, 6, 6, 6, 6, 6, 6, 6, 6,UN, 6,UN, 2, 4,10,10
+};
+
+static char *Page[4] = {
+    m16pg0, m16pg1, m16pg2, m16pg3
+};
+
+/*
  * Process a machine op.
  */
 VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, rf, cpg;
+	int op, rf, cpg;
 	struct expr e1, e2, e3;
 	char id[NCPS];
 	struct area *espa;
@@ -36,12 +136,13 @@ struct mne *mp;
 	clrexpr(&e1);
 	clrexpr(&e2);
 	clrexpr(&e3);
-	pc = dot.s_addr;
+	pc = (int) dot.s_addr;
 	cpg = 0;
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	switch (rf = mp->m_type) {
 
 	case S_SDP:
+		opcycles = OPCY_SDP;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -175,7 +276,7 @@ struct mne *mp;
 				 *        = e3.e_addr - dot.s_addr - 2 + 6 - 6
 				 *        = e3.e_addr - dot.s_addr - 2
 				 */
-				vn = e3.e_addr - dot.s_addr - 2;
+				vn = (int) (e3.e_addr - dot.s_addr - 2);
 				outaw(vn);
 			} else {
 				/* R_PCR is calculated relative to the
@@ -195,7 +296,7 @@ struct mne *mp;
 				t1 |= T_IND16;
 			} else {
 				if (mchpcr(&e3)) {
-					vn = e3.e_addr - dot.s_addr - 4;
+					vn = (int) (e3.e_addr - dot.s_addr - 4);
 					if ((vn < -128) || (vn > 127)) {
 						t1 |= T_IND16;
 					} else {
@@ -225,7 +326,7 @@ struct mne *mp;
 					 *        = e3.e_addr - dot.s_addr - 1 + 4 - 6
 					 *        = e3.e_addr - dot.s_addr - 3
 					 */
-					vn = e3.e_addr - dot.s_addr - 3;
+					vn = (int) (e3.e_addr - dot.s_addr - 3);
 					if ((vn < -128) || (vn > 127))
 						aerr();
 					outab(vn);
@@ -255,7 +356,7 @@ struct mne *mp;
 					 *        = e3.e_addr - dot.s_addr - 2 + 6 - 6
 					 *        = e3.e_addr - dot.s_addr - 2
 					 */
-					vn = e3.e_addr - dot.s_addr - 2;
+					vn = (int) (e3.e_addr - dot.s_addr - 2);
 					outaw(vn);
 				} else {
 					/* R_PCR is calculated relative to the
@@ -587,7 +688,7 @@ struct mne *mp;
 			 *        = e1.e_addr - dot.s_addr - 2 + 4 - 6
 			 *        = e1.e_addr - dot.s_addr - 4
 			 */
-			vn = e1.e_addr - dot.s_addr - 4;
+			vn = (int) (e1.e_addr - dot.s_addr - 4);
 			outaw(vn);
 		} else {
 			/*
@@ -618,7 +719,7 @@ struct mne *mp;
 			 *        = e1.e_addr - dot.s_addr - 1 + 2 - 6
 			 *        = e1.e_addr - dot.s_addr - 5
 			 */
-			vn = e1.e_addr - dot.s_addr - 5;
+			vn = (int) (e1.e_addr - dot.s_addr - 5);
 			if ((vn < -128) || (vn > 127))
 				rerr();
 			outab(vn);
@@ -638,11 +739,20 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
 	}
 	if (pc & 0x0001) {
 		err('b');
 		dot.s_addr += 1;
+	}
+
+	if (opcycles == OPCY_NONE) {
+		opcycles = m16pg0[cb[0] & 0xFF];
+		if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+			opcycles = Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+		}
 	}
 }
 
@@ -724,7 +834,7 @@ struct expr *e1;
 	if (pass == 1) {
 		if (e1->e_addr >= dot.s_addr)
 			e1->e_addr -= fuzz;
-		vn = e1->e_addr;
+		vn = (int) e1->e_addr;
 		flag = 0;
 		if ((vn<-128) || (vn>127) || e1->e_flag || e1->e_base.e_ap)
 			flag = 1;
@@ -780,7 +890,7 @@ int b;
 int
 getbit()
 {
-	register int f;
+	int f;
 
 	if (bp >= &bb[NB])
 		return (1);
@@ -798,7 +908,7 @@ getbit()
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);

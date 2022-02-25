@@ -3,8 +3,8 @@ R:\ASXV4PXX\asxmak\Symantec\build\as61860.prj
 as61860.OPN
 novcs
 as61860.DEF
-8
-1055905280
+6
+1092880030
 0 0 0 0 0 "..\..\..\ASXXSRC\asdata.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asdbg.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asexpr.c"

@@ -6,11 +6,11 @@
 	abx			;1A E5
 	aby			;19 ED
 	adca	#0x01		;89 01
-	adcb	*0x02		;D9 02
+	adcb	*0x02		;D9*02
 	adda	#0x03		;8B 03
-	addb	*0x04		;DB 04
+	addb	*0x04		;DB*04
 	addd	#0x05		;C3 00 05
-	anda	*0x06		;94 06
+	anda	*0x06		;94*06
 	andb	#0x07		;C4 07
 	andcc	#0x08		;10 08
 	asl	0,x		;68 00
@@ -21,7 +21,7 @@
 	asra			;47
 	asrb			;57
 	bcc	.+0x12		;24 10
-	bclr	*0xFF,#0xFE	;4D FF FE
+	bclr	*0xFF,#0xFE	;4D*FF FE
 	bcs	.+0x12		;25 10
 	beq	.+0x12		;27 10
 	bge	.+0x12		;2C 10
@@ -31,7 +31,7 @@
 	bhis	.+0x12		;24 10
 	bhs	.+0x12		;24 10
 	bita	#0x09		;85 09
-	bitb	*0x0a		;D5 0A
+	bitb	*0x0a		;D5*0A
 	ble	.+0x12		;2F 10
 	blo	.+0x12		;25 10
 	blos	.+0x12		;23 10
@@ -41,10 +41,10 @@
 	bne	.+0x12		;26 10
 	bpl	.+0x12		;2A 10
 	bra	.+0x12		;20 10
-	brclr	*0xFD,#0xFC,.+0x12	;4F FD FC 0E
+	brclr	*0xFD,#0xFC,.+0x12	;4F*FD FC 0E
 	brn	.+0x12		;21 10
-	brset	*0xFB,#0xFA,.+0x12	;4E FB FA 0E
-	bset	*0xF9,#0xF8	;4C F9 F8
+	brset	*0xFB,#0xFA,.+0x12	;4E*FB FA 0E
+	bset	*0xF9,#0xF8	;4C*F9 F8
 	bsr	.+0x12		;07 10
 	bvc	.+0x12		;28 10
 	bvs	.+0x12		;29 10
@@ -57,18 +57,18 @@
 	clrb			;C7
 	clv			;10 FD
 	cmpa	#0x0b		;81 0B
-	cmpb	*0x0c		;D1 0C
+	cmpb	*0x0c		;D1*0C
 	cmpd	#0x0d		;8C 00 0D
-	cmps	*0x0e		;9F 0E
+	cmps	*0x0e		;9F*0E
 	cmpx	#0x10		;8E 00 10
-	cmpy	*0x11		;9D 11
+	cmpy	*0x11		;9D*11
 	com	,x		;61 00
 	coma			;41
 	comb			;51
 	cpd	#0x0d		;8C 00 0D
-	cps	*0x0e		;9F 0E
+	cps	*0x0e		;9F*0E
 	cpx	#0x10		;8E 00 10
-	cpy	*0x11		;9D 11
+	cpy	*0x11		;9D*11
 	daa			;18 07
 	dbeq	a,.+0x100	;04 00 FD
 	dbne	b,.+0x100	;04 21 FD
@@ -88,7 +88,7 @@
 	emul			;13
 	emuls			;18 13
 	eora	#0x13		;88 13
-	eorb	*0x14		;D8 14
+	eorb	*0x14		;D8*14
 	etbl	5,x		;18 3F 05
 	exg	a,b		;B7 81
 	fdiv			;18 11
@@ -125,13 +125,13 @@
 	lbvc	.+0x14		;18 28 00 10
 	lbvs	.+0x14		;18 29 00 10
 	lda	#0x15		;86 15
-	ldaa	*0x16		;96 16
+	ldaa	*0x16		;96*16
 	ldb	#0x17		;C6 17
-	ldab	*0x18		;D6 18
+	ldab	*0x18		;D6*18
 	ldd	#0x19		;CC 00 19
-	lds	*0x1a		;DF 1A
+	lds	*0x1a		;DF*1A
 	ldx	#0x1c		;CE 00 1C
-	ldy	*0x1d		;DD 1D
+	ldy	*0x1d		;DD*1D
 	leas	-1,s		;1B 9F
 	leax	-1,x		;1A 1F
 	leay	-1,y		;19 5F
@@ -155,9 +155,9 @@
 	nega			;40
 	negb			;50
 	nop			;A7
-	ora	*0x1e		;9A 1E
+	ora	*0x1e		;9A*1E
 	oraa	#0x1f		;8A 1F
-	orb	*0x20		;DA 20
+	orb	*0x20		;DA*20
 	orab	#0x21		;CA 21
 	orcc	#0x22		;14 22
 	psha			;36
@@ -185,7 +185,7 @@
 	rts			;3D
 	sba			;18 16
 	sbca	#0x23		;82 23
-	sbcb	*0x24		;D2 24
+	sbcb	*0x24		;D2*24
 	sec			;14 01
 	sei			;14 10
 	sev			;14 02
@@ -200,7 +200,7 @@
 	stx	,x		;6E 00
 	sty	,x		;6D 00
 	suba	#0x25		;80 25
-	subb	*0x26		;D0 26
+	subb	*0x26		;D0*26
 	subd	#0x27		;83 00 27
 	swi			;3F
 	tab			;18 0E
@@ -1318,13 +1318,13 @@
 	idx1 = 0x00FF
 	idx2 = 0x5678
 
-	bclr	*dir,msk	;4D 22 A5
+	bclr	*dir,msk	;4D*22 A5
 	bclr	ext,msk		;1D 12 34 A5
 	bclr	1,x,msk		;0D 01 A5
 	bclr	idx1,x,msk	;0D E0 FF A5
 	bclr	idx2,x,msk	;0D E2 56 78 A5
 
-	bset	*dir,msk	;4C 22 A5
+	bset	*dir,msk	;4C*22 A5
 	bset	ext,msk		;1C 12 34 A5
 	bset	1,x,msk		;0C 01 A5
 	bset	idx1,x,msk	;0C E0 FF A5
@@ -1342,13 +1342,13 @@
 	idx1 = 0x00FF
 	idx2 = 0x5678
 
-	brclr	*dir,msk,.+6		;4F 22 A5 02
+	brclr	*dir,msk,.+6		;4F*22 A5 02
 	brclr	ext,msk,.+6		;1F 12 34 A5 01
 	brclr	1,x,msk,.+6		;0F 01 A5 02
 	brclr	idx1,x,msk,.+6		;0F E0 FF A5 01
 	brclr	idx2,x,msk,.+6		;0F E2 56 78 A5 00
 
-	brset	*dir,msk,.+6		;4E 22 A5 02
+	brset	*dir,msk,.+6		;4E*22 A5 02
 	brset	ext,msk,.+6		;1E 12 34 A5 01
 	brset	1,x,msk,.+6		;0E 01 A5 02
 	brset	idx1,x,msk,.+6		;0E E0 FF A5 01

@@ -14,9 +14,65 @@
 
 
 <H4><B><PRE>
-68HC12 REGISTER SET 
+PROCESSOR SPECIFIC DIRECTIVES 
 
-The following is a list of the 68HC12 registers used by AS6812: 
+   The   AS6812  assembler  supports  the  68HC(S)12  series  of
+microprocessors which includes  the  68HC(S)8xx  and  68HC(S)9xx
+series.  
+
+
+.hc12 Directive 
+
+Format:  
+
+        .hc12 
+
+The  .hc12 directive selects the HC12 core specific cycles count
+output when the -c command line option is specified.  
+
+
+.hcs12 Directive 
+
+Format:  
+
+        .hcs12 
+
+The  .hcs12  directive  selects  the  HCS12 core specific cycles
+count output when the -c command line option is specified.  
+
+
+The .__.CPU.  Variable 
+
+   The value of the pre-defined symbol '.__.CPU.' corresponds to
+the selected processor type.  The default value is 0 which  cor-
+responds  to  the  default  processor type.  The following table
+lists the processor types and associated values for  the  AS6812
+assembler:  
+
+        Processor Type            .__.CPU. Value
+        --------------            --------------
+            .hc12                        0
+            .hcs12                       1
+
+
+   The  variable  '.__.CPU.'  is by default defined as local and
+will not be output to the created .rel file.  The assembler com-
+mand line options -g or -a will not cause the local symbol to be
+output to the created .rel file.  
+
+   The  assembler  .globl  directive  may  be used to change the
+variable type to global causing its definition to be  output  to
+the  .rel file.  The inclusion of the definition of the variable
+'.__.CPU.' might be a useful means of validating that seperately
+assembled  files have been compiled for the same processor type.
+The linker will report an error for variables with multiple  non
+equal definitions.  
+
+
+68HC(S)12 REGISTER SET 
+
+The  following  is a list of the  68HC(S)12  registers  used  by
+AS6812: 
 
         a,b     -       8-bit accumulators
         d       -       16-bit accumulator &lt;a:b&gt;
@@ -26,13 +82,14 @@ The following is a list of the 68HC12 registers used by AS6812:
         ccr,cc  -       condition code register
 
 
-68HC12 INSTRUCTION SET 
+68HC(S)12 INSTRUCTION SET 
 
 
-   The  following tables list all 68HC12 mnemonics recognized by
-the AS6812 assembler.  The designation [] refers to  a  required
-addressing  mode  argument.   The  following  list specifies the
-format for each addressing mode supported by AS6812:  
+   The   following   tables   list   all   68HC(S)12   mnemonics
+recognized by the  AS6812 assembler.  The designation  [] refers
+to  a  required addressing  mode  argument.   The following list
+specifies  the  format  for  each  addressing   mode   supported
+by AS6812:  
 
         #data           immediate data
                         byte or word data
@@ -86,7 +143,7 @@ The  terms  data, dir, label, offset, and ext may all be expres-
 sions.  
 
    Note  that  not all addressing modes are valid with every in-
-struction, refer to the 68HC12 technical data for valid modes.  
+struction, refer to the 68HC(S)12 technical data for valid modes.  
 
 
 Inherent Instructions 
@@ -306,5 +363,6 @@ M68HC11 Compatibility Mode Instructions
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

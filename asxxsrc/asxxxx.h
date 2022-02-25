@@ -1,7 +1,7 @@
 /* asxxxx.h */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,9 +15,28 @@
  *
  *	Bill McKinnon (BM)
  *	w_mckinnon@conknet.com
+ *
+ *	Boisy G. Petri (BGP)
+ *	boisy at boisypitre dot com
+ *
+ *	Mike McCarty
+ *	mike dot mccarty at sbcglobal dot net
  */
 
-#define	VERSION	"V04.00"
+/*
+ * System Include Files
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <setjmp.h>
+#include <string.h>
+
+/*
+ * Local Definitions
+ */
+
+#define	VERSION	"V04.10"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -36,9 +55,32 @@
  *
  * The type INT32 is defined so that compiler dependent
  * variable sizes may be specified in one place.
+ *
+ * LONGINT is defined when INT32 is 'long' to
+ * select the 'l' forms for format strings
+ * and constants.
  */
 
+/* Turbo C++ 3.0 for DOS */
+/* 'int' is 16-bits, 'long' is 32-bits */
+
+#ifdef	__TURBOC__
+#define		INT32	long
+#define		LONGINT
+#endif
+
+/* Symantec C++ V6.x/V7.x for DOS (not DOSX) */
+/* 'int' is 16-bits, 'long' is 32-bits */
+
+#ifdef	__SC__
+#define		INT32	long
+#define		LONGINT
+#endif
+
+/* The DEFAULT is 'int' is 32 bits */
+#ifndef	INT32
 #define		INT32	int
+#endif
 
 
 /*)Module	asxxxx.h
@@ -54,10 +96,12 @@
  *	 compiler/operating system specific definitions
  */
 
+#undef	VOID
+
 /* DECUS C void definition */
 /* File/extension seperator */
 
-#ifdef	decus
+#ifdef	DECUS
 #define	VOID	char
 #define	FSEPX	'.'
 #endif
@@ -116,6 +160,18 @@
 #define	ELIST	5		/* Equate only */
 
 /*
+ * Opcode Cycle definitions (Must Be The Same In ASxxxx / ASLink)
+ */
+#define	CYCNT_BGN	'['	/* Cycle count begin delimiter */
+#define	CYCNT_END	']'	/* Cycle count end   delimiter */
+
+/*
+ * OPCY_NONE bit set signifies no opcode cycles set.
+ */
+#define	OPCY_NONE	((char) 0x80)	/* Opcode Cycle Count Not Set */
+#define	OPCY_MASK	((char) 0x7F)	/* Opcode Cycle Count MASK */
+
+/*
  * NTXT must be defined to have the same value in
  * the ASxxxx assemblers and ASLink.
  *
@@ -132,7 +188,21 @@
 #define dcb	bank[0]		/* Dcb, default code bank */
 
 
+/*
+ *	The defined type 'a_uint' is used for all address and
+ *	unsigned variable value calculations.  Its size is
+ *	required to be at least 32-bits to allow upto
+ *	32-bit addressing or 32-bit value manipulation.
+ */
 typedef	unsigned INT32 a_uint;
+
+/*
+ *	The defined type 'v_sint' is used for address and
+ *	variable value calculations requiring a sign.
+ *	Its size is required to be at least 32-bits to allow
+ *	upto 32-bit addressing or 32-bit value manipulation.
+ */
+typedef	signed INT32 v_sint;
 
 /*
  *	The area structure contains the parameter values for a
@@ -192,6 +262,8 @@ struct	area
 #define	A_DSEG	0x4040		/* DSEG */
 #define A_NOBNK	0x8000		/* Non-Banked */
 #define A_BNK	0x8080		/* Banked */
+
+#define	A_OUT	0x0100		/* Output Code Flag */
 
 /*
  *	The "R_" relocation constants define values used in
@@ -332,8 +404,8 @@ struct	mne
  *	defined in asdata.c.  The entry 'struct tsym *s_tsym'
  *	links any temporary symbols following this symbol and
  *	preceeding the next normal symbol.  The structure also
- *	contains the symbol's name, type (USER or NEW), flag
- *	(global, assigned, and multiply defined), a pointer
+ *	contains the symbol's name, type (NEW, USER or LOCAL),
+ *	flag (global, assigned, and multiply defined), a pointer
  *	to the area structure defining where the symbol is
  *	located, a reference number assigned by outgsd() in
  *	asout.c, and the symbols address relative to the base
@@ -351,72 +423,80 @@ struct	sym
 	a_uint	s_addr;		/* Address */
 };
 
-#define	S_GBL		001	/* Global */
-#define	S_ASG		002	/* Assigned */
-#define	S_LCL		004	/* Special Function Register */
-#define	S_MDF		010	/* Mult. def */
-#define	S_EOL		020	/* End mark for ___pst files */
+#define	S_EOL		040	/* End mark for ___pst files */
 
-#define	S_NEW		0	/* New name */
-#define	S_USER		1	/* User name */
-#define	S_PAGE		2	/* .page */
-#define	S_HEADER	3	/* .title, .sbttl */
+#define	S_LCL		000	/* Local Variable */
+#define	S_GBL		001	/* Global Variable */
+#define	S_ASG		002	/* Assigned Value */
+#define	S_MDF		004	/* Multiple Definition */
+
+#define	S_NEW		0	/* New  Name (External) */
+#define	S_USER		1	/* User Name (Assigned) */
+#define	S_ULCL		2	/* User Name (Internal) */
+#define	S_PAGE		3	/* .page */
+#define	S_HEADER	4	/* .title, .sbttl */
 #define	  O_TITLE    0		/* .title */
 #define	  O_SBTTL    1		/* .sbttl */
-#define	S_MODUL		4	/* .module */
-#define	S_INCL		5	/* .include */
-#define	S_AREA		6	/* .area */
-#define	S_ATYP		7	/* .area type */
-#define	S_BANK		8	/* .bank */
-#define S_BTYP		9	/* .bank type */
-#define	S_ORG		10	/* .org */
-#define	S_RADIX		11	/* .radix */
-#define	S_GLOBL		12	/* .globl */
-#define	S_LOCAL		13	/* .local */
-#define	S_CONDITIONAL	14	/* .if, .else, .endif, .ifdef, .ifndef */
+#define	S_MODUL		5	/* .module */
+#define	S_INCL		6	/* .include */
+#define	S_AREA		7	/* .area */
+#define	S_ATYP		8	/* .area type */
+#define	S_BANK		9	/* .bank */
+#define S_BTYP		10	/* .bank type */
+#define	S_ORG		11	/* .org */
+#define	S_RADIX		12	/* .radix */
+#define	S_GLOBL		13	/* .globl */
+#define	S_LOCAL		14	/* .local */
+#define	S_CONDITIONAL	15	/* .if, .else, .endif, .ifdef, .ifndef */
 #define	  O_IF       0		/* .if */
 #define	  O_ELSE     1		/* .else */
 #define	  O_ENDIF    2		/* .endif */
 #define	  O_IFDEF    3		/* .ifdef */
 #define	  O_IFNDEF   4		/* .ifndef */
-#define	S_LISTING	15	/* .nlist, .list */
+#define	  O_IFGT     5		/* .ifgt (BGP) */
+#define	  O_IFLT     6		/* .iflt (BGP) */
+#define	  O_IFGE     7		/* .ifge (BGP) */
+#define	  O_IFLE     8		/* .ifle (BGP) */
+#define	  O_IFEQ     9		/* .ifeq (BGP) */
+#define	  O_IFNE     10		/* .ifne (BGP) */
+#define	S_LISTING	16	/* .nlist, .list */
 #define	  O_LIST     0		/* .list */
 #define	  O_NLIST    1		/* .nlist */
-#define	S_EQU		16	/* .equ, .gblequ, .lclequ */
+#define	S_EQU		17	/* .equ, .gblequ, .lclequ */
 #define	  O_EQU      0		/* .equ */
 #define	  O_GBLEQU   1		/* .gblequ */
 #define	  O_LCLEQU   2		/* .lclequ */
-#define	S_DATA		17	/* .byte, .word, .3byte, .4byte, .db, .dw, .fcb, .fdb */
+#define	S_DATA		18	/* .byte, .word, .3byte, .4byte, .db, .dw, .fcb, .fdb */
 #define	  O_1BYTE    1		/* .byte, .db, .fcb */
 #define	  O_2BYTE    2		/* .word, .dw, .fdb */
 #define	  O_3BYTE    3		/* .3byte */
 #define	  O_4BYTE    4		/* .4byte */
-#define	S_BLK		18	/* .blkb, .blkw, .blk3, .blk4, .ds, .rmb, .rs */
+#define	S_BLK		19	/* .blkb, .blkw, .blk3, .blk4, .ds, .rmb, .rs */
 /*	  O_1BYTE    1	*/	/* .blkb, .ds, .rmb, .rs */
 /*	  O_2BYTE    2	*/	/* .blkw */
 /*	  O_3BYTE    3	*/	/* .blk3 */
 /*	  O_4BYTE    4	*/	/* .blk4 */
-#define	S_ASCIX		19	/* .ascii, .ascis, .asciz, .str, .strs, .strz */
+#define	S_ASCIX		20	/* .ascii, .ascis, .asciz, .str, .strs, .strz */
 #define	  O_ASCII    0		/* .ascii */
 #define	  O_ASCIS    1		/* .ascis */
 #define	  O_ASCIZ    2		/* .asciz */
-#define	S_DEFINE	20	/* .define, .undefine */
+#define	S_DEFINE	21	/* .define, .undefine */
 #define	  O_DEF      0		/* .define */
 #define	  O_UNDEF    1		/* .undefine */
-#define	S_BOUNDARY	21	/* .even, .odd */
+#define	S_BOUNDARY	22	/* .even, .odd */
 #define	  O_EVEN     0		/* .even */
 #define	  O_ODD      1		/* .odd */
-#define	S_MSG		22	/* .msg */
-#define	S_ERROR		23	/* .assume, .error */
+#define	S_MSG		23	/* .msg */
+#define	S_ERROR		24	/* .assume, .error */
 #define	  O_ASSUME   0		/* .assume */
 #define	  O_ERROR    1		/* .error */
-#define	S_MSB		24	/* .msb(0), .msb(1), .msb(2), .msb(3) */
-#define	S_BITS		25	/* .8bit, .16bit, .24bit, .32bit */
+#define	S_MSB		25	/* .msb(0), .msb(1), .msb(2), .msb(3) */
+#define	S_BITS		26	/* .8bit, .16bit, .24bit, .32bit */
 /*	  O_1BYTE    1	*/	/* .8bit */
 /*	  O_2BYTE    2	*/	/* .16bit */
 /*	  O_3BYTE    3	*/	/* .24bit */
 /*	  O_4BYTE    4	*/	/* .32bit */
-#define	S_END		26	/* .end */
+#define	S_END		27	/* .end */
 
 /*
  *	The tsym structure is a linked list of temporary
@@ -431,7 +511,7 @@ struct	sym
 struct	tsym
 {
 	struct	tsym *t_lnk;	/* Link to next */
-	int	t_num;		/* 0-65535$      for a 16-bit int */
+	a_uint	t_num;		/* 0-65535$      for a 16-bit int */
 				/* 0-4294967295$ for a 32-bit int */
 	int	t_flg;		/* flags */
 	struct	area *t_area;	/* Area */
@@ -612,6 +692,8 @@ extern	int	aflag;		/*	-a, make all symbols global flag
 				 */
 extern	int	bflag;		/*	-b(b), listing mode flag
 				 */
+extern	int	cflag;		/*	-c, include cycle counts in listing flag
+				 */
 extern	int	fflag;		/*	-f(f), relocations flagged flag
 				 */
 extern	int	gflag;		/*	-g, make undefined symbols global flag
@@ -716,6 +798,8 @@ extern	int	*cpt;		/*	pointer to assembler relocation type
 				 */
 extern	int	cbt[NCODE];	/*	array of assembler relocation types
 				 *	describing the data in cb[]
+				 */
+extern	int	opcycles;	/*	opcode execution cycles
 				 */
 extern	char	tb[NTITL];	/*	Title string buffer
 				 */
@@ -823,7 +907,9 @@ extern	FILE *		afile(char *fn, char *ft, int wf);
 extern	VOID		afilex(char *fn, char *ft);
 extern	VOID		asexit(int i);
 extern	VOID		asmbl(void);
+extern	VOID		equate(char *id,struct expr *e1,a_uint equtype);
 extern	int		fndidx(char *str);
+extern	int		intsiz(void);
 extern	int		main(int argc, char *argv[]);
 extern	VOID		newdot(struct area *nap);
 extern	VOID		phase(struct area *ap, a_uint a);
@@ -892,10 +978,10 @@ extern	VOID		lstsym(FILE *fp);
 extern	VOID		slew(FILE *fp, int flag);
 
 /* asout.c */
-extern	int		lobyte(int v);
-extern	int		hibyte(int v);
-extern	int		thrdbyte(int v);
-extern	int		frthbyte(int v);
+extern	int		lobyte(a_uint v);
+extern	int		hibyte(a_uint v);
+extern	int		thrdbyte(a_uint v);
+extern	int		frthbyte(a_uint v);
 extern	VOID		out(char *p, int n);
 extern	VOID		outarea(struct area *ap);
 extern	VOID		outbank(struct bank *bp);
@@ -908,30 +994,30 @@ extern	VOID		outbuf(char *s);
 extern	VOID		outchk(int nt, int nr);
 extern	VOID		outgsd(void);
 extern	VOID		outsym(struct sym *sp);
-extern	VOID		outab(int v);
-extern	VOID		outaw(int v);
-extern	VOID		outa3b(int v);
-extern	VOID		outa4b(int v);
-extern	VOID		outaxb(int i, int v);
-extern	VOID		outatxb(int i, int v);
+extern	VOID		outab(a_uint v);
+extern	VOID		outaw(a_uint v);
+extern	VOID		outa3b(a_uint v);
+extern	VOID		outa4b(a_uint v);
+extern	VOID		outaxb(int i, a_uint v);
+extern	VOID		outatxb(int i, a_uint v);
 extern	VOID		outrb(struct expr *esp, int r);
 extern	VOID		outrw(struct expr *esp, int r);
 extern	VOID		outr3b(struct expr *esp, int r);
 extern	VOID		outr4b(struct expr *esp, int r);
 extern	VOID		outrxb(int i, struct expr *esp, int r);
-extern	VOID		outrbm(struct expr *esp, int r, int v);
-extern	VOID		outrwm(struct expr *esp, int r, int v);
-extern	VOID		outr3bm(struct expr *esp, int r, int v);
-extern	VOID		outr4bm(struct expr *esp, int r, int v);
-extern	VOID		outrxbm(int i, struct expr *esp, int r, int v);
-extern	int		outmerge(int esp, int r, int v);
-extern	VOID		out_lb(int v, int t);
-extern	VOID		out_lw(int v, int t);
-extern	VOID		out_l3b(int v, int t);
-extern	VOID		out_l4b(int v, int t);
-extern	VOID		out_lxb(int i, int v, int t);
-extern	VOID		out_rw(int n);
-extern	VOID		out_txb(int i, int v);
+extern	VOID		outrbm(struct expr *esp, int r, a_uint v);
+extern	VOID		outrwm(struct expr *esp, int r, a_uint v);
+extern	VOID		outr3bm(struct expr *esp, int r, a_uint v);
+extern	VOID		outr4bm(struct expr *esp, int r, a_uint v);
+extern	VOID		outrxbm(int i, struct expr *esp, int r, a_uint v);
+extern	a_uint		outmerge(a_uint esp, int r, a_uint v);
+extern	VOID		out_lb(a_uint v, int t);
+extern	VOID		out_lw(a_uint v, int t);
+extern	VOID		out_l3b(a_uint v, int t);
+extern	VOID		out_l4b(a_uint v, int t);
+extern	VOID		out_lxb(int i, a_uint v, int t);
+extern	VOID		out_rw(a_uint v);
+extern	VOID		out_txb(int i, a_uint v);
 
 /* Machine dependent variables */
 
@@ -978,7 +1064,9 @@ extern	FILE *		afile();
 extern	VOID		afilex();
 extern	VOID		asexit();
 extern	VOID		asmbl();
+extern	VOID		equate();
 extern	int		fndidx();
+extern	int		intsiz();
 extern	int		main();
 extern	VOID		newdot();
 extern	VOID		phase();
@@ -1079,7 +1167,7 @@ extern	VOID		outrwm();
 extern	VOID		outr3bm();
 extern	VOID		outr4bm();
 extern	VOID		outrxbm();
-extern	int		outmerge();
+extern	a_uint		outmerge();
 extern	VOID		out_lb();
 extern	VOID		out_lw();
 extern	VOID		out_l3b();

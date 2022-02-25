@@ -1,7 +1,7 @@
 /* rabpst.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,11 +13,9 @@
  * PS Division
  * CERN
  * CH-1211 Geneva-23
- * email: Ulrich.Raich@cern.ch
+ * email: Ulrich dot Raich at cern dot ch
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "rab.h"
 
@@ -63,7 +61,7 @@ char	mode0[32] = {	/* R_NORM */
  *	m_mask contains the active bit positions for the output.
  *	m_mbro contains the active bit positions for the input.
  *
- *	struct	vsd
+ *	struct	mode
  *	{
  *		char *	m_def;		Bit Relocation Definition
  *		int	m_flag;		Bit Swapping Flag
@@ -76,7 +74,7 @@ struct	mode	mode[1] = {
 };
 
 /*
- * Array of Pointers to VSD Structures
+ * Array of Pointers to mode Structures
  */
 struct	mode	*modep[16] = {
 	&mode[0],	NULL,		NULL,		NULL,
@@ -126,6 +124,12 @@ struct	mne	mne[] = {
     {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
+    {	NULL,	".iflt",	S_CONDITIONAL,	0,	O_IFLT	},
+    {	NULL,	".ifge",	S_CONDITIONAL,	0,	O_IFGE	},
+    {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
+    {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
+    {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},
@@ -171,13 +175,13 @@ struct	mne	mne[] = {
 
 	/* Machines */
 
-    {	NULL,	".r3k",		X_R2K,		0,	0	},
-    {	NULL,	".r2k",		X_R2K,		0,	0	},
-    {	NULL,	".hd64",	X_HD64,		0,	0	},
-    {	NULL,	".z180",	X_HD64,		0,	0	},
-    {	NULL,	".z80",		X_Z80,		0,	0	},
+    {	NULL,	".r3k",		S_CPU,		0,	X_R2K	},
+    {	NULL,	".r2k",		S_CPU,		0,	X_R2K	},
+    {	NULL,	".hd64",	S_CPU,		0,	X_HD64	},
+    {	NULL,	".z180",	S_CPU,		0,	X_HD64	},
+    {	NULL,	".z80",		S_CPU,		0,	X_Z80	},
 
-	/* Z80 */
+	/* Z80 / 64180 Instructions */
 
     {	NULL,	"ld",		S_LD, P_ALTD|P_IO,	0x40	},
 
@@ -294,6 +298,6 @@ struct	mne	mne[] = {
     {   NULL,   "ldp",          RB_LDP,		0,	0x64    },
 
     {   NULL,   "lcall",        RB_LCALL,	0,	0xCF    },
-    {   NULL,   "ljp",          RB_LCALL,	S_END,	0xC7    }
+    {   NULL,   "ljp",          RB_LCALL,	S_EOL,	0xC7    }
 
 };

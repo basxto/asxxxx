@@ -1,7 +1,7 @@
 /* m74adr.c */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2005-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,17 +15,15 @@
  * Uwe Steller
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m740.h"
 
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c, d;
-	register char *p;
+	int c, d;
+	char *p;
 
 	/*
 	 * Immediate Mode
@@ -47,11 +45,6 @@ register struct expr *esp;
 	} else if (c == '*') {
 		expr(esp, 0);
 		esp->e_mode = S_ZP;
-		if ((!esp->e_flag)
-		    && (esp->e_base.e_ap==NULL)
-			&& (esp->e_addr & ~0xFF))
-			    err('d');
-		
 		/*
 		 * Direct Page Mode with Indexing
 		 */
@@ -182,11 +175,11 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-	register char *ptr;
-	register int i;
-	register char *ips;
+	char *ptr;
+	int i;
+	char *ips;
 
 	ips = ip;
 	unget(getnb());
@@ -207,9 +200,9 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-	register char *ptr;
+	char *ptr;
 	ptr = ip;
 
 	while (*ptr && *str) {
@@ -256,7 +249,7 @@ struct adsym	axy[] = {		/* a, x, or y registers*/
  *	zpage --- check for direct page address equivalent
  */
 int zpage(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	return((!esp->e_flag) && (esp->e_base.e_ap==NULL) && !(esp->e_addr & ~0xFF));
 }

@@ -11,7 +11,7 @@ NDEBUG		= 1
 !ENDIF
 
 PROJ		= IncToDef
-APPTYPE		= DOSX EXE
+APPTYPE		= DOS EXE
 PROJTYPE	= EXE
 
 CC		= SC
@@ -37,7 +37,7 @@ CREATETARGETDIR	=
 
 LIBS		= 
 
-CFLAGS		=  -mx -C -S -3 -a4 -c -g -gd 
+CFLAGS		=  -ms -C -S -3 -a2 -c -g -gd 
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
@@ -56,7 +56,7 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 
 LIBS		= 
 
-CFLAGS		=  -A -r -J -mx -o+time -3 -a4 -c 
+CFLAGS		=  -A -r -J -ml -o+time -3 -a2 -c 
 LFLAGS		=  /DE /PACKF /XN
 DEFINES		= 
 !ENDIF
@@ -69,7 +69,7 @@ DEBUGGERFLAGS	=
 AFLAGS		= $(CFLAGS) 
 HELPFLAGS	= 
 
-MODEL		= N
+MODEL		= L
 
 PAR		= PROJS BATS OBJS
 

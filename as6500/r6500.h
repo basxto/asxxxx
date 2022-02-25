@@ -1,7 +1,7 @@
 /* r6500.h */
 
 /*
- * (C) Copyright 1995-2003
+ * (C) Copyright 1995-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin

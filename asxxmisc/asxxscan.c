@@ -1,7 +1,7 @@
 /* asxscn.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,33 +9,21 @@
  * Kent, Ohio  44240
  */
 
-
-#include <stdio.h>
-#include <string.h>
-#include <setjmp.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
-
 #include "asxxxx.h"
 
 
+int inpfil;		/* Input File Counter		*/
+int radix;		/* Radix Value			*/
+int a_bytes;		/* Address Bytes		*/
+int iflag;		/* Ignore Relocation Flags	*/
+int vlines;		/* Valid Lines Scanned		*/
+int aserr;		/* Error Counter		*/
 
-static int inpfil;		/* Input File Counter		*/
-static int radix;		/* Radix Value			*/
-static int a_bytes;		/* Address Bytes		*/
-static int iflag;		/* Ignore Relocation Flags	*/
-static int vlines;		/* Valid Lines Scanned		*/
-static int aserr;		/* Error Counter		*/
+FILE *sfp[MAXFIL];	/* Input File Handle		*/
 
-static FILE *sfp[MAXFIL];	/* Input File Handle		*/
+char scfile[80];	/* Input File Name		*/
 
-static char scfile[80];		/* Input File Name		*/
-
-static char scline[256];	/* Input text line		*/
+char scline[256];	/* Input text line		*/
 
 
 /*
@@ -96,8 +84,8 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-	register char *p, *q;
-	register int c, i, n, m, r;
+	char *p, *q;
+	int c, i, n, m, r;
 
 	/*
 	 * Set Defaults
@@ -175,7 +163,7 @@ char *argv[];
 	 */
 loop:
 	while (fgets(scline, sizeof(scline), sfp[0])) {
-		scline[strlen(scline)-1] = '\0';
+		chopcrlf(scline);
 		p = scline;
 
 		/* The Output Formats
@@ -309,9 +297,13 @@ loop:
 		n = strlen(q);
 		for (i=0; i<n; i++) {
 			if (ccase[*p & 0x007F] != ccase[*q & 0x007F]) {
-				if ((iflag == 0) ||
-				    (dgt(r, p, 1) && dgt(r, q, 1))) {
-					printf("%s\r\n", scline);
+				switch (dgt(r, p, 1) + dgt(r, q, 1)) {
+				default:
+				case 0:
+				case 1:
+					if (iflag) { break; }
+				case 2:
+					printf("''%s''\r\n", scline);
 					aserr += 1;
 					goto loop;
 				}
@@ -365,6 +357,59 @@ char *str;
 		}
 	}
 	return(1);
+}
+
+/*)Function	VOID	chopcrlf(str)
+ *
+ *		char	*str		string to chop
+ *
+ *	The function chopcrlf() removes
+ *	LF, CR, LF/CR, or CR/LF from str
+ *  and strips trailing white space.
+ *
+ *	local variables:
+ *		char *	p		temporary string pointer
+ *		char *	q		temporary string pointer
+ *		char	c		temporary character
+ *		int	i		temporary loop counter
+ *		int	n		temporary character count
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		strlen()		c-library
+ *
+ *	side effects:
+ *		All CR and LF characters removed.
+ *		Trailing white space removed.
+ */
+
+VOID
+chopcrlf(str)
+char *str;
+{
+	char *p, *q;
+	char c;
+	int i, n;
+
+	p = str;
+	q = str;
+	do {
+		c = *p++ = *q++;
+		if ((c == '\r') || (c == '\n')) {
+			p--;
+		}
+	} while (c != 0);
+
+	n = strlen(str);
+	p = str + n;
+	for (i=0; (i<n)&&(*p==0); i++) {
+		c = *(--p);
+		if ((c == '\t') || (c == ' ')) {
+			*p = 0;
+		}
+	}
 }
 
 /*)Function	VOID	asexit(i)
@@ -436,7 +481,7 @@ VOID
 usage(n)
 int n;
 {
-	register char   **dp;
+	char **dp;
 
 	fprintf(stderr, "\nASxxxx Assembler Listing Scanner %s\n\n", VERSION);
 	for (dp = usetxt; *dp; dp++)

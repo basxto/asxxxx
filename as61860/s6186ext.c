@@ -1,7 +1,7 @@
 /* s6186ext.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 2003-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,8 +11,6 @@
  * Ported for SC61860 by Edgar Puehringer
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "s61860.h"
 

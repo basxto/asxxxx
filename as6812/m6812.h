@@ -1,7 +1,7 @@
 /* m6812.h */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -94,6 +94,13 @@
  * Set Direct Pointer
  */
 #define	S_SDP		80
+#define	S_CPU		81
+
+/*
+ * Processor Type
+ */
+#define	X_HC12		0
+#define X_HCS12		1
 
 
 extern	int	aindx;

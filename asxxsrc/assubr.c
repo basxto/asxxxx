@@ -1,23 +1,13 @@
 /* assubr.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "asxxxx.h"
 
@@ -63,9 +53,9 @@
 
 VOID
 err(c)
-register int c;
+int c;
 {
-	register char *p;
+	char *p;
 
 	aserr++;
 	p = eb;
@@ -110,7 +100,7 @@ register int c;
 VOID
 diag()
 {
-	register char *p,*errstr;
+	char *p,*errstr;
 
 	if (eb != ep) {
 		p = eb;

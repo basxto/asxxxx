@@ -1,7 +1,7 @@
 /* asxcnv.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,29 +9,24 @@
  * Kent, Ohio  44240
  */
 
-
-#include <stdio.h>
-#include <string.h>
-#include <setjmp.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
-
 #include "asxxxx.h"
 
 
-static int inpfil;		/* Input File Counter	*/
-static int radix;		/* Radix Flag		*/
-static int a_bytes;		/* Addressing Bytes	*/
-static int aserr;		/* Error Counter	*/
+int inpfil;		/* Input File Counter	*/
+int radix;		/* Radix Flag		*/
+int a_bytes;		/* Addressing Bytes	*/
+int aserr;		/* Error Counter	*/
 
-static FILE *nfp;		/* Input File Handle	*/
-static FILE *dfp;		/* Output File Handle	*/
+FILE *nfp;		/* Input File Handle	*/
+FILE *dfp;		/* Output File Handle	*/
 
-static char scline[256];	/* Input text line	*/
+/*
+ * Opcode Cycle definitions (Must Be The Same As ASxxxx / ASLink)
+ */
+#define	CYCNT_BGN	'['	/* Cycle count begin delimiter */
+#define	CYCNT_END	']'	/* Cycle count end   delimiter */
+
+char scline[256];	/* Input text line	*/
 
 
 /*
@@ -100,7 +95,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-	register char *p, *q, *r, *s;
+	char *p, *q, *r, *s;
 	int c, i, j, k, l, m, n;
 	int ldgt, pos, rdx;
 	unsigned int lcon, lnum;
@@ -172,25 +167,25 @@ char *argv[];
 	if (inpfil == 0)
 		usage(ER_WARNING);
 
-	/* ldgt	Last Data Digit in Line		*/
-	/* lcon	Line Continuation Length	*/
-	/* lnum First Line Number Digit		*/
-
-	switch(a_bytes) {
-	default:
-	case 2: ldgt = 25; lnum=26; lcon = 32; break;
-	case 3:
-	case 4: ldgt = 33; lnum=34; lcon = 40; break;
-	}
-
 	/*
 	 * Convert listing file to a source file
 	 * with assembled data appended as comments.
 	 */
 loop:
 	while (fgets(scline, sizeof(scline), nfp)) {
-		scline[strlen(scline)-1] = '\0';
+		chopcrlf(scline);
 		p = scline;
+
+		/* ldgt	Last Data Digit in Line		*/
+		/* lcon	Line Continuation Length	*/
+		/* lnum First Line Number Digit		*/
+
+		switch(a_bytes) {
+		default:
+		case 2: ldgt = 25; lnum=26; lcon = 32; break;
+		case 3:
+		case 4: ldgt = 33; lnum=34; lcon = 40; break;
+		}
 
 		/* The Output Formats
 		| Tabs- |       |       |       |       |       |
@@ -263,6 +258,31 @@ loop:
 			case 4: p += 3; n = 10; l = 3; m = 5; break;
 			}
 			break;
+		}
+
+		/*
+		 * If the assembled line contains a cycle
+		 * count of the form '[__]' then update:
+		 *
+		 * ldgt	  Last Data Digit in Line
+		 * m	  Number of bytes per line
+		 */
+		if ((scline[ldgt-3] == CYCNT_BGN) && (scline[ldgt] == CYCNT_END)) {
+			switch(rdx) {
+			default:
+			case RAD16:
+				ldgt -= 3; 
+				break;
+
+			case RAD8:
+				ldgt -= 4; 
+				break;
+
+			case RAD10:
+				ldgt -= 4; 
+				break;
+			}
+			m -= 1;
 		}
 
 		/*
@@ -377,12 +397,65 @@ loop:
 			 * source line.
 			 */
 			strcat(scline,";");
-			strncat(scline,p,q-p);
+			strncat(scline,p,(int) (q-p));
 			fprintf(dfp, "%s\n", scline + lcon);
 		}
 	}
 	asexit(aserr ? ER_ERROR : ER_NONE);
 	return(0);
+}
+
+/*)Function	VOID	chopcrlf(str)
+ *
+ *		char	*str		string to chop
+ *
+ *	The function chopcrlf() removes
+ *	LF, CR, LF/CR, or CR/LF from str
+ *  and strips trailing white space.
+ *
+ *	local variables:
+ *		char *	p		temporary string pointer
+ *		char *	q		temporary string pointer
+ *		char	c		temporary character
+ *		int	i		temporary loop counter
+ *		int	n		temporary character count
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		strlen()		c-library
+ *
+ *	side effects:
+ *		All CR and LF characters removed.
+ *		Trailing white space removed.
+ */
+
+VOID
+chopcrlf(str)
+char *str;
+{
+	char *p, *q;
+	char c;
+	int i, n;
+
+	p = str;
+	q = str;
+	do {
+		c = *p++ = *q++;
+		if ((c == '\r') || (c == '\n')) {
+			p--;
+		}
+	} while (c != 0);
+
+	n = strlen(str);
+	p = str + n;
+	for (i=0; (i<n)&&(*p==0); i++) {
+		c = *(--p);
+		if ((c == '\t') || (c == ' ')) {
+			*p = 0;
+		}
+	}
 }
 
 /*)Function	VOID	asexit(i)
@@ -454,7 +527,7 @@ VOID
 usage(n)
 int n;
 {
-	register char   **dp;
+	char   **dp;
 
 	fprintf(stderr,
 		"\nASxxxx Assembler Listing Converter %s\n\n", VERSION);

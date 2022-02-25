@@ -1,7 +1,7 @@
 /* m6816.h */
 
 /*
- * (C) Copyright 1991-2003
+ * (C) Copyright 1991-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin

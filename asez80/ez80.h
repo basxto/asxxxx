@@ -1,7 +1,7 @@
 /* ez80.h */
 
 /*
- * (C) Copyright 1989-2004
+ * (C) Copyright 1989-2005
  * All Rights Reserved
  *
  * Alan R. Baldwin

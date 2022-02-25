@@ -14,6 +14,53 @@
 
 
 <H4><B><PRE>
+.6805 DIRECTIVE 
+
+Format:  
+
+        .6805 
+
+The  .6805  directive  selects  the MC6805 specific cycles count
+output when the -c command line option is specified.  
+
+
+.hc05 DIRECTIVE 
+
+Format:  
+
+        .hc05 
+
+The  .hc05 directive selects the MC68HC05/146805 specific cycles
+count output when the -c command line option is specified.  
+
+
+THE .__.CPU.  VARIABLE 
+
+   The value of the pre-defined symbol '.__.CPU.' corresponds to
+the selected processor type.  The default value is 0 which  cor-
+responds  to  the  default  processor type.  The following table
+lists the processor types and associated values  for  the  ASZ80
+assembler:  
+
+        Processor Type            .__.CPU. Value
+        --------------            --------------
+            .6805                        0
+            .hc05                        1
+
+   The  variable  '.__.CPU.'  is by default defined as local and
+will not be output to the created .rel file.  The assembler com-
+mand line options -g or -a will not cause the local symbol to be
+output to the created .rel file.  
+
+   The  assembler  .globl  directive  may  be used to change the
+variable type to global causing its definition to be  output  to
+the  .rel file.  The inclusion of the definition of the variable
+'.__.CPU.' might be a useful means of validating that seperately
+assembled  files have been compiled for the same processor type.
+The linker will report an error for variables with multiple  non
+equal definitions.  
+
+
 6805 REGISTER SET 
 
 The following is a list of the 6805 registers used by AS6805:  
@@ -156,5 +203,6 @@ Jump and Jump to Subroutine Instructions
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

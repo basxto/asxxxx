@@ -1,7 +1,7 @@
 /* 1802pst.c */
 
 /*
- * (C) Copyright 2002-2004
+ * (C) Copyright 2002-2006
  * All Rights Reserved
  *
  * Shujen Chen
@@ -9,8 +9,6 @@
  * Naperville, IL 60540
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "1802.h"
 
@@ -71,7 +69,7 @@ char	mode2[32] = {	/* R_IO */
  *	m_mask contains the active bit positions for the output.
  *	m_mbro contains the active bit positions for the input.
  *
- *	struct	vsd
+ *	struct	mode
  *	{
  *		char *	m_def;		Bit Relocation Definition
  *		int	m_flag;		Bit Swapping Flag
@@ -86,7 +84,7 @@ struct	mode	mode[3] = {
 };
 
 /*
- * Array of Pointers to VSD Structures
+ * Array of Pointers to mode Structures
  */
 struct	mode	*modep[16] = {
 	&mode[0],	&mode[1],	&mode[2],	NULL,
@@ -136,6 +134,12 @@ struct	mne	mne[] = {
     {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
+    {	NULL,	".iflt",	S_CONDITIONAL,	0,	O_IFLT	},
+    {	NULL,	".ifge",	S_CONDITIONAL,	0,	O_IFGE	},
+    {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
+    {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
+    {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},
@@ -289,5 +293,5 @@ struct	mne	mne[] = {
     {	NULL,	"SEX",		S_NIB,	0,	0xE0	},
     {	NULL,	"STR",		S_NIB,	0,	0x50	},
     {	NULL,	"INP",		S_INP,	0,	0x68	},
-    {	NULL,	"OUT",		S_OUT,	S_END,	0x60	}
+    {	NULL,	"OUT",		S_OUT,	S_EOL,	0x60	}
 };

@@ -1,7 +1,7 @@
 /* m6801.h */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -78,9 +78,15 @@ struct adsym
 #define	S_SDP	80
 
 /*
- * HD6303 Option
+ * CPU Option
  */
-#define	S_HD63	81
+#define	S_CPU	81
+
+/*
+ * Processor Type (S_CPU)
+ */
+#define	X_6801	0
+#define	X_HD63	1
 
 
 	/* machine dependent functions */

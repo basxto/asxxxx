@@ -1,7 +1,7 @@
 /* 1802.c */
 
 /*
- * (C) Copyright 2002-2003
+ * (C) Copyright 2002-2006
  * All Rights Reserved
  *
  * Shujen Chen
@@ -9,8 +9,6 @@
  * Naperville, IL 60540
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "1802.h"
 

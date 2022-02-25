@@ -503,6 +503,102 @@ word:	.word	.+2			;s00r92
 	.byte	n,m			; 01 00
 
 
+	.sbttl	Signed Conditionals With -1
+
+	n = -1
+
+	.ifeq	n
+		.error	1		; n = -1, .ifeq n  != 0
+	.endif
+
+	.ifne	n
+	.else
+		.error	1		; n = -1, .ifne n  != 0
+	.endif
+
+	.ifgt	n
+		.error	1		; n = -1, .ifgt n  !>= 0
+	.endif
+
+	.iflt	n
+	.else
+		.error	1		; n = -1, .iflt n  !>= 0
+	.endif
+
+	.ifge	n
+		.error	1		; n = -1, .ifge n  !>= 0
+	.endif
+
+	.ifle	n
+	.else
+		.error	1		; n = -1, .ifle n  !> 0
+	.endif
+
+
+	.sbttl	Signed Conditionals With 0
+
+	n = 0
+
+	.ifeq	n
+	.else
+		.error	1		; n = 0, .ifeq n  == 0
+	.endif
+
+	.ifne	n
+		.error	1		; n = 0, .ifne n  == 0
+	.endif
+
+	.ifgt	n
+		.error	1		; n = 0, .ifgt n  !> 0
+	.endif
+
+	.iflt	n
+		.error	1		; n = 0, .iflt n  !< 0
+	.endif
+
+	.ifge	n
+	.else
+		.error	1		; n = 0, .ifge n  !< 0
+	.endif
+
+	.ifle	n
+	.else
+		.error	1		; n = 0, .ifle n  !> 0
+	.endif
+
+	
+	.sbttl	Signed Conditionals With +1
+
+	n = +1
+
+	.ifeq	n
+		.error	1		; n = +1, .ifeq n  != 0
+	.endif
+
+	.ifne	n
+	.else
+		.error	1		; n = +1, .ifne n  != 0
+	.endif
+
+	.ifgt	n
+	.else
+		.error	1		; n = +1, .ifgt n  !<= 0
+	.endif
+
+	.iflt	n
+		.error	1		; n = +1, .iflt n  !<= 0
+	.endif
+
+	.ifge	n
+	.else
+		.error	1		; n = +1, .ifge n  !< 0
+	.endif
+
+	.ifle	n
+		.error	1		; n = +1, .ifle n  !<= 0
+	.endif
+
+
 	.sbttl	Local Symbols
 
 lclsym0:

@@ -1,7 +1,7 @@
 /* h8ext.c */
 
 /*
- * (C) Copyright 1994-2003
+ * (C) Copyright 1994-2005
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 
 char	*cpu	= "Hitachi H8/3xx";

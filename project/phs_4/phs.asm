@@ -112,10 +112,6 @@ irqtbl:	.word	undfnd,	exrsrvd	; reserved	(unused)
 	.word	7$	; nmi		(unused)
 	.word	8$	; power up entry point
 
-	reset = .-2
-
-	.end	reset
-
 
 	.page
 	.sbttl	Copyright Notice
@@ -2022,4 +2018,7 @@ pulse:	.word	0d0		; LED drive = 0 ma.
 6$:	.asciz	""
 	.asciz	"P.H.S. Internal Routines"
 	.byte	0q200
+
+	.end	pwrup
+
 

@@ -1,7 +1,7 @@
 /* asdbg.c */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2003-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,16 +14,6 @@
  *	John L. Hartman	(JLH)
  *	3-Nov-1997
  */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "asxxxx.h"
 

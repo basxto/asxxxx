@@ -5,7 +5,7 @@
  * Bill McKinnon
  * w_mckinnon at conknet dot com
  *
- * (C) Copyright 1998-2003
+ * (C) Copyright 1998-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -18,8 +18,6 @@
  *
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "ds8.h"
 
@@ -44,10 +42,10 @@ struct adsym reg51[] = {	/* R0 thru R7 registers */
 /*  Classify argument as to address mode */
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c;
-	register unsigned rd;
+	int c;
+	unsigned int rd;
 
 	if ((c = getnb()) == '#') {
 		/*  Immediate mode */
@@ -107,8 +105,6 @@ register struct expr *esp;
 		/* Force inverted bit  */
 		expr(esp, 0);
 		esp->e_mode = S_NOT_BIT;
-		if (esp->e_addr & ~0xFF)
-			err('d');
 	} 
 	else {
 		unget(c);
@@ -158,10 +154,11 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-	register char *ptr;
-	register int i;
+	char *ptr;
+	int i;
+
 	unget(getnb());
 	i = 0;
 	while ( *(ptr = &sp[i].a_str[0]) ) {
@@ -178,9 +175,9 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-	register char *ptr;
+	char *ptr;
 	ptr = ip;
 
 	while (*ptr && *str) {
@@ -222,7 +219,7 @@ char *str;
 int
 reg()
 {
-	register struct mne *mp;
+	struct mne *mp;
 	char id[NCPS];
 
 	getid(id, -1);
@@ -236,7 +233,7 @@ reg()
 	case S_DPTR:
 	case S_PC:
 	case S_REG:
-		return (mp->m_valu);
+		return ((int) mp->m_valu);
 
 	default:
 		return (-1);

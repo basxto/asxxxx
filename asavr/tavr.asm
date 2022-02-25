@@ -3,6 +3,8 @@
 	; All instructions
 	.AT90Sxxxx
 
+	.32bit
+
 	.area	AREA
 
 	.sbttl	Arithmetic and Logic Instruction Tests

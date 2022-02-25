@@ -11,7 +11,7 @@ NDEBUG		= 1
 !ENDIF
 
 PROJ		= as6800
-APPTYPE		= DOSX EXE
+APPTYPE		= DOS EXE
 PROJTYPE	= EXE
 
 CC		= SC
@@ -24,8 +24,8 @@ DISASM		= OBJ2ASM
 LNK		= LINK
 DLLS		= 
 
-HEADERS		= C:\SC\INCLUDE\stdio.h C:\SC\INCLUDE\setjmp.h ..\..\..\asxxsrc\asxxxx.h  \
-		..\..\..\AS6800\m6800.h C:\SC\INCLUDE\string.h C:\SC\INCLUDE\alloc.h C:\SC\INCLUDE\stdlib.h 
+HEADERS		= ..\..\..\asxxsrc\asxxxx.h C:\SC\INCLUDE\stdlib.h C:\SC\INCLUDE\stdio.h  \
+		C:\SC\INCLUDE\setjmp.h C:\SC\INCLUDE\string.h ..\..\..\AS6800\m6800.h 
 
 DEFFILE		= as6800.DEF
 
@@ -45,7 +45,7 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 
 LIBS		= 
 
-CFLAGS		=  -A -r -J -mx -C -o+time -S -3 -a4 -c -g -gd 
+CFLAGS		=  -A -r -J -ms -C -o+time -S -3 -a2 -c -g -gd 
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
@@ -64,8 +64,8 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 
 LIBS		= 
 
-CFLAGS		=  -A -r -J -mx -o+time -3 -a4 -c 
-LFLAGS		=  /NOI /DE /PACKF /XN
+CFLAGS		=  -A -r -J -ml -o+time -3 -a2 -c 
+LFLAGS		=  /DE /PACKF /XN
 DEFINES		= 
 !ENDIF
 
@@ -77,7 +77,7 @@ DEBUGGERFLAGS	=
 AFLAGS		= $(CFLAGS) 
 HELPFLAGS	= 
 
-MODEL		= N
+MODEL		= L
 
 PAR		= PROJS BATS OBJS
 

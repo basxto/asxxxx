@@ -1,7 +1,7 @@
 /* rabmch.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,14 +16,499 @@
  * email: Ulrich dot Raich at cern dot ch
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "rab.h"
 
 char	imtab[3] = { 0x46, 0x56, 0x5E };
 struct  preByteType preByte;
-int	mchtyp = X_R2K;
+int	mchtyp;
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	OPCY_CPU	((char) (0xFD))
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+#define	P2	((char) (OPCY_NONE | 0x01))
+#define	P3	((char) (OPCY_NONE | 0x02))
+#define	P4	((char) (OPCY_NONE | 0x03))
+#define	P5	((char) (OPCY_NONE | 0x04))
+#define	P6	((char) (OPCY_NONE | 0x05))
+#define	P7	((char) (OPCY_NONE | 0x06))
+
+/*
+ * Rabbit 2000 / 3000 Opcode Cycle Pages
+ */
+
+static char  rabpg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   2, 6, 7, 2, 2, 2, 4, 2, 2, 2, 6, 2, 2, 2, 4, 2,
+/*10*/   5, 6, 7, 2, 2, 2, 4, 2, 5, 2, 6, 2, 2, 2, 4, 2,
+/*20*/   5, 6,13, 2, 2, 2, 4, 4, 5, 2,11, 2, 2, 2, 4, 2,
+/*30*/   5, 6,10, 2, 8, 8, 7, 2, 5, 2, 9, 2, 2, 2, 4, 2,
+/*40*/   2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 5, 2,
+/*50*/   2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 5, 2,
+/*60*/   2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 5, 2,
+/*70*/   6, 6, 6, 6, 6, 6, 0, 6, 2, 2, 2, 2, 2, 2, 5, 2,
+/*80*/   2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 5, 2,
+/*90*/   2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 5, 2,
+/*A0*/   2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 5, 2,
+/*B0*/   2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 5, 2,
+/*C0*/   8, 7, 7, 7, 9,10, 4,10, 8, 8, 7,P2, 2,12, 4,19,
+/*D0*/   8, 7, 7, 0,11,10, 4, 8, 8, 2, 7, 0, 2,P3, 4, 8,
+/*E0*/   8, 7, 7, 2, 9,10, 6, 8, 8, 4, 7, 2, 2,P4, 4, 8,
+/*F0*/   8, 7, 7, 2,11,10, 4,12, 8, 2, 7, 2, 2,P5, 4, 8
+};
+
+static char  rabpg2[256] = {  /* P2 == CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4,
+/*10*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4,
+/*20*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN, 4, 4, 4, 4, 4, 4,10, 4,
+/*40*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*50*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*60*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*70*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*80*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4,
+/*90*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4,
+/*A0*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4,
+/*B0*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4,
+/*C0*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4,
+/*D0*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4,
+/*E0*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4,
+/*F0*/   4, 4, 4, 4, 4, 4,10, 4, 4, 4, 4, 4, 4, 4,10, 4
+};
+
+static char  rabpg3[256] = {  /* P3 == DD */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN, 4,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN, 4,UN,UN,UN,UN,UN,UN,
+/*20*/  UN, 8,15, 4,UN,UN,UN,UN,UN, 4,13, 4,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,12,12,11,UN,UN, 4,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*50*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*60*/  UN,UN,UN,UN,12,15, 9,UN,UN,UN,UN,UN,10,13, 9,UN,
+/*70*/  10,10,10,10,10,10,UN,10,UN,UN,UN,UN, 4, 4, 9,UN,
+/*80*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*90*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*C0*/  UN,UN,UN,UN,11,UN,UN,UN,UN,UN,UN,P6, 4,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN, 4,UN,UN,UN,
+/*E0*/  UN, 9,UN,15,11,12,UN,UN,UN, 6,UN,UN, 4,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,13,UN,UN,UN,UN, 4,UN,UN, 4,UN,UN,UN
+};
+
+static char  rabpg4[256] = {  /* P4 == ED */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*40*/  UN, 4, 4,15, 4,13, 4, 4,UN, 4, 4,13,UN,12, 4, 4,
+/*50*/  UN, 4, 4,15,15,UN, 4, 4,UN, 4, 4,13,UN, 4, 4, 4,
+/*60*/  UN, 4, 4,15,12,15,UN, 4,UN, 4, 4,UN,10,13,UN,UN,
+/*70*/  UN,UN, 4,15,UN,UN, 9, 9,UN,UN, 4,13,UN,UN, 7,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*A0*/  10,UN,UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,
+/*B0*/   6,UN,UN,UN,UN,UN,UN,UN, 6,UN,UN,UN,UN,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN
+};
+
+static char  rabpg5[256] = {  /* P5 == FD */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN, 4,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN, 4,UN,UN,UN,UN,UN,UN,
+/*20*/  UN, 8,15, 4,UN,UN,UN,UN,UN, 4,13, 4,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,12,12,11,UN,UN, 4,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*50*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*60*/  UN,UN,UN,UN,12,15, 9,UN,UN,UN,UN,UN,10,13, 9,UN,
+/*70*/  10,10,10,10,10,10,UN,10,UN,UN,UN,UN, 4, 4, 9,UN,
+/*80*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*90*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN, 9,UN,UN,UN,UN,UN,UN,UN, 9,UN,
+/*C0*/  UN,UN,UN,UN,11,UN,UN,UN,UN,UN,UN,P7, 4,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN, 4,UN,UN,UN,
+/*E0*/  UN, 9,UN,15,11,12,UN,UN,UN, 6,UN,UN, 4,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,13,UN,UN,UN,UN, 4,UN,UN, 4,UN,UN,UN
+};
+
+static char  rabpg6[256] = {  /* P6 == DD CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,13,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,13,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,13,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,13,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,13,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,13,UN
+};
+
+static char  rabpg7[256] = {  /* P7 == FD CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,13,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,13,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,UN,10,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,13,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,13,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,13,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,13,UN,UN,UN,UN,UN,UN,UN,13,UN
+};
+
+static char *rabPage[7] = {
+    rabpg1, rabpg2, rabpg3, rabpg4,
+    rabpg5, rabpg6, rabpg7
+};
+
+/*
+ * HD64180 / Z180  Opcode Cycle Pages
+ */
+
+static char  hd64pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   3, 9, 7, 4, 4, 4, 6, 3, 4, 7, 6, 4, 4, 4, 6, 3,
+/*10*/   9, 9, 7, 4, 4, 4, 6, 3, 8, 7, 6, 4, 4, 4, 6, 3,
+/*20*/   8, 9,16, 4, 4, 4, 6, 4, 8, 7,15, 4, 4, 4, 6, 3,
+/*30*/   8, 9,13, 4,10,10, 9, 3, 8, 7,12, 4, 4, 4, 6, 3,
+/*40*/   4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4,
+/*50*/   4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4,
+/*60*/   4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4,
+/*70*/   7, 7, 7, 7, 7, 7, 3, 7, 4, 4, 4, 4, 4, 4, 6, 4,
+/*80*/   4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4,
+/*90*/   4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4,
+/*A0*/   4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4,
+/*B0*/   4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4,
+/*C0*/  10, 9, 9, 9,16,11, 6,11,10, 9, 9,P2,16,16, 6,11,
+/*D0*/  10, 9, 9,10,16,11, 6,11,10, 3, 9, 9,16,P3, 6,11,
+/*E0*/  10, 9, 9,16,16,11, 6,11,10, 3, 9, 3,16,P4, 6,11,
+/*F0*/  10, 9, 9, 3,16,11, 6,11,10, 4, 9, 3,16,P5, 6,11
+};
+
+static char  hd64pg2[256] = {  /* P2 == CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*10*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*20*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN, 7, 7, 7, 7, 7, 7,13, 7,
+/*40*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*50*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*60*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*70*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*80*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*90*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*A0*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*B0*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7, 
+/*C0*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*D0*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*E0*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7,
+/*F0*/   7, 7, 7, 7, 7, 7,13, 7, 7, 7, 7, 7, 7, 7,13, 7
+};
+
+static char  hd64pg3[256] = {  /* P3 == DD */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,12,19, 7,UN,UN,UN,UN,UN,10,18, 7,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,18,18,15,UN,UN,10,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*70*/  15,15,15,15,15,15,UN,15,UN,UN,UN,UN,UN,UN,14,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,P6,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,12,UN,19,UN,14,UN,UN,UN, 6,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,UN,UN,UN
+};
+
+static char  hd64pg4[256] = {  /* P4 == ED */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  12,13,UN,UN, 7,UN,UN,UN,12,13,UN,UN, 7,UN,UN,UN,
+/*10*/  12,13,UN,UN, 7,UN,UN,UN,12,13,UN,UN, 7,UN,UN,UN,
+/*20*/  12,13,UN,UN, 7,UN,UN,UN,12,13,UN,UN, 7,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,10,UN,UN,UN,12,13,UN,UN, 7,UN,UN,UN,
+/*40*/   9,10,10,19, 6,12, 6, 6, 9,10,10,18,17,12,UN, 6,
+/*50*/   9,10,10,19,UN,UN, 6, 6, 9,10,10,18,17,UN, 6, 6,
+/*60*/   9,10,10,19, 9,UN,UN,16, 9,10,10,18,17,UN,UN,16,
+/*70*/  UN,10,10,19,12,UN, 8,UN, 9,10,10,18,17,UN,UN,UN,
+/*80*/  UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,
+/*90*/  UN,UN,UN,16,UN,UN,UN,UN,UN,UN,UN,16,UN,UN,UN,UN,
+/*A0*/  12,12,12,12,UN,UN,UN,UN,12,12,12,12,UN,UN,UN,UN,
+/*B0*/  14,14,14,14,UN,UN,UN,UN,14,14,14,14,UN,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN
+};
+
+static char  hd64pg5[256] = {  /* P5 == FD */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,12,19, 7,UN,UN,UN,UN,UN,10,18, 7,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,18,18,15,UN,UN,10,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*70*/  15,15,15,15,15,15,UN,15,UN,UN,UN,UN,UN,UN,14,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,14,UN,UN,UN,UN,UN,UN,UN,14,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,P7,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,12,UN,19,UN,14,UN,UN,UN, 6,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,UN,UN,UN
+};
+
+static char  hd64pg6[256] = {  /* P6 == DD CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN
+};
+
+static char  hd64pg7[256] = {  /* P7 == FD CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN
+};
+
+static char *hd64Page[7] = {
+    hd64pg1, hd64pg2, hd64pg3, hd64pg4,
+    hd64pg5, hd64pg6, hd64pg7
+};
+
+/*
+ * Z80 Opcode Cycle Pages
+ */
+
+static char  z80pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   4,10, 7, 6, 4, 4, 7, 4, 4,11, 7, 6, 4, 4, 7, 4,
+/*10*/  13,10, 7, 6, 4, 4, 7, 4,12,11, 7, 6, 4, 4, 7, 4,
+/*20*/  12,10,16, 6, 4, 4, 7, 4,12,11,16, 6, 4, 4, 7, 4,
+/*30*/  12,10,13, 6,11,11,10, 4,12,11,13, 6, 4, 4, 7, 4,
+/*40*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*50*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*60*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*70*/   7, 7, 7, 7, 7, 7, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4,
+/*80*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*90*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*A0*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*B0*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*C0*/  11,10,10,10,17,11, 7,11,11,10,10,P2,17,17, 7,11,
+/*D0*/  11,10,10,11,17,11, 7,11,11, 4,10,11,17,P3, 7,11,
+/*E0*/  11,10,10,19,17,11, 7,11,11, 4,10, 4,17,P4, 7,11,
+/*F0*/  11,10,10, 4,17,11, 7,11,11, 6,10, 4,17,P5, 7,11
+};
+
+static char  z80pg2[256] = {  /* P2 == CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*10*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*20*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN, 8, 8, 8, 8, 8, 8,15, 8,
+/*40*/   8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+/*50*/   8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+/*60*/   8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+/*70*/   8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+/*80*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*90*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*A0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*B0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*C0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*D0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*E0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*F0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8
+};
+
+static char  z80pg3[256] = {  /* P3 == DD */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,14,20,10,UN,UN,UN,UN,UN,15,20,10,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,23,23,19,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*70*/  19,19,19,19,19,19,UN,19,UN,UN,UN,UN,UN,UN,19,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,P6,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,14,UN,23,UN,15,UN,UN,UN, 8,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN
+};
+
+static char  z80pg4[256] = {  /* P4 == ED */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*40*/  12,12,15,20, 8,14, 8, 9,12,12,15,20,UN,14,UN, 9,
+/*50*/  12,12,15,20,UN,UN, 8, 9,12,12,15,20,UN,UN, 8, 9,
+/*60*/  12,12,15,20,UN,UN,UN,18,12,12,15,20,UN,UN,UN,18,
+/*70*/  UN,UN,15,20,UN,UN,UN,UN,12,12,15,20,UN,UN,UN,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*A0*/  16,16,16,16,UN,UN,UN,UN,16,16,16,16,UN,UN,UN,UN,
+/*B0*/  21,21,21,21,UN,UN,UN,UN,21,21,21,21,UN,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN
+};
+
+static char  z80pg5[256] = {  /* P5 == FD */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,14,20,10,UN,UN,UN,UN,UN,15,20,10,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,23,23,19,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*70*/  19,19,19,19,19,19,UN,19,UN,UN,UN,UN,UN,UN,19,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,P7,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,14,UN,23,UN,15,UN,UN,UN, 8,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN
+};
+
+static char  z80pg6[256] = {  /* P6 == DD CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN
+};
+
+static char  z80pg7[256] = {  /* P7 == FD CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN
+};
+
+static char *z80Page[7] = {
+    z80pg1, z80pg2, z80pg3, z80pg4,
+    z80pg5, z80pg6, z80pg7
+};
 
 /*
  * Process a machine op.
@@ -32,21 +517,25 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, t1, t2;
+	int op, t1, t2;
 	struct expr e1, e2;
 	int rf, v1, v2;
+	int of;
 
 	clrexpr(&e1);
 	clrexpr(&e2);
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	rf = mp->m_type;
 
 	chkPreByte(mp);
 
 	switch (rf) {
-	case X_R2K:	mchtyp = X_R2K;		break;
-	case X_HD64:	mchtyp = X_HD64;	break;
-	case X_Z80:	mchtyp = X_Z80;		break;
+	case S_CPU:
+		mchtyp = op;
+		sym[2].s_addr = op;
+		opcycles = OPCY_CPU;
+		lmode = SLIST;
+		break;
 
 	case RB_PRE:
 		/*
@@ -65,7 +554,6 @@ struct mne *mp;
 			err('o');
 		}
 		return;
-		break;
 
 	case S_INH1:
 	case S_INH1R:
@@ -103,7 +591,7 @@ struct mne *mp;
 	case S_RET:
 		if (more()) {
 			if ((v1 = admode(CND)) != 0) {
-				outab(op | v1<<3);
+				outab(op | (v1<<3));
 			} else {
 				qerr();
 			}
@@ -149,14 +637,14 @@ struct mne *mp;
 				outab(op+0x20);
 				break;
 			}
-			outab(op | v1<<4);
+			outab(op | (v1<<4));
 			break;
 		}
 		aerr();
 		break;
 
 	case S_RST:
-		v1 = absexpr();
+		v1 = (int) absexpr();
 		if (v1 & ~0x38) {
 			aerr();
 			v1 = 0;
@@ -193,13 +681,13 @@ struct mne *mp;
 			e1.e_addr = 0;
 		}
 		outab(op);
-		outab(imtab[e1.e_addr]);
+		outab(imtab[(int) e1.e_addr]);
 		break;
 
 	case S_BIT:
 		expr(&e1, 0);
 		t1 = 0;
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		if (v1 > 7) {
 			v1 &= 0x07;
 			++t1;
@@ -221,7 +709,7 @@ struct mne *mp;
 	case S_RL:
 		t1 = addr(&e1);
 		if ((mchtyp == X_R2K) && (t1 == S_R16)) {
-			v1 = e1.e_addr;
+			v1 = (int) e1.e_addr;
 			if (preByte.ioi || preByte.ioe) {
 				err('o');
 			}
@@ -255,9 +743,7 @@ struct mne *mp;
 			chkIOPreByte(t1);
 			if (genop(0xCB, op, &e1, 0))
 				aerr();
-			break;
 		}
-		aerr();
 		break;
 
 	case S_AND:
@@ -312,12 +798,12 @@ struct mne *mp;
 				aerr();		/* sub / xor */
 				break;
 			}
-			v2 = e2.e_addr;
+			v2 = (int) e2.e_addr;
 			if (v2 != DE) {
 				aerr();
 				break;
 			}
-			v1 = e1.e_addr;
+			v1 = (int) e1.e_addr;
 			if (v1 == HL) {		/* op  hl,de */
 				outab(op);
 			} else
@@ -389,8 +875,8 @@ struct mne *mp;
 			if (rf == S_SBC) {
 				op = 0x42;
 			}
-			v1 = e1.e_addr;
-			v2 = e2.e_addr;
+			v1 = (int) e1.e_addr;
+			v2 = (int) e2.e_addr;
 			/*
 			 * op  hl,bc
 			 * op  hl,de
@@ -451,10 +937,10 @@ struct mne *mp;
 
 	case S_LD:
 	      	t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		comma();
 		t2 = addr(&e2);
-		v2 = e2.e_addr;
+		v2 = (int) e2.e_addr;
 		if (t2 == S_USER)
 			t2 = e2.e_mode = S_IMMED;
 		/*
@@ -463,7 +949,7 @@ struct mne *mp;
 		 */
 		if ((t1 == S_R8) && (v1 == A)) {
 			if ((t2 == S_IDBC) || (t2 == S_IDDE)) {
-				outab(0x0A | (t2-S_INDR)<<4);
+				outab(0x0A | ((t2-S_INDR)<<4));
 				break;
 			}
 		}
@@ -475,7 +961,7 @@ struct mne *mp;
 			if ((t1 == S_IDBC) || (t1 == S_IDDE)) {
 				if (preByte.altd)
 					err('o');
-				outab(0x02 | (t1-S_INDR)<<4);
+				outab(0x02 | ((t1-S_INDR)<<4));
 				break;
 			}
 		}
@@ -542,13 +1028,13 @@ struct mne *mp;
 			 * ld  r,(iy+d)
 			 * ld  r,g
 			 */
-			if (genop(0, op | v1<<3, &e2, 0) == 0)
+			if (genop(0, op | (v1<<3), &e2, 0) == 0)
 				break;
 			/*
 			 * ld  r,n	(r,#n)
 			 */
 			if (t2 == S_IMMED) {
-				outab(v1<<3 | 0x06);
+				outab((v1<<3) | 0x06);
 				outrb(&e2,0);
 				break;
 			}
@@ -567,7 +1053,7 @@ struct mne *mp;
 			if (preByte.altd && ((v1 == SP) || (v1 == IX) || (v1 == IY)))
 				err('o');
 			v1 = gixiy(v1);
-			outab(0x01|v1<<4);
+			outab(0x01|(v1<<4));
 			outrw(&e2, 0);
 			break;
 		}
@@ -586,7 +1072,7 @@ struct mne *mp;
 				outab(0x2A);
 			} else {
 				outab(0xED);
-				outab(0x4B | v1<<4);
+				outab(0x4B | (v1<<4));
 			}
 			outrw(&e2, 0);
 			break;
@@ -672,7 +1158,7 @@ struct mne *mp;
 				outab(0x22);
 			} else {
 				outab(0xED);
-				outab(0x43 | v2<<4);
+				outab(0x43 | (v2<<4));
 			}
 			outrw(&e1, 0);
 			break;
@@ -789,10 +1275,10 @@ struct mne *mp;
 
 	case S_EX:
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		comma();
 		t2 = addr(&e2);
-		v2 = e2.e_addr;
+		v2 = (int) e2.e_addr;
 		if (t2 == S_R16) {
 			/*
 			 * ex  (sp),hl
@@ -840,7 +1326,7 @@ struct mne *mp;
 						break;
 					}
  					if (gixiy(v1) == HL) {
-						outab(0xe3);
+						outab(0xE3);
 						break;
 					}
 				} else {
@@ -881,7 +1367,7 @@ struct mne *mp;
 			if ((mchtyp == X_R2K) && (t2 == S_R16ALT) && (v2 == HL)) {
 				if (preByte.altd)
 					err('o');
-				outab(0x76);
+				outab(preByte.altd = 0x76);
 				outab(0xEB);
 				break;
 			}
@@ -898,7 +1384,7 @@ struct mne *mp;
 			if ((t2 == S_R16ALT) && (v2 == HL)) {
 				if (preByte.altd)
 					err('o');
-				outab(0x76);
+				outab(preByte.altd = 0x76);
 				outab(0xE3);
 				break;
 			}
@@ -920,8 +1406,8 @@ struct mne *mp;
 			comma();
 			t1 = addr(&e1);
 		}
-		v1 = e1.e_addr;
-		v2 = e2.e_addr;
+		v1 = (int) e1.e_addr;
+		v2 = (int) e2.e_addr;
 		if (t1 == S_R8) {
 			/*
 			 * in   a,(n)	[in   a,(#n)]
@@ -948,7 +1434,7 @@ struct mne *mp;
 	case S_DEC:
 	case S_INC:
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		if (preByte.ioi || preByte.ioe) {
 			if ((t1 != S_IDHL) && (t1 != S_IDIX) && (t1 != S_IDIY))
 				err('o');
@@ -1023,7 +1509,7 @@ struct mne *mp;
 		expr(&e2, 0);
 		outab(op);
 		if (mchpcr(&e2)) {
-			v2 = e2.e_addr - dot.s_addr - 1;
+			v2 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v2 < -128) || (v2 > 127))
 				aerr();
 			outab(v2);
@@ -1117,7 +1603,7 @@ struct mne *mp;
 		 */
 		if ((t1 == S_R8) && (t2 == S_INDM)) {
 			outab(0xED);
-			outab(op | e1.e_addr<<3);
+			outab(op | (e1.e_addr<<3));
 			outrb(&e2, 0);
 			break;
 		}
@@ -1131,9 +1617,9 @@ struct mne *mp;
 		/*
 		 * mlt  bc/de/hl/sp
 		 */
-		if ((t1 == S_R16) && ((v1 = e1.e_addr) <= SP)) {
+		if ((t1 == S_R16) && ((v1 = (int) e1.e_addr) <= SP)) {
 			outab(0xED);
-			outab(op | v1<<4);
+			outab(op | (v1<<4));
 			break;
 		}
 		aerr();
@@ -1150,7 +1636,7 @@ struct mne *mp;
 		 */
 		if (t1 == S_R8) {
 			outab(0xED);
-			outab(op | e1.e_addr<<3);
+			outab(op | (e1.e_addr<<3));
 			break;
 		}
 		/*
@@ -1194,7 +1680,7 @@ struct mne *mp;
 	case RB_IPSET:
 		if (mchtyp != X_R2K)
 			err('o');
-	        v1 = absexpr();
+	        v1 = (int) absexpr();
 		if (v1 > 3) {
 			aerr();
 			v1 &= 0x03;
@@ -1214,10 +1700,10 @@ struct mne *mp;
 		if (mchtyp != X_R2K)
 			err('o');
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		comma();
 		t2 = addr(&e2);
-		v2 = e2.e_addr;
+		v2 = (int) e2.e_addr;
 		/*
 		 * lcall  xpc,mn
 		 * ljp    nbr,mn
@@ -1235,10 +1721,10 @@ struct mne *mp;
 		if (mchtyp != X_R2K)
 			err('o');
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		comma();
 		t2 = addr(&e2);
-		v2 = e2.e_addr;
+		v2 = (int) e2.e_addr;
 		/*
 		 * ldp  (mn),hl
 		 * ldp  (mn),ix
@@ -1328,7 +1814,7 @@ struct mne *mp;
 		if (mchtyp != X_R2K)
 			err('o');
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		/*
 		 * bool  hl
 		 * bool  ix
@@ -1347,8 +1833,83 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
 		break;
+	}
+
+	if (opcycles == OPCY_NONE) {
+		switch (mchtyp) {
+		case X_R2K:
+			of = (preByte.altd || preByte.ioe || preByte.ioi) ? 1 : 0;
+			opcycles = rabpg1[cb[of + 0] & 0xFF];
+			while ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+				switch (opcycles) {
+				case P2:	/* CB xx	*/
+				case P3:	/* DD xx	*/
+				case P4:	/* ED xx	*/
+				case P5:	/* FD xx	*/
+					opcycles = rabPage[opcycles & OPCY_MASK][cb[of + 1] & 0xFF];
+					break;
+				case P6:	/* DD CB -- xx	*/
+				case P7:	/* FD CB -- xx	*/
+					opcycles = rabPage[opcycles & OPCY_MASK][cb[of + 3] & 0xFF];
+					break;
+				default:
+					opcycles = OPCY_NONE;
+					break;
+				}
+			}
+			if (of) {
+				opcycles += 2;
+			}
+			break;
+
+		case X_HD64:
+			opcycles = hd64pg1[cb[0] & 0xFF];
+			while ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+				switch (opcycles) {
+				case P2:	/* CB xx	*/
+				case P3:	/* DD xx	*/
+				case P4:	/* ED xx	*/
+				case P5:	/* FD xx	*/
+					opcycles = hd64Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+					break;
+				case P6:	/* DD CB -- xx	*/
+				case P7:	/* FD CB -- xx	*/
+					opcycles = hd64Page[opcycles & OPCY_MASK][cb[3] & 0xFF];
+					break;
+				default:
+					opcycles = OPCY_NONE;
+					break;
+				}
+			}
+			break;
+
+		case X_Z80:
+			opcycles = z80pg1[cb[0] & 0xFF];
+			while ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+				switch (opcycles) {
+				case P2:	/* CB xx	*/
+				case P3:	/* DD xx	*/
+				case P4:	/* ED xx	*/
+				case P5:	/* FD xx	*/
+					opcycles = z80Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+					break;
+				case P6:	/* DD CB -- xx	*/
+				case P7:	/* FD CB -- xx	*/
+					opcycles = z80Page[opcycles & OPCY_MASK][cb[3] & 0xFF];
+					break;
+				default:
+					opcycles = OPCY_NONE;
+					break;
+				}
+			}
+			break;
+
+		default:
+			break;
+		}
 	}
 	clrPreByte();
 }
@@ -1360,11 +1921,11 @@ struct mne *mp;
  */
 int
 genop(pop, op, esp, f)
-register int pop, op;
-register struct expr *esp;
+int pop, op;
+struct expr *esp;
 int f;
 {
-	register int t1;
+	int t1;
 	/*
 	 * r
 	 */
@@ -1447,7 +2008,7 @@ clrPreByte()
 
 VOID
 chkIOPreByte(addrMode)
-register int addrMode;
+int addrMode;
 {
 	if (preByte.ioi || preByte.ioe) {
 		if ((addrMode != S_IDHL) && (addrMode != S_IDIX) && (addrMode != S_IDIY))
@@ -1481,7 +2042,7 @@ struct mne *mp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);
@@ -1519,8 +2080,11 @@ comma()
 VOID
 minit()
 {
-	mchtyp = X_R2K;
 	clrPreByte();
+	if (pass == 0) {
+		mchtyp = X_R2K;
+		sym[2].s_addr = X_R2K;
+	}
 }
 
 

@@ -1,7 +1,7 @@
 /* s6186adr.c */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2003-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,8 +11,6 @@
  * Ported for SC61860 by Edgar Puehringer
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "s61860.h"
 
@@ -20,9 +18,9 @@
 /*  Classify argument as to address mode */
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c;
+	int c;
 
 	if ((c = getnb()) == '#') {
 		/*  Immediate mode */

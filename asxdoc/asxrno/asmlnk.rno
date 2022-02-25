@@ -20,8 +20,8 @@
 .skip 2
 .center line;ASLINK Relocating Linker
 .skip 4
-.center line;Version###4.00
-.center line;November 2003
+.center line;Version###4.10
+.center line;January 2006
 
 .require "prefac"
 .require "eula"
@@ -40,15 +40,23 @@
 .require "asmblr"
 .require "aslink"
 .require "asmbld"
-.require "asavr"
-.require "aspic"
-.require "asrab"
-.require "asez80"
-.require "asz80"
-.require "asgb"
-.require "as8xcx"
+
+.send toc .number appendix A
+.number appendix A
+
+.require "asxscn"
+.require "asxcnv"
+.require "aschk"
+.require "change"
+
+.send toc .number appendix AA
+.number appendix AA
+
+.require "as1802"
+.require "as2650"
 .require "as430"
-.require "ash8"
+.require "as6186"
+.require "as6500"
 .require "as6800"
 .require "as6801"
 .require "as6804"
@@ -58,11 +66,18 @@
 .require "as6811"
 .require "as6812"
 .require "as6816"
+.require "as740"
 .require "as8051"
 .require "as8085"
-.require "as6500"
-.require "as740"
-.require "as1802"
-.require "as6186"
+.require "as8xcx"
+.require "asavr"
+.require "asez80"
+.require "asf2mc"
+.require "asgb"
+.require "ash8"
+.require "aspic"
+.require "asrab"
+.require "asz8"
+.require "asz80"
 
 .send toc .end TOC

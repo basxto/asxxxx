@@ -1,7 +1,7 @@
 /* lksym.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,15 +13,6 @@
  *	jhartman@compuserve.com
  *
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -137,7 +128,8 @@ syminit()
 struct sym *
 newsym()
 {
-	register int c, i, nsym;
+	a_uint ev;
+	int c, i, nsym;
 	struct sym *tsp;
 	struct sym **s;
 	char id[NCPS];
@@ -160,9 +152,9 @@ newsym()
 		}
 	} else
 	if (c == 'D') {
-		i = eval();
+		ev = eval();
 		if (tsp->s_type & S_DEF) {
-			if (tsp->s_addr != (a_uint) i) {
+			if (tsp->s_addr != ev) {
 				fprintf(stderr,
 					"Multiple definition of %s\n", id);
 				lkerr++;
@@ -171,7 +163,7 @@ newsym()
 			/*
 			 * Set value and area extension link.
 			 */
-			tsp->s_addr = (a_uint) i;
+			tsp->s_addr = ev;
 			tsp->s_axp = axp;
 			tsp->s_type |= S_DEF;
 			tsp->m_id = hp->m_id;
@@ -232,8 +224,8 @@ lkpsym(id, f)
 char *id;
 int f;
 {
-	register struct sym *sp;
-	register int h;
+	struct sym *sp;
+	int h;
 
 	h = hash(id, zflag);
 	sp = symhash[h];
@@ -274,9 +266,9 @@ int f;
 
 a_uint
 symval(tsp)
-register struct sym *tsp;
+struct sym *tsp;
 {
-	register a_uint val;
+	a_uint val;
 
 	val = tsp->s_addr;
 	if (tsp->s_axp) {
@@ -316,8 +308,8 @@ VOID
 symdef(fp)
 FILE *fp;
 {
-	register struct sym *sp;
-	register int i;
+	struct sym *sp;
+	int i;
 
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
@@ -366,7 +358,7 @@ symmod(fp, tsp)
 FILE *fp;
 struct sym *tsp;
 {
-	register int i;
+	int i;
 	struct sym **p;
 
 	if ((hp = headp) != NULL) {
@@ -417,10 +409,10 @@ struct sym *tsp;
 
 int
 symeq(p1, p2, cflag)
-register char *p1, *p2;
+char *p1, *p2;
 int cflag;
 {
-	register int n;
+	int n;
 
 	n = strlen(p1) + 1;
 	if(cflag) {
@@ -470,10 +462,10 @@ int cflag;
 
 int
 hash(p, cflag)
-register char *p;
-register int cflag;
+char *p;
+int cflag;
 {
-	register int h;
+	int h;
 
 	h = 0;
 	while (*p) {
@@ -604,8 +596,8 @@ char *
 new(n)
 unsigned int n;
 {
-	register char *p,*q;
-	register unsigned int i;
+	char *p,*q;
+	unsigned int i;
 
 	/*
 	 * Always an even byte count
@@ -750,8 +742,8 @@ char *
 new(n)
 unsigned int n;
 {
-	register char *p,*q;
-	register unsigned int i;
+	char *p,*q;
+	unsigned int i;
 
 	if ((p = (char *) malloc(n)) == NULL) {
 		fprintf(stderr, "Out of space!\n");

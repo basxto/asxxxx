@@ -1,7 +1,7 @@
 /* lkrloc3.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,15 +16,6 @@
  *	Bill McKinnon (BM)
  *	w_mckinnon@conknet.com
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -263,10 +254,11 @@ relt3()
 VOID
 relr3()
 {
-	register int mode;
-	register a_uint reli, relv;
-	int aindex, rindex, rtp, error, v;
+	int mode;
+	a_uint reli, relv;
+	int aindex, rindex, rtp, error, i;
 	a_uint rtbase, rtofst, rtpofst, paga, pags;
+	a_uint m, v;
 	struct areax **a;
 	struct sym **s;
 
@@ -288,7 +280,7 @@ relr3()
 	/*
 	 * Get area pointer
 	 */
-	aindex = evword();
+	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
 		fprintf(stderr, "R area error\n");
 		lkerr++;
@@ -298,7 +290,7 @@ relr3()
 	/*
 	 * Select Output File
 	 */
-	if (oflag) {
+	if (oflag != 0) {
 		ap = a[aindex]->a_bap;
 		if (ofp != NULL) {
 			rtabnk->b_rtaflg = rtaflg;
@@ -334,9 +326,9 @@ relr3()
 		error = 0;
 		relv = 0;
 		rtpofst = rtofst;
-		mode = eval();
-		rtp = eval();
-		rindex = evword();
+		mode = (int) eval();
+		rtp = (int) eval();
+		rindex = (int) evword();
 
 		/*
 		 * R3_SYM or R3_AREA references
@@ -405,9 +397,9 @@ relr3()
 			/*
 			 * Page Relocation Error Checking
 			 */
-			if (mode & R3_PAG0 && (relv & ~0xFF || paga || pags))
+			if (mode & R3_PAG0 && (relv & ~((a_uint) 0x000000FF) || paga || pags))
 				error = 4;
-			if (mode & R3_PAG  && (relv & ~0xFF))
+			if (mode & R3_PAG  && (relv & ~((a_uint) 0x000000FF)))
 				error = 5;
 		/*
 		 * Extended Modes
@@ -432,8 +424,8 @@ relr3()
 				 * Calculate absolute destination
 				 * relv must be on same 2K page as pc
 				 */
-				if ((relv & ~0x7ff) !=
-				   ((pc + rtp - rtofst) & ~0x7ff)) {
+				if ((relv & ~((a_uint) 0x000007FF)) !=
+				   ((pc + rtp - rtofst) & ~((a_uint) 0x000007FF))) {
 					error = 6;
 				}
 
@@ -446,7 +438,7 @@ relr3()
 				 */
  				rtval[rtp + (a_bytes - 2)] =
 					rtval[rtp + a_bytes] |
-					((rtval[rtp + (a_bytes - 2)] & 0x07)<<5);
+					((rtval[rtp + (a_bytes - 2)] & ((a_uint) 0x00000007))<<5);
 				rtflg[rtp + a_bytes] = 0;
 				rtofst += 1;
 				break;
@@ -469,10 +461,17 @@ relr3()
 				 * Calculate absolute destination
 				 * relv must be on same 512K page as pc
 				 */
-				if ((relv & ~0x7ffff) !=
-				   ((pc + rtp - rtofst) & ~0x7ffff)) {
+#ifdef	LONGINT
+				if ((relv & ~((a_uint) 0x0007FFFFl)) !=
+				   ((pc + rtp - rtofst) & ~((a_uint) 0x0007FFFFl))) {
 					error = 7;
 				}
+#else
+				if ((relv & ~((a_uint) 0x0007FFFF)) !=
+				   ((pc + rtp - rtofst) & ~((a_uint) 0x0007FFFF))) {
+					error = 7;
+				}
+#endif
 
 				rtofst += (a_bytes - 3);
 
@@ -483,7 +482,7 @@ relr3()
 				 */
 				rtval[rtp + (a_bytes - 3)] =
 					rtval[rtp + a_bytes] |
-					((rtval[rtp + (a_bytes - 3)] & 0x07)<<5);
+					((rtval[rtp + (a_bytes - 3)] & ((a_uint) 0x00000007))<<5);
 				rtflg[rtp + a_bytes] = 0;
 				rtofst += 1;
 				break;
@@ -511,7 +510,7 @@ relr3()
 		/*
 		 * Unsigned Byte Checking
 		 */
-		if (mode & R3_USGN && mode & R3_BYTE && relv & ~0xFF)
+		if (mode & R3_USGN && mode & R3_BYTE && relv & ~((a_uint) 0x000000FF))
 			error = 1;
 
 		/*
@@ -520,11 +519,15 @@ relr3()
 		if (mode & R3_PCR) {
 			v = relv - reli;
 			if ((mode & R3_BYTE) && (mode & R3_BYTX)) {
-				if ((v < ~0x7F) || (v > 0x7F))
+				m = ~((a_uint) 0x0000007F);
+				if (((v & m) != m) && ((v & m) != 0)) {
 					error = 2;
+				}
 			} else {
-				if ((v < ~0x7FFF) || (v > 0x7FFF))
+				m = ~((a_uint) 0x00007FFF);
+				if (((v & m) != m) && ((v & m) != 0)) {
 					error = 3;
+				}
 			}
 		}
 
@@ -537,14 +540,20 @@ relr3()
 			rerr.rtbase = rtbase + rtp - rtpofst;
 			rerr.rindex = rindex;
 			rerr.rval = relv - reli;
-			relerr3(errmsg3[error-1]);
+			relerr3(errmsg3[error]);
 
-			for (v=rtp; v<rtp+a_bytes-1; v++) {
-				if (rtflg[v]) {
-					rterr[v] = error;
+			for (i=rtp; i<rtp+a_bytes-1; i++) {
+				if (rtflg[i]) {
+					rterr[i] = error;
 					break;
 				}
 			}
+		}
+		/*
+		 * Bank Has Output
+		 */
+		if ((oflag != 0) && (obj_flag == 0)) {
+			rtabnk->b_oflag = 1;
 		}
 	}
 	if (uflag != 0) {
@@ -556,14 +565,15 @@ relr3()
 }
 
 char *errmsg3[] = {
-	"Unsigned Byte error",
-	"Byte PCR relocation error",
-	"Word PCR relocation error",
-	"Page0 relocation error",
-	"Page Mode relocation error",
-	"2K Page relocation error",
-	"512K Page relocation error",
-	"Undefined Extended Mode error"
+/* 0 */	"LKRLOC3 Error List",
+/* 1 */	"Unsigned Byte error",
+/* 2 */	"Byte PCR relocation error",
+/* 3 */	"Word PCR relocation error",
+/* 4 */	"Page0 relocation error",
+/* 5 */	"Page Mode relocation error",
+/* 6 */	"2K Page relocation error",
+/* 7 */	"512K Page relocation error",
+/* 8 */	"Undefined Extended Mode error"
 };
 
 
@@ -624,7 +634,7 @@ char *errmsg3[] = {
 VOID
 relp3()
 {
-	register int aindex, rindex;
+	int aindex, rindex;
 	int mode, rtp;
 	a_uint relv;
 	struct areax **a;
@@ -647,7 +657,7 @@ relp3()
 	/*
 	 * Get area pointer
 	 */
-	aindex = evword();
+	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
 		fprintf(stderr, "P area error\n");
 		lkerr++;
@@ -658,9 +668,9 @@ relp3()
 	 * Do remaining relocations
 	 */
 	while (more()) {
-		mode = eval();
-		rtp = eval();
-		rindex = evword();
+		mode = (int) eval();
+		rtp = (int) eval();
+		rindex = (int) evword();
 
 		/*
 		 * R3_SYM or R3_AREA references
@@ -686,7 +696,7 @@ relp3()
 	/*
 	 * Paged values
 	 */
-	aindex = adb_xb(0,a_bytes);
+	aindex = (int) adb_xb(0, a_bytes);
 	if (aindex >= hp->h_narea) {
 		fprintf(stderr, "P area error\n");
 		lkerr++;
@@ -924,7 +934,7 @@ erpdmp3(fptr, str)
 FILE *fptr;
 char *str;
 {
-	register struct head *thp;
+	struct head *thp;
 
 	thp = sdp.s_areax->a_bhp;
 
@@ -982,8 +992,8 @@ adb_lo(v, i)
 a_uint	v;
 int	i;
 {
-	register a_uint j;
-	register int m, n;
+	a_uint j;
+	int m, n;
 
 	j = adb_xb(v, i);
 	/*
@@ -1028,8 +1038,8 @@ adb_hi(v, i)
 a_uint	v;
 int	i;
 {
-	register a_uint j;
-	register int m, n;
+	a_uint j;
+	int m, n;
 
 	j = adb_xb(v, i);
 	/*

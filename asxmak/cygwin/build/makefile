@@ -3,37 +3,42 @@
 #		Cygwin 'GNU make' Version
 #		=========================
 #
-#   26  May  2004
+#   8  January  2006
 #
 ####################################################################
 
-ASXXXX =	as430 as740 as1802 as6500	\
-		as6800 as6801 as6804 as6805	\
-		as6808 as6809 as6811 as6812	\
-		as6816 as61860			\
-		as8051 as8085			\
-		asz80 asgb asez80		\
-		asrab				\
-		as8xcxxx ash8			\
-		asavr aspic			\
-		ascheck				\
-		aslink				\
-		asxcnv asxscn
+ASXXXX =	as430		\
+		as740		\
+		as1802		\
+		as2650		\
+		as6500		\
+		as6800		\
+		as6801		\
+		as6804		\
+		as6805		\
+		as6808		\
+		as6809		\
+		as6811		\
+		as6812		\
+		as6816		\
+		as61860		\
+		as8051		\
+		as8085		\
+		asz8		\
+		asz80		\
+		asgb		\
+		asez80		\
+		asrab		\
+		asf2mc8		\
+		as8xcxxx	\
+		ash8		\
+		asavr		\
+		aspic		\
+		ascheck		\
+		aslink		\
+		asxscn		\
+		asxcnv
 	
-####################################################################
-# Special
-####################################################################
-
-.PHONY:	all clean
-
-all:	$(ASXXXX)
-
-clean:
-	rm -f $(ASXXXX)
-	rm -f *.exe
-	rm -f *.o
-
-
 ####################################################################
 # Option Definitions
 ####################################################################
@@ -62,6 +67,7 @@ DSTEXE=		../exe/
 SRC430=		$(ASXBAS)as430/
 SRC740=		$(ASXBAS)as740/
 SRC1802=	$(ASXBAS)as1802/
+SRC2650=	$(ASXBAS)as2650/
 SRC6500=	$(ASXBAS)as6500/
 SRC6800=	$(ASXBAS)as6800/
 SRC6801=	$(ASXBAS)as6801/
@@ -77,13 +83,29 @@ SRC8051=	$(ASXBAS)as8051/
 SRC8085=	$(ASXBAS)as8085/
 SRC8xcxxx=	$(ASXBAS)as8xcxxx/
 SRCH8=		$(ASXBAS)ash8/
+SRCZ8=		$(ASXBAS)asz8/
 SRCZ80=		$(ASXBAS)asz80/
 SRCGB=		$(ASXBAS)asgb/
 SRCEZ80=	$(ASXBAS)asez80/
+SRCF2MC8=	$(ASXBAS)asf2mc8/
 SRCRAB=		$(ASXBAS)asrab/
 SRCAVR=		$(ASXBAS)asavr/
 SRCPIC=		$(ASXBAS)aspic/
 SRCCHECK=	$(ASXBAS)ascheck/
+
+
+####################################################################
+# Special
+####################################################################
+
+.PHONY:	all clean
+
+all:	$(ASXXXX)
+
+clean:
+	rm -f *.exe
+	rm -f *.o
+	rm -f $(DSTEXE)*.exe
 
 
 ####################################################################
@@ -173,6 +195,27 @@ as1802 :	$(ASXX) $(AS1802)
 		$(LD) $(LDFLAGS) -o as1802 $(ASXX) $(AS1802)
 		cp as1802.exe $(DSTEXE)as1802.exe
 		strip $(DSTEXE)as1802.exe
+
+
+####################################################################
+# AS2650
+####################################################################
+
+AS2650 =		s26adr.o s26ext.o s26pst.o s26mch.o
+
+s26adr.o :	$(SRC2650)s26adr.c $(SRC2650)s2650.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+s26ext.o :	$(SRC2650)s26ext.c $(SRC2650)s2650.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+s26pst.o :	$(SRC2650)s26pst.c $(SRC2650)s2650.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+s26mch.o :	$(SRC2650)s26mch.c $(SRC2650)s2650.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+as2650 :		$(ASXX) $(AS2650)
+		$(LD) $(LDFLAGS) -o as2650 $(ASXX) $(AS2650)
+		cp as2650.exe $(DSTEXE)as2650.exe
+		strip $(DSTEXE)as2650.exe
 
 
 ####################################################################
@@ -447,6 +490,27 @@ as8085 :	$(ASXX) $(AS8085)
 
 
 ####################################################################
+# ASZ8
+####################################################################
+
+ASZ8 =		z8ext.o z8pst.o z8mch.o z8adr.o
+
+z8ext.o :	$(SRCZ8)z8ext.c $(SRCZ8)z8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+z8pst.o :	$(SRCZ8)z8pst.c $(SRCZ8)z8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+z8mch.o :	$(SRCZ8)z8mch.c $(SRCZ8)z8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+z8adr.o :	$(SRCZ8)z8adr.c $(SRCZ8)z8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+asz8 :		$(ASXX) $(ASZ8)
+		$(LD) $(LDFLAGS) -o asz8 $(ASXX) $(ASZ8)
+		cp asz8.exe $(DSTEXE)asz8.exe
+		strip $(DSTEXE)asz8.exe
+
+
+####################################################################
 # ASZ80
 ####################################################################
 
@@ -528,6 +592,27 @@ asrab :		$(ASXX) $(ASRAB)
 		$(LD) $(LDFLAGS) -o asrab $(ASXX) $(ASRAB)
 		cp asrab.exe $(DSTEXE)asrab.exe
 		strip $(DSTEXE)asrab.exe
+
+
+####################################################################
+# ASF2MC8
+####################################################################
+
+ASF2MC8 =	f8ext.o f8pst.o f8mch.o f8adr.o
+
+f8ext.o :	$(SRCF2MC8)f8ext.c $(SRCF2MC8)f2mc8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+f8pst.o :	$(SRCF2MC8)f8pst.c $(SRCF2MC8)f2mc8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+f8mch.o :	$(SRCF2MC8)f8mch.c $(SRCF2MC8)f2mc8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+f8adr.o :	$(SRCF2MC8)f8adr.c $(SRCF2MC8)f2mc8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+asf2mc8 :	$(ASXX) $(ASF2MC8)
+		$(LD) $(LDFLAGS) -o asf2mc8 $(ASXX) $(ASF2MC8)
+		cp asf2mc8.exe $(DSTEXE)asf2mc8.exe
+		strip $(DSTEXE)asf2mc8.exe
 
 
 ####################################################################

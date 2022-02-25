@@ -1,18 +1,125 @@
 /* m11mch.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *
+ *   With enhancements from
+ *
+ *	Mike McCarty
+ *	mike dot mccarty at sbcglobal dot net
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6811.h"
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+#define	P2	((char) (OPCY_NONE | 0x01))
+#define	P3	((char) (OPCY_NONE | 0x02))
+#define	P4	((char) (OPCY_NONE | 0x03))
+
+static char  m11pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   0, 2,41,41, 3, 3, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2,
+/*10*/   2, 2, 6, 6, 6, 6, 2, 2,P2, 2,P3, 2, 7, 7, 7, 7,
+/*20*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*30*/   3, 3, 4, 4, 3, 3, 3, 3, 5, 5, 3,12, 4,10,14,14,
+/*40*/   2,UN,UN, 2, 2,UN, 2, 2, 2, 2, 2,UN, 2, 2,UN, 2,
+/*50*/   2,UN,UN, 2, 2,UN, 2, 2, 2, 2, 2,UN, 2, 2,UN, 2,
+/*60*/   6,UN,UN, 6, 6,UN, 6, 6, 6, 6, 6,UN, 6, 6, 3, 6,
+/*70*/   6,UN,UN, 6, 6,UN, 6, 6, 6, 6, 6,UN, 6, 6, 3, 6,
+/*80*/   2, 2, 2, 4, 2, 2, 2,UN, 2, 2, 2, 2, 4, 6, 3, 3,
+/*90*/   3, 3, 3, 5, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 4, 4,
+/*A0*/   4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 6, 6, 5, 5,
+/*B0*/   4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 6, 6, 5, 5,
+/*C0*/   2, 2, 2, 4, 2, 2, 2,UN, 2, 2, 2, 2, 3,P4, 3, 2,
+/*D0*/   3, 3, 3, 5, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4,
+/*E0*/   4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
+/*F0*/   4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5
+};
+
+static char  m11pg2[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN, 4, 4,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 8, 8, 8, 8,
+/*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/   4,UN,UN,UN,UN, 4,UN,UN, 6,UN, 4,UN, 5,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*60*/   7,UN,UN, 7, 7,UN, 7, 7, 7, 7, 7,UN, 7, 7, 4, 7,
+/*70*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 5,UN,UN, 4,
+/*90*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 6,UN,UN,UN,
+/*A0*/   5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 5, 7, 7, 6, 6,
+/*B0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 4,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 5, 5,
+/*E0*/   5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 6, 6
+};
+
+static char  m11pg3[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*80*/  UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*90*/  UN,UN,UN, 6,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*A0*/  UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,
+/*B0*/  UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 6, 6,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN
+};
+
+static char  m11pg4[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*A0*/  UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 6, 6,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN
+};
+
+static char *Page[4] = {
+    m11pg1, m11pg2, m11pg3, m11pg4
+};
+
 
 /*
  * Process a machine op.
@@ -21,7 +128,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, t1, t2;
+	int op, t1, t2;
 	struct expr e1, e2, e3;
 	struct area *espa;
 	char id[NCPS];
@@ -32,11 +139,12 @@ struct mne *mp;
 	clrexpr(&e3);
 	reg = 0;
 	cpg = 0;
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	type = mp->m_type;
 	switch (type) {
 
 	case S_SDP:
+		opcycles = OPCY_SDP;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -96,7 +204,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(op);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -335,7 +443,7 @@ struct mne *mp;
 		outrb(&e2, 0);
 		if (type == S_BTB) {
 			if (mchpcr(&e3)) {
-				v3 = e3.e_addr - dot.s_addr - 1;
+				v3 = (int) (e3.e_addr - dot.s_addr - 1);
 				if ((v3 < -128) || (v3 > 127))
 					aerr();
 				outab(v3);
@@ -348,7 +456,16 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+
+	if (opcycles == OPCY_NONE) {
+		opcycles = m11pg1[cb[0] & 0xFF];
+		if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+			opcycles = Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+		}
 	}
 }
 
@@ -357,7 +474,7 @@ struct mne *mp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);

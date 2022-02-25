@@ -1,7 +1,7 @@
 /* ez80ext.c */
 
 /*
- * (C) Copyright 1989-2004
+ * (C) Copyright 1989-2005
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "ez80.h"
 

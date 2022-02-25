@@ -74,7 +74,7 @@ be reported.
 The relocatable object file is an ascii file containing symbol references
 and definitions, program area definitions, and the relocatable assembled
 code, the linker ASLINK will use this information to generate an absolute
-load file (Motorola or Intel formats).
+load file (Intel, Motorola or Tandy CoCo Disk Basic formats).
 
 
 .header level 1;SOURCE PROGRAM FORMAT
@@ -767,11 +767,12 @@ operands differ with each directive.
 .header level 2;_.module Directive
 Format:
 .skip;.indent 8
-_.module	string
+_.module	name
 
-The .module directive causes the string to be included in the assemblers
+The .module directive causes the name to be included in the assemblers
 output file as an identifier for this particular object module.  The
-string may be from 1 to 79 characters in length. Only one identifier is
+name may be from 1 to 79 characters in length.  The name may not have
+any embedded white space (spaces or tabs).  Only one identifier is
 allowed per assembled module. The main use of this directive is to
 allow the linker to report a modules' use of undefined symbols. At link
 time all undefined symbols are reported and the modules referencing them
@@ -784,7 +785,9 @@ Format:
 _.title	string
 
 The .title directive provides a character string to be placed on the second
-line of each page during listing.
+line of each page during listing.  The string begins with the first non
+white space character (after any space or tab) and ends with the end
+of the line.
 
 
 .header level 2;_.sbttl Directive
@@ -793,7 +796,10 @@ Format:
 _.sbttl	string
 
 The .sbttl directive provides a character string to be placed on the third
-line of each page during listing.
+line of each page during listing.  The string begins with the first non
+white space character (after any space or tab) and ends with the end
+of the line.
+
 
 
 .header level 2;_.page Directive
@@ -811,12 +817,19 @@ file listing. Paging may be disabled by invoking the -p directive.
 .header level 2;_.msg Directive
 Format:
 .skip;.indent 8
-_.msg text
+_.msg /string/
 .skip;.left margin +16
 .indent -16
-where:##text####represents a delimited string.  The string is
+where:##string##represents a text string.  The string is
 printed to the console during the final assembly pass.
+.skip;.indent -8
+/##/####represent the delimiting characters. These delimiters
+may be any paired printing characters, as long as the
+characters are not contained within the string itself.
+If the delimiting characters do not match, the .msg
+directive will give the (q) error.
 .left margin -16
+
 .skip
 
 The _.msg directive is useful to report assembly status or
@@ -1299,9 +1312,9 @@ where:	sym1,		represent legal symbolic names.
 
 A .globl directive may also have a label field and/or a comment field.
 
-The .globl directive is provided to define (and thus provide
+The .globl directive is provided to export (and thus provide
 linkage to) symbols not otherwise defined as global symbols within
-a module. In defining global symbols the directive .globl J is
+a module. In exporting global symbols the directive .globl J is
 similar to:
 .skip
 .indent 6;J _=_= expression or J::
@@ -1311,6 +1324,18 @@ vital to a program. All internal symbols appearing within a given program
 must be defined at the end of pass 1 or they will be considered undefined.
 The assembly directive (-g) can be be invoked to make all undefined
 symbols global at the end of pass 1.
+
+Naming a symbol not existing in the current assembly in a .globl
+directive will cause a 'u' error.
+
+The .globl directive and == construct can be overridden by a
+following .local directive.
+
+.note
+The ASxxxx assemblers use the last occurring symbol specification
+in the source file(s) as the type shown in the symbol table
+and output to the .rel file.
+.end note
 
 
 .header level 2;_.local Directive
@@ -1339,8 +1364,19 @@ that should not be exported into the .rel output file.  A typical
 usage is in the definition of SFRs (Special Function Registers)
 for a microprocessor.
 
-The .local directive and =: construct can be overridden by the
-_.globl directive.
+The .local directive and =: construct can be overridden by a
+following .globl directive.
+
+A defined symbol that has not been given a value is considered
+an external variable and will cause an 'r' error in a .local
+directive and its symbol type will not be changed. An undefined
+symbol in a .local directive causes a 'u' error.
+
+.note
+The ASxxxx assemblers use the last occurring symbol specification
+in the source file(s) as the type shown in the symbol table
+and output to the .rel file.
+.end note
 
 
 .header	level 2;_.equ, _.gblequ, and _.lclequ Directives
@@ -1349,6 +1385,12 @@ Format:
 	sym1	.equ	expr	; equivalent to sym1  = expr
 	sym2	.gblequ	expr	; equivalent to sym2 == expr
 	sym3	.lclequ	expr	; equivalent to sym3 =: expr
+
+	or
+
+	.equ	sym1,	expr	; equivalent to sym1  = expr
+	.gblequ	sym2,	expr	; equivalent to sym2 == expr
+	.lclequ	sym3,	expr	; equivalent to sym3 =: expr
 .end literal
 
 These alternate forms of equivalence are provided for user
@@ -1371,7 +1413,7 @@ Format:
 
 The conditional assembly directives allow you to include or exclude
 blocks of source code during the assembly process, based on the
-evaluation of the condition test.
+evaluation of the test condition.
 
 The range of true condition will be processed if the expression 'expr'
 is not zero (i.e. true) and the range of false condition will be
@@ -1415,6 +1457,62 @@ source program with out the need to use the comment delimiter (;):
 .end literal
 
 
+.header level 2;_.ifxx, _.else, and _.endif Directives
+
+Additional conditional directives are available to
+test the value of an evaluated expression:
+
+.skip;.literal
+	.ifne	expr		; true if expr != 0
+	.ifeq	expr		; true if expr == 0
+	.ifgt	expr		; true if expr >  0
+	.iflt	expr		; true if expr <  0
+	.ifge	expr		; true if expr >= 0
+	.ifle	expr		; true if expr <= 0
+.end literal
+
+Format:
+.skip;.literal
+	.ifxx	expr
+	.			;}
+	.			;} range of true condition
+	.			;}
+	.else
+	.			;}
+	.			;} range of false condition
+	.			;}
+	.endif
+.end literal
+
+The conditional assembly directives allow you to include or exclude
+blocks of source code during the assembly process, based on the
+evaluation of the test condition.
+
+The range of true condition will be processed if the expression 'expr'
+is not zero (i.e. true) and the range of false condition will be
+processed if the expression 'expr' is zero (i.e false). The range of
+true condition is optional as is the .else directive and the range
+of false condition.  The following are all valid .if/.else/.endif
+constructions:
+.skip;.literal
+	.ifne	A-4		;evaluate A-4
+	.byte	1,2		;insert bytes if A-4 is
+	.endif			;not zero
+
+	.ifeq	K+3		;evaluate K+3
+	.byte	3,4		;insert bytes if K+3
+	.endif			;is zero
+
+	.ifne	J&3		;evaluate J masked by 3
+	.byte	12		;insert this byte if J&3
+	.else			;is not zero
+	.byte	13		;insert this byte if J&3
+	.endif			;is zero
+.end literal
+.skip 2
+The .ifxx/.else/.endif directives may be nested upto 10 levels.
+
+
 .header level 2;_.ifdef, _.else, and _.endif Directives
 Format:
 .skip;.literal
@@ -1431,29 +1529,32 @@ Format:
 
 The conditional assembly directives allow you to include or exclude
 blocks of source code during the assembly process, based on the
-evaluation of the condition test.
+evaluation of the test condition.
 
 The range of true condition will be processed if the symbol 'sym'
-is defined (i.e. true) and the range of false condition will be
-processed if the symbol 'sym' is not defined (i.e false). The range of
-true condition is optional as is the .else directive and the range
-of false condition.  The following are all valid .ifdef/.else/.endif
-constructions:
+has been defined with a .define directive or 'sym' is a variable
+with an assigned value else the false range will be processed.
+The range of true condition is optional as is the .else directive
+and the range of false condition.  The following are all
+valid .ifdef/.else/.endif constructions:
+
 .skip;.literal
 	.ifdef	sym$1		;lookup symbol sym$1
-	.byte	1,2		;insert bytes if sym$1 is
-	.endif			;defined
+	.byte	1,2		;insert bytes if sym$1
+	.endif			;is defined or
+				;assigned a value
 
 	.ifdef	sym$2		;lookup symbol sym$2
 	.else
 	.byte	3,4		;insert bytes if sym$1
-	.endif			;is not defined
+	.endif			;is not defined and
+				;not assigned a value
 
 	.ifdef	sym$3		;lookup symbol sym$3
 	.byte	12		;insert this byte if sym$3
-	.else			;is defined
+	.else			;is defined/valued
 	.byte	13		;insert this byte if sym$3
-	.endif			;is not defined
+	.endif			;is not defined/valued
 .end literal
 .skip 2
 The .ifdef/.else/.endif directives may be nested upto 10 levels.
@@ -1478,26 +1579,29 @@ blocks of source code during the assembly process, based on the
 evaluation of the condition test.
 
 The range of true condition will be processed if the symbol 'sym'
-is not defined (i.e. true) and the range of false condition will be
-processed if the symbol 'sym' is defined (i.e false). The range of
-true condition is optional as is the .else directive and the range
-of false condition.  The following are all valid .ifndef/.else/.endif
-constructions:
+is not defined by a .define directive and a variable 'sym' has
+not been assigned a value else the range of false condition will be
+processed. The range of true condition is optional as is the .else
+directive and the range of false condition.  The following are all
+valid .ifndef/.else/.endif constructions:
+
 .skip;.literal
 	.ifndef	sym$1		;lookup symbol sym$1
 	.byte	1,2		;insert bytes if sym$1 is
-	.endif			;not defined
+	.endif			;not defined and
+				;not assigned a value
 
 	.ifndef	sym$2		;lookup symbol sym$2
 	.else
 	.byte	3,4		;insert bytes if sym$1
-	.endif			;is defined
+	.endif			;is defined or
+				;is assigned a value
 
 	.ifndef	sym$3		;lookup symbol sym$3
 	.byte	12		;insert this byte if sym$3
-	.else			;is not defined
+	.else			;is not defined/valued
 	.byte	13		;insert this byte if sym$3
-	.endif			;is defined
+	.endif			;is defined/valued
 .end literal
 .skip 2
 The .ifndef/.else/.endif directives may be nested upto 10 levels.
@@ -1506,11 +1610,17 @@ The .ifndef/.else/.endif directives may be nested upto 10 levels.
 .header level 2;_.include Directive
 Format:
 .skip;.indent 8
-_.include	string
+_.include	/string/
 .skip;.left margin +16
 .indent -16
-where:##string##represents a delimited string that is the
+where:##string##represents a string that is the
 file specification of an ASxxxx source file.
+.skip;.indent -8
+/##/####represent the delimiting characters. These delimiters
+may be any paired printing characters, as long as the
+characters are not contained within the string itself.
+If the delimiting characters do not match, the .include
+directive will give the (q) error.
 .left margin -16
 
 The .include directive is used to insert a source file within the
@@ -1533,19 +1643,25 @@ as "include1" then the file D:_\proj_\include1.asm is opened.
 .header level 2;_.define and _.undefine Directives
 Format:
 .skip;.indent 8
-_.define########keyword	string
+_.define########keyword	/string/
 .skip;.indent 8
 _.undefine######keyword
 .skip;.left margin +16
 .indent -16
-where:##keyword##is the substitutable string which must
+where:##keyword#is the substitutable string which must
 start with a letter and may contain any combination of
 digits and letters.
 .skip
 .indent -16
-where:##string###represents a delimited string that is
+where:##string##represents a string that is
 substituted for the keyword.  The string may contain
 any sequence of characters including white space.
+.skip;.indent -8
+/##/####represent the delimiting characters. These delimiters
+may be any paired printing characters, as long as the
+characters are not contained within the string itself.
+If the delimiting characters do not match, the .define
+directive will give the (q) error.
 .left margin -16
 
 The .define directive specifies a user defined string
@@ -1680,8 +1796,7 @@ Format:
 
 The _.16bit, _.24bit, and _.32bit directives are special
 directives for assembler configuration when default values are
-not used. (Currently only the as8xCxxx and aspic assemblers can
-use the _.16bit, _.24bit, or _.32bit directives in special mode.)
+not used.
 
 
 .header level 2;.\m\s\b Directive 
@@ -1744,8 +1859,36 @@ for details.
 The _.end directive without an expression is ignored.
 
 
-.tp 35
+.tp 48
 .header level 1;INVOKING ASXXXX
+
+Starting an ASxxxx assembler without any arguments provides
+the following option list and then exits:
+
+.skip
+.literal
+Usage: [-options] file1 [file2 file3 ...]
+  -d   Decimal listing
+  -q   Octal   listing
+  -x   Hex     listing (default)
+  -g   Undefined symbols made global
+  -a   All user symbols made global
+  -b   Display .define substitutions in listing
+  -bb  and display without .define substitutions
+  -c   Enable instruction cycle count in listing
+  -j   Enable NoICE Debug Symbols
+  -y   Enable SDCC  Debug Symbols
+  -l   Create list   output file1[.lst]
+  -o   Create object output file1[.rel]
+  -s   Create symbol output file1[.sym]
+  -p   Disable listing pagination
+  -u   Disable .list/.nlist processing
+  -w   Wide listing format for symbol table
+  -z   Disable case sensitivity for symbols
+  -f   Flag relocatable references by  `   in listing file
+  -ff  Flag relocatable references by mode in listing file
+.end literal
+.skip 2
 
 The  ASxxxx  assemblers are command line oriented.  Most
 sytems require the option(s) and file(s) arguments to
@@ -1760,7 +1903,7 @@ as6809
 .br
 argv:   [-Options] file1 [file2 file3 ...]
 .skip 2
-The options are:
+The ASxxxx options in some more detail:
 .skip;.literal
 	-d	decimal	listing
 	-q	octal	listing
@@ -1770,15 +1913,38 @@ The options are:
 		.lst, .rel, and .sym files.
 
 	-g	undefined symbols made global
+
+		Unresolved (external) variables
+		and symbols are flagged as global.
+
 	-a	all user symbols made global
 
+		All defined (not local or external)
+		variables and symbols are flagged
+		as global.
+
 	-b	display .define substitutions in listing
+
+		If a .define substitution has been applied
+		to an assembler source line the source
+		line is printed with the substitution.
+
 	-bb	and display without .define substitutions
+
+		If a .define substitution has been applied
+		to an assembler source line the source
+		line is first printed without substitution
+		followed by the line with the substitution.
 
 	-j	enable NOICE debug symbols
 	-y	enable SDCC debug symbols
 
 	-l	create list   output file1.lst
+
+		If -s (symbol table output) is not
+		specified the symbol table is included
+		at the end of the listing file.
+
 	-o	create object output file1.rel
 	-s	create symbol output file1.sym
 
@@ -1788,10 +1954,15 @@ The options are:
 
 	-z	disable case sensitivity for symbols
 
-		relocatable reference flagging:
-
 	-f	by  `   in the listing file
 	-ff	by mode in the listing file
+
+		Relocatable modess are flagged by byte
+		position (LSB, Byte 2, Byte 3, MSB)
+		*nMN	paged,
+		uvUV	unsigned,
+		rsRS	signed,
+		pqPQ	program counter relative.
 .end literal
 
 The file name for the .lst, .rel, and .sym files is the first file name
@@ -1803,9 +1974,6 @@ invoke the assembler for each file.
 The .rel file contains a radix directive so that the linker will
 use the proper conversion for this file. Linked files may have
 different radices.
-
-If the list (l) option is specified without the symbol table (s)
-option, the symbol table is placed at the end of the listing file.
 
 
 .header level 1;ERRORS

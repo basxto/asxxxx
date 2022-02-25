@@ -1,7 +1,7 @@
 /* pic.h */
 
 /*
- * (C) Copyright 2001-2003
+ * (C) Copyright 2001-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin

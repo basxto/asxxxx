@@ -47,6 +47,9 @@ supported by the Rabbit 2000/3000 will be flagged with an 'a' error.
 A synonym of .r2k is .r3k.  The default assembler mode is .r2k.
 
 
+The .r2k directive also selects the Rabbit 2000/3000 specific
+cycles count output when the -c command line option is specified.
+
 
 .header level 2;.\h\d64 Directive
 
@@ -63,6 +66,9 @@ Addressing modes not supported by the HD64180 (Z180) will be
 flagged with an 'a' error.  A synonym of .hd64 is .z180.
 
 
+The .hd64 directive also selects the HD64180/Z180 specific
+cycles count output when the -c command line option is specified.
+
 
 .header level 2;.\z80 Directive
 
@@ -77,6 +83,42 @@ mnemonics. HD64180 and Rabbit 2000/3000 specific mnemonics
 will be flagged with an 'o' error.  Addressing modes not
 supported by the z80 will be flagged with an 'a' error.
 
+
+The .z80 directive also selects the Z80 specific
+cycles count output when the -c command line option is specified.
+
+
+.header level 2;The .____.CPU. Variable
+
+The value of the pre-defined symbol '.____.CPU.' corresponds
+to the selected processor type.  The default value is 0
+which corresponds to the default processor type.  The
+following table lists the processor types and associated
+values for the ASRAB assembler:
+
+.skip 1
+.literal
+	Processor Type		  .__.CPU. Value
+	--------------		  --------------
+	 .r2k / .r3k			 0
+	.hd64 / .z180			 1
+	    .z80			 2
+.end literal
+
+.skip 1
+  The variable '.____.CPU.' is by default defined as local
+and will not be output to the created .rel file.  The
+assembler command line options -g or -a will not cause the
+local symbol to be output to the created .rel file.
+
+  The assembler .globl directive may be used to change the
+variable type to global causing its definition to be
+output to the .rel file.  The inclusion of the definition
+of the variable '.____.CPU.' might be a useful means of
+validating that seperately assembled files have been
+compiled for the same processor type.  The linker will
+report an error for variables with multiple non equal
+definitions.
 
 
 .page

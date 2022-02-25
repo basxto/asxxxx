@@ -1,7 +1,7 @@
 /* z80.h */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -126,15 +126,25 @@
 #define	S_SBC	82
 
 /*
+ * CPU Types
+ */
+#define	S_CPU	83
+
+/*
+ * Processor Types (S_CPU)
+ */
+#define	X_Z80	0
+#define	X_HD64	1
+
+/*
  * HD64180 Instructions
  */
-#define	X_HD64	90
-#define	X_INH2	91
-#define	X_IN	92
-#define	X_OUT	93
-#define	X_MLT	94
-#define	X_TST	95
-#define	X_TSTIO	96
+#define	X_INH2	90
+#define	X_IN	91
+#define	X_OUT	92
+#define	X_MLT	93
+#define	X_TST	94
+#define	X_TSTIO	95
 
 struct adsym
 {

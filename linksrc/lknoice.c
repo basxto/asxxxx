@@ -8,23 +8,13 @@
  *  2-Feb-98 JLH Allow optional .nest on local vars - C scoping rules...
  * 27-May-01 ARB Updated for ASxxxx V4
  *
- * (C) Copyright 2001-2003
+ * (C) Copyright 2001-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 

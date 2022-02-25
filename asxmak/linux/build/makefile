@@ -3,19 +3,20 @@
 #		LINUX Version
 #		=============
 #
-#   7 October 2003			Created for LINUX     / make /
+#   29 July 2005			Created for LINUX     / make /
 #
 ######################################################################
 
 .PHONY:	all clean
 
-all:	as430 as740 as1802 as6500	\
+all:	as430 as740 as1802 as2650	\
+	as6500				\
 	as6800 as6801 as6804 as6805	\
 	as6808 as6809 as6811 as6812	\
 	as6816 as61860			\
 	as8051 as8085			\
-	asz80 asgb asez80		\
-	asrab				\
+	asz8 asz80 asgb asez80		\
+	asrab asf2mc8			\
 	ash8 as8xcxxx			\
 	asavr aspic			\
 	ascheck				\
@@ -29,6 +30,7 @@ clean:
 	rm -f $(SRC430)*.o
 	rm -f $(SRC740)*.o
 	rm -f $(SRC1802)*.o
+	rm -f $(SRC2650)*.o
 	rm -f $(SRC6500)*.o
 	rm -f $(SRC6800)*.o
 	rm -f $(SRC6801)*.o
@@ -42,10 +44,12 @@ clean:
 	rm -f $(SRC61860)*.o
 	rm -f $(SRC8051)*.o
 	rm -f $(SRC8085)*.o
+	rm -f $(SRCZ8)*.o
 	rm -f $(SRCZ80)*.o
 	rm -f $(SRCGB)*.o
 	rm -f $(SRCEZ80)*.o
 	rm -f $(SRCRAB)*.o
+	rm -f $(SRCF2MC8)*.o
 	rm -f $(SRC8XCXXX)*.o
 	rm -f $(SRCH8)*.o
 	rm -f $(SRCAVR)*.o
@@ -73,6 +77,7 @@ DSTEXE:=	$(ASXBAS)asxmak/linux/exe/
 SRC430=		$(ASXBAS)as430/
 SRC740=		$(ASXBAS)as740/
 SRC1802=	$(ASXBAS)as1802/
+SRC2650=	$(ASXBAS)as2650/
 SRC6500=	$(ASXBAS)as6500/
 SRC6800=	$(ASXBAS)as6800/
 SRC6801=	$(ASXBAS)as6801/
@@ -86,10 +91,12 @@ SRC6816=	$(ASXBAS)as6816/
 SRC61860=	$(ASXBAS)as61860/
 SRC8051=	$(ASXBAS)as8051/
 SRC8085=	$(ASXBAS)as8085/
+SRCZ8=		$(ASXBAS)asz8/
 SRCZ80=		$(ASXBAS)asz80/
 SRCGB=		$(ASXBAS)asgb/
 SRCEZ80=	$(ASXBAS)asez80/
 SRCRAB=		$(ASXBAS)asrab/
+SRCF2MC8=	$(ASXBAS)asf2mc8/
 SRC8XCXXX=	$(ASXBAS)as8xcxxx/
 SRCH8=		$(ASXBAS)ash8/
 SRCAVR=		$(ASXBAS)asavr/
@@ -105,6 +112,7 @@ SRCCHECK=	$(ASXBAS)ascheck/
 	strip $<
 	cp $< $@
 	cp $< $(DSTEXE)$@
+	chmod 557 $(DSTEXE)$@
 
 
 ASXX =	asdata.o asexpr.o aslex.o aslist.o	\
@@ -156,6 +164,20 @@ $(AS1802SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC1802)1802.h
 
 as1802.new:	$(ASXXSRC) $(AS1802SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS1802SRC) -o as1802.new
+
+
+####################################################################
+# AS2650
+####################################################################
+
+AS2650 =		s26adr.o s26ext.o s26mch.o s26pst.o
+
+AS2650SRC =	$(addprefix $(SRC2650),$(AS2650))
+
+$(AS2650SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC2650)s2650.h
+
+as2650.new:	$(ASXXSRC) $(AS2650SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS2650SRC) -o as2650.new
 
 
 ####################################################################
@@ -341,6 +363,20 @@ as8085.new:	$(ASXXSRC) $(AS8085SRC)
 
 
 ####################################################################
+# ASZ8
+####################################################################
+
+ASZ8 =		z8adr.o z8ext.o z8mch.o z8pst.o
+
+ASZ8SRC =	$(addprefix $(SRCZ8),$(ASZ8))
+
+$(ASZ8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCZ8)z8.h
+
+asz8.new:	$(ASXXSRC) $(ASZ8SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASZ8SRC) -o asz8.new
+
+
+####################################################################
 # ASZ80
 ####################################################################
 
@@ -394,6 +430,20 @@ $(ASRABSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCRAB)rab.h
 
 asrab.new:	$(ASXXSRC) $(ASRABSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASRABSRC) -o asrab.new
+
+
+####################################################################
+# ASF2MC8
+####################################################################
+
+ASF2MC8 =	f8adr.o f8ext.o f8mch.o f8pst.o
+
+ASF2MC8SRC =	$(addprefix $(SRCF2MC8),$(ASF2MC8))
+
+$(ASF2MC8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCF2MC8)f2mc8.h
+
+asf2mc8.new:	$(ASXXSRC) $(ASF2MC8SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASF2MC8SRC) -o asf2mc8.new
 
 
 ####################################################################

@@ -1,22 +1,13 @@
 /* lkmain.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -32,6 +23,7 @@
  *		FILE *	afile()
  *		VOID	bassav()
  *		VOID	gblsav()
+ *		int	intsiz()
  *		VOID	link()
  *		VOID	lkexit()
  *		int	fndext()
@@ -143,10 +135,10 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-	register int c, i, j, k;
+	int c, i, j, k;
 
-	if (sizeof(a_mask) < 4) {
-		fprintf(stderr, "?ASxxxx-Error-Size of INT32 is not 32 bits or larger.\n\r\n");
+	if (intsiz() < 4) {
+		fprintf(stderr, "?ASlink-Error-Size of INT32 is not 32 bits or larger.\n\r\n");
 		exit(ER_FATAL);
 	}
 
@@ -277,7 +269,7 @@ char *argv[];
 			/*
 			 * Check bank size limits.
 			 */
-			chkbank();
+			chkbank(stderr);
 			/*
 			 * Process global definitions.
 			 */
@@ -313,6 +305,29 @@ char *argv[];
 	}
 	lkexit(lkerr ? ER_ERROR : ER_NONE);
 	return(0);
+}
+
+/*)Function	int	intsiz()
+ *
+ *	The function intsiz() returns the size of INT32
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
+ */
+
+int
+intsiz()
+{
+	return(sizeof(a_uint));
 }
 
 /*)Function	VOID	lkexit(i)
@@ -385,6 +400,7 @@ int i;
  *		VOID	module()	lkhead.c
  *		VOID	newarea()	lkarea.c
  *		VOID	newhead()	lkhead.c
+ *		VOID	newmode()	lkhead.c
  *		sym *	newsym()	lksym.c
  *		VOID	NoICEmagic()	lknoice.c
  *		VOID	reloc()		lkreloc.c
@@ -397,7 +413,7 @@ int i;
 VOID
 link()
 {
-	register int c;
+	int c;
 
 	c = getnb();
 	switch (c) {
@@ -436,6 +452,29 @@ link()
 				break;
 			}
 		}
+#ifdef	LONGINT
+		switch(a_bytes) {
+		default:
+			a_bytes = 2;
+		case 2:
+			a_mask = 0x0000FFFFl;
+			s_mask = 0x00008000l;
+			v_mask = 0x00007FFFl;
+			break;
+
+		case 3:
+			a_mask = 0x00FFFFFFl;
+			s_mask = 0x00800000l;
+			v_mask = 0x007FFFFFl;
+			break;
+
+		case 4:
+			a_mask = 0xFFFFFFFFl;
+			s_mask = 0x80000000l;
+			v_mask = 0x7FFFFFFFl;
+			break;
+		}
+#else
 		switch(a_bytes) {
 		default:
 			a_bytes = 2;
@@ -457,6 +496,7 @@ link()
 			v_mask = 0x7FFFFFFF;
 			break;
 		}
+#endif
 		break;
 
 	case 'H':
@@ -585,9 +625,9 @@ link()
 VOID
 map()
 {
-	register int i;
-	register struct head *hdp;
-	register struct lbfile *lbfh;
+	int i;
+	struct head *hdp;
+	struct lbfile *lbfh;
 
 	if (mflag == 0) return;
 
@@ -671,6 +711,7 @@ map()
 		}
 	}
 	fprintf(mfp, "\n\f");
+	chkbank(mfp);
 	symdef(mfp);
 }
 
@@ -726,8 +767,8 @@ map()
 int
 parse()
 {
-	register int c, idx;
-	register char *p;
+	int c, idx;
+	char *p;
 	int sv_type;
 	char fid[FILSPC+FILSPC];
 
@@ -772,6 +813,11 @@ parse()
 				case 's':
 				case 'S':
 					oflag = 2;
+					break;
+
+				case 't':
+				case 'T':
+					oflag = 3;
 					break;
 
 				case 'o':
@@ -1106,8 +1152,8 @@ gblsav()
 VOID
 setgbl()
 {
-	register int v;
-	register struct sym *sp;
+	int v;
+	struct sym *sp;
 	char id[NCPS];
 
 	gsp = globlp;
@@ -1115,7 +1161,7 @@ setgbl()
 		ip = gsp->g_strp;
 		getid(id, -1);
 		if (getnb() == '=') {
-			v = expr(0);
+			v = (int) expr(0);
 			sp = lkpsym(id, 0);
 			if (sp == NULL) {
 				fprintf(stderr,
@@ -1143,7 +1189,9 @@ setgbl()
  *
  *		char *	fn		file specification string
  *		char *	ft		file type string
- *		int	wf		read(0)/write(1) flag
+ *		int	wf		0 ==>> read
+ *					1 ==>> write
+ *					2 ==>> binary write
  *
  *	The function afile() opens a file for reading or writing.
  *		(1)	If the file type specification string ft
@@ -1161,13 +1209,13 @@ setgbl()
  *
  *	local variables:
  *		int	c		character value
- *		char	fb[]		constructed file specification string
  *		FILE *	fp		filehandle for opened file
  *		char *	p1		pointer to filespec string fn
  *		char *	p2		pointer to filespec string fb
  *		char *	p3		pointer to filetype string ft
  *
  *	global variables:
+ *		char	afspec[]	constructed file specification string
  *		int	lkerr		error flag
  *
  *	functions called:
@@ -1185,10 +1233,10 @@ char *fn;
 char *ft;
 int wf;
 {
-	register char *p1, *p2, *p3;
-	register int c;
+	char *p1, *p2, *p3;
+	int c;
+	char * frmt;
 	FILE *fp;
-	char fb[FILSPC];
 
 	if (strlen(fn) > (FILSPC-5)) {
 		fprintf(stderr, "File Specification %s is too long.", fn);
@@ -1199,9 +1247,9 @@ int wf;
 	/*
 	 * Skip The Path
 	 */
-	strcpy(fb, fn);
-	c = fndidx(fb);
-	p1 = &fb[c];
+	strcpy(afspec, fn);
+	c = fndidx(afspec);
+	p1 = &afspec[c];
 	p2 = &fn[c];
 
 	/*
@@ -1224,12 +1272,26 @@ int wf;
 		}
 	}
 	while ((c = *p3++) != 0) {
-		if (p1 < &fb[FILSPC-1])
+		if (p1 < &afspec[FILSPC-1])
 			*p1++ = c;
 	}
 	*p1++ = 0;
-	if ((fp = fopen(fb, wf?"w":"r")) == NULL) {
-		fprintf(stderr, "%s: cannot %s.\n", fb, wf?"create":"open");
+
+	/*
+	 * Select Read/Write/Binary Write
+	 */
+	switch(wf) {
+	default:
+	case 0:	frmt = "r";	break;
+	case 1:	frmt = "w";	break;
+#ifdef	DECUS
+	case 2:	frmt = "wn";	break;
+#else
+	case 2:	frmt = "wb";	break;
+#endif
+	}
+	if ((fp = fopen(afspec, frmt)) == NULL) {
+		fprintf(stderr, "%s: cannot %s.\n", afspec, wf?"create":"open");
 		lkerr++;
 	}
 	return (fp);
@@ -1264,7 +1326,7 @@ int
 fndidx(str)
 char *str;
 {
-	register char *p1, *p2;
+	char *p1, *p2;
 
 	/*
 	 * Skip Path Delimiters
@@ -1274,7 +1336,7 @@ char *str;
 	if ((p2 = strrchr(p1,  '/')) != NULL) { p1 = p2 + 1; }
 	if ((p2 = strrchr(p1, '\\')) != NULL) { p1 = p2 + 1; }
 
-	return(p1 - str);
+	return((int) (p1 - str));
 }
 
 /*)Function	int	fndext(str)
@@ -1304,7 +1366,7 @@ int
 fndext(str)
 char * str;
 {
-	register char *p1, *p2;
+	char *p1, *p2;
 
 	/*
 	 * Find the file seperator
@@ -1312,7 +1374,7 @@ char * str;
 	p1 = str + strlen(str);
 	if ((p2 = strrchr(str,  FSEPX)) != NULL) { p1 = p2; }
 
-	return(p1 - str);
+	return((int) (p1 - str));
 }
 
 
@@ -1338,6 +1400,7 @@ char *usetxt[] = {
 	"Output:",
 	"  -i   Intel Hex as outfile[.i--]",
 	"  -s   Motorola S Record as outfile[.s--]",
+	"  -t   Tandy CoCo Disk BASIC binary as outfile[.bi-]",
 #if NOICE
 	"  -j   NoICE Debug output as outfile[.noi]",
 #endif
@@ -1381,7 +1444,7 @@ VOID
 usage(n)
 int n;
 {
-	register char	**dp;
+	char	**dp;
 
 	fprintf(stderr, "\nASxxxx Linker %s\n\n", VERSION);
 	for (dp = usetxt; *dp; dp++)

@@ -1,7 +1,7 @@
 /* ez80pst.c */
 
 /*
- * (C) Copyright 1989-2004
+ * (C) Copyright 1989-2005
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,8 +15,6 @@
  * patrick at phead dot net
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "ez80.h"
 
@@ -84,22 +82,30 @@ char	mode2[32] = {	/* R_3BIT */
  *	m_mask contains the active bit positions for the output.
  *	m_mbro contains the active bit positions for the input.
  *
- *	struct	vsd
+ *	struct	mode
  *	{
  *		char *	m_def;		Bit Relocation Definition
- *		int	m_flag;		Bit Swapping Flag
- *		int	m_mask;		Bit Mask
- *		int	m_mbro;		Bit Range Overflow Mask
+ *		a_uint	m_flag;		Bit Swapping Flag
+ *		a_uint	m_mask;		Bit Mask
+ *		a_uint	m_mbro;		Bit Range Overflow Mask
  *	};
  */
+#ifdef	LONGINT
+struct	mode	mode[3] = {
+    {	&mode0[0],	0,	0x00FFFFFFl,	0x00FFFFFFl	},	/* Normal 24-BIT Mode */
+    {	&mode1[0],	0,	0x0000FFFFl,	0x0000FFFFl	},	/* Z80 16-BIT Mode */
+    {	&mode2[0],	1,	0x00000038l,	0x00000007l	}	/* BIT, RST and SET 3-BIT Mode */
+};
+#else
 struct	mode	mode[3] = {
     {	&mode0[0],	0,	0x00FFFFFF,	0x00FFFFFF	},	/* Normal 24-BIT Mode */
     {	&mode1[0],	0,	0x0000FFFF,	0x0000FFFF	},	/* Z80 16-BIT Mode */
     {	&mode2[0],	1,	0x00000038,	0x00000007	}	/* BIT, RST and SET 3-BIT Mode */
 };
+#endif
 
 /*
- * Array of Pointers to VSD Structures
+ * Array of Pointers to mode Structures
  */
 struct	mode	*modep[16] = {
 	&mode[0],	&mode[1],	&mode[2],	NULL,
@@ -149,6 +155,12 @@ struct	mne	mne[] = {
     {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
+    {	NULL,	".iflt",	S_CONDITIONAL,	0,	O_IFLT	},
+    {	NULL,	".ifge",	S_CONDITIONAL,	0,	O_IFGE	},
+    {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
+    {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
+    {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},

@@ -1,10 +1,10 @@
 82569
-R:\ASXV4PXX\asxmak\Symantec\build\IncToDef.prj
+R:\ASXV4PXX\ASXMAK\SYMANTEC\BUILD\IncToDef.prj
 IncToDef.OPN
 novcs
 IncToDef.DEF
-8
-1041620054
+6
+1092880634
 0 0 0 0 0 "..\..\..\ASPIC\PTOA\IncToDef.c"
 0 0 0 0 0 "..\..\..\ASPIC\PTOA\PtoA.c"
 0 0 0 0 0 "IncToDef.DEF"

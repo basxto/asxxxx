@@ -1,7 +1,7 @@
 /* r65adr.c */
 
 /*
- * (C) Copyright 1995-2003
+ * (C) Copyright 1995-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -20,16 +20,14 @@
  * EARN/BitNet: msmakela at finuh
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "r6500.h"
 
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c;
+	int c;
 
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
@@ -37,10 +35,6 @@ register struct expr *esp;
 	} else if (c == '*') {
 		expr(esp, 0);
 		esp->e_mode = S_DIR;
-		if ((!esp->e_flag)
-		    && (esp->e_base.e_ap==NULL)
-			&& (esp->e_addr & ~0xFF))
-			    err('d');
 		if (more()) {
 			comma();
 			switch(admode(axy)) {
@@ -139,11 +133,11 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-	register char *ptr;
-	register int i;
-	register char *ips;
+	char *ptr;
+	int i;
+	char *ips;
 
 	ips = ip;
 	unget(getnb());
@@ -164,9 +158,9 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-	register char *ptr;
+	char *ptr;
 	ptr = ip;
 
 	while (*ptr && *str) {

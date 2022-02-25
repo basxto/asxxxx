@@ -9,6 +9,6 @@ as6809 -gloasxff histos
 as6809 -gloasxff help
 as6809 -gloasxff aiconv
 as6809 -gloasxff phsmon
-as6809 -gloasxff phsopt
+as6809 -gloasxff opt
 aslink -f phs
-aslink -f phsopt
+aslink -f opt

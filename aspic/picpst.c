@@ -1,7 +1,7 @@
 /* picpst.c */
 
 /*
- * (C) Copyright 2001-2003
+ * (C) Copyright 2001-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "pic.h"
 
@@ -174,11 +172,28 @@ char mode12[32] = {	/* R_20BIT */
  *	struct	mode
  *	{
  *		char *	m_def;		Bit Relocation Definition
- *		int	m_flag;		Bit Swapping Flag
- *		int	m_mask;		Bit Mask
- *		int	m_mbro;		Bit Range Overflow Mask
+ *		a_uint	m_flag;		Bit Swapping Flag
+ *		a_uint	m_mask;		Bit Mask
+ *		a_uint	m_mbro;		Bit Range Overflow Mask
  *	};
  */
+#ifdef	LONGINT
+struct	mode	mode[13] = {
+    {	&mode0[0],	0l,	0x0000FFFFl,	0x0000FFFFl	},	/* R_NORM  */
+    {	&mode1[0],	0l,	0x00000007l,	0x00000007l	},	/* R_3BIT  */
+    {	&mode2[0],	0l,	0x0000000Fl,	0x0000000Fl	},	/* R_4BTL  */
+    {	&mode3[0],	1l,	0x000000F0l,	0x0000000Fl	},	/* R_4BTR  */
+    {	&mode4[0],	0l,	0x0000001Fl,	0x0000001Fl	},	/* R_5BIT  */
+    {	&mode5[0],	0l,	0x0000007Fl,	0x0000007Fl	},	/* R_7BIT  */
+    {	&mode6[0],	0l,	0x000000FFl,	0x000000FFl	},	/* R_8BIT  */
+    {	&mode7[0],	0l,	0x000001FFl,	0x000001FFl	},	/* R_9BIT  */
+    {	&mode8[0],	0l,	0x000007FFl,	0x000007FFl	},	/* R_11BIT */
+    {	&mode9[0],	0l,	0x00000FFFl,	0x00000FFFl	},	/* R_12BIT */
+    {	&mode10[0],	1l,	0x000F00FFl,	0x00000FFFl	},	/* R_LFSR  */
+    {	&mode11[0],	0l,	0x00001FFFl,	0x00001FFFl	},	/* R_13BIT */
+    {	&mode12[0],	1l,	0x00FF0FFFl,	0x000FFFFFl	}	/* R_20BIT */
+};
+#else
 struct	mode	mode[13] = {
     {	&mode0[0],	0,	0x0000FFFF,	0x0000FFFF	},	/* R_NORM  */
     {	&mode1[0],	0,	0x00000007,	0x00000007	},	/* R_3BIT  */
@@ -194,6 +209,7 @@ struct	mode	mode[13] = {
     {	&mode11[0],	0,	0x00001FFF,	0x00001FFF	},	/* R_13BIT */
     {	&mode12[0],	1,	0x00FF0FFF,	0x000FFFFF	}	/* R_20BIT */
 };
+#endif
 
 /*
  * Array of Pointers to mode Structures
@@ -260,6 +276,12 @@ struct	mne	mne[] = {
     {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
+    {	NULL,	".iflt",	S_CONDITIONAL,	0,	O_IFLT	},
+    {	NULL,	".ifge",	S_CONDITIONAL,	0,	O_IFGE	},
+    {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
+    {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
+    {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},

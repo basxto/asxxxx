@@ -1,7 +1,7 @@
 /* 1802.h */
 
 /*
- * (C) Copyright 2002-2003
+ * (C) Copyright 2002-2006
  * All Rights Reserved
  *
  * Shujen Chen

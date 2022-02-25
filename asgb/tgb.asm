@@ -179,9 +179,13 @@
 	; halt (wait for interrupt or reset)
 	halt				;76
 	;***********************************************************
-	; load 'a' with input from device n
+	; load 'a' with input from device n or c
 	in	a,(n)			;F0 20
 	in	a,(c)			;F2
+	; alternates
+	ldh	a,(n)			;F0 20
+	ldh	a,(c)			;F2
+	ld	a,(c)			;F2
 	;***********************************************************
 	; increment operand
 	inc	(hl)			;34
@@ -310,12 +314,30 @@ jr5:
 	ld	hl,sp			;F8
 	;***********************************************************
 	; load via (hl) then decrement hl
+	ld	a,(hld)			;3A
+	ld	(hld),a			;32
+	; alternates
 	ldd	a,(hl)			;3A
 	ldd	(hl),a			;32
 	;***********************************************************
 	; load via (hl) then increment hl
+	ld	a,(hli)			;2A
+	ld	(hli),a			;22
+	; alternates
 	ldi	a,(hl)			;2A
 	ldi	(hl),a			;22
+	;***********************************************************
+	; load 'a' with input from device c
+	ld	a,(c)			;F2
+	; alternates
+	ldh	a,(c)			;F2
+	in	a,(c)			;F2
+	;***********************************************************
+	; load output port (c) with 'a'
+	ld	(c),a			;E2
+	; alternates
+	ldh	(c),a			;E2
+	out	(c),a			;E2
 	;***********************************************************
 	; no operation
 	nop				;00
@@ -331,11 +353,13 @@ jr5:
 	or	a,l			;B5
 	or	a,#n			;F6 20
 	;***********************************************************
-	; load output port (c) with reg
+	; load output port (c) or (n) with 'a'
 	out	(c),a			;E2
-	;***********************************************************
-	; load output port (n) with 'a'
 	out	(n),a			;E0 20
+	; alternates
+	ldh	(c),a			;E2
+	ld	(c),a			;E2
+	ldh	(n),a			;E0 20
 	;***********************************************************
 	; load destination with top of stack
 	pop	af			;F1
@@ -613,8 +637,15 @@ jr5:
 	sub	a,l			;95
 	sub	a,#n			;D6 20
 	;***********************************************************
-	; swap nybbles in A
+	; swap nybbles
+	swap	(hl)			;CB 36
 	swap	a			;CB 37
+	swap	b			;CB 30
+	swap	c			;CB 31
+	swap	d			;CB 32
+	swap	e			;CB 33
+	swap	h			;CB 34
+	swap	l			;CB 35
 	;***********************************************************
 	; logical 'xor' operand with 'a'
 	xor	a,(hl)			;AE

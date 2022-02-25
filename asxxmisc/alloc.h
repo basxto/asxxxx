@@ -1,11 +1,30 @@
 /* alloc.h */
-/* DECUS C */
+
+#undef	VOID
+
+/* DECUS C void definition */
+
+#ifdef	DECUS
+#define	VOID	char
+#endif
+
+/* PDOS C void definition */
+
+#ifdef	PDOS
+#define	VOID	char
+#endif
+
+/* Default void definition */
+
+#ifndef	VOID
+#define	VOID	void
+#endif
 
 
-extern	char	*alloc();
-extern	char	*malloc();
-extern	char	*calloc();
-extern	char	*realloc();
+extern	VOID	*alloc();
+extern	VOID	*malloc();
+extern	VOID	*calloc();
+extern	VOID	*realloc();
 extern	int	free();
 
 

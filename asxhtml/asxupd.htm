@@ -12,12 +12,35 @@ ASxxxx Cross Assembler Updates
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 
-<H3><B>Version 4</B></H3>
+<H3><B>Version 4.10</B></H3>
 
 <H4><B><PRE>
 
+   Version  4.10  of   the   ASxxxx  Cross  Assemblers
+features 4 additional assemblers:
+
+        Fujitsu F2MC8L/FX Microprocessors
+        Signetics 2650 processor
+        Zilog ez80 processor
+        Zilog z8 processor
+
+
+   A new option, -c, has been added to the assemblers.
+This option enables  the  listing  of  machine  cycles
+for each assembled instruction.  For instructions with
+variable execution times  the maximum  cycle  count is
+listed.
+
+   Additional conditional directives:   .ifeq,  .ifne,
+.ifgt, .iflt, .ifge, and .ifle  have been added to the
+assemblers.
+
+   A new linker option, -t,  produces  the Tandy Color
+Computer Disk Basic binary output format.
+
+
    Version  4.00  of   the   ASxxxx  Cross  Assemblers
-features 7 additional assemblers:
+featured 7 additional assemblers:
 
         Rabbit 2000/3000 processors
         Atmel AVR processors
@@ -92,5 +115,6 @@ specify case insensitivity.
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY>
 </HTML>

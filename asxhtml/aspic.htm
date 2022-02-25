@@ -41,7 +41,7 @@ define the register file address page.
 
 Format:  
 
-        .pic    string 
+        .pic    "string" 
 
      The assembler uses the delimited string to define a proces-
 sor  specific  symbol.   e.g:   "p12c508"  produces  the  symbol
@@ -110,6 +110,37 @@ Format:
      This directive selects 20-bit addressing and the 16-bit in-
 struction word mnemonics and opcode values to be used during the
 assembly process.  
+
+
+The .__.CPU.  Variable 
+
+     The  value of the pre-defined symbol '.__.CPU.' corresponds
+to the selected processor type.  The default value  is  0  which
+corresponds  to the default processor type.  The following table
+lists the processor types and associated values  for  the  ASPIC
+assembler:  
+
+        Processor Type            .__.CPU. Value
+        --------------            --------------
+          .picnopic                      0
+          .pic12bit                      1
+          .pic14bit                      2
+          .pic16bit                      3
+          .pic20bit                      4
+
+
+     The  variable '.__.CPU.' is by default defined as local and
+will not be output to the created .rel file.  The assembler com-
+mand line options -g or -a will not cause the local symbol to be
+output to the created .rel file.  
+
+     The  assembler  .globl  directive may be used to change the
+variable type to  global  causing  its  definition to be  output
+to  the .rel file.  The inclusion of the definition of the vari-
+able '.__.CPU.' might be  a  useful  means  of  validating  that
+seperately  assembled files have been compiled for the same pro-
+cessor type.  The linker will report an error for variables with
+multiple non equal definitions.  
 
 
 Format:  
@@ -537,5 +568,6 @@ mode argument.
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

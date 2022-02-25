@@ -1,7 +1,7 @@
 /* asmain.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -12,21 +12,16 @@
  *   With enhancements from
  *
  *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *	jhartman at compuserve dot com
+ *
+ *	Boisy G. Pitre (BGP)
+ *	boisy at boisypitre dot com
+ *
+ *	Mike McCarty
+ *	mike dot mccarty at sbcglobal dot net
  */
 
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
-
 #include "asxxxx.h"
-
 
 /*)Module	asmain.c
  *
@@ -40,6 +35,7 @@
  *		VOID	asmbl()
  *		FILE *	afile(fn, ft, wf)
  *		int	fndidx(str)
+ *		int	intsiz()
  *		VOID	newdot(nap)
  *		VOID	phase(ap, a)
  *		VOID	usage()
@@ -151,6 +147,7 @@
  *		VOID	err()		assubr.c
  *		int	fprintf()	c-library
  *		int	getline()	aslex.c
+ *		int	int32siz()	asmain.c
  *		VOID	list()		aslist.c
  *		VOID	lstsym()	aslist.c
  *		VOID	minit()		___mch.c
@@ -174,12 +171,12 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-	register char *p;
-	register int c, i;
+	char *p;
+	int c, i;
 	struct area *ap;
 	struct def *dp;
 
-	if (sizeof(a_mask) < 4) {
+	if (intsiz() < 4) {
 		fprintf(stderr, "?ASxxxx-Error-Size of INT32 is not 32 bits or larger.\n\n");
 		exit(ER_FATAL);
 	}
@@ -204,6 +201,11 @@ char *argv[];
 				case 'b':
 				case 'B':
 					++bflag;
+					break;
+
+				case 'c':
+				case 'C':
+					cflag = 1;      /* Cycle counts in listing */
 					break;
 
 				case 'g':
@@ -373,6 +375,7 @@ char *argv[];
 				fprintf(ofp, "%s\n", ip );
 			}
 
+                        opcycles = OPCY_NONE;
 			if (setjmp(jump_env) == 0)
 				asmbl();
 			if (pass == 2) {
@@ -397,6 +400,29 @@ char *argv[];
 	}
 	asexit(aserr ? ER_ERROR : ER_NONE);
 	return(0);
+}
+
+/*)Function	int	intsiz()
+ *
+ *	The function intsiz() returns the size of INT32
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
+ */
+
+int
+intsiz()
+{
+	return(sizeof(INT32));
 }
 
 /*)Function	VOID	asexit(i)
@@ -459,18 +485,32 @@ int i;
  *		int	c		character from assembler-source
  *					text line
  *		area *	ap		pointer to an area structure
+ *		bank *	bp		pointer to a  bank structure
+ *		def *	dp		pointer to a  definition structure
  *		expr	e1		expression structure
+ *		char	equ[]		equated string
+ *		int	equtype		equate type (O_EQU,O_LCLEQU,O_GBLEQU)
  *		char	id[]		id string
  *		char	opt[]		options string
  *		char	fn[]		filename string
  *		char *	p		pointer into a string
  *		int	d		temporary value
  *		int	n		temporary value
- *		int	uaf		user area options flag
  *		int	uf		area options
+ *		int	con_ovr		concatenate / overlay flag
+ *		int	rel_abs		relocatable / absolute flag
+ *		int	npg_pag		page / non page flag
+ *		int	csg_dsg		code / data segment flag
+ *		a_uint	base		bank base address
+ *		a_uint	size		bank size limit
+ *		a_uint	map		bank map parameter
+ *		a_uint	v		temporary value
+ *		int	cnt	        temporary counter
+ *		int	flags		temporary flag
  *
  *	global variables:
  *		area *	areap		pointer to an area structure
+ *		bank *	bankp		pointer to a  bank structure
  *		char	ctype[]		array of character types, one per
  *					ASCII character
  *		int	flevel		IF-ELSE-ENDIF flag will be non
@@ -507,9 +547,12 @@ int i;
  *	functions called:
  *		a_uint	absexpr()	asexpr.c
  *		area *	alookup()	assym.c
+ *		bank *	blookup()	assym.c
+ *		def *	dlookup()	assym.c
  *		VOID	clrexpr()	asexpr.c
  *		int	digit()		asexpr.c
  *		char	endline()	aslex.c
+ *		VOID	equate()	asmain.c
  *		VOID	err()		assubr.c
  *		VOID	expr()		asexpr.c
  *		int	fndidx()	asmain.c
@@ -542,23 +585,25 @@ int i;
 VOID
 asmbl()
 {
-	register struct mne *mp;
-	register struct sym *sp;
-	register struct tsym *tp;
-	register int c;
+	struct mne *mp;
+	struct sym *sp;
+	struct tsym *tp;
+	int c;
 	struct area  *ap;
 	struct bank  *bp;
 	struct def *dp;
 	struct expr e1;
 	char id[NCPS];
+	char equ[NCPS];
+	char *equ_ip;
+	int  equtype;
 	char opt[NCPS];
 	char fn[FILSPC+FILSPC];
 	char *p;
-	int d, n, uf;
+	int d, nc, uf;
 	int con_ovr, rel_abs, npg_pag, csg_dsg;
-	int flags;
-	a_uint base, size, map;
-	int cnt, v;
+	a_uint base, size, map, n, v;
+	int cnt, flags;
 
 	laddr = dot.s_addr;
 	lmode = SLIST;
@@ -690,65 +735,58 @@ loop:
 	}
 	/*
 	 * If the next character is a = then an equate is being processed.
-	 * A == defines a global equate.
-	 * A =: defines an internal machine equate.
+	 *
+	 * Syntax:
+	 *    [labels] sym =  value   defines an equate.
+	 *    [labels] sym == value   defines a global equate.
+	 *    [labels] sym =: value   defines an internal machine equate.
 	 * If this is a new variable then create a symbol structure.
 	 */
 	if (c == '=') {
 		if (flevel)
 			return;
-		c = get();
-		if (c == ':') {
-			clrexpr(&e1);
-			expr(&e1, 0);
-			abscheck(&e1);
-			sp = lookup(id);
-			if (sp == &dot) {
-				outall();
-				if (e1.e_flag || e1.e_base.e_ap != dot.s_area)
-					err('.');
-			} else
-			if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
-				err('m');
-			}
-			sp->s_type = S_LCL;
-			sp->s_area = e1.e_base.e_ap;
-			sp->s_addr = laddr = e1.e_addr;
-			sp->s_flag |= S_ASG;
-			lmode = ELIST;
-			goto loop;
-		} else {
-			if (c != '=') {
-				unget(c);
-				c = 0;
-			}
-			clrexpr(&e1);
-			expr(&e1, 0);
-			sp = lookup(id);
-			if (sp == &dot) {
-				outall();
-				if (e1.e_flag || e1.e_base.e_ap != dot.s_area)
-					err('.');
-			} else
-			if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
-				err('m');
-			}
-			sp->s_type = S_USER;
-			if (e1.e_flag && (e1.e_base.e_sp->s_type == S_NEW)) {
-				rerr();
-			} else {
-				sp->s_area = e1.e_base.e_ap;
-			}
-			sp->s_addr = laddr = e1.e_addr;
-			sp->s_flag |= S_ASG;
-			if (c) {
-				sp->s_flag |= S_GBL;
-			}
-			lmode = ELIST;
-			goto loop;
+		switch (c = get()) {
+		    case '=':   equtype = O_GBLEQU;			break;
+		    case ':':   equtype = O_LCLEQU;     		break;
+		    default:    equtype = O_EQU;	unget(c);	break;
 		}
+		clrexpr(&e1);
+		expr(&e1, 0);
+		equate(id, &e1, equtype);
+		goto loop;
 	}
 	unget(c);
+	/*
+	 * Check for Equates if 'id' is not an Assembler Directive
+	 *
+	 * Syntax:
+	 *     [labels] sym .equ    value   defines an equate
+	 *     [labels] sym .glbequ value   defines a global equate
+	 *     [labels] sym .lclequ value   defines a local equate
+	 */
+	if (mlookup(id) == NULL) {
+		if (flevel)
+               		return;
+		/*
+		 * Alternates for =, ==, and =:
+		 */
+		equ_ip = ip;	 /* Save current char pointer for case equate not found. */
+		getid(equ, -1);
+                if ((mp = mlookup(equ)) == NULL || mp->m_type != S_EQU) {
+                	ip = equ_ip;
+                } else {
+			clrexpr(&e1);
+			expr(&e1, 0);
+                	equate(id, &e1, mp->m_valu);
+                	goto loop;
+		}
+	}
+	/*
+	 * Completed scan for lables , equates, and symbols.
+	 *
+	 * An assembler directive or mnemonic is
+	 * required to continue processing line.
+	 */
 	lmode = flevel ? SLIST : CLIST;
 	if ((mp = mlookup(id)) == NULL) {
 		if (!flevel)
@@ -759,14 +797,27 @@ loop:
 	 * If we have gotten this far then we have found an
 	 * assembler directive or an assembler mnemonic.
 	 *
-	 * Check for .if, .else, .endif, .list,
-	 * .nlist, and .page directives which are
-	 * not controlled by the conditional flags
+	 * Check for .if, .ifeq, .ifne, .ifgt, .iflt, .ifle,
+         * .ifge, .else, .endif, .list, .nlist, and .page
+         * directives which are not controlled by the
+         * conditional flags
 	 */
 	switch (mp->m_type) {
 	case S_CONDITIONAL:
+		/*
+		 * BGP
+		 *
+		 * Conditionals .ifne, .ifeq, .ifgt,
+		 * .iflt, .ifge, and .ifle added.
+		 */
 		switch(mp->m_valu) {
 		case O_IF:
+		case O_IFNE:
+		case O_IFEQ:
+		case O_IFGT:
+		case O_IFLT:
+		case O_IFGE:
+		case O_IFLE:
 			if (flevel) {
 				while (get()) ;
 				n = 0;
@@ -774,10 +825,20 @@ loop:
 				n = absexpr();
 			}
 			if (tlevel < MAXIF) {
+				switch (mp->m_valu) {
+				default:
+				case O_IF:
+				case O_IFNE:	n = (((v_sint) n) != 0);	break;
+				case O_IFEQ:	n = (((v_sint) n) == 0);	break;
+				case O_IFGT:	n = (((v_sint) n) >  0);	break;
+				case O_IFLT:	n = (((v_sint) n) <  0);	break;
+				case O_IFGE:	n = (((v_sint) n) >= 0);	break;
+				case O_IFLE:	n = (((v_sint) n) <= 0);	break;
+				}
 				++tlevel;
-				ifcnd[tlevel] = n;
+				ifcnd[tlevel] = (int) n;
 				iflvl[tlevel] = flevel;
-				if (n == 0) {
+				if (!n) {
 					++flevel;
 				}
 			} else {
@@ -785,7 +846,7 @@ loop:
 			}
 			lmode = ELIST;
 			laddr = n;
-			return;
+			break;
 
 		case O_IFDEF:
 		case O_IFNDEF:
@@ -808,7 +869,7 @@ loop:
 			}
 			if (tlevel < MAXIF) {
 				++tlevel;
-				ifcnd[tlevel] = n;
+				ifcnd[tlevel] = (int) n;
 				iflvl[tlevel] = flevel;
 				if (n == 0) {
 					++flevel;
@@ -818,7 +879,7 @@ loop:
 			}
 			lmode = ELIST;
 			laddr = n ? 1 : 0;
-			return;
+			break;
 
 		case O_ELSE:
 			if (ifcnd[tlevel]) {
@@ -831,7 +892,7 @@ loop:
 				}
 			}
 			lmode = SLIST;
-			return;
+			break;;
 
 		case O_ENDIF:
 			if (tlevel) {
@@ -840,10 +901,10 @@ loop:
 				err('i');
 			}
 			lmode = SLIST;
-			return;
+			break;
 
 		default:
-			return;
+			break;
 		}
 		return;
 
@@ -854,14 +915,14 @@ loop:
 			if (nlevel) {
 				nlevel -= 1;
 			}
-			return;
+			break;;
 
 		case O_NLIST:
 			nlevel += 1;
-			return;
+			break;
 
 		default:
-			return;
+			break;
 		}
 		return;
 
@@ -943,6 +1004,9 @@ loop:
 		 */
 		d = getnb();
 		while ((c = get()) != d) {
+			if (c == '\0') {
+				qerr();
+			}
 			if (p < &fn[FILSPC+FILSPC-1]) {
 				*p++ = c;
 			} else {
@@ -991,7 +1055,7 @@ loop:
 				mp = mlookup(opt);
 				if (mp && mp->m_type == S_ATYP) {
 					v = mp->m_valu;
-					uf |= v;
+					uf |= (int) v;
 					if (v == A_BNK) {
 						if ((c = getnb()) != '=')
 							qerr();
@@ -1000,20 +1064,20 @@ loop:
 						getid(opt, -1);
 						if ((bp = blookup(opt)) == NULL) {
 							err('u');
-							uf &= ~v;
+							uf &= (int) ~v;
 						}
 					}
 					if (v & A_CON) {
-						con_ovr = v;
+						con_ovr = (int) v;
 					} else
 					if (v & A_REL) {
-						rel_abs = v;
+						rel_abs = (int) v;
 					} else
 					if (v & A_NOPAG) {
-						npg_pag = v;
+						npg_pag = (int) v;
 					} else
 					if (v & A_CSEG) {
-						csg_dsg = v;
+						csg_dsg = (int) v;
 					}
 				} else {
 					err('u');
@@ -1099,7 +1163,7 @@ loop:
 				mp = mlookup(opt);
 				if (mp && mp->m_type == S_BTYP) {
 					v = mp->m_valu;
-					uf |= v;
+					uf |= (int) v;
 					if (v == B_BASE) {
 						if ((c = getnb()) != '=')
 							qerr();
@@ -1234,35 +1298,55 @@ loop:
 	case S_GLOBL:
 		do {
 			getid(id, -1);
-			sp = lookup(id);
-			sp->s_flag |= S_GBL;
+			sp = slookup(id);
+			if (sp != NULL) {
+				if (sp->s_type == S_ULCL) {
+					sp->s_type = S_USER;
+				}
+				sp->s_flag &= ~S_LCL;
+				sp->s_flag |=  S_GBL;
+			} else {
+				err('u');
+			}
+		} while ((c = getnb()) == ',');
+		unget(c);
+		lmode = SLIST;
+		break;
+
+	case S_LOCAL:
+		do {
+			getid(id, -1);
+			sp = slookup(id);
+			if (sp != NULL) {
+				if (sp->s_type == S_NEW) {
+					rerr();
+				} else {
+					sp->s_type = S_ULCL;
+					sp->s_flag &= ~S_GBL;
+					sp->s_flag |=  S_LCL;
+				}
+			} else {
+				err('u');
+			}
 		} while ((c = getnb()) == ',');
 		unget(c);
 		lmode = SLIST;
 		break;
 
 	case S_EQU:
+		/*
+		 * Syntax:
+		 *     [labels] .equ    sym, value   defines an equate
+		 *     [labels] .glbequ sym, value   defines a global equate
+		 *     [labels] .lclequ sym, value   defines a local equate
+		 */
 		getid(id, -1);
 		if ((c = getnb()) != ',') {
 			qerr();
 		}
 		clrexpr(&e1);
 		expr(&e1, 0);
-		sp = lookup(id);
-		if (sp == &dot) {
-			err('.');
-		} else
-		if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
-			err('m');
-		}
-		sp->s_type = S_USER;
-		sp->s_area = e1.e_base.e_ap;
-		sp->s_addr = laddr = e1.e_addr;
-		sp->s_flag |= S_ASG;
-		if (mp->m_valu) {
-			sp->s_flag |= S_GBL;
-		}
-		lmode = ELIST;
+		equate(id, &e1, mp->m_valu);
 		break;
 
 	case S_DATA:
@@ -1283,7 +1367,7 @@ loop:
 		 *
 		 * Use full relocation mode
 		 */
-		if ((n == 1) || ((a_uint) n == size)) {
+		if ((n == 1) || (n == size)) {
 			do {
 				clrexpr(&e1);
 				expr(&e1, 0);
@@ -1443,7 +1527,7 @@ loop:
 			c = getmap(d);
 			while (c >= 0) {
 				c &= 0x7F;
-				if ((n = getmap(d)) < 0) {
+				if ((nc = getmap(d)) < 0) {
 					c |= 0x80;
 				}
 				if (hilo) {
@@ -1464,7 +1548,7 @@ loop:
 					cnt = 0;
 					v = 0;
 				}
-				c = n;
+				c = nc;
 			}
 			if (cnt != 0) {
 				switch(size) {
@@ -1489,13 +1573,21 @@ loop:
 		/*
 		 * Extract the substitution string
 		 */
+		if ((c = getnb()) != ',') {
+			unget(c);
+		}
 		p = opt;
-		d = getnb();
-		while ((c = get()) != d) {
-			if (p < &opt[NCPS-2]) {
-				*p++ = c;
-			} else {
-				break;
+		if (more()) {
+			d = getnb();
+			while ((c = get()) != d) {
+				if (c == '\0') {
+					qerr();
+				}
+				if (p < &opt[NCPS-2]) {
+					*p++ = c;
+				} else {
+					break;
+				}
 			}
 		}
 		*p = 0;
@@ -1568,6 +1660,9 @@ loop:
 		p = fn;
 		d = getnb();
 		while ((c = get()) != d) {
+			if (c == '\0') {
+				qerr();
+			}
 			if (p < &fn[FILSPC+FILSPC-1]) {
 				*p++ = c;
 			} else {
@@ -1600,7 +1695,7 @@ loop:
 		if (e1.e_addr >= (a_uint) a_bytes) {
 			err('o');
 		} else {
-			as_msb = e1.e_addr;
+			as_msb = (int) e1.e_addr;
 		}
 		lmode = SLIST;
 		break;
@@ -1656,6 +1751,72 @@ loop:
 		break;
 	}
 	goto loop;
+}
+
+/*)Function	VOID	equate(id,e1,equtype)
+ *
+ *		char *		id		ident to equate
+ *		struct expr *	e1		value of equate
+ *		a_uint		equtype		equate type (O_EQU,O_LCLEQU,O_GBLEQU)
+ *
+ *	The function equate() installs an equate of a
+ *	given type.
+ *
+ *	equate has no return value
+ *
+ *	local variables:
+ *		struct sym *    sp	symbol being equated
+ *
+ *	global variables:
+ *		lmode                   set to ELIST
+ *
+ *	functions called:
+ *              VOID    abscheck()      asexpr.c
+ *		VOID	err()		assubr.c
+ *		sym  *	lookup()	assym.c
+ *              VOID    outall()        asout.c
+ *		VOID	rerr()		assubr.c
+ *
+ *	side effects:
+ *		none
+ */
+
+VOID
+equate(id,e1,equtype)
+char *id;
+struct expr *e1;
+a_uint equtype;
+{
+	struct sym *sp;
+
+	if (equtype == O_LCLEQU)
+		abscheck(e1);
+	sp = lookup(id);
+	if (sp == &dot) {
+		outall();
+		if (e1->e_flag || e1->e_base.e_ap != dot.s_area)
+			err('.');
+	} else
+	if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
+		err('m');
+	}
+	if (equtype == O_LCLEQU) {
+		sp->s_type = S_ULCL;
+		sp->s_area = e1->e_base.e_ap;
+	} else {
+		sp->s_type = S_USER;
+		if (e1->e_flag && (e1->e_base.e_sp->s_type == S_NEW)) {
+			rerr();
+		} else {
+			sp->s_area = e1->e_base.e_ap;
+		}
+	}
+	sp->s_addr = laddr = e1->e_addr;
+	sp->s_flag = S_LCL | S_ASG;
+	if (equtype == O_GBLEQU) {
+		sp->s_flag |= S_GBL;
+	}
+	lmode = ELIST;
 }
 
 /*)Function	FILE *	afile(fn, ft, wf)
@@ -1754,8 +1915,8 @@ afilex(fn, ft)
 char *fn;
 char *ft;
 {
-	register char *p1, *p2, *p3;
-	register int c;
+	char *p1, *p2, *p3;
+	int c;
 
 	if (strlen(fn) > (FILSPC-5)) {
 		fprintf(stderr, "File Specification %s is too long.", fn);
@@ -1825,7 +1986,7 @@ int
 fndidx(str)
 char *str;
 {
-	register char *p1, *p2;
+	char *p1, *p2;
 
 	/*
 	 * Skip Path Delimiters
@@ -1835,7 +1996,7 @@ char *str;
 	if ((p2 = strrchr(p1,  '/')) != NULL) { p1 = p2 + 1; }
 	if ((p2 = strrchr(p1, '\\')) != NULL) { p1 = p2 + 1; }
 
-	return(p1 - str);
+	return((int) (p1 - str));
 }
 
 /*)Function	VOID	newdot(nap)
@@ -1868,9 +2029,9 @@ char *str;
 
 VOID
 newdot(nap)
-register struct area *nap;
+struct area *nap;
 {
-	register struct area *oap;
+	struct area *oap;
 
 	oap = dot.s_area;
 	oap->a_fuzz = fuzz;
@@ -1923,6 +2084,7 @@ char *usetxt[] = {
 	"  -a   All user symbols made global",
 	"  -b   Display .define substitutions in listing",
 	"  -bb  and display without .define substitutions",
+	"  -c   Enable instruction cycle count in listing",
 #if NOICE
 	"  -j   Enable NoICE Debug Symbols",
 #endif
@@ -1969,7 +2131,7 @@ VOID
 usage(n)
 int n;
 {
-	register char   **dp;
+	char   **dp;
 
 	fprintf(stderr, "\nASxxxx Assembler %s  (%s)\n\n", VERSION, cpu);
 	for (dp = usetxt; *dp; dp++)

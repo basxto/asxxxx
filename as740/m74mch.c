@@ -1,7 +1,7 @@
 /* m74mch.c */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2005-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,10 +15,45 @@
  * Uwe Steller
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m740.h"
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+
+/*
+ * 740 Cycle Count
+ *
+ *	opcycles = m74pg1[opcode]
+ */
+static char m74pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   7, 9, 7, 6,UN, 6, 5, 7, 3, 5, 2, 2,UN, 7, 6, 5,
+/*10*/   4, 9, 2, 6,UN, 7, 6, 7, 2, 8, 2, 2,UN, 8, 7, 5,
+/*20*/   6, 9, 5, 6, 3, 6, 5, 7, 4, 5, 2, 2, 4, 7, 6, 5,
+/*30*/   4, 9, 2, 6,UN, 7, 6, 7, 2, 8, 2, 2, 4, 8, 7, 5,
+/*40*/   6, 9, 5, 6, 5, 6, 5, 7, 3, 5, 2, 2, 3, 7, 6, 5,
+/*50*/   4, 9,UN, 6,UN, 7, 6, 7, 2, 8,UN, 2,UN, 8, 7, 5,
+/*60*/   6, 9,15, 6, 3, 6, 5, 7, 4, 5, 2, 2, 5, 7, 6, 5,
+/*70*/   4, 9,UN, 6,UN, 7, 6, 7, 2, 8,UN, 2,UN, 8, 7, 5,
+/*80*/   6, 7, 8, 6, 4, 4, 4, 7, 2,UN, 2, 2, 6, 5, 5, 5,
+/*90*/   4, 7,UN, 6, 5, 5, 5, 7, 2, 6, 2, 2,UN, 6,UN, 5,
+/*A0*/   2, 8, 2, 6, 3, 5, 4, 7, 2, 4, 2, 2, 4, 6, 4, 5,
+/*B0*/   4, 8, 4, 6, 4, 6, 4, 7, 2, 7, 2, 2, 5, 7, 4, 5,
+/*C0*/   2, 7, 2, 6, 3, 4, 5, 7, 2, 3, 2, 2, 4, 5, 6, 5,
+/*D0*/   4, 7,UN, 6,UN, 5, 6, 7, 2, 6,UN, 2,UN, 6, 7, 5,
+/*E0*/   2, 9,16, 6, 3, 6, 5, 7, 2, 5, 2, 2, 4, 7, 6, 5,
+/*F0*/   4, 9,UN, 6,UN, 7, 6, 7, 2, 8,UN, 2,UN, 8, 7, 5
+};
 
 /*
  * Process a machine op.
@@ -27,7 +62,7 @@ VOID
 machine(mp)
 struct mne *mp;
 	{
-	register int op, t1, t2;
+	int op, t1, t2;
 	struct expr e1,e2,e3;
 	struct area *espa;
 	char id[NCPS];
@@ -36,10 +71,11 @@ struct mne *mp;
 	clrexpr(&e1);
 	clrexpr(&e2);
 	clrexpr(&e3);
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	switch (mp->m_type) {
 
 	case S_SDP:
+		opcycles = OPCY_SDP;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -433,8 +469,12 @@ struct mne *mp;
 
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
 		break;
+	}
+	if (opcycles == OPCY_NONE) {
+		opcycles = m74pg1[cb[0] & 0xFF];
 	}
 }
 
@@ -443,7 +483,7 @@ struct mne *mp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);
@@ -493,7 +533,7 @@ struct expr *esp;
 	int v1;
 
 	if (mchpcr(esp)) {
-		v1 = esp->e_addr - dot.s_addr - 1;
+		v1 = (int) (esp->e_addr - dot.s_addr - 1);
 		if ((v1 < -128) || (v1 > 127))
 			aerr();
 		outab(v1);

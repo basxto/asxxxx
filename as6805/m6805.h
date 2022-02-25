@@ -1,7 +1,7 @@
 /* m6805.h */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -62,9 +62,16 @@ struct adsym
 #define	S_TYP4	65
 
 /*
- * Set Direct Pointer
+ * Special Types
  */
 #define	S_SDP	80
+#define	S_CPU	81
+
+/*
+ * Processor Types (S_CPU)
+ */
+#define	X_6805	0
+#define	X_HC05	1
 
 
 	/* machine dependent functions */

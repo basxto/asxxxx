@@ -1,7 +1,7 @@
 /* asexpr.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,16 +13,6 @@
  *	Bill McKinnon (BM)
  *	w_mckinnon@conknet.com
  */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "asxxxx.h"
 
@@ -104,10 +94,10 @@
 
 VOID
 expr(esp, n)
-register struct expr *esp;
+struct expr *esp;
 int n;
 {
-	register a_uint ae, ar;	
+	a_uint ae, ar;	
 	int c, p;
 	struct area *ap;
 	struct expr re;
@@ -285,7 +275,7 @@ absexpr()
  *		int	c		current character
  *		char	id[]		symbol name
  *		char *	jp		pointer to assembler-source text
- *		int	n		constant evaluation running sum
+ *		a_uint	n		constant evaluation running sum
  *		int	r		current evaluation radix
  *		sym *	sp		pointer to a sym structure
  *		tsym *	tp		pointer to a tsym structure
@@ -318,14 +308,15 @@ absexpr()
 
 VOID
 term(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c, n;
-	register char *jp;
+	int c;
+	char *jp;
 	char id[NCPS];
 	struct sym  *sp;
 	struct tsym *tp;
 	int r, v;
+	a_uint n;
 
 	r = radix;
 	c = getnb();
@@ -554,7 +545,7 @@ register struct expr *esp;
 
 int
 digit(c, r)
-register int c, r;
+int c, r;
 {
 	if (r == 16) {
 		if (ctype[c] & RAD16) {
@@ -609,7 +600,7 @@ register int c, r;
 
 VOID
 abscheck(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_flag || esp->e_base.e_ap) {
 		esp->e_flag = 0;
@@ -645,7 +636,7 @@ register struct expr *esp;
 
 int
 is_abs (esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_flag || esp->e_base.e_ap) {
 		return(0);
@@ -675,7 +666,7 @@ register struct expr *esp;
  
 int
 oprio(c)
-register int c;
+int c;
 {
 	if (c == '*' || c == '/' || c == '%')
 		return (10);
@@ -713,7 +704,7 @@ register int c;
  
 VOID
 clrexpr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	esp->e_mode = 0;
 	esp->e_flag = 0;
@@ -751,28 +742,51 @@ int n;
 {
 	a_bytes = n;
 
+#ifdef	LONGINT
 	switch(a_bytes) {
 	default:
 		a_bytes = 2;
 	case 2:
-		a_mask = 0x0000FFFF;
-		s_mask = 0x00008000;
-		v_mask = 0x00007FFF;
+		a_mask = (a_uint) 0x0000FFFFl;
+		s_mask = (a_uint) 0x00008000l;
+		v_mask = (a_uint) 0x00007FFFl;
 		break;
 
 	case 3:
-		a_mask = 0x00FFFFFF;
-		s_mask = 0x00800000;
-		v_mask = 0x007FFFFF;
+		a_mask = (a_uint) 0x00FFFFFFl;
+		s_mask = (a_uint) 0x00800000l;
+		v_mask = (a_uint) 0x007FFFFFl;
 		break;
 
 	case 4:
-		a_mask = 0xFFFFFFFF;
-		s_mask = 0x80000000;
-		v_mask = 0x7FFFFFFF;
+		a_mask = (a_uint) 0xFFFFFFFFl;
+		s_mask = (a_uint) 0x80000000l;
+		v_mask = (a_uint) 0x7FFFFFFFl;
 		break;
 	}
+#else
+	switch(a_bytes) {
+	default:
+		a_bytes = 2;
+	case 2:
+		a_mask = (a_uint) 0x0000FFFF;
+		s_mask = (a_uint) 0x00008000;
+		v_mask = (a_uint) 0x00007FFF;
+		break;
 
+	case 3:
+		a_mask = (a_uint) 0x00FFFFFF;
+		s_mask = (a_uint) 0x00800000;
+		v_mask = (a_uint) 0x007FFFFF;
+		break;
+
+	case 4:
+		a_mask = (a_uint) 0xFFFFFFFF;
+		s_mask = (a_uint) 0x80000000;
+		v_mask = (a_uint) 0x7FFFFFFF;
+		break;
+	}
+#endif
 }
 
 

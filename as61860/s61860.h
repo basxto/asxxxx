@@ -1,7 +1,7 @@
 /* s61860.h */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2003-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -57,6 +57,7 @@
  */
 #define	S_CASE	90		/* .case dummy instructions */
 #define	S_DEFA	91		/* default dummy instruction */
+#define	S_BASIC	92		/* old (non ascii) string */
 
 /*
  * Extended Addressing Modes
@@ -70,6 +71,7 @@
 #ifdef	OTHERSYSTEM
 	
 	/* s6186mch.c */
+extern	int		ascii2sbasic(int c);
 extern	int		comma(void);
 extern	VOID		machine(struct mne *mp);
 extern	int		mchpcr(struct expr *esp);
@@ -81,6 +83,7 @@ extern	int		addr(struct expr *esp);
 #else
 
 	/* s6186mch.c */
+extern	int		ascii2sbasic();
 extern	int		comma();
 extern	VOID		machine();
 extern	int		mchpcr();

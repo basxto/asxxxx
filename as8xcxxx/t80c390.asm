@@ -13,7 +13,7 @@
 ;
 ;  Alternate methods to define the processor
 ;
-Alternate = 1
+Alternate = 3
 
 .if Alternate-1
 .else
@@ -32,7 +32,8 @@ Alternate = 1
 
 .if Alternate-3
 .else
-	.DS80C390
+	.cpu	"Unknown"	0
+	.24bit
 	.include	"t80c390.sfr"
 .endif
 

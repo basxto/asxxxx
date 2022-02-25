@@ -1,7 +1,7 @@
 /* i51mch.c */
 
 /*
- * (C) Copyright 1998-2003
+ * (C) Copyright 1998-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,10 +15,45 @@
  *
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "i8051.h"
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+
+/*
+ * 8051 Cycle Count
+ *
+ *	opcycles = i51pg1[opcode]
+ */
+static char i51pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  12,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
+/*10*/  24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
+/*20*/  24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
+/*30*/  24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
+/*40*/  24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
+/*50*/  24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
+/*60*/  24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
+/*70*/  24,24,24,24,12,24,12,12,12,12,12,12,12,12,12,12,
+/*80*/  24,24,24,24,48,24,24,24,24,24,24,24,24,24,24,24,
+/*90*/  24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,
+/*A0*/  24,24,12,24,48,UN,24,24,24,24,24,24,24,24,24,24,
+/*B0*/  24,24,12,12,24,24,24,24,24,24,24,24,24,24,24,24,
+/*C0*/  24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+/*D0*/  24,24,12,12,12,24,12,12,24,24,24,24,24,24,24,24,
+/*E0*/  24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,
+/*F0*/  24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12
+};
 
 /*
  * Process machine ops.
@@ -27,13 +62,13 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, t, t1, v1;
+	int op, t, t1, v1;
 	struct expr e, e1;
 
 	clrexpr(&e);
 	clrexpr(&e1);
 
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	switch (mp->m_type) {
 
 	case S_INH:
@@ -390,7 +425,7 @@ struct mne *mp;
 		comma();
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -406,7 +441,7 @@ struct mne *mp;
 		outab(op);
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -458,7 +493,7 @@ struct mne *mp;
 		comma();
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -492,7 +527,7 @@ struct mne *mp;
 		comma();
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -622,6 +657,10 @@ struct mne *mp;
 	/* direct */
 	case S_DIRECT: 
 		t = addr(&e);
+		if (t == S_A) {
+			e.e_addr = 0xE0;
+			e.e_mode = S_DIR;
+		} else
 		if ((t != S_DIR) && (t != S_EXT)) {
 			aerr();
 			break;
@@ -648,7 +687,12 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+	if (opcycles == OPCY_NONE) {
+		opcycles = i51pg1[cb[0] & 0xFF];
 	}
 }
 
@@ -657,7 +701,7 @@ struct mne *mp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);
@@ -688,28 +732,50 @@ comma()
 	return(1);
 }
 
- /*
-  * Machine specific initialization
-  */
+/*
+ * Machine specific initialization
+ */
 
- static int beenHere = 0;	/* set non-zero if we have done that... */
+static int beenHere = 0;	/* set non-zero if we have done that... */
 
- VOID
- minit()
- {
-	 struct sym	*sp;
-	 struct PreDef *pd;
+VOID
+minit()
+{
+	struct sym	*sp;
+	struct PreDef	*pd;
+	int i;
+	char pid[8];
+	char *p;
 
-	 /* First time only, add the pre-defined symbols to the table */
-	 if (beenHere == 0) {
-		 pd = preDef;
-		 while (pd->id) {
-			 sp = lookup(pd->id);
-			 if (sp->s_type == S_NEW) {
-				 sp->s_addr = pd->value;
-				 sp->s_type = S_DIR;
-			 }
-			 pd++;
+	/*
+	 * First time only:
+	 *	add the pre-defined symbols to the table
+	 *	as local symbols.
+	 */
+	if (beenHere == 0) {
+		pd = preDef;
+		while (pd->id) {
+			strcpy(pid, pd->id);
+			for (i=0; i<2; i++) {
+				/*
+				 * i == 0,  Create Upper Case Symbols
+				 * i == 1,  Create Lower Case Symbols
+				 */
+				if (i == 1) {
+					p = pid;
+					while (*p) {
+						*p = ccase[*p & 0x007F];
+						p++;
+					}
+				}
+				sp = lookup(pid);
+				if (sp->s_type == S_NEW) {
+					sp->s_addr = pd->value;
+					sp->s_type = S_ULCL;
+					sp->s_flag = S_ASG;
+				}
+			}
+			pd++;
 		}
 		beenHere = 1;
 	}

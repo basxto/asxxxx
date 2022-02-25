@@ -11,7 +11,7 @@
 
 <A NAME = "TOP"> </A> 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
-<BR><BR>
+<BR>
 <A NAME = "Assemblers"> </A>
 <H3><B>
 <IMG SRC = "green.gif" ALT = "-">... The ASxxxx Assemblers</A>
@@ -64,9 +64,9 @@ the errors will be reported.
    The  relocatable object file is an ascii file containing sym-
 bol references and definitions, program  area  definitions,  and
 the  relocatable assembled code, the linker ASLINK will use this
-information to generate an absolute load file (Motorola or Intel
-formats).
-  
+information to generate an absolute load file  (Intel,  Motorola
+or Tandy CoCo Disk Basic formats).  
+
 </PRE></B></H4>
 <H5><A HREF= #Assemblers> =&gt; Section Index</A></H5>
 
@@ -199,8 +199,8 @@ ment.  The p code is generated because the symbols  location  is
 changing on each pass through the source file.  
 
    The  label  must  not  start with the characters 0-9, as this
-designates a local symbol with special attributes described in a
-later section.  
+designates a reusable symbol with special  attributes  described
+in a later section.  
 
    The  label  must  not  start  with  the  sequence $$, as this
 represents the temporary radix 16 for constants.  
@@ -747,9 +747,8 @@ tinctions are important:
          lative to the base address of the program area in which
          it appears;  it will have an offset value added at link
          time.  Terms that contain labels defined in relocatable
-         program   areas   will   have   a   relocatable  value;
-
-         similarly, a period (.) in a relocatable program  area,
+         program  areas  will  have  a relocatable value;  simi-
+         larly, a period (.)  in  a  relocatable  program  area,
          representing  the value of the current program location
          counter, will also have a relocatable value.  
 
@@ -785,5 +784,6 @@ tinctions are important:
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

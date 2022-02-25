@@ -1,7 +1,7 @@
 /* s6186pst.c */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2003-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,8 +11,6 @@
  * Ported for SC61860 by Edgar Puehringer
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "s61860.h"
 
@@ -88,7 +86,7 @@ struct	mode	mode[3] = {
 };
 
 /*
- * Array of Pointers to VSD Structures
+ * Array of Pointers to mode Structures
  */
 struct	mode	*modep[16] = {
 	&mode[0],	&mode[1],	&mode[2],	NULL,
@@ -109,6 +107,7 @@ struct	mne	mne[] = {
 
     {	NULL,	".case",	S_CASE,	        0,	0	},
     {	NULL,	".default",	S_DEFA,	        0,	0	},
+    {	NULL,	".sbasic",	S_BASIC,        0,	0	},
 
 	/* system */
 
@@ -141,6 +140,12 @@ struct	mne	mne[] = {
     {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
+    {	NULL,	".iflt",	S_CONDITIONAL,	0,	O_IFLT	},
+    {	NULL,	".ifge",	S_CONDITIONAL,	0,	O_IFGE	},
+    {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
+    {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
+    {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},
@@ -340,5 +345,5 @@ struct	mne	mne[] = {
     {	NULL,	"jrzp",       	S_JRP,		0,	0x38	},
     {	NULL,	"jrzm",       	S_JRM,		0,	0x39	},
     {	NULL,	"jrcp",       	S_JRP,		0,	0x3a	},
-    {	NULL,	"jrcm",       	S_JRM,		S_END,	0x3b	}
+    {	NULL,	"jrcm",       	S_JRM,		S_EOL,	0x3b	}
 };

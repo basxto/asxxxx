@@ -43,8 +43,8 @@ a_xtrn:	.byte	>xtrn
 	.page
 	.sbttl	Define Checks
 
-	.define		..ret		255$
-	.define		..tmp		10$
+	.define		..ret,		"255$"
+	.define		..tmp,		"10$"
 
 a_lcl:
 

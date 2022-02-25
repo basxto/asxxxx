@@ -1,7 +1,7 @@
 /* m12mch.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6812.h"
 
@@ -20,6 +18,152 @@ int	*bp;
 int	bm;
 int	bb[NB];
 
+int	mchtyp;
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+#define	OPCY_CPU	((char)	(0xFD))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	OPCY_INDX	((char) (0x40))
+
+#define	VALU_MASK	((char) (0x3F))
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+#define	P2	((char) (OPCY_NONE | 0x01))
+
+#define	I0	((char) (OPCY_INDX | 0x00))
+#define	I1	((char) (OPCY_INDX | 0x01))
+#define	I2	((char) (OPCY_INDX | 0x02))
+#define	I3	((char) (OPCY_INDX | 0x03))
+#define	I4	((char) (OPCY_INDX | 0x04))
+#define	I5	((char) (OPCY_INDX | 0x05))
+#define	I6	((char) (OPCY_INDX | 0x06))
+#define	I7	((char) (OPCY_INDX | 0x07))
+
+static char  m12pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   5, 5, 1, 1, 3, 6, 3, 4, 1, 1, 6, 8,I3,I3,I4,I4,
+/*10*/   1,11, 3, 3, 1, 7, 4, 4,P2, 2, 2, 2, 4, 4, 5, 5,
+/*20*/   3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*30*/   3, 3, 3, 3, 2, 2, 2, 2, 3, 2, 3, 2, 9, 5, 8, 9,
+/*40*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8,I5, 4, 4, 4, 4,
+/*50*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2,
+/*60*/  I2,I2,I2,I2,I2,I2,I2,I2,I2,I6,I6,I6,I6,I6,I6,I6,
+/*70*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3,
+/*80*/   1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
+/*90*/   3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3,
+/*A0*/  I1,I1,I1,I1,I1,I1,I1, 1,I1,I1,I1,I1,I1,I1,I1,I1,
+/*B0*/   3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3,
+/*C0*/   1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
+/*D0*/   3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3,
+/*E0*/  I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,
+/*F0*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
+};
+
+static char  m12pg2[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   4, 5, 5, 5, 6, 5, 2, 3, 4, 5, 5, 4, 6, 5, 2, 2,
+/*10*/  12,12,13, 3,12,12, 2, 2,I7,I7,I7,I7,I7,I7,I7,I7,
+/*20*/   4, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*30*/  10,10,10,10,10,10,10,10,10,10, 3, 3, 8, 8,14,10,
+/*40*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*50*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*60*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*70*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*80*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*90*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*A0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*B0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*C0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*D0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*E0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*F0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
+};
+
+static char *mPage[2] = {
+    m12pg1, m12pg2
+};
+
+static char m12idx[8][5] = {
+/*--*--*      IDX     IDX1    IDX2    [D,R]   [n,R]     */
+/*--*--*      ---     ----    ----    -----   -----     */
+/*I0*/  {      UN,     UN,     UN,     UN,     UN,      },
+/*I1*/  {       3,      3,      4,      6,      6,      }, /* ADC_  ... */
+/*I2*/  {       3,      4,      5,      6,      6,      }, /* ASL   ... */
+/*I3*/  {       4,      4,      6,     UN,     UN,      }, /* BCLR  ... */
+/*I4*/  {       4,      6,      8,     UN,     UN,      }, /* BRCLR ... */
+/*I5*/  {       8,      8,      9,     10,     10,      }, /* CALL      */
+/*I6*/  {       2,      3,      3,      5,      5,      }, /* CLR   ... */
+/*I7*/  {       4,      4,      5,      7,      7,      }  /* EMAX_ ... */
+};
+
+static char  s12pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   5, 5, 1, 1, 3, 6, 3, 4, 1, 1, 7, 8,I3,I3,I4,I4,
+/*10*/   1,11, 1, 3, 1, 7, 4, 4,P2, 2, 2, 2, 4, 4, 5, 5,
+/*20*/   3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*30*/   3, 3, 3, 3, 2, 2, 2, 2, 3, 2, 3, 2, 5, 5, 7, 9,
+/*40*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8,I5, 4, 4, 4, 4,
+/*50*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2,
+/*60*/  I2,I2,I2,I2,I2,I2,I2,I2,I2,I6,I6,I6,I6,I6,I6,I6,
+/*70*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3,
+/*80*/   1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
+/*90*/   3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3,
+/*A0*/  I1,I1,I1,I1,I1,I1,I1, 1,I1,I1,I1,I1,I1,I1,I1,I1,
+/*B0*/   3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3,
+/*C0*/   1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
+/*D0*/   3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3,
+/*E0*/  I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,I1,
+/*F0*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
+};
+
+static char  s12pg2[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   4, 5, 5, 5, 6, 5, 2, 3, 4, 5, 5, 4, 6, 5, 2, 2,
+/*10*/  12,12,13, 3,12,12, 2, 2,I7,I7,I7,I7,I7,I7,I7,I7,
+/*20*/   4, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*30*/  10,10,10,10,10,10,10,10,10,10, 3, 3, 7, 6, 8,10,
+/*40*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*50*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*60*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*70*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*80*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*90*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*A0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*B0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*C0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*D0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*E0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+/*F0*/  10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
+};
+
+static char *sPage[2] = {
+    s12pg1, s12pg2
+};
+
+static char s12idx[8][5] = {
+/*--*--*      IDX     IDX1    IDX2    [D,R]   [n,R]     */
+/*--*--*      ---     ----    ----    -----   -----     */
+/*I0*/  {      UN,     UN,     UN,     UN,     UN,      },
+/*I1*/  {       3,      3,      4,      6,      6,      }, /* ADC_  ... */
+/*I2*/  {       3,      4,      5,      6,      6,      }, /* ASL   ... */
+/*I3*/  {       4,      4,      6,     UN,     UN,      }, /* BCLR  ... */
+/*I4*/  {       4,      5,      6,     UN,     UN,      }, /* BRCLR ... */
+/*I5*/  {       7,      7,      8,     10,     10,      }, /* CALL      */
+/*I6*/  {       2,      3,      3,      4,      4,      }, /* CLR   ... */
+/*I7*/  {       4,      4,      5,      7,      7,      }  /* EMAX_ ... */
+};
+
 /*
  * Process a machine op.
  */
@@ -27,7 +171,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, rf, cpg, c;
+	int op, rf, cpg, c;
 	struct expr e1, e2, e3;
 	int t1, t2;
 	int v1, v2, v3;
@@ -38,10 +182,12 @@ struct mne *mp;
 	clrexpr(&e1);
 	clrexpr(&e2);
 	clrexpr(&e3);
-	op = mp->m_valu;
+
+	op = (int) mp->m_valu;
 	switch (rf = mp->m_type) {
 
 	case S_SDP:
+		opcycles = OPCY_SDP;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -68,6 +214,13 @@ struct mne *mp;
 		lmode = SLIST;
 		break;
 
+	case S_CPU:
+		opcycles = OPCY_CPU;
+		mchtyp = op;
+		sym[2].s_addr = op;
+		lmode = SLIST;
+		break;
+
 	case S_INH2:
 		cpg = PAGE2;
 
@@ -81,7 +234,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(op);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -97,7 +250,7 @@ struct mne *mp;
 		outab(PAGE2);
 		outab(op);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 2;
+			v1 = (int) (e1.e_addr - dot.s_addr - 2);
 			outaw(v1);
 		} else {
 			outrw(&e1, R_PCR);
@@ -114,7 +267,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(0x04);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 2;
+			v1 = (int) (e1.e_addr - dot.s_addr - 2);
 			if ((v1 < -256) || (v1 > 255))
 				aerr();
 			if (v1 >= 0) {
@@ -263,7 +416,7 @@ struct mne *mp;
 	case S_TBL:
 		cpg = PAGE2;
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		if ((t1 == S_IND) || (t1 == S_AIND))
 			aerr();
 		if (e1.e_base.e_ap || (v1 < -16) || (v1 > 15))
@@ -327,7 +480,7 @@ struct mne *mp;
 		genout(cpg, op, rf, &e1);
 		outrb(&e2, R_NORM);
 		if (mchpcr(&e3)) {
-			v3 = e3.e_addr - dot.s_addr - 1;
+			v3 = (int) (e3.e_addr - dot.s_addr - 1);
 			if ((v3 < -128) || (v3 > 127))
 				aerr();
 			outab(v3);
@@ -453,7 +606,104 @@ struct mne *mp;
 		break;		
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+
+	if ((opcycles == OPCY_NONE) && (mchtyp == X_HC12)) {
+		v1 = 1;
+		opcycles = m12pg1[cb[0] & 0xFF];
+		if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+			v1 += 1;
+			opcycles = mPage[opcycles & OPCY_MASK][cb[1] & 0xFF];
+		}
+		if (opcycles & OPCY_INDX) {
+			v2 = opcycles & VALU_MASK;
+			switch (cb[v1] & 0xE0) {
+			default:
+			case 0x00:	/* 5-bit constant offset */
+			case 0x40:
+			case 0x80:
+			case 0xC0:
+				opcycles = m12idx[v2][0];
+				break;
+			case 0x20:	/* Auto (+/-) xys (+/-) */
+			case 0x60:
+			case 0xA0:
+				opcycles = m12idx[v2][0];
+				break;
+			case 0xE0:
+				switch (cb[v1] & 0x07) {
+				default:
+				case 0x00:	/* 9-bit offset */
+				case 0x01:
+					opcycles = m12idx[v2][1];
+					break;
+				case 0x02:	/* 16-bit offset */
+					opcycles = m12idx[v2][2];
+					break;
+				case 0x03:	/* 16-bit offset indexed-indirect */
+					opcycles = m12idx[v2][4];
+					break;
+				case 0x04:	/* accumulator offset */
+				case 0x05:
+				case 0x06:
+					opcycles = m12idx[v2][0];
+					break;
+				case 0x07:	/* accumulator D offset indexed-indirect */
+					opcycles = m12idx[v2][3];
+					break;
+				}
+			}
+		}
+	} else
+	if ((opcycles == OPCY_NONE) && (mchtyp == X_HCS12)) {
+		v1 = 1;
+		opcycles = s12pg1[cb[0] & 0xFF];
+		if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+			v1 += 1;
+			opcycles = sPage[opcycles & OPCY_MASK][cb[1] & 0xFF];
+		}
+		if (opcycles & OPCY_INDX) {
+			v2 = opcycles & VALU_MASK;
+			switch (cb[v1] & 0xE0) {
+			default:
+			case 0x00:	/* 5-bit constant offset */
+			case 0x40:
+			case 0x80:
+			case 0xC0:
+				opcycles = s12idx[v2][0];
+				break;
+			case 0x20:	/* Auto (+/-) xys (+/-) */
+			case 0x60:
+			case 0xA0:
+				opcycles = s12idx[v2][0];
+				break;
+			case 0xE0:
+				switch (cb[v1] & 0x07) {
+				default:
+				case 0x00:	/* 9-bit offset */
+				case 0x01:
+					opcycles = s12idx[v2][1];
+					break;
+				case 0x02:	/* 16-bit offset */
+					opcycles = s12idx[v2][2];
+					break;
+				case 0x03:	/* 16-bit offset indexed-indirect */
+					opcycles = s12idx[v2][4];
+					break;
+				case 0x04:	/* accumulator offset */
+				case 0x05:
+				case 0x06:
+					opcycles = s12idx[v2][0];
+					break;
+				case 0x07:	/* accumulator D offset indexed-indirect */
+					opcycles = s12idx[v2][3];
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -462,14 +712,14 @@ struct mne *mp;
  */
 VOID
 genout(cpg, op, rf, esp)
-register int cpg, op, rf;
-register struct expr *esp;
+int cpg, op, rf;
+struct expr *esp;
 {
 	int espv;
 	struct area *espa;
 	int flag;
 
-	espv = esp->e_addr;
+	espv = (int) esp->e_addr;
 	espa = esp->e_base.e_ap;
 	switch (esp->e_mode) {
 
@@ -657,6 +907,7 @@ register struct expr *esp;
 
 	default:
 		aerr();
+		break;
 	}
 }
 
@@ -666,14 +917,14 @@ register struct expr *esp;
 VOID
 movout(esp, indx, offset)
 struct expr *esp;
-register int indx, offset;
+int indx, offset;
 {
-	register int espv;
+	int espv;
 	struct area *espa;
-	register int flag;
+	int flag;
 
 	espa = esp->e_base.e_ap;
-	espv = esp->e_addr;
+	espv = (int) esp->e_addr;
 
 	switch (esp->e_mode) {
 
@@ -759,6 +1010,7 @@ register int indx, offset;
 
 	default:
 		aerr();
+		break;
 	}
 }
 
@@ -769,8 +1021,8 @@ VOID
 m68out(i)
 int i;
 {
-	register char *ptr;
-	register int j;
+	char *ptr;
+	int j;
 
 	ptr = (char *) &mc6811[i];
 	for (j=0; j<4 ; j++) {
@@ -791,6 +1043,10 @@ minit()
 {
 	bp = bb;
 	bm = 1;
+	if (pass == 0) {
+		mchtyp = X_HC12;
+		sym[2].s_addr = X_HC12;
+	}
 }
 
 /*
@@ -821,7 +1077,7 @@ int b;
 int
 getbit()
 {
-	register int f;
+	int f;
 
 	if (bp >= &bb[NB])
 		return (1);
@@ -839,7 +1095,7 @@ getbit()
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);

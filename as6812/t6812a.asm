@@ -40,8 +40,8 @@ start:	movb	5,-y,-16,sp	;18 0a 6b 90
 	bclr	1,+x,0x55	;0d 20 55
 	bclr	1,+x,#0x55	;0d 20 55
 
-	bclr	*dir,0x55	;4d 57 55
-	bclr	*dir,#0x55	;4d 57 55
+	bclr	*dir,0x55	;4d*57 55
+	bclr	*dir,#0x55	;4d*57 55
 	
 	bclr	ext,0x55	;1d 12 34 55
 	bclr	ext,#0x55	;1d 12 34 55
@@ -49,8 +49,8 @@ start:	movb	5,-y,-16,sp	;18 0a 6b 90
 	brclr	1,+sp,0x55,.+0	;0f a0 55 fc
 	brclr	1,+sp,#0x55,.+0	;0f a0 55 fc
 	
-	brclr	*dir,0x55,.+0	;4f 57 55 fc
-	brclr	*dir,#0x55,.+0	;4f 57 55 fc
+	brclr	*dir,0x55,.+0	;4f*57 55 fc
+	brclr	*dir,#0x55,.+0	;4f*57 55 fc
 	
 	brclr	ext,0x55,.+0	;1f 12 34 55 fb
 	brclr	ext,#0x55,.+0	;1f 12 34 55 fb
@@ -58,8 +58,8 @@ start:	movb	5,-y,-16,sp	;18 0a 6b 90
 	brset	1,+sp,0x55,.+0	;0e a0 55 fc
 	brset	1,+sp,#0x55,.+0	;0e a0 55 fc
 	
-	brset	*dir,0x55,.+0	;4e 57 55 fc
-	brset	*dir,#0x55,.+0	;4e 57 55 fc
+	brset	*dir,0x55,.+0	;4e*57 55 fc
+	brset	*dir,#0x55,.+0	;4e*57 55 fc
 	
 	brset	ext,0x55,.+0	;1e 12 34 55 fb
 	brset	ext,#0x55,.+0	;1e 12 34 55 fb
@@ -67,8 +67,8 @@ start:	movb	5,-y,-16,sp	;18 0a 6b 90
 	bset	1,+sp,0x55	;0c a0 55
 	bset	1,+sp,#0x55	;0c a0 55
 
-	bset	*dir,0x55	;4c 57 55
-	bset	*dir,#0x55	;4c 57 55
+	bset	*dir,0x55	;4c*57 55
+	bset	*dir,#0x55	;4c*57 55
 
 	bset	ext,0x55	;1c 12 34 55
 	bset	ext,#0x55	;1c 12 34 55
@@ -167,7 +167,7 @@ a:	aba			;18 06
 	adca	d,sp		;a9 f6
 	adca	d,x		;a9 e6
 	adca	d,y		;a9 ee
-	adca	*dir		;99 57
+	adca	*dir		;99*57
 	adca	ext		;b9 01 88
 	adca	ext,sp		;a9 f2 01 88
 	adca	ext,x		;a9 e2 01 88
@@ -184,28 +184,28 @@ a:	aba			;18 06
 	adcb	1,+sp		;e9 a0
 	adcb	-small,pc	;e9 d2
 	adcb	125,pc		;e9 f8 7d
-	adcb	*dir		;d9 57
+	adcb	*dir		;d9*57
 	adcb	ext		;f9 01 88
 	adcb	ext,sp		;e9 f2 01 88
 	adda	#immed		;8b 72
 	adda	1,+sp		;ab a0
-	adda	*dir		;9b 57
+	adda	*dir		;9b*57
 	adda	ext		;bb 01 88
 	addb	#immed		;cb 72
 	addb	1,+sp		;eb a0
-	addb	*dir		;db 57
+	addb	*dir		;db*57
 	addb	ext		;fb 01 88
 	addd	#immed		;c3 00 72
 	addd	1,+sp		;e3 a0
-	addd	*dir		;d3 57
+	addd	*dir		;d3*57
 	addd	ext		;f3 01 88
 	anda	#immed		;84 72
 	anda	1,+sp		;a4 a0
-	anda	*dir		;94 57
+	anda	*dir		;94*57
 	anda	ext		;b4 01 88
 	andb	#immed		;c4 72
 	andb	1,+sp		;e4 a0
-	andb	*dir		;d4 57
+	andb	*dir		;d4*57
 	andb	ext		;f4 01 88
 	andcc	#immed		;10 72
 	asl	1,+sp		;68 a0
@@ -228,11 +228,11 @@ b:	bcc	.		;24 fe
 	bhi	.		;22 fe
 	bita	#immed		;85 72
 	bita	1,+sp		;a5 a0
-	bita	*dir		;95 57
+	bita	*dir		;95*57
 	bita	ext		;b5 01 88
 	bitb	#immed		;c5 72
 	bitb	1,+sp		;e5 a0
-	bitb	*dir		;d5 57
+	bitb	*dir		;d5*57
 	bitb	ext		;f5 01 88
 	ble	.		;2f fe
 	bls	.		;23 fe
@@ -257,7 +257,7 @@ c:	cba			;18 17
 	clv			;10 fd
 	cmpa	#immed		;81 72
 	cmpa	1,+sp		;a1 a0
-	cmpa	*dir		;91 57
+	cmpa	*dir		;91*57
 	cmpa	ext		;b1 01 88
 
 	cmpb	#immed		;c1 72
@@ -328,7 +328,7 @@ c:	cba			;18 17
 	cmpb	d,sp		;e1 f6
 	cmpb	d,x		;e1 e6
 	cmpb	d,y		;e1 ee
-	cmpb	*dir		;d1 57
+	cmpb	*dir		;d1*57
 	cmpb	ext		;f1 01 88
 	cmpb	ext,sp		;e1 f2 01 88
 	cmpb	ext,x		;e1 e2 01 88
@@ -491,7 +491,7 @@ c:	cba			;18 17
 	cpd	d,sp		;ac f6
 	cpd	d,x		;ac e6
 	cpd	d,y		;ac ee
-	cpd	*dir		;9c 57
+	cpd	*dir		;9c*57
 	cpd	ext		;bc 01 88
 	cpd	ext,sp		;ac f2 01 88
 	cpd	ext,x		;ac e2 01 88
@@ -572,7 +572,7 @@ c:	cba			;18 17
 	cps	d,sp		;af f6
 	cps	d,x		;af e6
 	cps	d,y		;af ee
-	cps	*dir		;9f 57
+	cps	*dir		;9f*57
 	cps	ext		;bf 01 88
 	cps	ext,sp		;af f2 01 88
 	cps	ext,x		;af e2 01 88
@@ -653,7 +653,7 @@ c:	cba			;18 17
 	cpx	d,sp		;ae f6
 	cpx	d,x		;ae e6
 	cpx	d,y		;ae ee
-	cpx	*dir		;9e 57
+	cpx	*dir		;9e*57
 	cpx	ext		;be 01 88
 	cpx	ext,sp		;ae f2 01 88
 	cpx	ext,x		;ae e2 01 88
@@ -734,7 +734,7 @@ c:	cba			;18 17
 	cpy	d,sp		;ad f6
 	cpy	d,x		;ad e6
 	cpy	d,y		;ad ee
-	cpy	*dir		;9d 57
+	cpy	*dir		;9d*57
 	cpy	ext		;bd 01 88
 	cpy	ext,sp		;ad f2 01 88
 	cpy	ext,x		;ad e2 01 88
@@ -1224,7 +1224,7 @@ e:	ediv			;11
 	eora	d,sp		;a8 f6
 	eora	d,x		;a8 e6
 	eora	d,y		;a8 ee
-	eora	*dir		;98 57
+	eora	*dir		;98*57
 	eora	ext		;b8 01 88
 	eora	ext,sp		;a8 f2 01 88
 	eora	ext,x		;a8 e2 01 88
@@ -1305,7 +1305,7 @@ e:	ediv			;11
 	eorb	d,sp		;e8 f6
 	eorb	d,x		;e8 e6
 	eorb	d,y		;e8 ee
-	eorb	*dir		;d8 57
+	eorb	*dir		;d8*57
 	eorb	ext		;f8 01 88
 	eorb	ext,sp		;e8 f2 01 88
 	eorb	ext,x		;e8 e2 01 88
@@ -1606,7 +1606,7 @@ j:	jmp	1,+sp		;05 a0
 	jsr	d,sp		;15 f6
 	jsr	d,x		;15 e6
 	jsr	d,y		;15 ee
-	jsr	*dir		;17 57
+	jsr	*dir		;17*57
 	jsr	ext		;16 01 88
 	jsr	ext,sp		;15 f2 01 88
 	jsr	ext,x		;15 e2 01 88
@@ -1705,7 +1705,7 @@ l:	lbcc	.		;18 24 ff fc
 	ldaa	d,sp		;a6 f6
 	ldaa	d,x		;a6 e6
 	ldaa	d,y		;a6 ee
-	ldaa	*dir		;96 57
+	ldaa	*dir		;96*57
 	ldaa	ext		;b6 01 88
 	ldaa	ext,sp		;a6 f2 01 88
 	ldaa	ext,x		;a6 e2 01 88
@@ -1786,7 +1786,7 @@ l:	lbcc	.		;18 24 ff fc
 	ldab	d,sp		;e6 f6
 	ldab	d,x		;e6 e6
 	ldab	d,y		;e6 ee
-	ldab	*dir		;d6 57
+	ldab	*dir		;d6*57
 	ldab	ext		;f6 01 88
 	ldab	ext,sp		;e6 f2 01 88
 	ldab	ext,x		;e6 e2 01 88
@@ -1867,7 +1867,7 @@ l:	lbcc	.		;18 24 ff fc
 	ldd	d,sp		;ec f6
 	ldd	d,x		;ec e6
 	ldd	d,y		;ec ee
-	ldd	*dir		;dc 57
+	ldd	*dir		;dc*57
 	ldd	ext		;fc 01 88
 	ldd	ext,sp		;ec f2 01 88
 	ldd	ext,x		;ec e2 01 88
@@ -1948,7 +1948,7 @@ l:	lbcc	.		;18 24 ff fc
 	lds	d,sp		;ef f6
 	lds	d,x		;ef e6
 	lds	d,y		;ef ee
-	lds	*dir		;df 57
+	lds	*dir		;df*57
 	lds	ext		;ff 01 88
 	lds	ext,sp		;ef f2 01 88
 	lds	ext,x		;ef e2 01 88
@@ -2029,7 +2029,7 @@ l:	lbcc	.		;18 24 ff fc
 	ldx	d,sp		;ee f6
 	ldx	d,x		;ee e6
 	ldx	d,y		;ee ee
-	ldx	*dir		;de 57
+	ldx	*dir		;de*57
 	ldx	ext		;fe 01 88
 	ldx	ext,sp		;ee f2 01 88
 	ldx	ext,x		;ee e2 01 88
@@ -2110,7 +2110,7 @@ l:	lbcc	.		;18 24 ff fc
 	ldy	d,sp		;ed f6
 	ldy	d,x		;ed e6
 	ldy	d,y		;ed ee
-	ldy	*dir		;dd 57
+	ldy	*dir		;dd*57
 	ldy	ext		;fd 01 88
 	ldy	ext,sp		;ed f2 01 88
 	ldy	ext,x		;ed e2 01 88
@@ -2992,7 +2992,7 @@ o:	oraa	#immed		;8a 72
 	oraa	d,sp		;aa f6
 	oraa	d,x		;aa e6
 	oraa	d,y		;aa ee
-	oraa	*dir		;9a 57
+	oraa	*dir		;9a*57
 	oraa	ext		;ba 01 88
 	oraa	ext,sp		;aa f2 01 88
 	oraa	ext,x		;aa e2 01 88
@@ -3073,7 +3073,7 @@ o:	oraa	#immed		;8a 72
 	orab	d,sp		;ea f6
 	orab	d,x		;ea e6
 	orab	d,y		;ea ee
-	orab	*dir		;da 57
+	orab	*dir		;da*57
 	orab	ext		;fa 01 88
 	orab	ext,sp		;ea f2 01 88
 	orab	ext,x		;ea e2 01 88
@@ -3339,7 +3339,7 @@ s:	sba			;18 16
 	sbca	d,sp		;a2 f6
 	sbca	d,x		;a2 e6
 	sbca	d,y		;a2 ee
-	sbca	*dir		;92 57
+	sbca	*dir		;92*57
 	sbca	ext		;b2 01 88
 	sbca	ext,sp		;a2 f2 01 88
 	sbca	ext,x		;a2 e2 01 88
@@ -3420,7 +3420,7 @@ s:	sba			;18 16
 	sbcb	d,sp		;e2 f6
 	sbcb	d,x		;e2 e6
 	sbcb	d,y		;e2 ee
-	sbcb	*dir		;d2 57
+	sbcb	*dir		;d2*57
 	sbcb	ext		;f2 01 88
 	sbcb	ext,sp		;e2 f2 01 88
 	sbcb	ext,x		;e2 e2 01 88
@@ -3515,7 +3515,7 @@ s:	sba			;18 16
 	staa	d,sp		;6a f6
 	staa	d,x		;6a e6
 	staa	d,y		;6a ee
-	staa	*dir		;5a 57
+	staa	*dir		;5a*57
 	staa	ext		;7a 01 88
 	staa	ext,sp		;6a f2 01 88
 	staa	ext,x		;6a e2 01 88
@@ -3595,7 +3595,7 @@ s:	sba			;18 16
 	stab	d,sp		;6b f6
 	stab	d,x		;6b e6
 	stab	d,y		;6b ee
-	stab	*dir		;5b 57
+	stab	*dir		;5b*57
 	stab	ext		;7b 01 88
 	stab	ext,sp		;6b f2 01 88
 	stab	ext,x		;6b e2 01 88
@@ -3675,7 +3675,7 @@ s:	sba			;18 16
 	std	d,sp		;6c f6
 	std	d,x		;6c e6
 	std	d,y		;6c ee
-	std	*dir		;5c 57
+	std	*dir		;5c*57
 	std	ext		;7c 01 88
 	std	ext,sp		;6c f2 01 88
 	std	ext,x		;6c e2 01 88
@@ -3756,7 +3756,7 @@ s:	sba			;18 16
 	sts	d,sp		;6f f6
 	sts	d,x		;6f e6
 	sts	d,y		;6f ee
-	sts	*dir		;5f 57
+	sts	*dir		;5f*57
 	sts	ext		;7f 01 88
 	sts	ext,sp		;6f f2 01 88
 	sts	ext,x		;6f e2 01 88
@@ -3836,7 +3836,7 @@ s:	sba			;18 16
 	stx	d,sp		;6e f6
 	stx	d,x		;6e e6
 	stx	d,y		;6e ee
-	stx	*dir		;5e 57
+	stx	*dir		;5e*57
 	stx	ext		;7e 01 88
 	stx	ext,sp		;6e f2 01 88
 	stx	ext,x		;6e e2 01 88
@@ -3916,7 +3916,7 @@ s:	sba			;18 16
 	sty	d,sp		;6d f6
 	sty	d,x		;6d e6
 	sty	d,y		;6d ee
-	sty	*dir		;5d 57
+	sty	*dir		;5d*57
 	sty	ext		;7d 01 88
 	sty	ext,sp		;6d f2 01 88
 	sty	ext,x		;6d e2 01 88
@@ -3997,7 +3997,7 @@ s:	sba			;18 16
 	suba	d,sp		;a0 f6
 	suba	d,x		;a0 e6
 	suba	d,y		;a0 ee
-	suba	*dir		;90 57
+	suba	*dir		;90*57
 	suba	ext		;b0 01 88
 	suba	ext,sp		;a0 f2 01 88
 	suba	ext,x		;a0 e2 01 88
@@ -4078,7 +4078,7 @@ s:	sba			;18 16
 	subb	d,sp		;e0 f6
 	subb	d,x		;e0 e6
 	subb	d,y		;e0 ee
-	subb	*dir		;d0 57
+	subb	*dir		;d0*57
 	subb	ext		;f0 01 88
 	subb	ext,sp		;e0 f2 01 88
 	subb	ext,x		;e0 e2 01 88
@@ -4159,7 +4159,7 @@ s:	sba			;18 16
 	subd	d,sp		;a3 f6
 	subd	d,x		;a3 e6
 	subd	d,y		;a3 ee
-	subd	*dir		;93 57
+	subd	*dir		;93*57
 	subd	ext		;b3 01 88
 	subd	ext,sp		;a3 f2 01 88
 	subd	ext,x		;a3 e2 01 88

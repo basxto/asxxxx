@@ -1,22 +1,13 @@
 /* lkhead.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -92,7 +83,7 @@
 VOID
 newhead()
 {
-	register int i;
+	int i;
 	char id[NCPS];
 	struct head *thp;
 
@@ -114,7 +105,7 @@ newhead()
 	 * Scan for Parameters	 
 	 */
 	while (more()) {
-		i = eval();
+		i = (int) eval();
 		getid(id, -1);
 		/*
 		 * Area pointer list
@@ -217,7 +208,7 @@ newmode()
 	/*
 	 * Mode number
 	 */
-	n = eval();
+	n = (int) eval();
 	if (n >= hp->h_nmode) {
 		fprintf(stderr, "Header mode list overflow\n");
 		lkexit(ER_FATAL);
@@ -225,7 +216,7 @@ newmode()
 	/*
 	 * Bit index
 	 */
-	index = eval();
+	index = (int) eval();
 	if (index == 0) {
 		mp = (struct mode *) new (sizeof(struct mode));
 		hp->m_list[n] = mp;
@@ -242,14 +233,14 @@ newmode()
 	 * Load Bits
 	 */
 	while (more() && (index < 32)) {
-		n = eval();
+		n = (int) eval();
 		if (mp->m_def[index] != (n & 0x1F)) {
 			mp->m_flag |= 1;
 		}
 		mp->m_def[index] = n;
 		if (n & 0x80) {
-			mp->m_mask |= (1 << (n & 0x1F));
-			mp->m_page |= (1 << index);
+			mp->m_mask |= (((a_uint) 1) << (n & 0x1F));
+			mp->m_page |= (((a_uint) 1) << index);
 		}
 		index += 1;
 	}

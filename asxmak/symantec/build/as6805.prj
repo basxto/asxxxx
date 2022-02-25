@@ -3,8 +3,8 @@ R:\ASXV4PXX\asxmak\Symantec\build\as6805.prj
 as6805.OPN
 novcs
 as6805.DEF
-8
-1040091802
+6
+1092880136
 0 0 0 0 0 "..\..\..\ASXXSRC\asdata.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asdbg.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asexpr.c"

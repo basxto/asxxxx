@@ -8,12 +8,12 @@
 	.ascii	/Hello,	world/
 
 	;var1=10
-	.define	var1,varx + 10
+	.define	var1, "varx + 10"
 
 	var2==20
 
 	;_bit7= 7
-	.define	_bit7, varx + 7
+	.define	_bit7, "varx + 7"
 
 
 	adc	a,(hl)		; 8E
@@ -1402,7 +1402,7 @@
 	.ascii	/Hello,	world/
 
 	;var1=10
-	.define	var1,varx + 10
+	.define	var1, "varx + 10"
 
 	var2==20
   

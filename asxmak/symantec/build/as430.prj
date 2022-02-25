@@ -3,8 +3,8 @@ R:\ASXV4PXX\asxmak\Symantec\build\as430.prj
 as430.OPN
 novcs
 as430.DEF
-8
-1057526120
+6
+1092880012
 0 0 0 0 0 "..\..\..\ASXXSRC\asdata.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asdbg.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asexpr.c"

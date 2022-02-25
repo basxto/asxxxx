@@ -1,7 +1,7 @@
 /* chk.h */
 
 /*
- * (C) Copyright 2001-2003
+ * (C) Copyright 2001-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -50,11 +50,23 @@ struct adsym
 /*
  * Instruction types
  */
+#define	S_OPCODE	40
 
 /*
  * Set Direct Pointer
  */
-#define	S_SDP	80
+#define	S_SDP		80
+
+/*
+ * Machine Type
+ */
+#define	S_CPU		81
+
+/*
+ * Processor Types (S_CPU)
+ */
+#define	X_NOCPU		0
+
 
 
 	/* machine dependent functions */

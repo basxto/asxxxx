@@ -1,7 +1,7 @@
 /* M09MCH:C */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6809.h"
 
@@ -21,13 +19,137 @@ int	bm;
 int	bb[NB];
 
 /*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	OPCY_INDX	((char) (0x40))
+#define	OPCY_PSPL	((char) (0x20))
+
+#define	VALU_MASK	((char) (0x1F))
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+#define	P2	((char) (OPCY_NONE | 0x01))
+#define	P3	((char) (OPCY_NONE | 0x02))
+
+#define	I3	((char) (OPCY_INDX | 0x03))
+#define	I4	((char) (OPCY_INDX | 0x04))
+#define	I5	((char) (OPCY_INDX | 0x05))
+#define	I6	((char) (OPCY_INDX | 0x06))
+#define	I7	((char) (OPCY_INDX | 0x07))
+
+#define	PP	((char) (OPCY_PSPL | 0x05))
+
+/*
+ * 6809 Cycle Count
+ *
+ *	opcycles = m09pg1[opcode]
+ */
+static char m09pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   6,UN,UN, 6, 6,UN, 6, 6, 6, 6, 6,UN, 6, 6, 3, 6,
+/*10*/  P2,P3, 2, 4,UN,UN, 5, 9,UN, 2, 3,UN, 3, 2, 8, 6,
+/*20*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*30*/  I4,I4,I4,I4,PP,PP,PP,PP,UN, 5, 3,15,20,11,UN,19,
+/*40*/   2,UN,UN, 2, 2,UN, 2, 2, 2, 2, 2,UN, 2, 2,UN, 2,
+/*50*/   2,UN,UN, 2, 2,UN, 2, 2, 2, 2, 2,UN, 2, 2,UN, 2,
+/*60*/  I6,UN,UN,I6,I6,UN,I6,I6,I6,I6,I6,UN,I6,I6,I3,I6,
+/*70*/   7,UN,UN, 7, 7,UN, 7, 7, 7, 7, 7,UN, 7, 7, 4, 7,
+/*80*/   2, 2, 2, 4, 2, 2, 2,UN, 2, 2, 2, 2, 4, 7, 3,UN,
+/*90*/   4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 6, 7, 5, 5,
+/*A0*/  I4,I4,I4,I6,I4,I4,I4,I4,I4,I4,I4,I4,I6,I7,I5,I5,
+/*B0*/   5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 5, 7, 8, 6, 6,
+/*C0*/   2, 2, 2, 4, 2, 2, 2,UN, 2, 2, 2, 2, 3,UN, 3,UN,
+/*D0*/   4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
+/*E0*/  I4,I4,I4,I6,I4,I4,I4,I4,I4,I4,I4,I4,I5,I5,I5,I5,
+/*F0*/   5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6
+};
+
+static char m09pg2[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,20,
+/*40*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*80*/  UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN,UN, 5,UN, 4,UN,
+/*90*/  UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN,UN, 7,UN, 6,UN,
+/*A0*/  UN,UN,UN,I7,UN,UN,UN,UN,UN,UN,UN,UN,I7,UN,I6,I6,
+/*B0*/  UN,UN,UN, 8,UN,UN,UN,UN,UN,UN,UN,UN, 8,UN, 7, 7,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 4,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 6, 6,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,I6,I6,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 7, 7
+};
+
+static char m09pg3[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,20,
+/*40*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*80*/  UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,
+/*90*/  UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,
+/*A0*/  UN,UN,UN,I7,UN,UN,UN,UN,UN,UN,UN,UN,I7,UN,UN,UN,
+/*B0*/  UN,UN,UN, 8,UN,UN,UN,UN,UN,UN,UN,UN, 8,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN
+};
+
+static char *Page[3] = {
+    m09pg1, m09pg2, m09pg3
+};
+
+static char m09idx[32] = {
+/*    ,R+	*/	2,	/*    ,R++	*/	3,
+/*    ,-R	*/	2,	/*    ,--R	*/	3,
+/*    ,R	*/	0,	/*   B,R	*/	1,
+/*   A,R	*/	1,	/*   ---	*/	0,
+/*   n,R     (8)*/	1,	/*   n,R    (16)*/	4,
+/*   ---	*/	0,	/*   D,R	*/	4,
+/*   n,PCR   (8)*/	1,	/*   n,PCR  (16)*/	5,
+/*   ---	*/	0,	/*   ---	*/	0,
+/*   ---	*/	0,	/*   [,R++]	*/	6,
+/*   ---	*/	0,	/*   [,--R]	*/	6,
+/*   [,R]	*/	3,	/*  [B,R]	*/	4,
+/*  [A,R]	*/	4,	/*   ---	*/	0,
+/*  [n,R]    (8)*/	4,	/*  [n,R]   (16)*/	7,
+/*   ---	*/	0,	/*  [D,R]	*/	7,
+/*  [n,PCR]  (8)*/	4,	/*  [n,PCR] (16)*/	8,
+/*   ---	*/	0,	/*  [n]		*/	5
+};
+
+static char m00cyc[24] = {
+	12,12, 3, 3, 3, 5, 5, 5,
+	 5, 6, 6, 6, 6,12, 3, 3,
+	 3, 8, 6, 8, 6, 6, 6,20
+};
+
+
+/*
  * Process a machine op.
  */
 VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, rf, cpg, c;
+	int op, rf, cpg, c;
 	struct expr e1;
 	int t1, v1, v2;
 	struct area *espa;
@@ -35,10 +157,11 @@ struct mne *mp;
 
 	cpg = 0;
 	clrexpr(&e1);
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	switch (rf = mp->m_type) {
 
 	case S_SDP:
+		opcycles = OPCY_SDP;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -81,7 +204,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(op);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -101,7 +224,7 @@ struct mne *mp;
 			outab(cpg);
 		outab(op);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 2;
+			v1 = (int) (e1.e_addr - dot.s_addr - 2);
 			outaw(v1);
 		} else {
 			outrw(&e1, R_PCR);
@@ -194,10 +317,37 @@ struct mne *mp;
 
 	case S_6800:
 		m68out(op);
+		opcycles = m00cyc[op];
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+
+	if (opcycles == OPCY_NONE) {
+		v2 = 1;
+		opcycles = m09pg1[cb[0] & 0xFF];
+		if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+			v2 += 1;
+			opcycles = Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+		}
+		if (opcycles & OPCY_INDX) {
+			if (cb[v2] & 0x80) {
+				opcycles = (opcycles & VALU_MASK) + m09idx[cb[v2] & 0x1F];
+			} else {
+				opcycles = (opcycles & VALU_MASK) + 1;
+			}
+		} else
+		if (opcycles & OPCY_PSPL) {
+			for (t1=0x01,v1=0; t1 < 0x0100; t1 <<= 1) {
+				if (cb[1] & t1) {
+			    		v1 += 1;
+				}
+			}
+			opcycles = (opcycles & VALU_MASK) + v1;
+		}
 	}
 }
 
@@ -206,14 +356,14 @@ struct mne *mp;
  */
 VOID
 genout(cpg, op, rf, esp)
-register int cpg, op, rf;
-register struct expr *esp;
+int cpg, op, rf;
+struct expr *esp;
 {
 	int espv;
 	struct area *espa;
 	int disp, flag;
 
-	espv = esp->e_addr;
+	espv = (int) esp->e_addr;
 	espa = esp->e_base.e_ap;
 	switch (esp->e_mode) {
 
@@ -277,7 +427,7 @@ register struct expr *esp;
 			if (esp->e_addr >= dot.s_addr)
 				esp->e_addr -= fuzz;
 			dot.s_addr += 2;
-			disp = esp->e_addr;
+			disp = (int) esp->e_addr;
 			flag = 0;
 			if (disp < -128 || disp > 127)
 				++flag;
@@ -309,7 +459,7 @@ register struct expr *esp;
 			if (esp->e_addr >= dot.s_addr)
 				esp->e_addr -= fuzz;
 			dot.s_addr += 2;
-			disp = esp->e_addr - dot.s_addr;
+			disp = (int) (esp->e_addr - dot.s_addr);
 			flag = 0;
 			if (disp < -128 || disp > 127)
 				++flag;
@@ -318,11 +468,11 @@ register struct expr *esp;
 		} else {
 			if (getbit()) {
 				outab(aindx|0x01);
-				disp = espv - dot.s_addr - 2;
+				disp = (int) (espv - dot.s_addr - 2);
 				outaw(disp);
 			} else {
 				outab(aindx);
-				disp = espv - dot.s_addr - 1;
+				disp = (int) (espv - dot.s_addr - 1);
 				outab(disp);
 			}
 		}
@@ -383,8 +533,8 @@ VOID
 m68out(i)
 int i;
 {
-	register char *ptr;
-	register int j;
+	char *ptr;
+	int j;
 
 	ptr = (char *) &mc6800[i];
 	for (j=0; j<4 ; j++) {
@@ -401,7 +551,7 @@ int i;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);

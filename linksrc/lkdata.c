@@ -1,7 +1,7 @@
 /* lkdata.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,15 +13,6 @@
  *	jhartman@compuserve.com
  *
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -43,6 +34,8 @@ int	ASxxxx_VERSION;
 
 char	*_abs_	= { ".  .ABS." };
 
+char	afspec[FILSPC];	/*	The filespec created by afile()
+			 */
 int	lkerr;		/*	Linker error flag
 			 */
 char	*ip;		/*	Pointer into the REL file text line in ib[]
@@ -279,11 +272,12 @@ struct	head	*hp;	/*	Pointer to the current
  *		int	b_flag;		Bank flags
  *		char *	b_fspec;	Bank File Specification
  *		FILE *	b_ofp;		Bank File Handle
+ *		int	b_oflag;	Bank has output flag
  *		int	b_rtaflg	Bank First Output flag
  *	};
  */
 struct	bank	bank[1] = {
-    {	NULL,	"",	"",	0,	0,	0,	0,	"",	NULL,	1	}
+    {	NULL,	"",	"",	0,	0,	0,	0,	"",	NULL,	0,	1	}
 };
 
 struct	bank	*bankp = &bank[0];
@@ -317,8 +311,8 @@ struct	bank	*bp;	/*	Pointer to the current
  *		FILE *	a_ofp;			Area File Handle
  *		a_uint	a_addr;			Beginning address of area
  *		a_uint	a_size;			Total size of the area
- *		char	a_bset;			Area base address set
- *		char	a_flag;			Flag byte
+ *		int	a_bset;			Area base address set
+ *		int	a_flag;			Flags
  *		char *	a_id;			Name
  *	};
  */

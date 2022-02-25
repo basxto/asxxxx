@@ -1,7 +1,7 @@
 /* m05adr.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,18 +9,16 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6805.h"
 
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c;
-	register struct area *espa;
-	register a_uint espv;
+	int c;
+	struct area *espa;
+	a_uint espv;
 	char *tcp;
 
 	if ((c = getnb()) == '#') {
@@ -33,8 +31,6 @@ register struct expr *esp;
 	} else if (c == '*') {
 		expr(esp, 0);
 		esp->e_mode = S_DIR;
-		if (esp->e_addr & ~0xFF)
-			err('d');
 		if (more()) {
 			comma();
 			tcp = ip;
@@ -76,11 +72,11 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-	register char *ptr;
-	register int i;
-	register char *ips;
+	char *ptr;
+	int i;
+	char *ips;
 
 	ips = ip;
 	unget(getnb());
@@ -101,9 +97,9 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-	register char *ptr;
+	char *ptr;
 	ptr = ip;
 
 	while (*ptr && *str) {

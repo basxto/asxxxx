@@ -1,7 +1,7 @@
 /* m430mch.c */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2003-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,11 +9,21 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
 #include "asxxxx.h"
 #include "m430.h"
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+
+#define	OPCY_PC	((char) (0x40))
 
 /*
  * Process a machine op.
@@ -22,7 +32,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op;
+	int op;
 	int rf;
 	struct expr e1, e2;
 	int t1, t2, v1, v2;
@@ -39,7 +49,7 @@ struct mne *mp;
 		dot.s_addr += 1;
 	}
 
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	switch (rf = mp->m_type) {
 
 	case S_DOP:
@@ -402,7 +412,7 @@ struct mne *mp;
 	case S_JXX:
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 2;
+			v1 = (int) (e1.e_addr - dot.s_addr - 2);
 			v1 >>= 1;
 			if ((v1 < -512) || (v1 > 511))
 				aerr();
@@ -415,7 +425,82 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+
+	if (opcycles == OPCY_NONE) {
+		v1 = cb[0];
+		v2 = cb[1];
+		if (v2 & 0xC0) {		/* Format 1 Instructions */
+			/*
+			 * Check For Internal Constant Modes
+			 *	R3, As=xx
+			 *	R2, AS=10/11
+			 */
+			if (((v2 & 0x0F) == 0x03) ||
+			   (((v2 & 0x0F) == 0x02) && (v1 & 0x20))) {
+			   	v1 &= 0xCF;
+			}
+			switch(v1 & 0xB0) {
+			default:
+	/* Ad=0,As=00 */case 0x00:	opcycles = 1 | OPCY_PC;		break;
+	/* Ad=0,As=01 */case 0x10:	opcycles = 3;			break;
+	/* Ad=0,As=10 */case 0x20:	opcycles = 2;			break;
+	/* Ad=0,As=11 */case 0x30:	opcycles = 2 | OPCY_PC;		break;
+	/* Ad=1,As=00 */case 0x80:	opcycles = 4;			break;
+	/* Ad=1,As=01 */case 0x90:	opcycles = 6;			break;
+	/* Ad=1,As=10 */case 0xA0:	opcycles = 5;			break;
+	/* Ad=1,As=11 */case 0xB0:	opcycles = 5;			break;
+			}
+			if (opcycles & OPCY_PC) {
+				if ((v1 & 0x0F) == 0) opcycles += 1;
+				opcycles &= ~OPCY_PC;
+			}
+		} else
+		if ((v2 & 0xF8) == 0x10) {	/* Format 2 Instructions */
+			switch(((v2 << 8) + v1) & 0x03C0) {
+			case 0x0000:	/* RRC   */
+			case 0x0040:	/* RRC.B */
+			case 0x0080:	/* SWPB  */
+			case 0x0100:	/* RRA   */
+			case 0x0140:	/* RRA.B */
+			case 0x0180:	/* SXT   */
+				switch(v1 & 0x30) {
+		/* As/Ad=00 */	case 0x00:	opcycles = 1;	break;
+		/* As/Ad=01 */	case 0x10:	opcycles = 4;	break;
+		/* As/Ad=10 */	case 0x20:	opcycles = 3;	break;
+		/* As/Ad=11 */	case 0x30:	opcycles = 3;	break;
+				}
+				break;
+			case 0x0200:	/* PUSH   */
+			case 0x0240:	/* PUSH.B */
+				switch(v1 & 0x30) {
+		/* As/Ad=00 */	case 0x00:	opcycles = 3;	break;
+		/* As/Ad=01 */	case 0x10:	opcycles = 5;	break;
+		/* As/Ad=10 */	case 0x20:	opcycles = 4;	break;
+		/* As/Ad=11 */	case 0x30:	opcycles = 4;	break;
+				}
+				break;
+			case 0x280:	/* CALL */
+				switch(v1 & 0x30) {
+		/* As/Ad=00 */	case 0x00:	opcycles = 4;	break;
+		/* As/Ad=01 */	case 0x10:	opcycles = 4;	break;
+		/* As/Ad=10 */	case 0x20:	opcycles = 5;	break;
+		/* As/Ad=11 */	case 0x30:	opcycles = 5;	break;
+				}
+				break;
+			case 0x0300:	/* RETI */
+				opcycles = 5;
+				break;
+			default:
+				break;
+			}
+		} else
+		if (v2 & 0x20) {		/* Format 3 Instructions */
+			opcycles = 2;
+		}
 	}
 }
 
@@ -424,7 +509,7 @@ struct mne *mp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);

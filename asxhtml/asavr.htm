@@ -30,8 +30,7 @@ instruction  word  address  will  be  the  file  encoded address
 divided by 2.  
 
 
-PROCESSOR SPECIFIC DIRECTIVE 
-
+PROCESSOR SPECIFIC DIRECTIVES 
 
      The  normal  PC relative addressing is -2047 to +2048 rela-
 tive to the current PC.  For a processor with less than 4K words
@@ -71,10 +70,59 @@ processor type.
         .ATtiny22
         .ATtiny28
 
-     A  file,  avr.sfr,  contains  definitions  for  the Special
-Function Registers for all the  defined  processors.   Edit  the
-file  to  make your selection of processor and then .include the
-file at the beginning of your assembler file.  
+   A  file, avr.sfr, contains definitions for the Spepcial Func-
+tion Registers for all the defined processors.  Edit the file to
+make  your  selection of processor and then .include the file at
+the beginning of your assembler file.  
+
+
+The .__.CPU.  Variable 
+
+   The value of the pre-defined symbol '.__.CPU.' corresponds to
+the selected processor type.  The default value is 0 which  cor-
+responds  to  the  default  processor type.  The following table
+lists the processor types and associated values  for  the  ASAVR
+assembler:  
+
+        Processor Type            .__.CPU. Value
+        --------------            --------------
+         Undefined                       0
+         AT90SXXXX (User Defined)        1
+         AT90S1200                       2
+         AT90S2313                       3
+         AT90S2323                       4
+         AT90S2343                       5
+         AT90S2333                       6
+         AT90S4433                       7
+         AT90S4414                       8
+         AT90S4434                       9
+         AT90S8515                      10
+         AT90C8534                      11
+         AT90S8535                      12
+         ATmega103                      13
+         ATmega603                      14
+         ATmega161                      15
+         ATmega163                      16
+         ATtiny10                       17
+         ATtiny11                       18
+         ATtiny12                       19
+         ATtiny15                       20
+         ATtiny22                       21
+         ATtiny28                       22
+
+
+   The  variable  '.__.CPU.'  is by default defined as local and
+will not be output to the created .rel file.  The assembler com-
+mand line options -g or -a will not cause the local symbol to be
+output to the created .rel file.  
+
+   The  assembler  .globl  directive  may  be used to change the
+variable type to global causing its definition to be  output  to
+the  .rel file.  The inclusion of the definition of the variable
+'.__.CPU.' might be a useful means of validating that seperately
+assembled  files have been compiled for the same processor type.
+The linker will report an error for variables with multiple  non
+equal definitions.  
 
 </PRE></B></H4>
 
@@ -281,5 +329,6 @@ AVR Data Transfer Instructions
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

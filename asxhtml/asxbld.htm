@@ -7,7 +7,7 @@
 <A href="../home.htm">
 <IMG width=343 height=58 border=0 SRC="welcom.gif" ALT="Welcome"></A>
 
-<H2>The Linker Description</H2>
+<H2>Building ASxxxx and ASlink</H2>
 
 <A NAME = "TOP"> </A> 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -16,110 +16,357 @@
 <IMG SRC = "green.gif" ALT = "-">... Building ASxxxx and ASlink</A>
 </B></H3>
 <H4><PRE>
-    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#Assembler">Building an Assembler</A>
-    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#Linker">Building ASlink</A>
+    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#LINUX">Building ASxxxx and ASlink with Linux</A>
+    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#CYGWIN">Building ASxxxx and ASlink with Cygwin</A>
+    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#DJGPP">Building ASxxxx and ASlink with DJGPP</A>
+    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#VC6">Building ASxxxx and ASlink with VC6</A>
+    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#TURBOC">Building ASxxxx and ASlink with Turbo C++ 3.0</A>
+    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#SYMANTEC">Building ASxxxx and ASlink with Symantec C/C++ 7.2</A>
     <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "asxdoc.htm#TOP">Go to Documentation Index</A>
 
 </PRE></H4>
 
 <H4><B><PRE>
+   The assemblers and linker have been successfully compiled for
+Linux, DOS, and various flavors of Windows using the Linux  GCC,
+the    Cygwin    environment,   the   DJGPP   environment,   the
+MS Visual C++ V6.0 graphical user interface  (gui)  and  command
+line  environment,  the Symantec C/C++ V7.2 gui and command line
+environment, and the Turbo C 3.0 gui and command  line  environ-
+ment.  
 
-   The  assemblers  and  linker  have  been  tested using Linux,
-DJGPP,  Cygwin,  Symantec  C/C++   V6.1/V7.2,   and   VC6   with
-MS-DOS/Windows  3.x/9x/NT/2000/XP.  Complete source code and do-
-cumentation for the assemblers and linker is included  with  the
-distribution.   Additionally,  test  code for each assembler and
-several microprocessor monitors ( ASSIST05 for the 6805,  MONDEB
-and  ASSIST09  for  the  6809, and BUFFALO 2.5 for the 6811) are
-included as working examples of use of these assemblers.
-  
-   The assemblers and linker have been successfully compiled us-
-ing Linux, Cygwin, DJGPP (GCC 2.8.2), Symantec C/C++  V6.1/V7.2,
-and VC6.  A Linux makefile,  Cygwin makefile,  DJGPP makefile,
-Symantec project files, and VC6  project  files  are  available
-to build all the assemblers and the linker.  
+   A  Linux  makefile,  Turbo C  make file, Symantec project and
+batch files, DJGPP makefile, Cygwin makefile,  and  VC6  project
+and  batch  files  are available to build all the assemblers and
+the linker.  
+
+   Unpack  the  asxv4p10.zip  file into an appropriate directory
+using the utility appropriate to your environment.  For  DOS  or
+Windows  the following command line will unpack the distribution
+zip file:  
+
+        pkunzip -d asxv4p10.zip
+
+
+The  distribution  file  has  been  packed with DOS style end of
+lines (CR/LF), and UPPER CASE file names.  The Linux  make  file
+assumes  all  lower  case directories and file names.  For Linux
+the unpacking utility you choose should have an option to  force
+all  lower  case  directories / file names and convert the ascii
+files to local format.  On most systems  the  following  command
+should do the trick:  
+
+        unzip -L -a asxv4p10.zip
+
+Some systems may require a -LL option to force all lower case.  
+
+   The  distribution  will  be  unpacked into the base directory
+'asxv4pxx' which will contain source directories for  each  sup-
+ported  processor  (as6800, asz80, ...), the machine independent
+source  (asxxsrc),  the  linker  source   (linksrc),   and   the
+miscellaneous sources (asxxmisc).  Other directories include the
+documentation (asxdoc), test file directory (asxtst),  html  do-
+cumentation  (asxhtml),  NoICE  support  files  (noice), various
+debug monitors that can be assembled with the ASxxxx  assemblers
+(asmasm),  project files for an application that uses the AS6809
+assembler and ASlink linker (project), and the packaging  direc-
+tory (zipper).  
 
 </PRE></B></H4>
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
-<A NAME = "Assembler"> </A>
+<A NAME = "LINUX"> </A>
 <H3><B>
-<IMG SRC = "green.gif" ALT = "-">... Building an Assembler</A>
+<IMG SRC = "green.gif" ALT = "-">... Building ASxxxx and ASlink with Linux</A>
 </B></H3>
 
 <H4><B><PRE>
-   The  building  of  a typical assembler (6809 for example) re-
-quires the following files:  
+   The  Linux  build  directory is /asxv4pxx/asxmak/linux/build.
+The makefile in this directory is compatible with the Linux  GNU
+make and GCC.  The command 
 
-     1.  m6809.h 
-     2.  m09ext.c 
-     3.  m09mch.c 
-     4.  m09adr.c 
-     5.  m09pst.c 
-     6.  asxxxx.h 
-     7.  asmain.c 
-     8.  asdbg.c 
-     9.  aslex.c 
-    10.  assym.c 
-    11.  assubr.c 
-    12.  asexpr.c 
-    13.  asdata.c 
-    14.  aslist.c 
-    15.  asout.c 
+        make clean
 
+will  remove  all  the  current  executable  files  in directory
+/asxv4pxx/asxmak/linux/exe and all the compiled  object  modules
+from the /asxv4pxx/asxmak/linux/build directory.  
 
-   The  first  five  files are the 6809 processor dependent sec-
-tions which contain the following:  
+   The command 
 
-     1.  m6809.h -  header  file containing the machine specific
-         definitions of constants,  variables,  structures,  and
-         types 
+        make all
 
-     2.  m09ext -  device  description, byte order, and file ex-
-         tension information 
+will compile and link all the ASxxxx assemblers, the ASlink pro-
+gram, and the utility programs asxscn and asxcnv.  The make file
+can make a single program by invoking make with the specific as-
+sembler, linker, or utility you wish to build:  
 
-     3.  m09pst -  a  table of the assembler general directives,
-         special device directives, and assembler mnemonics with
-         associated operation codes 
-
-     4.  m09mch / m09adr -  machine specific code for processing
-         the device mnemonics,  addressing  modes,  and  special
-         directives 
-
-
-   The  remaining nine files provide the device independent sec-
-tions which handle the  details  of  file  input/output,  symbol
-table  generation,  program/data areas, expression analysis, and
-assembler directive processing.  
+        make aslink
 
 </PRE></B></H4>
 <H5><A HREF= #Index> =&gt; Section Index</A></H5>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
-<A NAME = "Linker"> </A>
+<A NAME = "CYGWIN"> </A>
 <H3><B>
-<IMG SRC = "green.gif" ALT = "-">... Building ASlink</A>
+<IMG SRC = "green.gif" ALT = "-">... Building ASxxxx and ASlink with Cygwin</A>
 </B></H3>
 
 <H4><B><PRE>
-   The building of the linker requires the following files:  
+   The  Cygwin build directory is \asxv4pxx\asxmak\cygwin\build.
+The makefile in this directory is compatible with the Cygwin GNU
+make and GCC.  The command 
 
-     1.  aslink.h 
-     2.  lkmain.c 
-     3.  lklex.c 
-     4.  lkarea.c 
-     5.  lkbank.c 
-     6.  lkhead.c 
-     7.  lksym.c 
-     8.  lkeval.c 
-     9.  lkdata.c 
-    10.  lklist.c 
-    11.  lkrloc.c 
-    12.  lkrloc3.c 
-    13.  lkrloc4.c 
-    14.  lklibr.c 
-    15.  lknoice.c 
-    16.  lksdcdb.c 
-    17.  lkout.c 
+        make clean
+
+will  remove  all  the  current  executable  files  in directory
+\asxv4pxx\asxmak\cygwin\exe and all the compiled object  modules
+from the \asxv4pxx\asxmak\cygwin\build directory.  The command 
+
+        make all
+
+will compile and link all the ASxxxx assemblers, the ASlink pro-
+gram, and the utility programs asxscn and asxcnv.  The make file
+can  make  a  single  program by invoking make with the specific
+assembler, linker, or utility you wish to build:  
+
+        make aslink
+
+</PRE></B></H4>
+<H5><A HREF= #Index> =&gt; Section Index</A></H5>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<A NAME = "DJGPP"> </A>
+<H3><B>
+<IMG SRC = "green.gif" ALT = "-">... Building ASxxxx and ASlink with DJGPP</A>
+</B></H3>
+
+<H4><B><PRE>
+   The  DJGPP  build  directory is \asxv4pxx\asxmak\djgpp\build.
+The makefile in this directory is compatible with the DJGPP  GNU
+make and GCC.  The command 
+
+        make clean
+
+will  remove  all  the  current  executable  files  in directory
+\asxv4pxx\asxmak\djgpp\exe and all the compiled  object  modules
+from the \asxv4pxx\asxmak\djgpp\build directory.  The command 
+
+        make all
+
+will compile and link all the ASxxxx assemblers, the ASlink pro-
+gram, and the utility programs asxscn and asxcnv.  The make file
+can make a single program by invoking make with the specific as-
+sembler, linker, or utility you wish to build:  
+
+        make aslink
+
+</PRE></B></H4>
+<H5><A HREF= #Index> =&gt; Section Index</A></H5>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<A NAME = "VC6"> </A>
+<H3><B>
+<IMG SRC = "green.gif" ALT = "-">... Building ASxxxx and ASlink with VC6</A>
+</B></H3>
+
+<H4><B><PRE>
+Graphical User Interface 
+
+
+   Each  ASxxxx Assembler has a VC6 project file (*.dsw) located
+in   a  subdirectory   of   \asxv4pxx\asxmak\vc6\build.   Simply
+enter  this  project filename into the VC6 IDE and build/rebuild
+the assembler.  
+
+
+Command Line Interface 
+
+
+   Open      a      command     prompt     window     in     the
+\asxv4pxx\asxmak\vc6\build directory.  The file  make.bat  found
+in the directory can be used to invoke the VC6 command line com-
+piler.  The make.bat file assumes that the Visual  C++  compiler
+has  been installed in the default location.  If this is not the
+case then the line 
+
+SET MS$DEV="C:\Program Files\Microsoft Visual
+Studio\Common\MSDev98\Bin\msdev.exe"
+
+must  be changed to match your environment.  The compiled object
+code      modules      will      be      placed      in      the
+\asxv4pxx\asxmak\vc6\build\as----\release directory and the exe-
+cutable files will be  placed  in  the  \asxv4pxx\asxmak\vc6\exe
+directory.  
+
+
+
+   The command 
+
+        make all
+
+will compile and link all the ASxxxx assemblers, the ASlink pro-
+gram, and the utility programs asxscn and asxcnv.  The make file
+can make a single program by invoking make with the specific as-
+sembler, linker, or utility you wish to build:  
+
+        make aslink
+
+
+The  VC6  command line compiler uses the information in the cor-
+responding .dsw/.dsp files to compile and link the programs.  
+
+   The  command  'make clean' is not required or valid as a make
+of anything does a complete rebuild of the program.  
+
+</PRE></B></H4>
+<H5><A HREF= #Index> =&gt; Section Index</A></H5>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<A NAME = "TURBOC"> </A>
+<H3><B>
+<IMG SRC = "green.gif" ALT = "-">... Building ASxxxx and ASlink with Turbo C++ 3.0</A>
+</B></H3>
+
+<H4><B><PRE>
+   The  Borland  product  is  available in the Borland Turbo C++
+Suite which contains C++ Builder 1.0, Turbo C++ 4.5 for  Windows
+and  Turbo C++ 3.0 for DOS.  The DOS IDE will install and run on
+any version of Windows (including Windows Vista [Longhorn]).  
+
+
+Graphical User Interface 
+
+
+   Each   ASxxxx   Assembler  has  two  project  specific  files
+(*.dsk and *.prj)     located      in      the      subdirectory
+\asxv4pxx\asxmak\turboc30\build.    You   must  enter  the  .prj
+filename into the Turbo C++ IDE:  enter Options->Directories and
+change  the  include and output directories to match your confi-
+guration.  After these changes have been made you will  be  able
+to compile the selected project.  These changes must be manually
+entered for each project.  
+
+
+Command Line Interface 
+
+
+   Before  the  command line interface can be used you must per-
+form the steps outlined in the 'Graphical  User  Interface'  in-
+structions above for each project you wish to build.  
+
+   Open      a      command     prompt     window     in     the
+\asxv4pxx\asxmak\turboc30\build directory.   The  file  make.bat
+found in the directory can be used to invoke the Turbo C command
+line compiler.  The make.bat file assumes that the path  to  the
+compiler  directories  has  been set in the environment variable
+PATH.  Assuming the Turbo C compiler has been installed  in  the
+default location (C:\TC) the file _setpath.bat will set the PATH
+variable.  If this is not the case then the line 
+
+PATH=C:\TC;C:\TC\BIN;C:\TC\INCLUDE
+
+must  be changed to match your environment.  The compiled object
+code      modules      will      be      placed      in      the
+\asxv4pxx\asxmak\turboc30\build\  directory  and  the executable
+files will be placed in the \asxv4pxx\asxmak\turboc30\exe direc-
+tory.  
+
+
+
+   The command 
+
+        make all
+
+will compile and link all the ASxxxx assemblers, the ASlink pro-
+gram, and the utility programs asxscn and asxcnv.  The make file
+can make a single program by invoking make with the specific as-
+sembler, linker, or utility you wish to build:  
+
+        make aslink
+
+
+The   Turbo C   make   utility   uses  the  information  in  the
+corresponding .prj and .dsk files to compile and link  the  pro-
+grams.  
+
+   The  command  file  _clean.bat may be used to remove all com-
+piled .obj files and linked .exe executables.  
+
+</PRE></B></H4>
+<H5><A HREF= #Index> =&gt; Section Index</A></H5>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<A NAME = "SYMANTEC"> </A>
+<H3><B>
+<IMG SRC = "green.gif" ALT = "-">... Building ASxxxx and ASlink with Symantec C/C++ V7.2</A>
+</B></H3>
+
+<H4><B><PRE>
+   The  Symantec  product is no longer available but is included
+for historical reasons (the final version, 7.5,  was  introduced
+in  1996).   The  product had an excellent graphical user inter-
+face, built in editor, project manager, and supported  DOS,  Ex-
+tended  DOS  (the  executable  contained a built in DOS extender
+which was rendered unusable in Windows 2000 after service pack 2
+or in Windows XP), Win95, and Windows NT.  
+
+
+Graphical User Interface 
+
+
+   Each  ASxxxx Assembler has a series of project specific files
+(*.bro, *.def, *.dpd, *.lnk, *.mak, *.opn, and *.prj) located in
+in  the  subdirectory \asxv4pxx\asxmak\symantec\build.  You must
+enter the .prj filename into the Symantec IDE  and  then  select
+Project->Settings->Directories  and  change the include, target,
+and compiler output directories  to  match  your  configuration.
+After  these  changes have been made you will be able to compile
+the selected project.  These changes must  be  manually  entered
+for each project.  
+
+
+Command Line Interface 
+
+
+   Before  the  command line interface can be used you must per-
+form the steps outlined in the 'Graphical  User  Interface'  in-
+structions above for each project you wish to build.  
+
+   Open      a      command     prompt     window     in     the
+\asxv4pxx\asxmak\symantec\build directory.   The  file  make.bat
+found  in  the directory can be used to invoke the Symantec com-
+mand line compiler.  The make.bat file assumes that the path  to
+the  compiler  directories has been set in the environment vari-
+able PATH.  Assuming the Symantec compiler has been installed in
+the  default location (C:\SC) the file _setpath.bat will set the
+PATH variable.  If this is not the case then the line 
+
+PATH=C:\SC;C:\SC\BIN;C:\SC\INCLUDE;C:\SC\LIB
+
+must  be changed to match your environment.  The compiled object
+code      modules      will      be      placed      in      the
+\asxv4pxx\asxmak\symantec\build  directory  and  the  executable
+files will be placed in the \asxv4pxx\asxmak\symantec\exe direc-
+tory.  
+
+
+
+   The command 
+
+        make all
+
+will compile and link all the ASxxxx assemblers, the ASlink pro-
+gram, and the utility programs asxscn and asxcnv.  The make file
+can make a single program by invoking make with the specific as-
+sembler, linker, or utility you wish to build:  
+
+        make aslink
+
+
+The  Symantec  make utility , smake.exe, uses the information in
+the corresponding .mak files to compile and link the programs.  
+
+   The  command  file  _clean.bat may be used to remove all com-
+piled .obj files and linked .exe executables.  
 
 </PRE></B></H4>
 <H5><A HREF= #Index> =&gt; Section Index</A></H5>
@@ -136,5 +383,6 @@ assembler directive processing.
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

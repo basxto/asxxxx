@@ -1,7 +1,7 @@
 /* lkrloc4.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,15 +16,6 @@
  *	Bill McKinnon (BM)
  *	w_mckinnon@conknet.com
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -284,10 +275,12 @@ relt4()
 VOID
 relr4()
 {
-	register a_uint reli, relv;
-	register int mode;
-	a_uint rtbase, rtofst, rtpofst, paga, pags, pagx, m, m_page;
-	int aindex, argb, argm, rindex, rtp, rxm, error, v, pcrv, n;
+	a_uint reli, relv;
+	int mode;
+	a_uint rtbase, rtofst, rtpofst;
+	a_uint paga, pags, pagx, pcrv;
+	a_uint m, n, v;
+	int aindex, argb, argm, rindex, rtp, rxm, error, i;
 	struct areax **a;
 	struct sym **s;
 
@@ -309,7 +302,7 @@ relr4()
 	/*
 	 * Get area pointer
 	 */
-	aindex = evword();
+	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
 		fprintf(stderr, "R area error\n");
 		lkerr++;
@@ -319,7 +312,7 @@ relr4()
 	/*
 	 * Select Output File
 	 */
-	if (oflag) {
+	if (oflag != 0) {
 		ap = a[aindex]->a_bap;
 		if (ofp != NULL) {
 			rtabnk->b_rtaflg = rtaflg;
@@ -359,9 +352,9 @@ relr4()
 		error = 0;
 		relv = 0;
 		rtpofst = rtofst;
-		mode = eval();
-		rtp = eval();
-		rindex = evword();
+		mode = (int) eval();
+		rtp = (int) eval();
+		rindex = (int) evword();
 
 		/*
 		 * Argument Mode
@@ -477,13 +470,39 @@ relr4()
 			/*
 			 * Mask Value Selection
 			 */
-			switch(argb) {
+#ifdef	LONGINT
+			switch(argm) {
 			default:
-			case 1:	m = ~0x7F;		n = ~0xFF;		break;	/* 1 byte  */
-			case 2:	m = ~0x7FFF;		n = ~0xFFFF;		break;	/* 2 bytes */
-			case 3:	m = ~0x7FFFFF;		n = ~0xFFFFFF;		break;	/* 3 bytes */
-			case 4:	m = ~0x7FFFFFFF;	n = ~0xFFFFFFFF;	break;	/* 4 bytes */
+			case R4_1BYTE:	/* 1 byte  */
+				m = ~((a_uint) 0x0000007Fl);	n = ~((a_uint) 0x000000FFl);
+				break;
+			case R4_2BYTE:	/* 2 bytes */
+				m = ~((a_uint) 0x00007FFFl);	n = ~((a_uint) 0x0000FFFFl);
+				break;
+			case R4_3BYTE:	/* 3 bytes */
+				m = ~((a_uint) 0x007FFFFFl);	n = ~((a_uint) 0x00FFFFFFl);
+				break;
+			case R4_4BYTE:	/* 4 bytes */
+				m = ~((a_uint) 0x7FFFFFFFl);	n = ~((a_uint) 0xFFFFFFFFl);
+				break;
 			}
+#else
+			switch(argm) {
+			default:
+			case R4_1BYTE:	/* 1 byte  */
+				m = ~((a_uint) 0x0000007F);	n = ~((a_uint) 0x000000FF);
+				break;
+			case R4_2BYTE:	/* 2 bytes */
+				m = ~((a_uint) 0x00007FFF);	n = ~((a_uint) 0x0000FFFF);
+				break;
+			case R4_3BYTE:	/* 3 bytes */
+				m = ~((a_uint) 0x007FFFFF);	n = ~((a_uint) 0x00FFFFFF);
+				break;
+			case R4_4BYTE:	/* 4 bytes */
+				m = ~((a_uint) 0x7FFFFFFF);	n = ~((a_uint) 0xFFFFFFFF);
+				break;
+			}
+#endif
 
 			/*
 			 * Signed Value Checking
@@ -509,40 +528,22 @@ relr4()
 			case R4_PCR1:
 			case R4_PCR0:
 			case R4_PCR:
-				v = relv;
-				switch(argm) {
-				default:
-				case R4_1BYTE:
-					if ((v < ~0x7F) || (v > 0x7F))
-						error = 3;
-					break;
-				case R4_2BYTE:
-					if ((v < ~0x7FFF) || (v > 0x7FFF))
-						error = 4;
-					break;
-				case R4_3BYTE:
-					if ((v < ~0x7FFFFF) || (v > 0x7FFFFF))
-						error = 5;
-					break;
-				case R4_4BYTE:
-					if ((v < ~0x7FFFFFFF) || (v > 0x7FFFFFFF))
-						error = 6;
-					break;
+				if (((relv & m) != m) && ((relv & m) != 0)) {
+					error = 2 + argm;
 				}
 				break;
 			case R4_PAG0:
-				if (relv & ~0xFF || paga || pags)
+				if (relv & ~((a_uint) 0x000000FF) || paga || pags)
 					error = 7;
 				break;
 			case R4_PAGN:
-				if (relv & ~0xFF)
+				if (relv & ~((a_uint) 0x000000FF))
 					error = 8;
 				break;
 			case R4_PAGX0:	/* Paged from pc + 0 */
 			case R4_PAGX1:	/* Paged from pc + 1 */
 			case R4_PAGX2:	/* Paged from pc + 2 */
 			case R4_PAGX3:	/* Paged from pc + 3 */
-				m_page = ~hp->m_list[rxm]->m_page;
 				pcrv = pc + ((rtp - rtofst) / pcb);
 				switch(mode & (R4_PCR | R4_PBITS)) {
 				case R4_PAGX3:	pcrv += 1;	/* Paged from pc + 3 */
@@ -552,12 +553,12 @@ relr4()
 				default:
 					break;
 				}
-				pagx = pcrv & m_page;
+				pagx = pcrv & ~((a_uint) 0x000000FF);
 				/*
 				 * Paging Error if:
 				 *     Destination Page != Current Page
 				 */
-				if ((relv & m_page) != pagx)
+				if ((relv & ~((a_uint) 0x000000FF)) != pagx)
 					error = 9;
 				break;
 			default:
@@ -631,8 +632,8 @@ relr4()
 			 * The Merge Mode inserts a_bytes into
 			 * the T line data which is discarded.
 			 */
-			for (v=0; v<a_bytes; v++) {
-				rtflg[rtp + v] = 0;
+			for (i=0; i<a_bytes; i++) {
+				rtflg[rtp + i] = 0;
 			}
 			rtofst += a_bytes;
 			/*
@@ -646,23 +647,26 @@ relr4()
 			ptb_xb(0 , rtp);
 			adw_xb(argb, v, rtp);
 
-			m_page = ~(hp->m_list[rxm]->m_page >> 1);
+			/*
+			 * Mask Value Selection
+			 */
+			n = hp->m_list[rxm]->m_page;
+			m = ~(n >> 1);
+			n = ~(n >> 0);
 
 			/*
 			 * Signed Merge Bit Range Checking
 			 */
 			if (((mode & (R4_SGND | R4_USGN | R4_PAGX | R4_PCR)) == R4_SGND) &&
-			   ((relv & m_page) != m_page) && ((relv & m_page) != 0))
+			   ((relv & m) != m) && ((relv & m) != 0))
 				error = 10;
-
-			m_page = ~hp->m_list[rxm]->m_page;
 
 			/*
 			 * Unsigned Merge Bit Range Checking
 			 * Overflow Merge Bit Range Checking
 			 */
 			if (((mode & (R4_SGND | R4_USGN | R4_PAGX | R4_PCR)) == R4_USGN) &&
-			   (relv & m_page))
+			   (relv & n))
 				error = 11;
 
 			/*
@@ -675,18 +679,16 @@ relr4()
 			case R4_PCR1:
 			case R4_PCR0:
 			case R4_PCR:
-				v = relv;
-				pcrv = ~m_page >> 1;
-				if ((v < ~pcrv) || (v > pcrv)) {
+				if (((relv & m) != m) && ((relv & m) != 0)) {
 					error = 2 + argm;
 				}
 				break;
 			case R4_PAG0:
-				if (relv & m_page || paga || pags)
+				if (relv & n || paga || pags)
 					error = 7;
 				break;
 			case R4_PAGN:
-				if (relv & m_page)
+				if (relv & n)
 					error = 8;
 				break;
 			case R4_PAGX3:	/* Paged from pc + 3 */
@@ -702,12 +704,12 @@ relr4()
 				default:
 					break;
 				}
-				pagx = pcrv & m_page;
+				pagx = pcrv & n;
 				/*
 				 * Paging Error if:
 				 *     Destination Page != Current Page
 				 */
-				if ((relv & m_page) != pagx)
+				if ((relv & n) != pagx)
 					error = 9;
 				break;
 			default:
@@ -726,12 +728,18 @@ relr4()
 			rerr.rval = relv - reli;
 			relerr4(errmsg4[error]);
 
-			for (v=rtp; v<rtp+a_bytes-1; v++) {
-				if (rtflg[v]) {
-					rterr[v] = error;
+			for (i=rtp; i<rtp+a_bytes-1; i++) {
+				if (rtflg[i]) {
+					rterr[i] = error;
 					break;
 				}
 			}
+		}
+		/*
+		 * Bank Has Output
+		 */
+		if ((oflag != 0) && (obj_flag == 0)) {
+			rtabnk->b_oflag = 1;
 		}
 	}
 	if (uflag != 0) {
@@ -743,7 +751,7 @@ relr4()
 }
 
 char *errmsg4[] = {
-/* 0 */	"LKRLOC Error List",
+/* 0 */	"LKRLOC4 Error List",
 /* 1 */	"Signed value error",
 /* 2 */	"Unsigned value error",
 /* 3 */	"Byte PCR relocation error",
@@ -816,7 +824,7 @@ char *errmsg4[] = {
 VOID
 relp4()
 {
-	register int aindex, rindex;
+	int aindex, rindex;
 	int mode, rtp;
 	a_uint relv;
 	struct areax **a;
@@ -839,7 +847,7 @@ relp4()
 	/*
 	 * Get area pointer
 	 */
-	aindex = evword();
+	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
 		fprintf(stderr, "P area error\n");
 		lkerr++;
@@ -850,9 +858,9 @@ relp4()
 	 * Do remaining relocations
 	 */
 	while (more()) {
-		mode = eval();
-		rtp = eval();
-		rindex = evword();
+		mode = (int) eval();
+		rtp = (int) eval();
+		rindex = (int) evword();
 
 		/*
 		 * R4_SYM or R4_AREA references
@@ -878,7 +886,7 @@ relp4()
 	/*
 	 * Paged values
 	 */
-	aindex = adb_xb(0,a_bytes);
+	aindex = (int) adb_xb(0,a_bytes);
 	if (aindex >= hp->h_narea) {
 		fprintf(stderr, "P area error\n");
 		lkerr++;
@@ -1116,7 +1124,7 @@ erpdmp4(fptr, str)
 FILE *fptr;
 char *str;
 {
-	register struct head *thp;
+	struct head *thp;
 
 	thp = sdp.s_areax->a_bhp;
 
@@ -1141,42 +1149,41 @@ char *str;
 	prntval(fptr, sdp.s_area->a_addr + sdp.s_addr);
 }
 
-/*)Function	VOID	lkmerge(esp, r, v)
+/*)Function	VOID	lkmerge(val, r, v)
  *
- *		expr *	esp		pointer to expr structure
+ *		a_uint	val		base value
  *		int	r		relocation mode
- *		int	v		data to merge into
+ *		a_uint	v		data to merge into base value
  *
- *	The function outrxbm() merges the data in the expr structure esp
- *	and the variable v using the merge specification coded in r.
+ *	The function lkmerge() merges variable v, using the merge
+ *	specification coded in r, into the base value val.
  *
  *	local variables:
- *		struct	vsd *sdp	pointer to a merge specification structure
+ *		struct	mode *mp	pointer to a merge specification structure
  *		char *	vp		pointer to the merge specification string
  *		int	i		loop counter
  *		int	j		temporary
  *		int	m		bit shuffled value
  *
  *	global variables:
- *		struct	vsd  *vsd[]	array of pointers to merge specification structures
- *		sym	dot		defined as sym[0]
  *		FILE	*stderr		error console
  *
  *	functions called:
  *		int	fprintf()	c_library
- *		VOID	asexit()	asmain.c
+ *		VOID	lkexit()	lkmain.c
  *
  *	side effects:
  *		none
  */
-int lkmerge(esp, r, v)
-int esp;
+a_uint lkmerge(val, r, v)
+a_uint val;
 int r;
-int v;
+a_uint v;
 {
 	struct mode *mp;
 	char *vp;
-	int i, j, m;
+	int i, j;
+	a_uint m;
 
 	if ((mp = hp->m_list[r]) == NULL) {
 		fprintf(stderr, "undefined G mode\n");
@@ -1188,11 +1195,11 @@ int v;
 		vp = mp->m_def;
 		for (i=0; i<32; i++) {
 			if ((j = (int) *vp++) & 0x80) {
-				m |= (esp & (1 << i)) ? (1 << (j & 0x1F)) : 0;
+				m |= (val & (((a_uint) 1) << i)) ? (((a_uint) 1) << (j & 0x1F)) : 0;
 			}
 		}
 	} else {
-		m = esp;
+		m = val;
 	}
 	return((v & ~mp->m_mask) | (m & mp->m_mask));
 }
@@ -1200,7 +1207,7 @@ int v;
 /*)Function	a_uint 	adb_byte(p, v, i)
  *
  *		int	p		byte select
- *		int	v		value to add to byte
+ *		a_uint	v		value to add to byte
  *		int	i		rtval[] index
  *
  *	The function adb_byte() adds the value of v to the
@@ -1236,8 +1243,8 @@ int 	p;
 a_uint	v;
 int	i;
 {
-	register a_uint j;
-	register int m, n;
+	a_uint j;
+	int m, n;
 
 	j = adb_xb(v, i);
 	/*
@@ -1247,7 +1254,7 @@ int	i;
 	for (n=0; n<a_bytes; n++) {
 		if(n != m) rtflg[i+n] = 0;
 	}
-	return (j >> (8 * p));
+	return ((j >> (8 * p)) & ((a_uint) 0x000000FF));
 }
 
 /*)Function	a_uint 	gtb_1b(i)
@@ -1273,14 +1280,14 @@ int	i;
 
 a_uint
 gtb_1b(i)
-register int i;
+int i;
 {
 	return(rtval[i]);
 }
 
 /*)Function	a_uint 	ptb_1b(v, i)
  *
- *		int	v		value to put
+ *		a_uint	v		value to put
  *		int	i		rtval[] index
  *
  *	The function ptb_1b() places the byte value
@@ -1303,10 +1310,10 @@ register int i;
 
 a_uint
 ptb_1b(v, i)
-register a_uint v;
-register int i;
+a_uint v;
+int i;
 {
-	return(rtval[i] = v & 0xFF);
+	return(rtval[i] = v & ((a_uint) 0x000000FF));
 }
 
 /*)Function	a_uint 	gtb_2b(i)
@@ -1334,15 +1341,15 @@ register int i;
 
 a_uint
 gtb_2b(i)
-register int i;
+int i;
 {
-	register a_uint v;
+	a_uint v;
 
 	if (hilo) {
-		v = (rtval[i] << 8) +
-		    (rtval[i+1] & 0xff);
+		v = (rtval[i+0] << 8) +
+		    (rtval[i+1] << 0);
 	} else {
-		v = (rtval[i] & 0xff) +
+		v = (rtval[i+0] << 0) +
 		    (rtval[i+1] << 8);
 	}
 	return(v);
@@ -1374,15 +1381,15 @@ register int i;
 
 a_uint
 ptb_2b(v, i)
-register a_uint v;
-register int i;
+a_uint v;
+int i;
 {
 	if (hilo) {
-		rtval[i] = (v >> 8) & 0xff;
-		rtval[i+1] = v & 0xff;
+		rtval[i+0] = (v >> 8) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (v >> 0) & ((a_uint) 0x000000FF);
 	} else {
-		rtval[i] = v & 0xff;
-		rtval[i+1] = (v >> 8) & 0xff;
+		rtval[i+0] = (v >> 0) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (v >> 8) & ((a_uint) 0x000000FF);
 	}
 	return(v);
 }
@@ -1412,18 +1419,18 @@ register int i;
 
 a_uint
 gtb_3b(i)
-register int i;
+int i;
 {
-	register a_uint v;
+	a_uint v;
 
 	if (hilo) {
-		v = (((rtval[i] << 16) & 0xff0000) +
-		     ((rtval[i+1] << 8 ) & 0xff00) +
-		     ((rtval[i+2]) & 0xff));
+		v = (rtval[i+0] << 16) +
+		    (rtval[i+1] << 8 ) +
+		    (rtval[i+2] << 0 );
 	} else {
-		v = (((rtval[i+2] << 16) & 0xff0000) +
-		     ((rtval[i+1] << 8 ) & 0xff00) +
-		     ((rtval[i]) & 0xff));
+		v = (rtval[i+0] << 0 ) +
+		    (rtval[i+1] << 8 ) +
+		    (rtval[i+2] << 16);
 	}
 	return(v);
 }
@@ -1454,17 +1461,17 @@ register int i;
 
 a_uint
 ptb_3b(v, i)
-register a_uint v;
-register int i;
+a_uint v;
+int i;
 {
 	if (hilo) {
-		rtval[i] = (v >> 16) & 0xff;
-		rtval[i+1] = (v >> 8) & 0xff;
-		rtval[i+2] = v & 0xff;
+		rtval[i+0] = (v >> 16) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (v >>  8) & ((a_uint) 0x000000FF);
+		rtval[i+2] = (v >>  0) & ((a_uint) 0x000000FF);
 	} else {
-		rtval[i] = v & 0xff;
-		rtval[i+1] = (v >> 8) & 0xff;
-		rtval[i+2] = (v >> 16) & 0xff;
+		rtval[i+0] = (v >>  0) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (v >>  8) & ((a_uint) 0x000000FF);
+		rtval[i+2] = (v >> 16) & ((a_uint) 0x000000FF);
 	}
 	return(v);
 }
@@ -1494,20 +1501,20 @@ register int i;
 
 a_uint
 gtb_4b(i)
-register int i;
+int i;
 {
-	register a_uint v;
+	a_uint v;
 
 	if (hilo) {
-		v = (((rtval[i] << 24) & 0xff000000) +
-		     ((rtval[i+1] << 16) & 0xff0000) +
-		     ((rtval[i+2] << 8 ) & 0xff00) +
-		     ((rtval[i+3]) & 0xff));
+		v = (rtval[i+0] << 24) +
+		    (rtval[i+1] << 16) +
+		    (rtval[i+2] <<  8) +
+		    (rtval[i+3] <<  0);
 	} else {
-		v = (((rtval[i+3] << 24) & 0xff000000) +
-		     ((rtval[i+2] << 16) & 0xff0000) +
-		     ((rtval[i+1] << 8 ) & 0xff00) +
-		     ((rtval[i]) & 0xff));
+		v = (rtval[i+0] <<  0) +
+		    (rtval[i+1] <<  8) +
+		    (rtval[i+2] << 16) +
+		    (rtval[i+3] << 24);
 	}
 	return(v);
 }
@@ -1538,19 +1545,19 @@ register int i;
 
 a_uint
 ptb_4b(v, i)
-register a_uint v;
-register int i;
+a_uint v;
+int i;
 {
 	if (hilo) {
-		rtval[i] = (v >> 24) & 0xff;
-		rtval[i+1] = (v >> 16) & 0xff;
-		rtval[i+2] = (v >> 8) & 0xff;
-		rtval[i+3] = v & 0xff;
+		rtval[i+0] = (v >> 24) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (v >> 16) & ((a_uint) 0x000000FF);
+		rtval[i+2] = (v >>  8) & ((a_uint) 0x000000FF);
+		rtval[i+3] = (v >>  0) & ((a_uint) 0x000000FF);
 	} else {
-		rtval[i] = v & 0xff;
-		rtval[i+1] = (v >> 8) & 0xff;
-		rtval[i+2] = (v >> 16) & 0xff;
-		rtval[i+3] = (v >> 24) & 0xff;
+		rtval[i+0] = (v >>  0) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (v >>  8) & ((a_uint) 0x000000FF);
+		rtval[i+2] = (v >> 16) & ((a_uint) 0x000000FF);
+		rtval[i+3] = (v >> 24) & ((a_uint) 0x000000FF);
 	}
 	return(v);
 }
@@ -1581,27 +1588,56 @@ register int i;
 
 a_uint
 gtb_xb(i)
-register int i;
+int i;
 {
 	a_uint v;
 
+#ifdef	LONGINT
 	switch(a_bytes){
 	case 1:
 		v = gtb_1b(i);
-		return(v & 0x80 ? v | ~0x7F : v & 0x7F);
+		v = (v & ((a_uint) 0x00000080l) ? v | ~((a_uint) 0x0000007Fl) : v & ((a_uint) 0x0000007Fl));
+		break;
 	case 2:
 		v = gtb_2b(i);
-		return(v & 0x8000 ? v | ~0x7FFF : v & 0x7FFF);
+		v = (v & ((a_uint) 0x00008000l) ? v | ~((a_uint) 0x00007FFFl) : v & ((a_uint) 0x00007FFFl));
+		break;
 	case 3:
 		v = gtb_3b(i);
-		return(v & 0x800000 ? v | ~0x7FFFFF : v & 0x7FFFFF);
+		v = (v & ((a_uint) 0x00800000l) ? v | ~((a_uint) 0x007FFFFFl) : v & ((a_uint) 0x007FFFFFl));
+		break;
 	case 4:
 		v = gtb_4b(i);
-		return(v & 0x80000000 ? v | ~0x7FFFFFFF : v & 0x7FFFFFFF);
+		v = (v & ((a_uint) 0x80000000l) ? v | ~((a_uint) 0x7FFFFFFFl) : v & ((a_uint) 0x7FFFFFFFl));
+		break;
 	default:
-		return(0);
+		v = 0;
+		break;
 	}
-	return(0);
+#else
+	switch(a_bytes){
+	case 1:
+		v = gtb_1b(i);
+		v = (v & ((a_uint) 0x00000080) ? v | ~((a_uint) 0x0000007F) : v & ((a_uint) 0x0000007F));
+		break;
+	case 2:
+		v = gtb_2b(i);
+		v = (v & ((a_uint) 0x00008000) ? v | ~((a_uint) 0x00007FFF) : v & ((a_uint) 0x00007FFF));
+		break;
+	case 3:
+		v = gtb_3b(i);
+		v = (v & ((a_uint) 0x00800000) ? v | ~((a_uint) 0x007FFFFF) : v & ((a_uint) 0x007FFFFF));
+		break;
+	case 4:
+		v = gtb_4b(i);
+		v = (v & ((a_uint) 0x80000000) ? v | ~((a_uint) 0x7FFFFFFF) : v & ((a_uint) 0x7FFFFFFF));
+		break;
+	default:
+		v = 0;
+		break;
+	}
+#endif
+	return(v);
 }
 
 /*)Function	a_uint 	ptb_xb(v, i)
@@ -1632,27 +1668,56 @@ register int i;
 
 a_uint
 ptb_xb(v, i)
-register a_uint v;
-register int i;
+a_uint v;
+int i;
 {
 	a_uint j;
 
+#ifdef	LONGINT
 	switch(a_bytes){
 	case 1:
 		j = ptb_1b(v, i);
-		return(j & 0x80 ? j | ~0x7F : j & 0x7F);
+		j = (j & ((a_uint) 0x00000080l) ? j | ~((a_uint) 0x0000007Fl) : j & ((a_uint) 0x0000007Fl));
+		break;
 	case 2:
 		j = ptb_2b(v, i);
-		return(j & 0x8000 ? j | ~0x7FFF : j & 0x7FFF);
+		j = (j & ((a_uint) 0x00008000l) ? j | ~((a_uint) 0x00007FFFl) : j & ((a_uint) 0x00007FFFl));
+		break;
 	case 3:
 		j = ptb_3b(v, i);
-		return(j & 0x800000 ? j | ~0x7FFFFF : j & 0x7FFFFF);
+		j = (j & ((a_uint) 0x00800000l) ? j | ~((a_uint) 0x007FFFFFl) : j & ((a_uint) 0x007FFFFFl));
+		break;
 	case 4:
 		j = ptb_4b(v, i);
-		return(j & 0x80000000 ? j | ~0x7FFFFFFF : j & 0x7FFFFFFF);
+		j = (j & ((a_uint) 0x80000000l) ? j | ~((a_uint) 0x7FFFFFFFl) : j & ((a_uint) 0x7FFFFFFFl));
+		break;
 	default:
-		return(0);
+		j = 0;
+		break;
 	}
-	return(0);
+#else
+	switch(a_bytes){
+	case 1:
+		j = ptb_1b(v, i);
+		j = (j & ((a_uint) 0x00000080) ? j | ~((a_uint) 0x0000007F) : j & ((a_uint) 0x0000007F));
+		break;
+	case 2:
+		j = ptb_2b(v, i);
+		j = (j & ((a_uint) 0x00008000) ? j | ~((a_uint) 0x00007FFF) : j & ((a_uint) 0x00007FFF));
+		break;
+	case 3:
+		j = ptb_3b(v, i);
+		j = (j & ((a_uint) 0x00800000) ? j | ~((a_uint) 0x007FFFFF) : j & ((a_uint) 0x007FFFFF));
+		break;
+	case 4:
+		j = ptb_4b(v, i);
+		j = (j & ((a_uint) 0x80000000) ? j | ~((a_uint) 0x7FFFFFFF) : j & ((a_uint) 0x7FFFFFFF));
+		break;
+	default:
+		j = 0;
+		break;
+	}
+#endif
+	return(j);
 }
 

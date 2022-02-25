@@ -1,7 +1,7 @@
 /* asdata.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,17 +15,10 @@
  *
  *	Bill McKinnon (BM)
  *	w_mckinnon@conknet.com
+ *
+ *	Mike McCarty
+ *	mike dot mccarty at sbcglobal dot net
  */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "asxxxx.h"
 
@@ -102,6 +95,8 @@ int	aflag;		/*	-a, make all symbols global flag
 			 */
 int	bflag;		/*	-b(b), listing modes flag
 			 */
+int	cflag;		/*	-c, include cycle counts in listing flag
+			 */
 int	fflag;		/*	-f(f), relocations flagged flag
 			 */
 int	gflag;		/*	-g, make undefined symbols global flag
@@ -175,6 +170,8 @@ int	*cpt;		/*	pointer to assembler relocation type
 int	cbt[NCODE];	/*	array of assembler relocation types
 			 *	describing the data in cb[]
 			 */
+int	opcycles;	/*	opcode execution cycles
+			 */
 char	tb[NTITL];	/*	Title string buffer
 			 */
 char	stb[NSBTL];	/*	Subtitle string buffer
@@ -239,7 +236,8 @@ struct	mne	*mnehash[NHASH];
  */
 struct	sym	sym[] = {
     {	NULL,	NULL,	".",	    S_USER, 0,			NULL,0,0    },
-    {	NULL,	NULL,	".__.ABS.", S_USER, S_ASG|S_GBL|S_EOL,	NULL,0,0    }
+    {	NULL,	NULL,	".__.ABS.", S_USER, S_ASG|S_GBL,	NULL,0,0    },
+    {	NULL,	NULL,	".__.CPU.", S_ULCL, S_ASG|S_EOL,	NULL,0,0    }
 };
 
 struct	sym	*symp;		/*	pointer to a symbol structure
@@ -303,6 +301,7 @@ struct	area	*areap = &area[1];
  *		int	b_ref;		Ref. number
  *		a_uint	b_base;		Bank base address
  *		a_uint	b_size;		Bank length
+ *		a_uint	b_map;		Bank mapping
  *		int	b_flag;		Bank flags
  *	};
  *

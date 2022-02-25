@@ -1,7 +1,7 @@
 /* ez80mch.c */
 
 /*
- * (C) Copyright 1989-2004
+ * (C) Copyright 1989-2005
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,13 +15,188 @@
  * patrick at phead dot net
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "ez80.h"
 
 char	imtab[3] = { 0x46, 0x56, 0x5E };
 int	m_mode;
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	OPCY_AMOD	((char) (0xFD))
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+#define	P2	((char) (OPCY_NONE | 0x01))
+#define	P3	((char) (OPCY_NONE | 0x02))
+#define	P4	((char) (OPCY_NONE | 0x03))
+#define	P5	((char) (OPCY_NONE | 0x04))
+#define	P6	((char) (OPCY_NONE | 0x05))
+#define	P7	((char) (OPCY_NONE | 0x06))
+
+#define	PF	((char) (OPCY_NONE | 0x10))
+
+/*
+ * EZ80 Opcode Cycle Pages
+ */
+
+static char  ez80pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   1, 3, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1,
+/*10*/   4, 3, 2, 1, 1, 1, 2, 1, 3, 1, 2, 1, 1, 1, 2, 1,
+/*20*/   3, 3, 7, 1, 1, 1, 2, 1, 3, 1, 5, 1, 1, 1, 2, 1,
+/*30*/   3, 3, 4, 1, 4, 4, 3, 1, 3, 1, 4, 1, 1, 1, 2, 1,
+/*40*/  PF, 1, 1, 1, 1, 1, 2, 1, 1,PF, 1, 1, 1, 1, 2, 1,
+/*50*/   1, 1,PF, 1, 1, 1, 2, 1, 1, 1, 1,PF, 1, 1, 2, 1,
+/*60*/   1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1,
+/*70*/   2, 2, 2, 2, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1,
+/*80*/   1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1,
+/*90*/   1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1,
+/*A0*/   1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1,
+/*B0*/   1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1,
+/*C0*/   6, 3, 4, 4, 6, 3, 2, 5, 6, 5, 4,P2, 6, 5, 2, 5,
+/*D0*/   6, 3, 4, 3, 6, 3, 2, 5, 6, 1, 4, 3, 6,P3, 2, 5,
+/*E0*/   6, 3, 4, 5, 6, 3, 2, 5, 6, 3, 4, 1, 6,P4, 2, 5,
+/*F0*/   6, 3, 4, 1, 6, 3, 2, 5, 6, 1, 4, 1, 6,P5, 2, 5
+};
+
+static char  ez80pg2[256] = {  /* P2 == CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 5, 2,
+/*10*/   2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 5, 2,
+/*20*/   2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 5, 2,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN, 2, 2, 2, 2, 2, 2, 5, 2,
+/*40*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*50*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*60*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*70*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*80*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*90*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*A0*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*B0*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*C0*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*D0*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*E0*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2,
+/*F0*/   2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2
+};
+
+static char  ez80pg3[256] = {  /* P3 == DD */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN, 5,UN, 2,UN,UN,UN,UN,UN, 5,
+/*10*/  UN,UN,UN,UN,UN,UN,UN, 5,UN, 2,UN,UN,UN,UN,UN, 5,
+/*20*/  UN, 4, 6, 2, 2, 2, 2, 5,UN, 2, 6, 2, 2, 2, 2, 5,
+/*30*/  UN, 5,UN,UN, 6, 6, 5, 5,UN, 2,UN,UN,UN,UN, 5, 5,
+/*40*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*50*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*60*/   2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
+/*70*/   4, 4, 4, 4, 4, 4,UN, 4,UN,UN,UN,UN, 2, 2, 4,UN,
+/*80*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*90*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*A0*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*B0*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,P6,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN, 4,UN, 6,UN, 4,UN,UN,UN, 4,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN, 2,UN,UN,UN,UN,UN,UN
+};
+
+static char  ez80pg4[256] = {  /* P4 == ED */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   4, 4, 3, 3, 2,UN,UN, 4, 4, 4,UN,UN, 2,UN,UN, 4,
+/*10*/   4, 4, 3, 3, 2,UN,UN, 4, 4, 4,UN,UN, 2,UN,UN, 4,
+/*20*/   4, 4, 3, 3, 2,UN,UN, 4, 4, 4,UN,UN, 2,UN,UN, 4,
+/*30*/  UN, 4, 3, 3, 3,UN,UN, 4, 4, 4,UN,UN, 2,UN, 4, 4,
+/*40*/   3, 3, 2, 6, 2, 6, 2, 2, 3, 3, 2, 6, 6, 6,UN, 2,
+/*50*/   3, 3, 2, 6, 3, 3, 2, 2, 3, 3, 2, 6, 6,UN, 2, 2,
+/*60*/   3, 3, 2,UN, 3, 5, 5, 5, 3, 3, 2,UN, 6, 2, 2, 5,
+/*70*/  UN,UN, 2, 6, 4,UN, 2,UN, 3, 3, 2, 5, 6, 2, 2,UN,
+/*80*/  UN,UN, 5, 5, 5,UN,UN,UN,UN,UN, 5, 5, 5,UN,UN,UN,
+/*90*/  UN,UN, 2, 2, 2,UN,UN,UN,UN,UN, 2, 2, 2,UN,UN,UN,
+/*A0*/   5, 3, 5, 5, 5,UN,UN,UN, 5, 3, 5, 5, 5,UN,UN,UN,
+/*B0*/   2, 1, 2, 2, 2,UN,UN,UN, 2, 1, 2, 2, 2,UN,UN,UN,
+/*C0*/  UN,UN, 2, 3,UN,UN,UN, 2,UN,UN, 2, 2,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN, 2,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN
+};
+
+static char  ez80pg5[256] = {  /* P5 == FD */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN, 5,UN, 2,UN,UN,UN,UN,UN, 5,
+/*10*/  UN,UN,UN,UN,UN,UN,UN, 5,UN, 2,UN,UN,UN,UN,UN, 5,
+/*20*/  UN, 4, 6, 2, 2, 2, 2, 5,UN, 2, 6, 2, 2, 2, 2, 5,
+/*30*/  UN, 5,UN,UN, 6, 6, 5, 5,UN, 2,UN,UN,UN,UN, 5, 5,
+/*40*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*50*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*60*/   2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
+/*70*/   4, 4, 4, 4, 4, 4,UN, 4,UN,UN,UN,UN, 2, 2, 4,UN,
+/*80*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*90*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*A0*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*B0*/  UN,UN,UN,UN, 2, 2, 4,UN,UN,UN,UN,UN, 2, 2, 4,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,P7,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN, 4,UN, 6,UN, 4,UN,UN,UN, 4,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN, 2,UN,UN,UN,UN,UN,UN
+};
+
+static char  ez80pg6[256] = {  /* P6 == DD CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN, 7,UN,
+/*10*/  UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN, 7,UN,
+/*20*/  UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN, 7,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 7,UN,
+/*40*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*50*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*60*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*70*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*80*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*90*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN
+};
+
+static char  ez80pg7[256] = {  /* P7 == FD CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN, 7,UN,
+/*10*/  UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN, 7,UN,
+/*20*/  UN,UN,UN,UN,UN,UN, 7,UN,UN,UN,UN,UN,UN,UN, 7,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 7,UN,
+/*40*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*50*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*60*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*70*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*80*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*90*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN, 5,UN,UN,UN,UN,UN,UN,UN, 5,UN
+};
+
+static char *ez80Page[7] = {
+    ez80pg1, ez80pg2, ez80pg3, ez80pg4,
+    ez80pg5, ez80pg6, ez80pg7
+};
 
 /*
  * Process a machine op.
@@ -30,14 +205,15 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, t1, t2;
+	int op, of, t1, t2;
 	struct expr e1, e2;
 	int rf, sf, v1, v2;
 	int needPreamble, m_aerr;
+	int opc1, opc2, opc3;
 
 	clrexpr(&e1);
 	clrexpr(&e2);
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	rf = mp->m_type;
 	sf = mp->m_flag;
 
@@ -170,7 +346,7 @@ struct mne *mp;
 			 * ret  cc
 			 */
 			if ((v1 = admode(CND)) != 0) {
-				outab(op | v1<<3);
+				outab(op | (v1<<3));
 			} else {
 				qerr();
 			}
@@ -198,14 +374,14 @@ struct mne *mp;
 				outab(op+0x20);
 				break;
 			}
-			outab(op | v1<<4);
+			outab(op | (v1<<4));
 			break;
 		}
 		aerr();
 		break;
 
 	case S_RST:
-		v1 = absexpr();
+		v1 = (int) absexpr();
 		if (v1 & ~0x38) {
 			aerr();
 			v1 = 0;
@@ -221,7 +397,7 @@ struct mne *mp;
 			e1.e_addr = 0;
 		}
 		outab(op);
-		outab(imtab[e1.e_addr]);
+		outab(imtab[(int) e1.e_addr]);
 		break;
 
 	case S_BIT:
@@ -302,7 +478,7 @@ struct mne *mp;
 				t1 = e1.e_mode = S_IMMED;
 		}
 		if (t1 == S_R8X) {
-			v1 = e1.e_addr;
+			v1 = (int) e1.e_addr;
 			v2 = 4;
 			if ((v1 == IXL) || (v1 == IYL))
 				++v2;
@@ -376,8 +552,8 @@ struct mne *mp;
 				op = 0x4A;
 			if (rf == S_SBC)
 				op = 0x42;
-			v1 = e1.e_addr;
-			v2 = e2.e_addr;
+			v1 = (int) e1.e_addr;
+			v2 = (int) e2.e_addr;
 			/*
 			 * op  hl,bc
 			 * op  hl,de
@@ -430,9 +606,9 @@ struct mne *mp;
 				break;
 			}
 			if (t1 == S_R8X) {
-				v1 = e1.e_addr;
+				v1 = (int) e1.e_addr;
 			} else {
-				v1 = e2.e_addr;
+				v1 = (int) e2.e_addr;
 			}
 			v2 = 4;
 			if ((v1 == IXL) || (v1 == IYL))
@@ -505,10 +681,10 @@ struct mne *mp;
 		 * ld.s		ld.is		ld.sis
 		 */
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		comma();
 		t2 = addr(&e2);
-		v2 = e2.e_addr;
+		v2 = (int) e2.e_addr;
 		if (t2 == S_USER)
 			t2 = e2.e_mode = S_IMMED;
 		/*
@@ -534,7 +710,7 @@ struct mne *mp;
 				if (sf) {	/* No Opcode Suffixes Allowed */
 					aerr();
 				}
-				genop(0, op | v1<<3, &e2, 0);
+				genop(0, op | (v1<<3), &e2, 0);
 				break;
 			}
 			/*
@@ -544,7 +720,7 @@ struct mne *mp;
 				if (sf) {	/* No Opcode Suffixes Allowed */
 					aerr();
 				}
-				outab(v1<<3 | 0x06);
+				outab((v1<<3) | 0x06);
 				outrb(&e2,0);
 				break;
 			}
@@ -553,7 +729,7 @@ struct mne *mp;
 			 * ld  r,(ix+d)
 			 * ld  r,(iy+d)
 			 */
-			if (genop(0, op | v1<<3, &e2, 0) == 0) {
+			if (genop(0, op | (v1<<3), &e2, 0) == 0) {
 				/*
 				 * Only .S and .L Suffixes Allowed
 				 */
@@ -583,7 +759,7 @@ struct mne *mp;
 				aerr();
 			}
 			v1 = gixiy(v1);
-			outab(0x01|v1<<4);
+			outab(0x01 | (v1<<4));
 			glilsis(m_mode, sf, &e2);
 			break;
 		}
@@ -754,7 +930,7 @@ struct mne *mp;
 				outab(0x2A);
 			} else {
 				outab(0xED);
-				outab(0x4B | v1<<4);
+				outab(0x4B | (v1<<4));
 			}
 			glilsis(m_mode, sf, &e2);
 			break;
@@ -780,7 +956,7 @@ struct mne *mp;
 				outab(0x22);
 			} else {
 				outab(0xED);
-				outab(0x43 | v2<<4);
+				outab(0x43 | (v2<<4));
 			}
 			glilsis(m_mode, sf, &e1);
 			break;
@@ -1073,7 +1249,7 @@ struct mne *mp;
 				aerr();
 			}
 			if ((t2 == S_IDBC) || (t2 == S_IDDE)) {
-				outab(0x0A | (t2-S_INDR)<<4);
+				outab(0x0A | ((t2-S_INDR)<<4));
 				break;
 			}
 		}
@@ -1091,7 +1267,7 @@ struct mne *mp;
 				aerr();
 			}
 			if ((t1 == S_IDBC) || (t1 == S_IDDE)) {
-				outab(0x02 | (t1-S_INDR)<<4);
+				outab(0x02 | ((t1-S_INDR)<<4));
 				break;
 			}
 		}
@@ -1150,8 +1326,8 @@ struct mne *mp;
 		comma();
 		t2 = addr(&e2);
 		if (t2 == S_RX) {
-			v1 = e1.e_addr;
-			v2 = e2.e_addr;
+			v1 = (int) e1.e_addr;
+			v2 = (int) e2.e_addr;
 			/*
 			 * ex  (sp),hl
 			 * ex  (sp),ix
@@ -1201,8 +1377,8 @@ struct mne *mp;
 			t1 = addr(&e1);
 		}
 		if (t1 == S_R8) {
-			v1 = e1.e_addr;
-			v2 = e2.e_addr;
+			v1 = (int) e1.e_addr;
+			v2 = (int)e2.e_addr;
 			/*
 			 * in   a,(n)	[in   a,(#n)]
 			 * out  (n),a	[out  (#n),a]
@@ -1237,8 +1413,8 @@ struct mne *mp;
 			t1 = addr(&e1);
 		}
 		if (t1 == S_R8) {
-			v1 = e1.e_addr;
-			v2 = e2.e_addr;
+			v1 = (int) e1.e_addr;
+			v2 = (int) e2.e_addr;
 			/*
 			 * in0  r,(n)	[in0  r,(#n)]
 			 * out0 (n),r	[out0 (#n),r]
@@ -1256,7 +1432,7 @@ struct mne *mp;
 	case S_DEC:
 	case S_INC:
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		/*
 		 * op  r
 		 */
@@ -1310,7 +1486,7 @@ struct mne *mp;
 		 * op  IYH
 		 */
 		if (t1 == S_R8X) {
-			v1 = e1.e_addr;
+			v1 = (int) e1.e_addr;
 			v2 = 0x20;
 			if ((v1 == IXL) || (v1 == IYL))
 				v2 += 8;
@@ -1350,7 +1526,7 @@ struct mne *mp;
 		expr(&e2, 0);
 		outab(op);
 		if (mchpcr(&e2)) {
-			v2 = e2.e_addr - dot.s_addr - 1;
+			v2 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v2 < -128) || (v2 > 127))
 				aerr();
 			outab(v2);
@@ -1499,12 +1675,12 @@ struct mne *mp;
 		/*
 		 * mlt  bc/de/hl/sp
 		 */
-		if ((t1 == S_RX) && ((v1 = e1.e_addr) <= SP)) {
+		if ((t1 == S_RX) && ((v1 = (int) e1.e_addr) <= SP)) {
 			if (sf && (v1 != SP)) {
 				aerr();
 			}
 			outab(0xED);
-			outab(op | v1<<4);
+			outab(op | (v1<<4));
 			break;
 		}
 		aerr();
@@ -1549,7 +1725,7 @@ struct mne *mp;
 				aerr();
 			}
 			outab(0xED);
-			outab(op | e1.e_addr<<3);
+			outab(op | ((int) (e1.e_addr<<3)));
 			break;
 		}
 		/*
@@ -1585,10 +1761,10 @@ struct mne *mp;
 
 	case S_LEA:
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		comma();
 		t2 = addr(&e2);
-		v2 = e2.e_addr;
+		v2 = (int) e2.e_addr;
 		if ((t1 == S_RX) && (v1 != SP) && (t2 == S_RX) && (v2==IX || v2==IY)) {
 			if (more()) {
 				t2 = e2.e_mode = S_INDR + v2;
@@ -1645,7 +1821,7 @@ struct mne *mp;
 
 	case S_PEA:
 		t1 = addr(&e1);
-		v1 = e1.e_addr;
+		v1 = (int) e1.e_addr;
 		/*
 		 * pea  ix+d
 		 * pea  iy+d
@@ -1670,6 +1846,7 @@ struct mne *mp;
 		break;
 
 	case S_AMOD:
+		opcycles = OPCY_AMOD;
 		if (more()) {
 			/*
 			 * .adl	n
@@ -1693,7 +1870,308 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+
+	if (opcycles == OPCY_NONE) {
+		of = 0;
+		opcycles = ez80pg1[cb[0] & 0xFF];
+		while ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+			switch (opcycles) {
+			case PF:	/* 40 / 49 / 52 / 5B */
+				of = 1;
+				opcycles = ez80pg1[cb[1] & 0xFF];
+				break;
+			case P2:	/* CB xx	*/
+			case P3:	/* DD xx	*/
+			case P4:	/* ED xx	*/
+			case P5:	/* FD xx	*/
+				opcycles = ez80Page[opcycles & OPCY_MASK][cb[of + 1] & 0xFF];
+				break;
+			case P6:	/* DD CB -- xx	*/
+			case P7:	/* FD CB -- xx	*/
+				opcycles = ez80Page[opcycles & OPCY_MASK][cb[of + 3] & 0xFF];
+				break;
+			default:
+				opcycles = OPCY_NONE;
+				break;
+			}
+		}
+		/*
+		 * Cycle Adjustments
+		 */
+		if (opcycles != OPCY_NONE) {
+			opcycles += of;
+
+			opc1 = cb[0] & 0xFF;
+			opc2 = cb[1] & 0xFF;
+			opc3 = cb[2] & 0xFF;
+
+			switch(opc1) {
+			case 0x40:
+				switch(rf) {
+				case S_CALL:
+					switch(opc2) {
+					case 0xCD:		opcycles += 1;	break;
+					default:		opcycles += 0;	break;
+					}					break;
+				case S_EX:					break;
+				case S_JP:					break;
+				case S_LD:
+					switch(opc2) {
+					case 0xDD:
+					case 0xFD:
+						switch(opc3) {
+						case 0x21:	opcycles += 1;	break;
+
+						case 0x22:
+						case 0x2A:	opcycles += 2;	break;
+						default:			break;
+						}				break;
+					}					break;
+				default:					break;
+				}						break;
+
+			case 0x49:
+				switch(rf) {
+				case S_CALL:
+					switch(opc2) {
+					case 0xCD:		opcycles += 2;	break;
+					default:		opcycles += 1;	break;
+					}					break;
+				case S_EX:	opcycles += 2;			break;
+				case S_JP:					break;
+				case S_LD:
+					switch(opc2) {
+					case 0x32:		opcycles += 1;	break;
+
+					case 0xED:
+						switch(opc3) {
+						case 0x07:
+						case 0x0F:
+						case 0x17:
+						case 0x1F:
+						case 0x27:
+						case 0x2F:
+						case 0x31:
+						case 0x37:
+						case 0x3E:
+						case 0x3F:	opcycles += 1;	break;
+						default:			break;
+						}				break;
+
+					case 0xDD:
+					case 0xFD:
+						switch(opc3) {
+						case 0x07:
+						case 0x0F:
+						case 0x17:
+						case 0x1F:
+						case 0x27:
+						case 0x2F:
+						case 0x31:
+						case 0x37:
+						case 0x3E:
+						case 0x3F:	opcycles += 1;	break;
+
+						case 0x22:	opcycles += 2;	break;
+						default:			break;
+						}				break;
+					}					break;
+				case S_PEA:
+				case S_PUSH:
+				case S_RET:
+				case S_RST:			opcycles += 1;	break;
+				case S_INH2:
+					switch(op) {
+					case 0x45:
+					case 0x4D:		opcycles += 3;	break;
+					default:				break;
+					}					break;
+				default:					break;
+				}						break;
+
+			case 0x52:
+				switch(rf) {
+				case S_CALL:
+					switch(opc2) {
+					case 0xCD:		opcycles += 2;	break;
+					default:		opcycles += 1;	break;
+					}					break;
+				case S_EX:					break;
+				case S_JP:					break;
+				case S_LD:
+					switch(opc2) {
+					case 0x32:		opcycles += 1;	break;
+
+					case 0xDD:
+					case 0xFD:
+						switch(opc3) {
+						case 0x07:
+						case 0x0F:
+						case 0x17:
+						case 0x1F:
+						case 0x27:
+						case 0x2F:
+						case 0x31:
+						case 0x37:
+						case 0x3E:
+						case 0x3F:	opcycles += 1;	break;
+
+						case 0x22:	opcycles += 2;	break;
+						default:			break;
+						}				break;
+					}					break;
+				case S_RST:			opcycles += 2;	break;
+				default:					break;
+				}						break;
+
+			case 0x5B:
+				switch(rf) {
+				case S_CALL:
+					switch(opc2) {
+					case 0xCD:		opcycles += 3;	break;
+					default:		opcycles += 2;	break;
+					}					break;
+				case S_EX:					break;
+				case S_JP:
+					switch(opc2) {
+					case 0xDD:
+					case 0xED:
+					case 0xFD:				break;
+					default:		opcycles += 1;	break;
+					}					break;
+				case S_LD:
+					switch(opc2) {
+					case 0x01:
+					case 0x11:
+					case 0x21:
+					case 0x32:
+					case 0x3A:		opcycles += 1;	break;
+
+					case 0x22:
+					case 0x2A:
+					case 0x31:		opcycles += 2;	break;
+
+					case 0xED:
+						switch(opc3) {
+						case 0x7B:	opcycles += 1;	break;
+
+						case 0x43:
+						case 0x4B:
+						case 0x53:
+						case 0x5B:
+						case 0x73:	opcycles += 2;	break;
+						default:			break;
+						}				break;
+
+					case 0xDD:
+					case 0xFD:
+						switch(opc3) {
+						case 0x21:	opcycles += 1;	break;
+
+						case 0x22:
+						case 0x2A:	opcycles += 2;	break;
+						default:			break;
+						}				break;
+					}					break;
+				case S_RET:			opcycles += 1;	break;
+				case S_INH2:
+					switch(op) {
+					case 0x45:
+					case 0x4D:		opcycles += 3;	break;
+					default:				break;
+					}					break;
+				default:					break;
+				}						break;
+
+			default:
+				if (m_mode != MM_ADL)				break;
+
+				switch(rf) {
+				case S_CALL:
+					switch(opc1) {
+					case 0xCD:		opcycles += 2;	break;
+					default:		opcycles += 1;	break;
+					}					break;
+				case S_EX:			opcycles += 2;	break;
+				case S_JP:
+					switch(opc1) {
+					case 0xDD:
+					case 0xED:
+					case 0xFD:				break;
+					default:		opcycles += 1;	break;
+					}					break;
+				case S_LD:
+					switch(opc1) {
+					case 0x01:
+					case 0x11:
+					case 0x21:
+					case 0x32:
+					case 0x3A:		opcycles += 1;	break;
+
+					case 0x22:
+					case 0x2A:
+					case 0x31:		opcycles += 2;	break;
+
+					case 0xED:
+						switch(opc2) {
+						case 0x07:
+						case 0x0F:
+						case 0x17:
+						case 0x1F:
+						case 0x27:
+						case 0x2F:
+						case 0x31:
+						case 0x37:
+						case 0x3E:
+						case 0x3F:
+						case 0x7B:	opcycles += 1;	break;
+
+						case 0x43:
+						case 0x4B:
+						case 0x53:
+						case 0x5B:
+						case 0x73:	opcycles += 2;	break;
+						default:			break;
+						}				break;
+
+					case 0xDD:
+					case 0xFD:
+						switch(opc2) {
+						case 0x07:
+						case 0x0F:
+						case 0x17:
+						case 0x1F:
+						case 0x27:
+						case 0x2F:
+						case 0x21:
+						case 0x31:
+						case 0x37:
+						case 0x3E:
+						case 0x3F:	opcycles += 1;	break;
+
+						case 0x22:
+						case 0x2A:	opcycles += 2;	break;
+						default:			break;
+						}				break;
+					}					break;
+				case S_PEA:
+				case S_PUSH:
+				case S_RET:
+				case S_RST:			opcycles += 1;	break;
+				case S_INH2:
+					switch(op) {
+					case 0x45:
+					case 0x4D:		opcycles += 1;	break;
+					default:				break;
+					}					break;
+				default:					break;
+				}						break;
+			}
+		}
 	}
 }
 
@@ -1704,8 +2182,8 @@ struct mne *mp;
  */
 int
 genop(pop, op, esp, f)
-register int pop, op;
-register struct expr *esp;
+int pop, op;
+struct expr *esp;
 int f;
 {
 	register int t1;
@@ -1749,8 +2227,8 @@ int f;
  */
 int
 genopm(pop, op, esm, esp, f)
-register int pop, op;
-register struct expr *esm, *esp;
+int pop, op;
+struct expr *esm, *esp;
 int f;
 {
 	register int t1;
@@ -1860,7 +2338,7 @@ struct expr *esp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);

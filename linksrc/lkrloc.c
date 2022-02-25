@@ -1,7 +1,7 @@
 /* lkrloc.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,15 +16,6 @@
  *	Bill McKinnon (BM)
  *	w_mckinnon@conknet.com
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -114,7 +105,7 @@ int c;
 a_uint
 evword()
 {
-	register a_uint v;
+	a_uint v;
 
 	if (hilo) {
 		v =  (eval() << 8);
@@ -128,7 +119,7 @@ evword()
 
 /*)Function	a_uint 	adb_1b(v, i)
  *
- *		int	v		value to add to byte
+ *		a_uint	v		value to add to byte
  *		int	i		rtval[] index
  *
  *	The function adb_1b() adds the value of v to
@@ -136,7 +127,7 @@ evword()
  *	The new value of rtval[i] is returned.
  *
  *	local variable:
- *		none
+ *		a_uint	j		temporary evaluation variable
  *
  *	global variables:
  *		none
@@ -151,15 +142,20 @@ evword()
 
 a_uint
 adb_1b(v, i)
-register a_uint v;
-register int i;
+a_uint v;
+int i;
 {
-	return(rtval[i] += v);
+	a_uint j;
+
+	j = v + rtval[i];
+	rtval[i] = j & ((a_uint) 0x000000FF);
+
+	return(j);
 }
 
 /*)Function	a_uint 	adb_2b(v, i)
  *
- *		int	v		value to add to word
+ *		a_uint	v		value to add to word
  *		int	i		rtval[] index
  *
  *	The function adb_2b() adds the value of v to the
@@ -182,28 +178,28 @@ register int i;
 
 a_uint
 adb_2b(v, i)
-register a_uint v;
-register int i;
+a_uint v;
+int i;
 {
-	register a_uint j;
+	a_uint j;
 
 	if (hilo) {
-		j = v + (rtval[i] << 8) +
-			(rtval[i+1] & 0xff);
-		rtval[i] = (j >> 8) & 0xff;
-		rtval[i+1] = j & 0xff;
+		j = v + (rtval[i+0] << 8) +
+			(rtval[i+1] << 0);
+		rtval[i+0] = (j >> 8) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (j >> 0) & ((a_uint) 0x000000FF);
 	} else {
-		j = v + (rtval[i] & 0xff) +
+		j = v + (rtval[i+0] << 0) +
 			(rtval[i+1] << 8);
-		rtval[i] = j & 0xff;
-		rtval[i+1] = (j >> 8) & 0xff;
+		rtval[i+0] = (j >> 0) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (j >> 8) & ((a_uint) 0x000000FF);
 	}
 	return(j);
 }
 
 /*)Function	a_uint 	adb_3b(v, i)
  *
- *		int	v		value to add to word
+ *		a_uint	v		value to add to word
  *		int	i		rtval[] index
  *
  *	The function adb_3b() adds the value of v to the
@@ -226,32 +222,32 @@ register int i;
 
 a_uint
 adb_3b(v, i)
-register a_uint v;
-register int i;
+a_uint v;
+int i;
 {
-	register a_uint j;
+	a_uint j;
 
 	if (hilo) {
-		j = v + (((rtval[i] << 16) & 0xff0000) +
-			 ((rtval[i+1] << 8 ) & 0xff00) +
-			 ((rtval[i+2]) & 0xff));
-		rtval[i] = (j >> 16) & 0xff;
-		rtval[i+1] = (j >> 8) & 0xff;
-		rtval[i+2] = j & 0xff;
+		j = v + (rtval[i+0] << 16) +
+			(rtval[i+1] <<  8) +
+			(rtval[i+2] <<  0);
+		rtval[i+0] = (j >> 16) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (j >>  8) & ((a_uint) 0x000000FF);
+		rtval[i+2] = (j >>  0) & ((a_uint) 0x000000FF);
 	} else {
-		j = v + (((rtval[i+2] << 16) & 0xff0000) +
-			 ((rtval[i+1] << 8 ) & 0xff00) +
-			 ((rtval[i]) & 0xff));
-		rtval[i] = j & 0xff;
-		rtval[i+1] = (j >> 8) & 0xff;
-		rtval[i+2] = (j >> 16) & 0xff;
+		j = v + (rtval[i+0] <<  0) +
+			(rtval[i+1] <<  8) +
+			(rtval[i+2] << 16);
+		rtval[i+0] = (j >>  0) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (j >>  8) & ((a_uint) 0x000000FF);
+		rtval[i+2] = (j >> 16) & ((a_uint) 0x000000FF);
     }
     return(j);
 }
 
 /*)Function	a_uint 	adb_4b(v, i)
  *
- *		int	v		value to add to word
+ *		a_uint	v		value to add to word
  *		int	i		rtval[] index
  *
  *	The function adb_4b() adds the value of v to the
@@ -274,39 +270,39 @@ register int i;
 
 a_uint
 adb_4b(v, i)
-register a_uint v;
-register int i;
+a_uint v;
+int i;
 {
-	register a_uint j;
+	a_uint j;
 
 	if (hilo) {
-		j = v + (((rtval[i] << 24) & 0xff000000) +
-			 ((rtval[i+1] << 16) & 0xff0000) +
-			 ((rtval[i+2] << 8 ) & 0xff00) +
-			 ((rtval[i+3]) & 0xff));
-		rtval[i] = (j >> 24) & 0xff;
-		rtval[i+1] = (j >> 16) & 0xff;
-		rtval[i+2] = (j >> 8) & 0xff;
-		rtval[i+3] = j & 0xff;
+		j = v + (rtval[i+0] << 24) +
+			(rtval[i+1] << 16) +
+			(rtval[i+2] <<  8) +
+			(rtval[i+3] <<  0);
+		rtval[i+0] = (j >> 24) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (j >> 16) & ((a_uint) 0x000000FF);
+		rtval[i+2] = (j >>  8) & ((a_uint) 0x000000FF);
+		rtval[i+3] = (j >>  0) & ((a_uint) 0x000000FF);
 	} else {
-		j = v + (((rtval[i+3] << 24) & 0xff000000) +
-			 ((rtval[i+2] << 16) & 0xff0000) +
-			 ((rtval[i+1] << 8 ) & 0xff00) +
-			 ((rtval[i]) & 0xff));
-		rtval[i] = j & 0xff;
-		rtval[i+1] = (j >> 8) & 0xff;
-		rtval[i+2] = (j >> 16) & 0xff;
-		rtval[i+3] = (j >> 24) & 0xff;
+		j = v + (rtval[i+0] <<  0) +
+			(rtval[i+1] <<  8) +
+			(rtval[i+2] << 16) +
+			(rtval[i+3] << 24);
+		rtval[i+0] = (j >>  0) & ((a_uint) 0x000000FF);
+		rtval[i+1] = (j >>  8) & ((a_uint) 0x000000FF);
+		rtval[i+2] = (j >> 16) & ((a_uint) 0x000000FF);
+		rtval[i+3] = (j >> 24) & ((a_uint) 0x000000FF);
     }
     return(j);
 }
 
 /*)Function	a_uint 	adb_xb(v, i)
  *
- *		int	v		value to add to x-bytes
+ *		a_uint	v		value to add to x-bytes
  *		int	i		rtval[] index
  *
- *	The function adx_x() adds the value of v to
+ *	The function adb_xb() adds the value of v to
  *	the value contained in rtval[i] for x-bytes.
  *	The new value of rtval[i] for x-bytes is returned.
  *
@@ -329,34 +325,63 @@ register int i;
 
 a_uint
 adb_xb(v, i)
-register a_uint v;
-register int i;
+a_uint v;
+int i;
 {
 	a_uint j;
 
+#ifdef	LONGINT
 	switch(a_bytes){
 	case 1:
 		j = adb_1b(v, i);
-		return(j & 0x80 ? j | ~0x7F : j & 0x7F);
+		j = (j & ((a_uint) 0x00000080l) ? j | ~((a_uint) 0x0000007Fl) : j & ((a_uint) 0x0000007Fl));
+		break;
 	case 2:
 		j = adb_2b(v, i);
-		return(j & 0x8000 ? j | ~0x7FFF : j & 0x7FFF);
+		j = (j & ((a_uint) 0x00008000l) ? j | ~((a_uint) 0x00007FFFl) : j & ((a_uint) 0x00007FFFl));
+		break;
 	case 3:
 		j = adb_3b(v, i);
-		return(j & 0x800000 ? j | ~0x7FFFFF : j & 0x7FFFFF);
+		j = (j & ((a_uint) 0x00800000l) ? j | ~((a_uint) 0x007FFFFFl) : j & ((a_uint) 0x007FFFFFl));
+		break;
 	case 4:
 		j = adb_4b(v, i);
-		return(j & 0x80000000 ? j | ~0x7FFFFFFF : j & 0x7FFFFFFF);
+		j = (j & ((a_uint) 0x80000000l) ? j | ~((a_uint) 0x7FFFFFFFl) : j & ((a_uint) 0x7FFFFFFFl));
+		break;
 	default:
-		return(0);
+		j = 0;
+		break;
 	}
-	return(0);
+#else
+	switch(a_bytes){
+	case 1:
+		j = adb_1b(v, i);
+		j = (j & ((a_uint) 0x00000080) ? j | ~((a_uint) 0x0000007F) : j & ((a_uint) 0x0000007F));
+		break;
+	case 2:
+		j = adb_2b(v, i);
+		j = (j & ((a_uint) 0x00008000) ? j | ~((a_uint) 0x00007FFF) : j & ((a_uint) 0x00007FFF));
+		break;
+	case 3:
+		j = adb_3b(v, i);
+		j = (j & ((a_uint) 0x00800000) ? j | ~((a_uint) 0x007FFFFF) : j & ((a_uint) 0x007FFFFF));
+		break;
+	case 4:
+		j = adb_4b(v, i);
+		j = (j & ((a_uint) 0x80000000) ? j | ~((a_uint) 0x7FFFFFFF) : j & ((a_uint) 0x7FFFFFFF));
+		break;
+	default:
+		j = 0;
+		break;
+	}
+#endif
+	return(j);
 }
 
 /*)Function	a_uint 	adw_xb(x, v, i)
  *
  *		int	x		number of bytes to allow
- *		int	v		value to add to byte
+ *		a_uint	v		value to add to byte
  *		int	i		rtval[] index
  *
  *	The function adw_xb() adds the value of v to the
@@ -389,8 +414,8 @@ int x;
 a_uint v;
 int i;
 {
-	register a_uint j;
-	register int n;
+	a_uint j;
+	int n;
 
 	j = adb_xb(v, i);
 	/*
@@ -431,8 +456,37 @@ prntval(fptr, v)
 FILE *fptr;
 a_uint v;
 {
-	register char *frmt;
+	char *frmt;
 
+#ifdef	LONGINT
+	switch(xflag) {
+	default:
+	case 0:
+		switch(a_bytes) {
+		default:
+		case 2: frmt = "       %04lX\n"; break;
+		case 3: frmt = "     %06lX\n"; break;
+		case 4: frmt = "   %08lX\n"; break;
+		}
+		break;
+	case 1:
+		switch(a_bytes) {
+		default:
+		case 2: frmt = "     %06lo\n"; break;
+		case 3: frmt = "   %08lo\n"; break;
+		case 4: frmt = "%011lo\n"; break;
+		}
+		break;
+	case 2:
+		switch(a_bytes) {
+		default:
+		case 2: frmt = "      %05lu\n"; break;
+		case 3: frmt = "   %08lu\n"; break;
+		case 4: frmt = " %010lu\n"; break;
+		}
+		break;
+	}
+#else
 	switch(xflag) {
 	default:
 	case 0:
@@ -460,6 +514,7 @@ a_uint v;
 		}
 		break;
 	}
+#endif
 	fprintf(fptr, frmt, v & a_mask);
 }
 

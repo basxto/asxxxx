@@ -1,7 +1,7 @@
 /* picmch.c */
 
 /*
- * (C) Copyright 2001-2003
+ * (C) Copyright 2001-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,17 +9,36 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
 #include "asxxxx.h"
 #include "pic.h"
 
 static char buff[NINPUT];
 static char pic_cpu[80];
 static int  pic_type;
+static int  pic_bytes;
 static a_uint pic_fsr;
 static struct badram *br;
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	OPCY_SBITS	((char) (0xFD))
+#define	OPCY_PMAXR	((char) (0xFC))
+#define	OPCY_PBADR	((char) (0xFB))
+#define	OPCY_PTYPE	((char) (0xFA))
+#define	OPCY_PBITS	((char) (0xF9))
+#define	OPCY_PFIX	((char) (0xF8))
+#define	OPCY_SDMM	((char) (0xF7))
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+#define	P2	((char) (OPCY_NONE | 0x01))
+
 
 /*
  * Process machine ops.
@@ -28,7 +47,8 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	int c, d, op;
+	int c, d;
+	a_uint op;
 	char *cp, *p;
 	char id[NINPUT];
 	char picmne[NINPUT];
@@ -43,11 +63,19 @@ struct mne *mp;
 	switch (mp->m_type) {
 
 	case S_BITS:
-		exprmasks(mp->m_valu);
+		if (pic_bytes == 0) {
+			pic_bytes = (int) op;
+			exprmasks(pic_bytes);
+		} else
+		if (pic_bytes != (int) op) {
+			err('m');
+		}
+		opcycles = OPCY_SBITS;
 		lmode = SLIST;
 		break;
 
 	case X_PMAXR:		/*	.maxram		valu	*/
+		opcycles = OPCY_PMAXR;
 		lmode = SLIST;
 		clrexpr(&e1);
 		expr(&e1, 0);
@@ -72,6 +100,7 @@ struct mne *mp;
 		break;
 
 	case X_PBADR:		/*	.badram		valu [,	lovalu:hivalu]	*/
+		opcycles = OPCY_PBADR;
 		lmode = SLIST;
 		do {
 			clrexpr(&e1);
@@ -106,6 +135,8 @@ struct mne *mp;
 		break;
 
 	case X_PTYPE:
+		opcycles = OPCY_PTYPE;
+		lmode = SLIST;
 		/*
 		 * Append CPU Type to PIC_CPU
 		 */
@@ -113,6 +144,9 @@ struct mne *mp;
 			cp = p = id;
 			d = getnb();
 			while ((c = get()) != d) {
+				if (c == '\0') {
+					qerr();
+				}
 				if (p < &id[sizeof(id)-1]) {
 					*p++ = c;
 				} else {
@@ -121,7 +155,7 @@ struct mne *mp;
 			}
 			*p = 0;
 		} else {
-			cp = "PIC_Not_Selected";
+			cp = "_PIC_Not_Selected";
 		}
 		strcpy(pic_cpu, cp);
 
@@ -136,16 +170,17 @@ struct mne *mp;
 
 		sprintf(buff, "%s,  %s", PIC_CPU, pic_cpu);
 		cpu = buff;
-		lmode = SLIST;
 		break;
 
 	case X_PBITS:
-		pic_type = op;
+		opcycles = OPCY_PBITS;
+		lmode = SLIST;
+		pic_type = (int) op;
 		cd = picDef;
 		while (cd->id) {
 			mp = mlookup(cd->id);
 			if (mp) {
-				mp->m_valu = cd->opcode[op];
+				mp->m_valu = cd->opcode[(int) op];
 			} else
 			if (pass == 0) {
 				printf("?ASPIC-Internal-Error-<picpst.c: mne[]/picDef[]>\n");
@@ -179,10 +214,17 @@ struct mne *mp;
 			}
 			cf++;
 		}
-		lmode = SLIST;
+		if (pic_bytes == 0) {
+			pic_bytes = (int) a_bytes;
+		} else
+		if (pic_bytes != (int) a_bytes) {
+			err('m');
+		}
 		break;
 
 	case X_PFIX:
+		opcycles = OPCY_PFIX;
+		lmode = SLIST;
 		/*
 		 * Get the CPU type
 		 */
@@ -192,6 +234,9 @@ struct mne *mp;
 		p = id;
 		d = getnb();
 		while ((c = get()) != d) {
+			if (c == '\0') {
+				qerr();
+			}
 			if (p < &id[sizeof(id)-1]) {
 				*p++ = c;
 			} else {
@@ -209,6 +254,9 @@ struct mne *mp;
 		p = picmne;
 		d = getnb();
 		while ((c = get()) != d) {
+			if (c == '\0') {
+				qerr();
+			}
 			if (p < &picmne[sizeof(picmne)-1]) {
 				*p++ = c;
 			} else {
@@ -264,7 +312,8 @@ VOID
 pic12bit(mp)
 struct mne *mp;
 {
-	int c, op;
+	a_uint op;
+	int c;
 	int t1, t2;
 	int r_mode;
 	struct expr e1, e2;
@@ -281,6 +330,8 @@ struct mne *mp;
 	}
 	switch (mp->m_type) {
 	case S_SDMM:
+		opcycles = OPCY_SDMM;
+		lmode = SLIST;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -304,7 +355,6 @@ struct mne *mp;
 		} else {
 			outdp(dot.s_area, &e1, 0);
 		}
-		lmode = SLIST;
 		break;
 
 	case S_FW:			/* inst f,d */
@@ -429,8 +479,28 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
 		break;
+	}
+
+	if (opcycles == OPCY_NONE) {
+		switch(cb[0] & 0x000F) {
+		case 0x02:
+		case 0x03:
+			if ((cb[1] & 0xC0) == 0xC0) {
+				opcycles = 2;
+			} else {
+				opcycles = 1;
+			}			break;
+		case 0x06:
+		case 0x07:
+		case 0x08:
+		case 0x09:
+		case 0x0A:
+		case 0x0B:	opcycles = 2;	break;
+		default:	opcycles = 1;	break;
+		}
 	}
 }
 
@@ -439,7 +509,7 @@ struct mne *mp;
  */
 VOID
 mch12fsr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (pic_fsr != ~0) {
 		if ((esp->e_addr & ~0x1F) != pic_fsr) {
@@ -456,7 +526,8 @@ VOID
 pic14bit(mp)
 struct mne *mp;
 {
-	int c, op;
+	a_uint op;
+	int c;
 	int t1, t2;
 	int r_mode;
 	struct expr e1, e2;
@@ -473,6 +544,8 @@ struct mne *mp;
 	}
 	switch (mp->m_type) {
 	case S_SDMM:
+		opcycles = OPCY_SDMM;
+		lmode = SLIST;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -496,7 +569,6 @@ struct mne *mp;
 		} else {
 			outdp(dot.s_area, &e1, 0);
 		}
-		lmode = SLIST;
 		break;
 
 	case S_FW:			/* inst f,d */
@@ -611,10 +683,87 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
 		break;
 	}
+
+	if (opcycles == OPCY_NONE) {
+		switch((cb[0] >> 2) & 0x000F) {
+		case 0x02:
+		case 0x03:
+			if ((cb[0] & 0x03) == 0x03) {
+				opcycles = 2;
+			} else {
+				opcycles = 1;
+			}			break;
+		case 0x06:
+		case 0x07:
+		case 0x08:
+		case 0x09:
+		case 0x0A:
+		case 0x0B:
+		case 0x0D:	opcycles = 2;	break;
+		default:	opcycles = 1;
+			if ((cb[0] == 0) &&
+			   ((cb[1] == 0x08) || (cb[1] == 0x09))) {
+				opcycles = 2;
+			}			break;
+		}
+	}
 }
+
+
+/*
+ * pic16 Cycle Count
+ *
+ *	opcycles = p16pgx[opcode]
+ */
+static char  p16pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  P2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*10*/   1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2,
+/*20*/   1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1,
+/*30*/   2, 2, 2, 2, 1,UN,UN,UN, 1, 1, 1, 1, 1, 1, 1, 1,
+/*40*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*50*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*60*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*70*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*80*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*90*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*A0*/   1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2,
+/*B0*/   1, 1, 1, 1, 1, 1, 2, 2, 1,UN, 1, 1, 1,UN,UN,UN,
+/*C0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*D0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*E0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*F0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+};
+
+static char  p16pg2[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   1,UN, 2, 1, 1, 2,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN
+};
+
+static char *P16Page[2] = {
+    p16pg1, p16pg2
+};
 
 
 /*
@@ -624,7 +773,8 @@ VOID
 pic16bit(mp)
 struct mne *mp;
 {
-	int c, op;
+	a_uint op;
+	int c;
 	int t1, t2, t3;
 	int r_mode;
 	struct expr e1, e2, e3;
@@ -642,6 +792,8 @@ struct mne *mp;
 	}
 	switch (mp->m_type) {
 	case S_SDMM:
+		opcycles = OPCY_SDMM;
+		lmode = SLIST;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -665,7 +817,6 @@ struct mne *mp;
 		} else {
 			outdp(dot.s_area, &e1, 0);
 		}
-		lmode = SLIST;
 		break;
 
 	case S_DAW:			/* daw  f,s */
@@ -899,10 +1050,70 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
 		break;
 	}
+
+	if (opcycles == OPCY_NONE) {
+		opcycles = p16pg1[cb[0] & 0xFF];
+		if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+			opcycles = P16Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+		}
+	}
 }
+
+
+/*
+ * pic20 Cycle Count
+ *
+ *	opcycles = p20pgx[opcode]
+ */
+static char  p20pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  P2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1,
+/*10*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*20*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3,
+/*30*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3,
+/*40*/   1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3,
+/*50*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*60*/   3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1,
+/*70*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*80*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*90*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+/*A0*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*B0*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*C0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*D0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*E0*/   2, 2, 2, 2, 2, 2, 2, 2,UN,UN,UN,UN, 2, 2, 2, 2,
+/*F0*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+};
+
+static char  p20pg2[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   1,UN,UN, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2,
+/*10*/   2, 2, 2, 2,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 1
+};
+
+static char *P20Page[2] = {
+    p20pg1, p20pg2
+};
 
 
 /*
@@ -912,8 +1123,9 @@ VOID
 pic20bit(mp)
 struct mne *mp;
 {
-	int c, op;
-	int v1;
+	a_uint op;
+	v_sint v1;
+	int c;
 	int t1, t2;
 	int r_mode;
 	struct expr e1, e2, e3;
@@ -931,6 +1143,8 @@ struct mne *mp;
 	}
 	switch (mp->m_type) {
 	case S_SDMM:
+		opcycles = OPCY_SDMM;
+		lmode = SLIST;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -954,7 +1168,6 @@ struct mne *mp;
 		} else {
 			outdp(dot.s_area, &e1, 0);
 		}
-		lmode = SLIST;
 		break;
 
 	case S_FW:			/* inst f,d(,a) */
@@ -1205,7 +1418,7 @@ struct mne *mp;
 		} else {
 			e2.e_addr = 0;
 		}
-		outr4bm(&e1, R_20BIT, ((op + (e2.e_addr << 8)) << 16) + 0xF000);
+		outr4bm(&e1, R_20BIT, ((op + (e2.e_addr << 8)) << 16) + (a_uint) 0x0000F000);
 		break;
 
 	case S_GOTO:			/* goto k */
@@ -1213,7 +1426,7 @@ struct mne *mp;
 		if (t1 != S_EXT) {
 			aerr();
 		}
-		outr4bm(&e1, R_20BIT, ((op << 16) + 0xF000));
+		outr4bm(&e1, R_20BIT, (op << 16) + (a_uint) 0x0000F000);
 		break;
 
 	case S_BRA:			/* bra */
@@ -1275,7 +1488,7 @@ struct mne *mp;
 			aerr();
 		}
 		r_mode = is_abs(&e2) ? R_MBRO | R_LFSR : R_PAG0 | R_LFSR;
-		outr4bm(&e2, r_mode, ((op + (e1.e_addr << 4)) << 16) | 0xF000);
+		outr4bm(&e2, r_mode, ((op + (e1.e_addr << 4)) << 16) | (a_uint) 0x0000F000);
 		break;
 
 	case S_MOVFF:			/* movff f,f */
@@ -1295,7 +1508,7 @@ struct mne *mp;
 			aerr();
 		}
 		outrwm(&e1, R_12BIT | R_MBRO, op);
-		outrwm(&e2, R_12BIT | R_MBRO, 0xF000);
+		outrwm(&e2, R_12BIT | R_MBRO, (a_uint) 0x0000F000);
 		break;
 
 	case S_TBL:			/* tblrd/tblwt '*','*+','*-','+*'  */
@@ -1345,8 +1558,16 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
 		break;
+	}
+
+	if (opcycles == OPCY_NONE) {
+		opcycles = p20pg1[cb[0] & 0xFF];
+		if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+			opcycles = P20Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+		}
 	}
 }
 
@@ -1356,7 +1577,7 @@ struct mne *mp;
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);
@@ -1381,7 +1602,7 @@ register struct expr *esp;
  */
 VOID
 mchdpm(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
 		/*
@@ -1402,7 +1623,7 @@ register struct expr *esp;
  */
 int
 mchramchk(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	struct badram *brp;
 
@@ -1437,8 +1658,8 @@ comma()
 VOID
 minit()
 {
-	exprmasks(2);
 	if (pass == 0) {
+		pic_bytes = 0;
 		br = NULL;
 	}
 	pic_type = 0;

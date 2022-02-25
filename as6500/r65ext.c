@@ -1,7 +1,7 @@
 /* r65ext.c */
 
 /*
- * (C) Copyright 1995-2003
+ * (C) Copyright 1995-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -20,8 +20,6 @@
  * EARN/BitNet: msmakela at finuh
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "r6500.h"
 

@@ -1,7 +1,7 @@
 /* m04adr.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,16 +9,14 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6804.h"
 
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c;
+	int c;
 
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
@@ -31,8 +29,6 @@ register struct expr *esp;
 		expr(esp, 0);
 		esp->e_mode = S_DIR;
 	}
-	if (esp->e_addr & ~0xFF)
-		aerr();
 	return (esp->e_mode);
 }
 	
@@ -43,11 +39,11 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-	register char *ptr;
-	register int i;
-	register char *ips;
+	char *ptr;
+	int i;
+	char *ips;
 
 	ips = ip;
 	unget(getnb());
@@ -68,9 +64,9 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-	register char *ptr;
+	char *ptr;
 	ptr = ip;
 
 	while (*ptr && *str) {

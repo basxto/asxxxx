@@ -1,7 +1,7 @@
 /* i51pst.c */
 
 /*
- * (C) Copyright 1998-2003
+ * (C) Copyright 1998-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -15,8 +15,6 @@
  *
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "i8051.h"
 
@@ -81,7 +79,7 @@ struct	mode	mode[2] = {
 };
 
 /*
- * Array of Pointers to VSD Structures
+ * Array of Pointers to mode Structures
  */
 struct	mode	*modep[16] = {
 	&mode[0],	&mode[1],	NULL,		NULL,
@@ -131,6 +129,12 @@ struct	mne	mne[] = {
     {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
+    {	NULL,	".iflt",	S_CONDITIONAL,	0,	O_IFLT	},
+    {	NULL,	".ifge",	S_CONDITIONAL,	0,	O_IFGE	},
+    {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
+    {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
+    {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},
@@ -188,7 +192,6 @@ struct	mne	mne[] = {
     {	NULL,	"r5",		S_REG,		0,	R5	},
     {	NULL,	"r6",		S_REG,		0,	R6	},
     {	NULL,	"r7",		S_REG,		0,	R7	},
-
     {	NULL,	"nop",		S_INH,		0,	0x00	},
     {	NULL,	"ret",		S_INH,		0,	0x22	},
     {	NULL,	"reti",		S_INH,		0,	0x32	},
@@ -256,6 +259,15 @@ struct PreDef preDef[] = {
     {	"ACC.5",	0x00E5	},
     {	"ACC.6",	0x00E6	},
     {	"ACC.7",	0x00E7	},
+    {	"A",		0x00E0	},
+    {	"A.0",		0x00E0	},
+    {	"A.1",		0x00E1	},
+    {	"A.2",		0x00E2	},
+    {	"A.3",		0x00E3	},
+    {	"A.4",		0x00E4	},
+    {	"A.5",		0x00E5	},
+    {	"A.6",		0x00E6	},
+    {	"A.7",		0x00E7	},
     {	"B",		0x00F0	},
     {	"B.0",		0x00F0	},
     {	"B.1",		0x00F1	},

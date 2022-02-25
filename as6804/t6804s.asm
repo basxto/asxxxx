@@ -240,7 +240,7 @@ loc15:
 					; AE
 					; AF
 
-	mvi	abcd,#defg		; B0r01 FE
+	mvi	abcd,#defg		; B0*01 FE
 					; B1
 	rti				; B2
 	rts				; B3
@@ -258,41 +258,41 @@ loc15:
 					; BF
 
 
-1$:	brclr	#bit0,ram, .		; C0u02 FD
-2$:	brclr	#bit1,ram,2$		; C1u02 FD
-3$:	brclr	#bit2,ram,3$		; C2u02 FD
-4$:	brclr	#bit3,ram,4$		; C3u02 FD
-5$:	brclr	#bit4,ram,5$		; C4u02 FD
-6$:	brclr	#bit5,ram,6$		; C5u02 FD
-7$:	brclr	#bit6,ram,7$		; C6u02 FD
-8$:	brclr	#bit7,ram,8$		; C7u02 FD
+1$:	brclr	#bit0,ram, .		; C0*02 FD
+2$:	brclr	#bit1,ram,2$		; C1*02 FD
+3$:	brclr	#bit2,ram,3$		; C2*02 FD
+4$:	brclr	#bit3,ram,4$		; C3*02 FD
+5$:	brclr	#bit4,ram,5$		; C4*02 FD
+6$:	brclr	#bit5,ram,6$		; C5*02 FD
+7$:	brclr	#bit6,ram,7$		; C6*02 FD
+8$:	brclr	#bit7,ram,8$		; C7*02 FD
 
-9$:	brset	#bit0,ram,9$		; C8u02 FD
-10$:	brset	#bit1,ram,10$		; C9u02 FD
-11$:	brset	#bit2,ram,11$		; CAu02 FD
-12$:	brset	#bit3,ram,12$		; CBu02 FD
-13$:	brset	#bit4,ram,13$		; CCu02 FD
-14$:	brset	#bit5,ram,14$		; CDu02 FD
-15$:	brset	#bit6,ram,15$		; CEu02 FD
-16$:	brset	#bit7,ram,16$		; CFu02 FD
+9$:	brset	#bit0,ram,9$		; C8*02 FD
+10$:	brset	#bit1,ram,10$		; C9*02 FD
+11$:	brset	#bit2,ram,11$		; CA*02 FD
+12$:	brset	#bit3,ram,12$		; CB*02 FD
+13$:	brset	#bit4,ram,13$		; CC*02 FD
+14$:	brset	#bit5,ram,14$		; CD*02 FD
+15$:	brset	#bit6,ram,15$		; CE*02 FD
+16$:	brset	#bit7,ram,16$		; CF*02 FD
 
-	bclr	#bit0,ram		; D0u02
-	bclr	#bit1,ram		; D1u02
-	bclr	#bit2,ram		; D2u02
-	bclr	#bit3,ram		; D3u02
-	bclr	#bit4,ram		; D4u02
-	bclr	#bit5,ram		; D5u02
-	bclr	#bit6,ram		; D6u02
-	bclr	#bit7,ram		; D7u02
+	bclr	#bit0,ram		; D0*02
+	bclr	#bit1,ram		; D1*02
+	bclr	#bit2,ram		; D2*02
+	bclr	#bit3,ram		; D3*02
+	bclr	#bit4,ram		; D4*02
+	bclr	#bit5,ram		; D5*02
+	bclr	#bit6,ram		; D6*02
+	bclr	#bit7,ram		; D7*02
 
-	bset	#bit0,ram		; D8u02
-	bset	#bit1,ram		; D9u02
-	bset	#bit2,ram		; DAu02
-	bset	#bit3,ram		; DBu02
-	bset	#bit4,ram		; DCu02
-	bset	#bit5,ram		; DDu02
-	bset	#bit6,ram		; DEu02
-	bset	#bit7,ram		; DFu02
+	bset	#bit0,ram		; D8*02
+	bset	#bit1,ram		; D9*02
+	bset	#bit2,ram		; DA*02
+	bset	#bit3,ram		; DB*02
+	bset	#bit4,ram		; DC*02
+	bset	#bit5,ram		; DD*02
+	bset	#bit6,ram		; DE*02
+	bset	#bit7,ram		; DF*02
 
 
 	lda	,x			; E0

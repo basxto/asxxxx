@@ -5,7 +5,7 @@
  * Bill McKinnon
  * w_mckinnon at conknet dot com
  *
- * (C) Copyright 1998-2003
+ * (C) Copyright 1998-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -18,8 +18,6 @@
  *
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "ds8.h"
 
@@ -88,11 +86,19 @@ char	mode2[32] = {	/* R_J19 */
  *		int	m_mbro;		Bit Range Overflow Mask
  *	};
  */
+#ifdef	LONGINT
+struct	mode	mode[3] = {
+    {	&mode0[0],	0,	0x0000FFFFl,	0x0000FFFFl	},
+    {	&mode1[0],	1,	0x0000E0FFl,	0x000007FFl	},
+    {	&mode2[0],	1,	0x00E0FFFFl,	0x0007FFFFl	}
+};
+#else
 struct	mode	mode[3] = {
     {	&mode0[0],	0,	0x0000FFFF,	0x0000FFFF	},
     {	&mode1[0],	1,	0x0000E0FF,	0x000007FF	},
     {	&mode2[0],	1,	0x00E0FFFF,	0x0007FFFF	}
 };
+#endif
 
 /*
  * Array of Pointers to mode Structures
@@ -114,20 +120,20 @@ struct	mne	mne[] = {
     {	NULL,	"CSEG",		S_ATYP,		0,	A_CSEG|A_1BYTE	},
     {	NULL,	"DSEG",		S_ATYP,		0,	A_DSEG|A_1BYTE	},
 
-    {	NULL,	".amode",	X_AMODE,	0,	0	},
+    {	NULL,	".amode",	S_AMODE,	0,	0	},
 
-    {	NULL,	".cpu",		X_PTYPE,	0,	DS______	},
-    {	NULL,	".DS8XCXXX",	X_PTYPE,	0,	DS8xCxxx	},
-    {	NULL,	".DS80C310",	X_PTYPE,	0,	DS80C310	},
-    {	NULL,	".DS80C320",	X_PTYPE,	0,	DS80C320	},
-    {	NULL,	".DS80C323",	X_PTYPE,	0,	DS80C323	},
-    {	NULL,	".DS80C390",	X_PTYPE,	0,	DS80C390	},
-    {	NULL,	".DS83C520",	X_PTYPE,	0,	DS83C520	},
-    {	NULL,	".DS83C530",	X_PTYPE,	0,	DS83C530	},
-    {	NULL,	".DS83C550",	X_PTYPE,	0,	DS83C550	},
-    {	NULL,	".DS87C520",	X_PTYPE,	0,	DS87C520	},
-    {	NULL,	".DS87C530",	X_PTYPE,	0,	DS87C530	},
-    {	NULL,	".DS87C550",	X_PTYPE,	0,	DS87C550	},
+    {	NULL,	".cpu",		S_CPU,		0,	DS______	},
+    {	NULL,	".DS8XCXXX",	S_CPU,		0,	DS8XCXXX	},
+    {	NULL,	".DS80C310",	S_CPU,		0,	DS80C310	},
+    {	NULL,	".DS80C320",	S_CPU,		0,	DS80C320	},
+    {	NULL,	".DS80C323",	S_CPU,		0,	DS80C323	},
+    {	NULL,	".DS80C390",	S_CPU,		0,	DS80C390	},
+    {	NULL,	".DS83C520",	S_CPU,		0,	DS83C520	},
+    {	NULL,	".DS83C530",	S_CPU,		0,	DS83C530	},
+    {	NULL,	".DS83C550",	S_CPU,		0,	DS83C550	},
+    {	NULL,	".DS87C520",	S_CPU,		0,	DS87C520	},
+    {	NULL,	".DS87C530",	S_CPU,		0,	DS87C530	},
+    {	NULL,	".DS87C550",	S_CPU,		0,	DS87C550	},
 
 	/* system */
 
@@ -160,6 +166,12 @@ struct	mne	mne[] = {
     {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
+    {	NULL,	".iflt",	S_CONDITIONAL,	0,	O_IFLT	},
+    {	NULL,	".ifge",	S_CONDITIONAL,	0,	O_IFGE	},
+    {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
+    {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
+    {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},

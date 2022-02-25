@@ -1,7 +1,7 @@
 /* rabext.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,11 +13,9 @@
  * PS Division
  * CERN
  * CH-1211 Geneva-23
- * email: Ulrich.Raich@cern.ch
+ * email: Ulrich dot Raich at cern dot ch
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "rab.h"
 

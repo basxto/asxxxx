@@ -1,7 +1,7 @@
 /* m6808.h */
 
 /*
- * (C) Copyright 1993-2003
+ * (C) Copyright 1993-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -76,10 +76,25 @@ struct adsym
 #define	S_DZAX	71
 #define	S_MOV	72
 
+#define	S_INH8	73
+#define	S_INH8S	74
+#define	S_BRA8	75
+
 /*
- * Set Direct Pointer
+ * Special Types
  */
 #define	S_SDP	80
+#define	S_CPU	81
+
+/*
+ * Processor Types (S_CPU)
+ */
+#define	X_HC08	0
+#define X_HCS08	1
+#define	X_6805	2
+#define	X_HC05	3
+
+
 
 
 	/* machine dependent functions */
@@ -95,7 +110,6 @@ extern	int		srch(char *str);
 
 	/* m08mch.c */
 extern	VOID		machine(struct mne *mp);
-extern	int		chkindx(struct expr *exp);
 extern	int		mchpcr(struct expr *esp);
 extern	VOID		minit(void);
 extern	int		comma(void);
@@ -111,7 +125,6 @@ extern	int		srch();
 
 	/* m08mch.c */
 extern	VOID		machine();
-extern	int		chkindx();
 extern	int		mchpcr();
 extern	VOID		minit();
 extern	int		comma();

@@ -53,14 +53,14 @@ addressing mode supported by AS740:
 
         *zp             zero page addressing
                         (see .setdp directive)
-                        0 &lt;= dir &lt;= 255 
+                        0 <= dir <= 255 
 
         *zp,x           zero page x addressing
         *zp,y           zero page y addressing
                         address = (offset + (x or y))
 
         [*zp,x]         indirect x addressing
-                        0 &lt;= offset &lt;= 255
+                        0 <= offset <= 255
                         address = 2 bytes at location
                             [(offset + (x or y)) mod 256]
 
@@ -196,5 +196,6 @@ Other Instructions
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

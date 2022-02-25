@@ -1,7 +1,7 @@
 /* aslex.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,16 +9,6 @@
  * Kent, Ohio  44240
  *
  */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "asxxxx.h"
 
@@ -90,10 +80,10 @@
 
 VOID
 getid(id, c)
-register int c;
+int c;
 char *id;
 {
-	register char *p;
+	char *p;
 
 	if (c < 0) {
 		c = getnb();
@@ -154,10 +144,10 @@ char *id;
 
 VOID
 getst(id, c)
-register int c;
+int c;
 char *id;
 {
-	register char *p;
+	char *p;
 
 	if (c < 0) {
 		c = getnb();
@@ -196,7 +186,7 @@ char *id;
 int
 getnb()
 {
-	register int c;
+	int c;
 
 	while ((c=get()) == ' ' || c == '\t')
 		;
@@ -229,7 +219,7 @@ getnb()
 int
 get()
 {
-	register int c;
+	int c;
 
 	if ((c = *ip) != 0)
 		++ip;
@@ -307,7 +297,7 @@ int
 getmap(d)
 int d;
 {
-	register int c, n, v;
+	int c, n, v;
 
 	if ((c=get()) == '\0')
 		qerr();
@@ -353,6 +343,11 @@ int d;
 			}
 			unget(c);
 			c = v;
+			break;
+
+		default:
+			unget(c);
+			c = '\\';
 			break;
 		}
 	}
@@ -594,7 +589,7 @@ int
 replace(id)
 char *id;
 {
-	register char *p;
+	char *p;
 	char str[NINPUT*2];
 	char *frmt;
 	struct def *dp;
@@ -700,7 +695,7 @@ char *id;
 int
 more()
 {
-	register int c;
+	int c;
 
 	c = getnb();
 	unget(c);
@@ -732,7 +727,7 @@ more()
 char
 endline()
 {
-	register int c;
+	int c;
 
 	c = getnb();
 	return( (c == '\0' || c == ';') ? 0 : c );
@@ -763,8 +758,8 @@ VOID
 chopcrlf(str)
 char *str;
 {
-	register char *p;
-	register char c;
+	char *p;
+	char c;
 
 	p = str;
 	do {

@@ -1,7 +1,7 @@
 /* i85mch.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,10 +9,45 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "i8085.h"
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+
+/*
+ * 8085 Cycle Count
+ *
+ *	opcycles = h8pg1[opcode]
+ */
+static char i85pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   4,10, 7, 6, 4, 4, 7, 4,UN,10, 7, 6, 4, 4, 7, 4,
+/*10*/  UN,10, 7, 6, 4, 4, 7, 4,UN,10, 7, 6, 4, 4, 7, 4,
+/*20*/   4,10,16, 6, 4, 4, 7, 4,UN,10,16, 6, 4, 4, 7, 4,
+/*30*/   4,10,13, 6,10,10,10, 4,UN,10,13, 6, 4, 4, 7, 4,
+/*40*/   4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4,
+/*50*/   4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4,
+/*60*/   4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4,
+/*70*/   7, 7, 7, 7, 7, 7, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4,
+/*80*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*90*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*A0*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*B0*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*C0*/  12,10,10,10,18,12, 7,12,12,10,10,UN,18,18, 7,12,
+/*D0*/  12,10,10,10,18,12, 7,12,12,UN,10,10,18,UN, 7,12,
+/*E0*/  12,10,10,16,18,12, 7,12,12, 6,10, 4,18,UN, 7,12,
+/*F0*/  12,10,10, 4,18,12, 7,12,12, 6,10, 4,18,UN, 7,12
+};
 
 /*
  * Process machine ops.
@@ -21,11 +56,11 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register unsigned op, rd, rs;
+	unsigned op, rd, rs;
 	struct expr e;
 
 	clrexpr(&e);
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	switch (mp->m_type) {
 
 	case S_INH:
@@ -33,7 +68,7 @@ struct mne *mp;
 		break;
 
 	case S_RST:
-		rd = absexpr();
+		rd = (int) absexpr();
 		if (rd > 7)
 			aerr();
 		out3(op, rd);
@@ -110,7 +145,12 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+	if (opcycles == OPCY_NONE) {
+		opcycles = i85pg1[cb[0] & 0xFF];
 	}
 }
 
@@ -162,7 +202,7 @@ int s;
 int
 reg()
 {
-	register struct mne *mp;
+	struct mne *mp;
 	char id[NCPS];
 
 	getid(id, -1);
@@ -170,7 +210,7 @@ reg()
 		aerr();
 		return (0);
 	}
-	return (mp->m_valu);
+	return ((int) mp->m_valu);
 }
 
 /*

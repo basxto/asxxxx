@@ -174,6 +174,41 @@ LLL5:	ANMA			; 46
 
 MMMM:
 
+; .sbasic character translation
+
+	.sbasic	'\000', '\001', '\002', '\003'	; 00 01 02 03
+	.sbasic	'\004', '\005', '\006', '\007'	; 04 05 06 07
+	.sbasic	'\010', '\011', '\012', '\013'	; 08 09 0A 0B
+	.sbasic	'\014', '\015', '\016', '\017'	; 0C 0D 0E 0F
+	.sbasic	'\020', '\021', '\022', '\023'	; 10 11 12 13
+	.sbasic	'\024', '\025', '\026', '\027'	; 14 15 16 17
+	.sbasic	'\030', '\031', '\032', '\033'	; 18 19 1A 1B
+	.sbasic	'\034', '\035', '\036', '\037'	; 1C 1D 1E 1F
+	.sbasic	/ !"#/				; 11 14 12 15
+	.sbasic	/$%&'/				; 18 16 1F 27
+	.sbasic	/()*+/				; 30 31 37 35
+	.sbasic	@,-./@				; 1B 36 4A 38
+	.sbasic	/0123/				; 40 41 42 43
+	.sbasic	/4567/				; 44 45 46 47
+	.sbasic	/89:/, '\073'			; 48 49 1D 1C
+	.sbasic	/<=>?/				; 33 34 32 13
+	.sbasic	/@ABC/				; 1E 51 52 53
+	.sbasic	/DEFG/				; 54 55 56 57
+	.sbasic	/HIJK/				; 58 59 5A 5B
+	.sbasic	/LMNO/				; 5C 5D 5E 5F
+	.sbasic	/PQRS/				; 60 61 62 63
+	.sbasic	/TUVW/				; 64 65 66 67
+	.sbasic	/XYZ[/				; 68 69 6A 5B
+	.sbasic	/\]^_/				; 5C 5D 39 4E
+	.sbasic	/`abc/				; 60 61 4C 4C
+	.sbasic	/defg/				; 64 4B 66 67
+	.sbasic	/hijk/				; 68 10 6A 6B
+	.sbasic	/lmno/				; 6C 6D 6E 6F
+	.sbasic	/pqrs/				; 19 71 72 1A
+	.sbasic	/tuvw/				; 74 75 76 77
+	.sbasic	/xyz{/				; 78 17 7A 7B
+	.sbasic	/|}~/, '\177'			; 7C 7D 4D 7F
+
 .if 0
 
 Symbol Table

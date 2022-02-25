@@ -1,7 +1,7 @@
 /* lklibr.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -14,15 +14,6 @@
  * kenh@cmf.nrl.navy.mil
  *
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -247,8 +238,8 @@ char *libfil;
 VOID
 search()
 {
-	register struct sym *sp;
-	register int i,symfnd;
+	struct sym *sp;
+	int i,symfnd;
 
 	/*
 	 * Look for undefined symbols.  Keep

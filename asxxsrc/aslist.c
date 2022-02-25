@@ -1,7 +1,7 @@
 /* aslist.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,19 +11,11 @@
  *   With enhancements from
  *
  *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *	jhartman at compuserve dot com
  *
- */
-
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
+ *	Mike McCarty
+ *	mike dot mccarty at sbcglobal dot net
+*/
 
 #include "asxxxx.h"
 
@@ -54,6 +46,7 @@
  *		int *	wpt		pointer to the data byte mode
  *		int	n		number of bytes listed per line
  *		int	nb		computed number of assembled bytes
+ *		int	nl		number of bytes listed on this line
  *		int	l_addr		laddr (int) truncated to 2-bytes
  *
  *	global variables:
@@ -92,7 +85,7 @@
  *		Listing or symbol output updated.
  */
 
-/* The Output Formats
+/* The Output Formats, No Cycle Count
 | Tabs- |       |       |       |       |       |
           11111111112222222222333333333344444-----
 012345678901234567890123456789012345678901234-----
@@ -127,13 +120,48 @@ ee DDDDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(32)
 		       DDDDDDDDDD
 */
 
+/* The Output Formats,  With Cycle Count [nn]
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+   |    |               |     | |
+ee XXXX xx xx xx xx xx[nn]LLLLL *************	HEX(16)
+ee 000000 ooo ooo ooo [nn]LLLLL *************	OCTAL(16)
+ee  DDDDD ddd ddd ddd [nn]LLLLL *************	DECIMAL(16)
+                     XXXX
+		   OOOOOO
+		    DDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+     |       |                  |     | |
+ee    XXXXXX xx xx xx xx xx xx[nn]LLLLL *********	HEX(24)
+ee   OO000000 ooo ooo ooo ooo [nn]LLLLL *********	OCTAL(24)
+ee   DDDDDDDD ddd ddd ddd ddd [nn]LLLLL *********	DECIMAL(24)
+                           XXXXXX
+			 OOOOOOOO
+			 DDDDDDDD
+
+| Tabs- |       |       |       |       |       |
+          11111111112222222222333333333344444-----
+012345678901234567890123456789012345678901234-----
+  |          |                  |     | |
+ee  XXXXXXXX xx xx xx xx xx xx[nn]LLLLL *********	HEX(32)
+eeOOOOO000000 ooo ooo ooo ooo [nn]LLLLL *********	OCTAL(32)
+ee DDDDDDDDDD ddd ddd ddd ddd [nn]LLLLL *********	DECIMAL(32)
+                         XXXXXXXX
+		      OOOOOOOOOOO
+		       DDDDDDDDDD
+*/
+
 VOID
 list()
 {
-	register char *frmt, *wp;
-	register int *wpt;
-	register int n, nb;
-	register int l_addr;
+	char *frmt, *wp;
+	int *wpt;
+	int n, nb, nl;
+	a_uint l_addr;
 
 	if (lfp == NULL || lmode == NLIST || (nlevel && (uflag == 0)))
 		return;
@@ -196,12 +224,23 @@ list()
 		 * Equate only
 		 */
 		if (lmode == ELIST) {
+
+#ifdef	LONGINT
+			switch(a_bytes) {
+			default:
+			case 2: frmt = "%19s%04lX"; break;
+			case 3: frmt = "%25s%06lX"; break;
+			case 4: frmt = "%23s%08lX"; break;
+			}
+#else
 			switch(a_bytes) {
 			default:
 			case 2: frmt = "%19s%04X"; break;
 			case 3: frmt = "%25s%06X"; break;
 			case 4: frmt = "%23s%08X"; break;
 			}
+#endif
+
 			fprintf(lfp, frmt, "", l_addr);
 			fprintf(lfp, " %5u %s\n", line, il);
 			return;
@@ -210,12 +249,23 @@ list()
 		/*
 		 * Address (with allocation)
 		 */
+
+#ifdef	LONGINT
+		switch(a_bytes) {
+		default:
+		case 2: frmt = " %04lX"; break;
+		case 3: frmt = "    %06lX"; break;
+		case 4: frmt = "  %08lX"; break;
+		}
+#else
 		switch(a_bytes) {
 		default:
 		case 2: frmt = " %04X"; break;
 		case 3: frmt = "    %06X"; break;
 		case 4: frmt = "  %08X"; break;
 		}
+#endif
+
 		fprintf(lfp, frmt, l_addr);
 		if (lmode == ALIST || lmode == BLIST) {
 			switch(a_bytes) {
@@ -243,21 +293,27 @@ list()
 		}
 
 		/*
+		 * If we list cycles, decrease max. bytes on first line.
+		 */
+		nl = (cflag && !(opcycles & OPCY_NONE)) ? (n-1) : n;
+
+		/*
 		 * First line of output for this source line with data.
 		 */
-		list1(wp, wpt, nb, n, 1);
-		fprintf(lfp, " %5u %s\n", line, il);
+		list1(wp, wpt, nb, nl, 1);
+		fprintf(lfp, "%5u %s\n", line, il);
 
 		/*
 		 * Subsequent lines of output if more data.
 		 */
-		while ((nb - n) > 0) {
-			nb -= n;
-			wp += n;
-			wpt += n;
+		while ((nb - nl) > 0) {
+			nb -= nl;
+			wp += nl;
+			wpt += nl;
+			nl = n;
 			slew(lfp, 0);
 			fprintf(lfp, frmt, "");
-			list1(wp, wpt, nb, n, 0);
+			list1(wp, wpt, nb, nl, 0);
 			putc('\n', lfp);
 		}
 	} else
@@ -269,12 +325,21 @@ list()
 		 * Equate only
 		 */
 		if (lmode == ELIST) {
+#ifdef	LONGINT
+			switch(a_bytes) {
+			default:
+			case 2: frmt = "%17s%06lo"; break;
+			case 3: frmt = "%23s%08lo"; break;
+			case 4: frmt = "%20s%011lo"; break;
+			}
+#else
 			switch(a_bytes) {
 			default:
 			case 2: frmt = "%17s%06o"; break;
 			case 3: frmt = "%23s%08o"; break;
 			case 4: frmt = "%20s%011o"; break;
 			}
+#endif
 			fprintf(lfp, frmt, "", l_addr);
 			fprintf(lfp, " %5u %s\n", line, il);
 			return;
@@ -283,12 +348,22 @@ list()
 		/*
 		 * Address (with allocation)
 		 */
+#ifdef	LONGINT
+		switch(a_bytes) {
+		default:
+		case 2: frmt = " %06lo"; break;
+		case 3: frmt = "   %08lo"; break;
+		case 4: frmt = "%011lo"; break;
+		}
+#else
 		switch(a_bytes) {
 		default:
 		case 2: frmt = " %06o"; break;
 		case 3: frmt = "   %08o"; break;
 		case 4: frmt = "%011o"; break;
 		}
+#endif
+
 		fprintf(lfp, frmt, l_addr);
 		if (lmode == ALIST || lmode == BLIST) {
 			switch(a_bytes) {
@@ -316,21 +391,27 @@ list()
 		}
 
 		/*
+		 * If we list cycles, decrease max. bytes on first line.
+		 */
+		nl = (cflag && !(opcycles & OPCY_NONE)) ? (n-1) : n;
+
+		/*
 		 * First line of output for this source line with data.
 		 */
-		list1(wp, wpt, nb, n, 1);
-		fprintf(lfp, " %5u %s\n", line, il);
+		list1(wp, wpt, nb, nl, 1);
+		fprintf(lfp, "%5u %s\n", line, il);
 
 		/*
 		 * Subsequent lines of output if more data.
 		 */
-		while ((nb - n) > 0) {
-			nb -= n;
-			wp += n;
-			wpt += n;
+		while ((nb - nl) > 0) {
+			nb -= nl;
+			wp += nl;
+			wpt += nl;
+			nl = n;
 			slew(lfp, 0);
 			fprintf(lfp, frmt, "");
-			list1(wp, wpt, nb, n, 0);
+			list1(wp, wpt, nb, nl, 0);
 			putc('\n', lfp);
 		}
 	} else
@@ -342,12 +423,21 @@ list()
 		 * Equate only
 		 */
 		if (lmode == ELIST) {
+#ifdef	LONGINT
+			switch(a_bytes) {
+			default:
+			case 2: frmt = "%18s%05lu"; break;
+			case 3: frmt = "%23s%08lu"; break;
+			case 4: frmt = "%21s%010lu"; break;
+			}
+#else
 			switch(a_bytes) {
 			default:
 			case 2: frmt = "%18s%05u"; break;
 			case 3: frmt = "%23s%08u"; break;
 			case 4: frmt = "%21s%010u"; break;
 			}
+#endif
 			fprintf(lfp, frmt, "", l_addr);
 			fprintf(lfp, " %5u %s\n", line, il);
 			return;
@@ -356,12 +446,21 @@ list()
 		/*
 		 * Address (with allocation)
 		 */
+#ifdef	LONGINT
+		switch(a_bytes) {
+		default:
+		case 2: frmt = "  %05lu"; break;
+		case 3: frmt = "   %08lu"; break;
+		case 4: frmt = " %010lu"; break;
+		}
+#else
 		switch(a_bytes) {
 		default:
 		case 2: frmt = "  %05u"; break;
 		case 3: frmt = "   %08u"; break;
 		case 4: frmt = " %010u"; break;
 		}
+#endif
 		fprintf(lfp, frmt, l_addr);
 		if (lmode == ALIST || lmode == BLIST) {
 			switch(a_bytes) {
@@ -389,21 +488,27 @@ list()
 		}
 
 		/*
+		 * If we list cycles, decrease max. bytes on first line.
+		 */
+		nl = (cflag && !(opcycles & OPCY_NONE)) ? (n-1) : n;
+
+		/*
 		 * First line of output for this source line with data.
 		 */
-		list1(wp, wpt, nb, n, 1);
-		fprintf(lfp, " %5u %s\n", line, il);
+		list1(wp, wpt, nb, nl, 1);
+		fprintf(lfp, "%5u %s\n", line, il);
 
 		/*
 		 * Subsequent lines of output if more data.
 		 */
-		while ((nb - n) > 0) {
-			nb -= n;
-			wp += n;
-			wpt += n;
+		while ((nb - nl) > 0) {
+			nb -= nl;
+			wp += nl;
+			wpt += nl;
+			nl = n;
 			slew(lfp, 0);
 			fprintf(lfp, frmt, "");
-			list1(wp, wpt, nb, n, 0);
+			list1(wp, wpt, nb, nl, 0);
 			putc('\n', lfp);
 		}
 	}
@@ -433,10 +538,10 @@ list()
 
 VOID
 list1(wp, wpt, nb, n, f)
-register char *wp;
-register int *wpt, nb, n, f;
+char *wp;
+int *wpt, nb, n, f;
 {
-	register int i;
+	int i;
 
 	/*
 	 * HEX output Option.
@@ -519,6 +624,17 @@ register int *wpt, nb, n, f;
 			}
 		}
 	}
+
+	/*
+	 * If we list cycles, put them out, first line only
+	 */
+	if (f && cflag && !(opcycles & OPCY_NONE)) {
+		fprintf(lfp, "%s%c%2d%c",
+			(xflag != 0) ? " " : "", CYCNT_BGN, opcycles, CYCNT_END);
+	}
+	else if (f) {
+		fprintf(lfp, " ");
+	}
 }
 
 /*)Function	VOID	list2(wpt)
@@ -544,9 +660,9 @@ register int *wpt, nb, n, f;
 
 VOID
 list2(t)
-register int t;
+int t;
 {
-	register int c;
+	int c;
 
 	c = ' ';
 
@@ -630,7 +746,7 @@ slew(fp,flag)
 FILE *fp;
 int flag;
 {
-	register char *frmt;
+	char *frmt;
 
 	if ((lop++ >= NLPP) && flag) {
 		fprintf(fp, "\fASxxxx Assembler %s  (%s), page %u.\n",
@@ -663,6 +779,7 @@ int flag;
  *		char *	ptr		pointer to an id string
  *		int	nmsym		number of symbols
  *		int	narea		number of areas
+ *		a_uint	sa		temporary
  *		sym *	sp		pointer to symbol structure
  *		sym **	p		pointer to an array of
  *					pointers to symbol structures
@@ -695,9 +812,10 @@ VOID
 lstsym(fp)
 FILE *fp;
 {
-	register int c, i, j, k, n;
-	register char *frmt, *ptr;
+	int c, i, j, k, n;
 	int nmsym, narea, nbank;
+	a_uint sa;
+	char *frmt, *ptr;
 	struct sym *sp;
 	struct sym **p;
 	struct area *ap;
@@ -825,7 +943,38 @@ FILE *fp;
 			}
 			fprintf(fp, frmt);
 		} else {
-			j = sp->s_addr & 0xFFFF;
+			sa = sp->s_addr & a_mask;
+#ifdef	LONGINT
+			switch(a_bytes) {
+			default:
+			case 2:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "  %04lX "; break;
+				case 1:	frmt = "%06lo "; break;
+				case 2:	frmt = " %05lu "; break;
+				}
+				break;
+
+			case 3:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "  %06lX "; break;
+				case 1:	frmt = "%08lo "; break;
+				case 2:	frmt = "%08lu "; break;
+				}
+				break;
+
+			case 4:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "   %08lX "; break;
+				case 1:	frmt = "%011lo "; break;
+				case 2:	frmt = " %010lu "; break;
+				}
+				break;
+			}
+#else
 			switch(a_bytes) {
 			default:
 			case 2:
@@ -855,7 +1004,8 @@ FILE *fp;
 				}
 				break;
 			}
-			fprintf(fp, frmt, j);
+#endif
+			fprintf(fp, frmt, sa);
 		}
 
 		j = 0;
@@ -938,8 +1088,39 @@ atable:
 				fprintf(fp, "%-14.14s", ptr);
 			}
 
-			j = ap->a_size & a_mask;
+			sa = ap->a_size & a_mask;
 			k = ap->a_flag;
+#ifdef	LONGINT
+			switch(a_bytes) {
+			default:
+			case 2:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "   size %4lX   flags %4X\n"; break;
+				case 1:	frmt = "   size %6lo   flags %6o\n"; break;
+				case 2:	frmt = "   size %5lu   flags %6u\n"; break;
+				}
+				break;
+
+			case 3:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "   size %6lX   flags %4X\n"; break;
+				case 1:	frmt = "   size %8lo   flags %6o\n"; break;
+				case 2:	frmt = "   size %8lu   flags %6u\n"; break;
+				}
+				break;
+
+			case 4:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "   size %8lX   flags %4X\n"; break;
+				case 1:	frmt = "   size %11lo   flags %6o\n"; break;
+				case 2:	frmt = "   size %10lu   flags %6u\n"; break;
+				}
+				break;
+			}
+#else
 			switch(a_bytes) {
 			default:
 			case 2:
@@ -969,7 +1150,8 @@ atable:
 				}
 				break;
 			}
-			fprintf(fp, frmt, j, k);
+#endif
+			fprintf(fp, frmt, sa, k);
 			slew(fp, 0);
 		}
 	}		

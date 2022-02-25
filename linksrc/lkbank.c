@@ -1,22 +1,13 @@
 /* lkbank.c */
 
 /*
- * (C) Copyright 2001-2003
+ * (C) Copyright 2001-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -54,6 +45,7 @@
  *		int	i		counter, loop variable, value
  *		char	id[]		id string
  *		int	nbank		number of banks in this head structure
+ *		a_uint	v		temporary value
  *
  *	global variables:
  *		bank	*bp		Pointer to the current
@@ -95,7 +87,8 @@
 VOID
 newbank()
 {
-	register int i;
+	int i;
+	a_uint v;
 	char id[NCPS];
 	int nbank;
 	struct bank **hblp;
@@ -118,11 +111,11 @@ newbank()
 		 * Evaluate base address
 		 */
 		if (symeq("base", id, 1)) {
-			i = eval();
+			v = eval();
 			if (bp->b_base == 0) {
-				bp->b_base = i;
+				bp->b_base = v;
 			} else {
-				if (i && (bp->b_base != (a_uint) i)) {
+				if (v && (bp->b_base != v)) {
 					fprintf(stderr, "Conflicting address in bank %s\n", id);
 					lkerr++;
 				}
@@ -132,11 +125,11 @@ newbank()
 		 * Evaluate bank size
 		 */
 		if (symeq("size", id, 1)) {
-			i = eval();
+			v = eval();
 			if (bp->b_size == 0) {
-				bp->b_size = i;
+				bp->b_size = v;
 			} else {
-				if (i && (bp->b_size != (a_uint) i)) {
+				if (v && (bp->b_size != v)) {
 					fprintf(stderr, "Conflicting size in bank %s\n", id);
 					lkerr++;
 				}
@@ -146,11 +139,11 @@ newbank()
 		 * Evaluate bank mapping
 		 */
 		if (symeq("map", id, 1)) {
-			i = eval();
+			v = eval();
 			if (bp->b_map == 0) {
-				bp->b_map = i;
+				bp->b_map = v;
 			} else {
-				if (i && (bp->b_map != (a_uint) i)) {
+				if (v && (bp->b_map != v)) {
 					fprintf(stderr, "Conflicting mapping in bank %s\n", id);
 					lkerr++;
 				}
@@ -160,7 +153,7 @@ newbank()
 		 * Evaluate flags
 		 */
 		if (symeq("flags", id, 1)) {
-			i = eval();
+			i = (int) eval();
 			if (bp->b_flag == 0) {
 				bp->b_flag = i;
 			} else {
@@ -235,7 +228,7 @@ VOID
 lkpbank(id)
 char *id;
 {
-	register struct bank *tbp;
+	struct bank *tbp;
 
 	bp = bankp;
 	while (bp) {
@@ -336,7 +329,9 @@ setbank()
 }
 
 
-/*)Function	VOID	chkbank()
+/*)Function	VOID	chkbank(fp)
+ *
+ *		FILE	*fp		file handle
  *
  *	The function chkbank() scans the bank/area structures to
  *	determine the length of a bank.  Banks exceeding the size
@@ -366,7 +361,8 @@ setbank()
  */
 
 VOID
-chkbank()
+chkbank(fp)
+FILE *fp;
 {
 	a_uint alow, ahigh, blimit, bytes;
 
@@ -397,8 +393,8 @@ chkbank()
 			}
 		}
 		if ((ahigh - alow) > blimit) {
-			fprintf(stderr,
-			"Size limit exceeded in bank %s\n", bp->b_id);
+			fprintf(fp,
+			"\n?ASlink-Warning-Size limit exceeded in bank %s\n", bp->b_id);
 			lkerr++;
 		}
 	}
@@ -428,6 +424,7 @@ chkbank()
  *				 	area structure
  *		area	*areap		The pointer to the first
  *				 	area structure of a linked list
+ *		char	afspec[]	Filespec from afile()
  *		bank	*bp		Pointer to the current
  *				 	bank structure
  *		bank	*bankp		The pointer to the first
@@ -486,7 +483,7 @@ lkfopen()
 		if ((ap->a_flag & A4_BNK) != A4_BNK) {
 			ap->a_bp = bankp;
 		}
-		if (ap->a_size != 0) {
+		if ((ap->a_flag & A4_OUT) || (ap->a_size != 0)) {
 			bp = ap->a_bp;
 			if (bp->b_ofp == NULL) {
 				/*
@@ -497,11 +494,13 @@ lkfopen()
 					if (symeq(tbp->b_fspec, bp->b_fspec, 1)) {
 						if (tbp->b_ofp != NULL) {
 							bp->b_ofp = tbp->b_ofp;
+							bp->b_ofspec = tbp->b_ofspec;
 						}
 					}
 				}
 			}
 			if (bp->b_ofp == NULL) {
+				fp = stderr;
 				/*
 				 * Open output file
 				 */
@@ -513,17 +512,6 @@ lkfopen()
 					case 4: frmt = "i86"; break;
 					}
 					fp = afile(bp->b_fspec, frmt, 1);
-					if (fp == NULL) {
-						lkexit(ER_FATAL);
-					}
-#if NOICE
-					/*
-					 * Include NoICE command to load file
-					 */
-        	                	if (jfp) {
-						fprintf(jfp, "LOAD %s.%s\n", bp->b_fspec, frmt);
-					}
-#endif
 				} else
 				if (oflag == 2) {
 					switch(a_bytes) {
@@ -533,19 +521,29 @@ lkfopen()
 					case 4: frmt = "s37"; break;
 					}
 					fp = afile(bp->b_fspec, frmt, 1);
+				} else
+				if (oflag == 3) {
+					switch(a_bytes) {
+					default:
+					case 2: frmt = "bin"; break;
+					case 3: frmt = "bi3"; break;
+					case 4: frmt = "bi4"; break;
+					}
+					fp = afile(bp->b_fspec, frmt, 2);
+				}
+				if (fp != stderr) {
 					if (fp == NULL) {
 						lkexit(ER_FATAL);
 					}
+					bp->b_ofspec = strsto(afspec);
 #if NOICE
 					/*
 					 * Include NoICE command to load file
 					 */
-        	                	if (jfp) {
-						fprintf(jfp, "LOAD %s.%s\n", bp->b_fspec, frmt);
+       	                		if (jfp) {
+						fprintf(jfp, "LOAD %s\n", bp->b_ofspec);
 					}
 #endif
-				} else {
-					fp = stderr;
 				}
 				bp->b_ofp = fp;
 			}
@@ -561,7 +559,7 @@ lkfopen()
 /*)Function	VOID	lkfclose()
  *
  *	The function lkfclose() scans the bank structures to
- *	close all open data outout files.
+ *	close all open data output files.
  *
  *	local variables:
  *		struct bank *tbp	temporary bank pointer
@@ -577,6 +575,7 @@ lkfopen()
  *	functions called:
  *		VOID	lkout()		lkout.c
  *		int	fclose()	c_library
+ *		int	delete()	c_library
  *
  *	side effects:
  *		All open data output files are closed.
@@ -599,6 +598,18 @@ lkfclose()
 			lkout(0);
 			if (ofp != stderr) {
 				fclose(ofp);
+#if 0
+				/*
+				 * Remove files with no data
+				 */
+				if (bp->b_oflag == 0) {
+#ifdef	OTHERSYSTEM
+					remove(bp->b_ofspec);
+#else
+					delete(bp->b_ofspec);
+#endif
+				}
+#endif
 			}
 			/*
 			 * Scan bank structure for

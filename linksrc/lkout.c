@@ -1,7 +1,7 @@
 /* lkout.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,15 +13,6 @@
  * 	G. Osborn
  *	gary@s-4.com.  
  */
-
-#include <stdio.h>
-#include <string.h>
-
-#ifdef WIN32
-#include <stdlib.h>
-#else
-#include <alloc.h>
-#endif
 
 #include "aslink.h"
 
@@ -38,6 +29,8 @@
  *		VOID	iflush()
  *		VOID	sxx()
  *		VOID	sflush()
+ *		VOID	dbx()
+ *		VOID	dflush()
  *
  *	lkout.c contains no local variables.
  */
@@ -56,10 +49,13 @@
  *	global variables:
  *		int	oflag		output type flag
  *		int	obj_flag	Output enabled flag
+ *		a_uint	pc		Current relocation address
+ *		int	pcb		Current pc bytes per address
  *
  *	functions called:
  *		VOID	ixx()		lkout.c
  *		VOID	sxx()		lkout.c
+ *		VOID	dbx()		lkout.c
  *
  *	side effects:
  *		The REL data is output in the required format.
@@ -92,6 +88,12 @@ int i;
 	 */
 	if (oflag == 2) {
 		sxx(i);
+	} else
+	/*
+	 * Disk Basic Formats
+	 */
+	if (oflag == 3) {
+		dbx(i);
 	}
 }
 
@@ -111,6 +113,7 @@ int i;
  *	functions called:
  *		VOID	iflush()	lkout.c
  *		VOID	sflush()	lkout.c
+ *		VOID	dflush()	lkout.c
  *
  *	side effects:
  *		Any remaining REL data is flushed
@@ -133,6 +136,12 @@ lkflush()
 	 */
 	if (oflag == 2) {
 		sflush();
+	} else
+	/*
+	 * Disk Basic Formats
+	 */
+	if (oflag == 3) {
+		dflush();
 	}
 }
 
@@ -242,8 +251,6 @@ lkflush()
  *	Plus 32 data bytes (64 characters)
  */
 
-#define	MAXBYTES	32
-
 VOID
 ixx(i)
 int i;
@@ -278,7 +285,7 @@ int i;
 			}
 		}
 		for (i=0,rtadr2=0; i<a_bytes; i++) {
-			rtadr2 = rtadr2 << 8 | rtval[i];
+			rtadr2 = (rtadr2 << 8) | rtval[i];
 		}
 		if ((rtadr2 != rtadr1) || rtaflg) {
 			/*
@@ -290,15 +297,15 @@ int i;
 		}
 		for (k=a_bytes; k<rtcnt; k++) {
 			if (rtflg[k]) {
-				rtbuf[rtadr1++ - rtadr0] = rtval[k];
-				if (rtadr1 - rtadr0 == MAXBYTES) {
+				rtbuf[(int) (rtadr1++ - rtadr0)] = rtval[k];
+				if (rtadr1 - rtadr0 == IXXMAXBYTES) {
 					iflush();
 				}
 			}
 		}
 	} else {
 		sp = lkpsym(".__.END.", 0);
-		if (sp) {
+		if (sp && (sp->s_axp->a_bap->a_ofp == ofp)) {
 			symadr = symval(sp);
 			lo_addr = symadr & 0xffff;
 			if (a_bytes > 2) {
@@ -307,13 +314,21 @@ int i;
 				chksum += hi_addr;
 				chksum += hi_addr >> 8;
 				chksum += 0x04;
+#ifdef	LONGINT
+				fprintf(ofp, ":00%04lX04%02lX\n", hi_addr, (~chksum + 1) & 0x00ff);
+#else
 				fprintf(ofp, ":00%04X04%02X\n", hi_addr, (~chksum + 1) & 0x00ff);
+#endif
 			}
 			chksum =  0x00;
 			chksum += lo_addr;
 			chksum += lo_addr >> 8;
 			chksum += 0x03;
+#ifdef	LONGINT
+			fprintf(ofp, ":00%04lX03%02lX\n", lo_addr, (~chksum + 1) & 0x00ff);
+#else
 			fprintf(ofp, ":00%04X03%02X\n", lo_addr, (~chksum + 1) & 0x00ff);
+#endif
 		}
 
 		fprintf(ofp, ":00000001FF\n");
@@ -354,7 +369,7 @@ int i;
  * of G. Osborn, gary@s-4.com.
  * The new version concatenates the assembler
  * output records when they represent contiguous
- * memory segments to produces NMAX character
+ * memory segments to produce IXXMAXBYTES data byte
  * Intel Hex output lines whenever possible, resulting
  * in a substantial reduction in file size.
  * More importantly, the download time
@@ -367,7 +382,7 @@ iflush()
 	int i, max, reclen;
 	a_uint chksum, lo_addr, hi_addr;
 
-	max = rtadr1 - rtadr0;
+	max = (int) (rtadr1 - rtadr0);
 	if (max) {
 
 		/*
@@ -380,7 +395,11 @@ iflush()
 		chksum = reclen;
 		chksum += lo_addr;
 		chksum += lo_addr >> 8;
+#ifdef	LONGINT
+		fprintf(ofp, ":%02X%04lX00", reclen, lo_addr);
+#else
 		fprintf(ofp, ":%02X%04X00", reclen, lo_addr);
+#endif
 		for (i=0; i<max; i++) {
 			chksum += rtbuf[i];
 			fprintf(ofp, "%02X", rtbuf[i] & 0x00ff);
@@ -388,7 +407,11 @@ iflush()
 		/*
 		 * 2's complement
 		 */
+#ifdef	LONGINT
+		fprintf(ofp, "%02lX\n", (~chksum + 1) & 0x00ff);
+#else
 		fprintf(ofp, "%02X\n", (~chksum + 1) & 0x00ff);
+#endif
 		rtadr0 = rtadr1;
 	}
 
@@ -399,7 +422,11 @@ iflush()
 			chksum += hi_addr;
 			chksum += hi_addr >> 8;
 			chksum += 0x04;
+#ifdef	LONGINT
+			fprintf(ofp, ":00%04lX04%02lX\n", hi_addr, (~chksum + 1) & 0x00ff);
+#else
 			fprintf(ofp, ":00%04X04%02X\n", hi_addr, (~chksum + 1) & 0x00ff);
+#endif
 		}
 	}
 }
@@ -506,14 +533,12 @@ iflush()
  *	Plus 32 data bytes (64 characters)
  */
 
-#define	MAXBYTES	32
-
 VOID
 sxx(i)
 int i;
 {
-	register struct sym *sp;
-	register char *frmt;
+	struct sym *sp;
+	char *frmt;
 	int k, reclen;
 	a_uint	j, addr, symadr, chksum;
 
@@ -542,7 +567,7 @@ int i;
 			}
 		}
 		for (i=0,rtadr2=0; i<a_bytes; i++) {
-			rtadr2 = rtadr2 << 8 | rtval[i];
+			rtadr2 = (rtadr2 << 8) | rtval[i];
 		}
 
 		if (rtadr2 != rtadr1) {
@@ -554,8 +579,8 @@ int i;
 		}
 		for (k=a_bytes; k<rtcnt; k++) {
 			if (rtflg[k]) {
-				rtbuf[rtadr1++ - rtadr0] = rtval[k];
-				if (rtadr1 - rtadr0 == MAXBYTES) {
+				rtbuf[(int) (rtadr1++ - rtadr0)] = rtval[k];
+				if (rtadr1 - rtadr0 == SXXMAXBYTES) {
 					sflush();
 				}
 			}
@@ -571,7 +596,7 @@ int i;
 		reclen = 1 + a_bytes;
 		chksum = reclen;
 		sp = lkpsym(".__.END.", 0);
-		if (sp) {
+		if (sp && (sp->s_axp->a_bap->a_ofp == ofp)) {
 			symadr = symval(sp);
 			for (i=0,addr=symadr; i<a_bytes; i++,addr>>=8) {
 				chksum += addr;
@@ -579,17 +604,30 @@ int i;
 		} else {
 			symadr = 0;
 		}
+#ifdef	LONGINT
+		switch(a_bytes) {
+		default:
+		case 2: frmt = "S9%02X%04lX"; addr = symadr & 0x0000ffffl; break;
+		case 3: frmt = "S8%02X%06lX"; addr = symadr & 0x00ffffffl; break;
+		case 4: frmt = "S7%02X%08lX"; addr = symadr & 0xffffffffl; break;
+		}
+#else
 		switch(a_bytes) {
 		default:
 		case 2: frmt = "S9%02X%04X"; addr = symadr & 0x0000ffff; break;
 		case 3: frmt = "S8%02X%06X"; addr = symadr & 0x00ffffff; break;
 		case 4: frmt = "S7%02X%08X"; addr = symadr & 0xffffffff; break;
 		}
+#endif
 		fprintf(ofp, frmt, reclen, addr);
 		/*
 		 * 1's complement
 		 */
+#ifdef	LONGINT
+		fprintf(ofp, "%02lX\n", (~chksum) & 0x00ff);
+#else
 		fprintf(ofp, "%02X\n", (~chksum) & 0x00ff);
+#endif
 	}
 }
 
@@ -625,7 +663,7 @@ int i;
  * Written by G. Osborn, gary@s-4.com, 6-17-98.
  * The new version concatenates the assembler
  * output records when they represent contiguous
- * memory segments to produces NMAX character
+ * memory segments to produce SXXMAXBYTES data byte
  * S_ output lines whenever possible, resulting
  * in a substantial reduction in file size.
  * More importantly, the download time
@@ -639,7 +677,7 @@ sflush()
 	int i, max, reclen;
 	a_uint	addr, chksum;
 
-	max = rtadr1 - rtadr0;
+	max = (int) (rtadr1 - rtadr0);
 	if (max == 0) {
 		return;
 	}
@@ -656,12 +694,21 @@ sflush()
 	for (i=0,addr=rtadr0; i<a_bytes; i++,addr>>=8) {
 		chksum += addr;
 	}
+#ifdef	LONGINT
+	switch(a_bytes) {
+	default:
+	case 2: frmt = "S1%02X%04lX"; addr = rtadr0 & 0x0000ffffl; break;
+	case 3: frmt = "S2%02X%06lX"; addr = rtadr0 & 0x00ffffffl; break;
+	case 4: frmt = "S3%02X%08lX"; addr = rtadr0 & 0xffffffffl; break;
+	}
+#else
 	switch(a_bytes) {
 	default:
 	case 2: frmt = "S1%02X%04X"; addr = rtadr0 & 0x0000ffff; break;
 	case 3: frmt = "S2%02X%06X"; addr = rtadr0 & 0x00ffffff; break;
 	case 4: frmt = "S3%02X%08X"; addr = rtadr0 & 0xffffffff; break;
 	}
+#endif
 	fprintf(ofp, frmt, reclen, addr);
 	for (i=0; i<max; i++) {
 		chksum += rtbuf[i];
@@ -670,7 +717,224 @@ sflush()
 	/*
 	 * 1's complement
 	 */
+#ifdef	LONGINT
+	fprintf(ofp, "%02lX\n", (~chksum) & 0x00ff);
+#else
 	fprintf(ofp, "%02X\n", (~chksum) & 0x00ff);
+#endif
+	rtadr0 = rtadr1;
+}
+
+
+/*)Disk BASIC Format
+ *
+ * Each code segment starts with the following record:
+ *
+ *      Record Preamble      -  This field is either $00 (for start of new
+ *                              record) or $FF (for last record in file).
+ *
+ *      Record Length Field  -  This field specifies the record length
+ *                              that follows the Load Address Field.
+ *
+ *           16-Bit Length   -  2-bytes
+ *           24-Bit Length   -  3-bytes
+ *           32-Bit Length   -  4-bytes
+ *
+ *      Load Address Field   -  This field consists of the address where
+ *                              the record will be loaded into memory.
+ *
+ *           16-Bit Address  -  2-bytes
+ *           24-Bit Address  -  3-bytes
+ *           32-Bit Address  -  4-bytes
+ *
+ *      Binary Data Bytes    -  Record Length data bytes.
+ *
+ * After the last code segment, a final record like the one above is
+ * placed.  In this final segment, the Record Preamble is $FF, the
+ * Record Length Field is $0000 and the Load Adress Field is the
+ * execution address.
+ */
+
+/*)Function	dbx(i)
+ *
+ *		int	i		1 - process data
+ *					0 - end of data
+ *
+ *	The function decb() loads the output buffer with
+ *	the relocated data.
+ *
+ *	local variables:
+ *		int	k		loop counter
+ *		struct sym *sp		symbol pointer
+ *		a_uint	symadr		start address
+ *
+ *	global variables:
+ *		int	a_bytes		T Line Address Bytes
+ *		FILE *	ofp		output file handle
+ *		int	rtcnt		count of data words
+ *		int	rtflg[]		output the data flag
+ *		a_uint	rtval[]		relocated data
+ *		char	rtbuf[]		output buffer
+ *		a_uint	rtadr0		address temporary
+ *		a_uint	rtadr1		address temporary
+ *		a_uint	rtadr2		address temporary
+ *
+ *	functions called:
+ *		int	putc()		c_library
+ *		VOID	dflush()	lkout.c
+ *
+ *	side effects:
+ *		The data is placed into the output buffer.
+ */
+
+VOID
+dbx(i)
+int i;
+{
+	struct sym *sp;
+	int k;
+	a_uint	j, symadr;
+
+	if (i) {
+		if (hilo == 0) {
+			switch(a_bytes){
+			default:
+			case 2:
+				j = rtval[0];
+				rtval[0] = rtval[1];
+				rtval[1] = j;
+				break;
+			case 3:
+				j = rtval[0];
+				rtval[0] = rtval[2];
+				rtval[2] = j;
+				break;
+			case 4:
+				j = rtval[0];
+				rtval[0] = rtval[3];
+				rtval[3] = j;
+				j = rtval[2];
+				rtval[2] = rtval[1];
+				rtval[1] = j;
+				break;
+			}
+		}
+		for (i=0,rtadr2=0; i<a_bytes; i++) {
+			rtadr2 = (rtadr2 << 8) | rtval[i];
+		}
+
+		if (rtadr2 != rtadr1) {
+			/*
+			 * data bytes not contiguous between records
+			 */
+			dflush();
+			rtadr0 = rtadr1 = rtadr2;
+		}
+		for (k=a_bytes; k<rtcnt; k++) {
+			if (rtflg[k]) {
+				rtbuf[(int) (rtadr1++ - rtadr0)] = rtval[k];
+				if (rtadr1 - rtadr0 == (unsigned) (DBXMAXBYTES - (2 * a_bytes) - 1)) {
+					dflush();
+				}
+			}
+		}
+	} else {
+		/* Disk BASIC BIN Trailer */
+		sp = lkpsym(".__.END.", 0);
+		if (sp && (sp->s_axp->a_bap->a_ofp == ofp)) {
+			symadr = symval(sp);
+		} else {
+			symadr = 0;
+		}
+		/* Terminator */
+		putc(0xFF, ofp);
+
+		/* Size (0) */
+		switch(a_bytes) {
+		case 4:	putc((int) (0 >> 24) & 0xFF, ofp);
+		case 3:	putc((int) (0 >> 16) & 0xFF, ofp);
+		default:
+		case 2:	putc((int) (0 >>  8) & 0xFF, ofp);
+			putc((int) (0 >>  0) & 0xFF, ofp);
+			break;
+		}
+
+		/* Starting Address */
+		switch(a_bytes) {
+		case 4:	putc((int) (symadr >> 24) & 0xFF, ofp);
+		case 3:	putc((int) (symadr >> 16) & 0xFF, ofp);
+		default:
+		case 2:	putc((int) (symadr >>  8) & 0xFF, ofp);
+			putc((int) (symadr >>  0) & 0xFF, ofp);
+			break;
+		}
+	}
+}
+
+
+/*)Function	dflush()
+ *
+ *	The function dflush() outputs the relocated data
+ *	in the Disk BASIC loadable format
+ *
+ *	local variables:
+ *		int	i		loop counter
+ *		int	max		number of data bytes
+ *
+ *	global variables:
+ *		FILE *	ofp		output file handle
+ *		char	rtbuf[]		output buffer
+ *		a_uint	rtadr0		address temporary
+ *		a_uint	rtadr1		address temporary
+ *
+ *	functions called:
+ *		int	putc()		c_library
+ *
+ *	side effects:
+ *		The data is output to the file defined by ofp.
+ */
+
+/*
+ * Written by Boisy G. Pitre, boisy@boisypitre.com, 6-7-04
+ */
+
+VOID
+dflush()
+{
+	int i, max;
+
+	max = (int) (rtadr1 - rtadr0);
+	if (max == 0) {
+		return;
+	}
+
+	/* Preamble Byte */
+	putc(0, ofp);
+
+	/* Record Size */
+	switch(a_bytes){
+	case 4:	putc((int) (max >> 24) & 0xFF, ofp);
+	case 3:	putc((int) (max >> 16) & 0xFF, ofp);
+	default:
+	case 2:	putc((int) (max >>  8) & 0xFF, ofp);
+		putc((int) (max >>  0) & 0xFF, ofp);
+		break;
+	}
+
+	/* Load Address */
+	switch(a_bytes){
+	case 4:	putc((int) (rtadr0 >> 24) & 0xFF, ofp);
+	case 3:	putc((int) (rtadr0 >> 16) & 0xFF, ofp);
+	default:
+	case 2:	putc((int) (rtadr0 >>  8) & 0xFF, ofp);
+		putc((int) (rtadr0 >>  0) & 0xFF, ofp);
+		break;
+	}
+
+	for (i = 0; i < max; i++) {
+		putc(rtbuf[i], ofp);
+	}
+
 	rtadr0 = rtadr1;
 }
 

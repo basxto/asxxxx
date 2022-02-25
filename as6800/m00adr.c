@@ -1,7 +1,7 @@
 /* m00adr.c */
 
 /*
- * (C) Copyright 1989-2003
+ * (C) Copyright 1989-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,16 +9,14 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "m6800.h"
 
 int
 addr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int c;
+	int c;
 
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
@@ -30,8 +28,6 @@ register struct expr *esp;
 	} else if (c == '*') {
 		expr(esp, 0);
 		esp->e_mode = S_DIR;
-		if (esp->e_addr & ~0xFF)
-			err('d');
 		if (more()) {
 			comma();
 			esp->e_mode = S_INDX;
@@ -48,10 +44,6 @@ register struct expr *esp;
 				comma();
 				esp->e_mode = S_INDX;
 				if (admode(abx) != S_X)
-					aerr();
-				if ((!esp->e_flag)
-					&& (esp->e_base.e_ap==NULL)
-					&& (esp->e_addr & ~0xFF))
 					aerr();
 			} else {
 				if ((!esp->e_flag)
@@ -74,11 +66,11 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-	register char *ptr;
-	register int i;
-	register char *ips;
+	char *ptr;
+	int i;
+	char *ips;
 
 	ips = ip;
 	unget(getnb());
@@ -99,9 +91,9 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
-	register char *ptr;
+	char *ptr;
 	ptr = ip;
 
 	while (*ptr && *str) {

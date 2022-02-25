@@ -1747,14 +1747,14 @@ ioi$n	res	1,c			; D3 CB 89
 z80$b	ret				; C9
 	;***********************************************************
 	; return from subroutine if condition is true
-z80$x	ret	C			; D8
-z80$x	ret	M			; F8
-z80$x	ret	NC			; D0
-z80$x	ret	NZ			; C0
-z80$x	ret	P			; F0
-z80$x	ret	PE			; E8
-z80$x	ret	PO			; E0
-z80$x	ret	Z			; C8
+z80$b	ret	C			; D8
+z80$b	ret	M			; F8
+z80$b	ret	NC			; D0
+z80$b	ret	NZ			; C0
+z80$b	ret	P			; F0
+z80$b	ret	PE			; E8
+z80$b	ret	PO			; E0
+z80$b	ret	Z			; C8
 	;***********************************************************
 	; return from interrupt
 z80$b	reti				; ED 4D

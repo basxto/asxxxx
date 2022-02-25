@@ -1,7 +1,7 @@
 /* 1802mch.c */
 
 /*
- * (C) Copyright 2002-2003
+ * (C) Copyright 2002-2006
  * All Rights Reserved
  *
  * Shujen Chen
@@ -9,10 +9,45 @@
  * Naperville, IL 60540
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "1802.h"
+
+/*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	((char) (0xFF))
+#define	OPCY_ERR	((char) (0xFE))
+
+/*	OPCY_NONE	((char) (0x80))	*/
+/*	OPCY_MASK	((char) (0x7F))	*/
+
+#define	UN	((char) (OPCY_NONE | 0x00))
+
+/*
+ * 1802 Cycle Count
+ *
+ *	opcycles = 1802pg1[opcode]
+ */
+static char pg1802[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*10*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*20*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*30*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*40*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*50*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*60*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*70*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*80*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*90*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*A0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*B0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*C0*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+/*D0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*E0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*F0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+};
 
 /*
  * Process machine ops.
@@ -21,11 +56,11 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register unsigned op, v, rd;
+	int op, v, rd;
 	struct expr e;
 
 	clrexpr(&e);
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	switch (mp->m_type) {
 
 	case S_INH:
@@ -56,7 +91,7 @@ struct mne *mp;
 	case S_IMM:
 		expr(&e, 0);
 		if (is_abs(&e)) {
-			v = e.e_addr & ~0xFF;
+			v = (int) (e.e_addr & ~0xFF);
 			if ( ((v & ~0xFF) != 0) && ((v & ~0x7F) != ~0x7F) )
 				aerr();
 		}
@@ -79,7 +114,12 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
+	}
+	if (opcycles == OPCY_NONE) {
+		opcycles = pg1802[cb[0] & 0xFF];
 	}
 }
 
@@ -89,7 +129,7 @@ struct mne *mp;
 int
 reg()
 {
-	register struct mne *mp;
+	struct mne *mp;
 	char id[NCPS];
 
 	getid(id, -1);
@@ -97,7 +137,7 @@ reg()
 		aerr();
 		return (0);
 	}
-	return (mp->m_valu);
+	return ((int) mp->m_valu);
 }
 
 /*
@@ -105,7 +145,7 @@ reg()
  */
 int
 mchbr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);

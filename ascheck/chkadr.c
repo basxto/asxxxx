@@ -1,7 +1,7 @@
 /* chkadr.c */
 
 /*
- * (C) Copyright 2003
+ * (C) Copyright 2001-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,8 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
 #include "asxxxx.h"
 #include "chk.h"
 
@@ -28,11 +26,11 @@ register struct expr *esp;
  */
 int
 admode(sp)
-register struct adsym *sp;
+struct adsym *sp;
 {
-	register char *ptr;
-	register int i;
-	register char *ips;
+	char *ptr;
+	int i;
+	char *ips;
 
 	ips = ip;
 	unget(getnb());
@@ -53,7 +51,7 @@ register struct adsym *sp;
  */
 int
 srch(str)
-register char *str;
+char *str;
 {
 	register char *ptr;
 	ptr = ip;

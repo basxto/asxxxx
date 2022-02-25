@@ -14,16 +14,64 @@
 
 
 <H4><B><PRE>
+.z80 DIRECTIVE 
+
+Format:  
+
+        .z80 
+
+The  .z80  directive enables processing of only the z80 specific
+mnemonics.  HD64180/Z180 mnemonics encountered without the .hd64
+directive will be flagged with an 'o' error.  
+
+     The  .z80  directive  also  selects the Z80 specific cycles
+count output when the -c command line option is specified.  
+
+
 .hd64 DIRECTIVE 
 
 Format:  
 
         .hd64 
 
-The  .hd64  directive enables processing of the HD64180 specific
-mnemonics not included in  the  Z80  instruction  set.   HD64180
-mnemonics  encountered  without  the  .hd64  directive  will  be
-flagged with an 'o' error.  
+The  .hd64  directive  enables  processing  of  the HD64180/Z180
+specific mnemonics not included  in  the  Z80  instruction  set.
+HD64180/Z180  mnemonics  encountered without the .hd64 directive
+will be flagged with an 'o' error.  A synonym of .hd64 is .z180. 
+
+     The  .hd64 directive also selects the HD64180/Z180 specific
+cycles count output when the -c command line  option  is  speci-
+fied.  
+
+
+
+THE .__.CPU.  VARIABLE 
+
+
+     The  value of the pre-defined symbol '.__.CPU.' corresponds
+to the selected processor type.  The default value  is  0  which
+corresponds  to the default processor type.  The following table
+lists the processor types and associated values  for  the  ASZ80
+assembler:  
+
+        Processor Type            .__.CPU. Value
+        --------------            --------------
+            .z80                         0
+        .hd64 / .z180                    1
+
+
+     The  variable '.__.CPU.' is by default defined as local and
+will not be output to the created .rel file.  The assembler com-
+mand line options -g or -a will not cause the local symbol to be
+output to the created .rel file.  
+
+     The  assembler  .globl  directive may be used to change the
+variable  type to  global  causing  its definition to be  output
+to  the .rel file.  The inclusion of the definition of the vari-
+able '.__.CPU.' might be  a  useful  means  of  validating  that
+seperately  assembled files have been compiled for the same pro-
+cessor type.  The linker will report an error for variables with
+multiple non equal definitions.  
 
 
 Z80 REGISTER SET AND CONDITIONS 
@@ -47,7 +95,7 @@ condition mnemonics:
 
 
 
-L.3  Z80 INSTRUCTION SET 
+Z80 INSTRUCTION SET 
 
 
   The following list specifies the format for each addressing
@@ -79,12 +127,12 @@ The terms dir and offset are not allowed to be  external  refer-
 ences.  
 
    Note  that  not all addressing modes are valid with every in-
-struction, refer to the Z80/HD64180  technical  data  for  valid
-modes.  
+struction,  refer  to the Z80/HD64180/Z180  technical  data  for
+valid modes.  
 
-   The  following  tables  list all Z80/HD64180 mnemonics recog-
-nized by the ASZ80 assembler.  The designation []  refers  to  a
-required addressing mode argument.  
+   The  following  tables  list  all  Z80/HD64180/Z180 mnemonics
+recognized by the ASZ80 assembler.  The designation [] refers to
+a required addressing mode argument.  
 
 Inherent Instructions 
 
@@ -209,7 +257,7 @@ Register Pair Instructions
         push    rp              pop     rp
 
 
-HD64180 Specific Instructions 
+HD64180/Z180 Specific Instructions 
 
         in0     rg,(n)
         out0    (n),rg
@@ -240,5 +288,6 @@ HD64180 Specific Instructions
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

@@ -34,7 +34,18 @@ file address page.
 .header level 2;_.pic Directive
 Format:
 .skip;.indent 8
-_.pic	string
+_.pic	/string/
+.skip;.left margin +16
+.indent -16
+where:##string##represents a text string.  The string is
+the pic processor type.
+.skip;.indent -8
+/##/####represent the delimiting characters. These delimiters
+may be any paired printing characters, as long as the
+characters are not contained within the string itself.
+If the delimiting characters do not match, the .pic
+directive will give the (q) error.
+.left margin -16
 
 The assembler uses the delimited string to define
 a processor specific symbol.
@@ -55,7 +66,7 @@ The ASPIC assembler will then be configured
 for the PIC processor type "p12c508".  The
 _.pic directive must precede the PIC type
 directive.  The PIC type directive configures
-the assembler base on the processor name
+the assembler based on the processor name
 and type selection.
 
 An alternate method to configure the ASPIC
@@ -121,6 +132,41 @@ _.pic20bit
 This directive selects 20-bit addressing and the
 16-bit instruction word mnemonics and opcode values
 to be used during the assembly process.
+
+
+.header level 2;The .____.CPU. Variable
+
+The value of the pre-defined symbol '.____.CPU.' corresponds
+to the selected processor type.  The default value is 0
+which corresponds to the default processor type.  The
+following table lists the processor types and associated
+values for the ASPIC assembler:
+
+.skip 1
+.literal
+	Processor Type		  .__.CPU. Value
+	--------------		  --------------
+	  .picnopic			 0
+	  .pic12bit			 1
+	  .pic14bit			 2
+	  .pic16bit			 3
+	  .pic20bit			 4
+.end literal
+
+.skip 1
+  The variable '.____.CPU.' is by default defined as local
+and will not be output to the created .rel file.  The
+assembler command line options -g or -a will not cause the
+local symbol to be output to the created .rel file.
+
+  The assembler .globl directive may be used to change the
+variable type to global causing its definition to be
+output to the .rel file.  The inclusion of the definition
+of the variable '.____.CPU.' might be a useful means of
+validating that seperately assembled files have been
+compiled for the same processor type.  The linker will
+report an error for variables with multiple non equal
+definitions.
 
 
 .header level 2;_.picfix Directive

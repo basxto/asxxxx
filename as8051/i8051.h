@@ -1,7 +1,7 @@
 /* i8051.h */
 
 /*
- * (C) Copyright 1998-2003
+ * (C) Copyright 1998-2006
  * All Rights Reserved
  *
  * Alan R. Baldwin

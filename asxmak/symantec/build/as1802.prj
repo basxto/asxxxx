@@ -3,8 +3,8 @@ R:\ASXV4PXX\asxmak\Symantec\build\as1802.prj
 as1802.OPN
 novcs
 as1802.DEF
-8
-1040428442
+6
+1134247010
 0 0 0 0 0 "..\..\..\AS1802\1802ext.c"
 0 0 0 0 0 "..\..\..\AS1802\1802mch.c"
 0 0 0 0 0 "..\..\..\AS1802\1802pst.c"
@@ -18,10 +18,9 @@ as1802.DEF
 0 0 0 0 0 "..\..\..\ASXXSRC\assubr.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\assym.c"
 0 0 0 0 0 "as1802.DEF"
+0 -1 0 0 0 "..\..\..\asxxsrc\asxxxx.h"
+0 -1 0 0 0 "C:\SC\INCLUDE\stdlib.h"
 0 -1 0 0 0 "C:\SC\INCLUDE\stdio.h"
 0 -1 0 0 0 "C:\SC\INCLUDE\setjmp.h"
-0 -1 0 0 0 "..\..\..\asxxsrc\asxxxx.h"
-0 -1 0 0 0 "..\..\..\AS1802\1802.h"
 0 -1 0 0 0 "C:\SC\INCLUDE\string.h"
-0 -1 0 0 0 "C:\SC\INCLUDE\alloc.h"
-0 -1 0 0 0 "C:\SC\INCLUDE\stdlib.h"
+0 -1 0 0 0 "..\..\..\AS1802\1802.h"

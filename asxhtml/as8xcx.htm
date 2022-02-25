@@ -36,8 +36,9 @@ contributed by John Hartman.
 DS8XCXXX ASSEMBLER DIRECTIVES 
 
    The  AS8XCXXX  assembler  contains  directives to specify the
-particular SFR (Special Function Registers) to be enabled during
-the assembly process.  The following directives are supported:  
+processor core SFR (Special Function Registers) and  enable  the
+SFR  Bit  Register values during the assembly process.  The fol-
+lowing directives are supported:  
 
         .DS8XCXXX               ;80C32 core
         .DS80C310               ;Dallas Semiconductor
@@ -51,21 +52,46 @@ the assembly process.  The following directives are supported:
         .DS87C530
         .DS87C550
 
-If  the  microprocessor  selector  directive  is  followed  by a
-non-zero argument then the SFR register bit values will also  be
-defined.  
+The invocation of one of the processor directives creates a pro-
+cessor specific symbol and an SFR-Bits symbol.  For example  the
+directive 
 
-   If  a microprocessor selector directive is not specified then
-no SFR or SFR register bit values will be  defined.   This  mode
-allows  the  SFR  to  be  defined by an external assembly source
-file.  The file DS8XCXXX.SFR contains the SFR and  SFR  register
-bit values for all the microprocessor selector directives.  This
-file may be modified to create a new SFR for other  microproces-
-sor types.  
+        .DS80C390
 
-   Also, if a microprocessor selector directive is not specified
-then the  following  address  length  assembler  directives  are
-accepted:  
+creates  the  global  symbols '__DS80C390' and '__SFR_BITS' each
+with a value of 1.  If the microprocessor core selection  direc-
+tive  is  followed  by  an  optional  argument  then  the symbol
+'__SFR_BITS' is given the  value  of  the  argument.   The  file
+DS8XCXXX.SFR  contains  the  SFR and SFR register bit values for
+all the microprocessor selector directives.  This  file  may  be
+modified to create a new SFR for other microprocessor types.  
+
+   If a microprocessor selection directive is not specified then
+no processor symbols will be defined.  This mode allows the  SFR
+and SFR register bit values to be defined by the assembly source
+file.  
+
+
+.cpu Directive 
+
+   The  .cpu  directive  is  similar  to the processor selection
+directives.  This directive defines a  new  processor  type  and
+creates a user defined symbol:  
+
+        .cpu    "CP84C331"      2
+
+   creates  the  symbol  '__CP84C331'  with a value of 1 and the
+symbol '__SFR_BITS' with a value of 2.  These values can be used
+to  select  the  processor SFR and SFR register bits from an in-
+clude file.  If the optional final argument, 2, is omitted  then
+the value of the symbol '__SFR_BITS' is 1.  
+
+
+Processor Addressing Range Directives 
+
+   If one of the .DS8...  microprocessor selection directives is
+not specified then the following address range assembler  direc-
+tives are accepted:  
 
         .16bit                  ;16-Bit Addressing
         .24bit                  ;24-Bit Addressing
@@ -76,6 +102,48 @@ fect the output format for the .lst, .sym, and .rel files.
 
    The  default  addressing space for defined microprocessors is
 16-Bit except for the DS80C390 microprocessor which is 24-Bit.  
+
+   The  .cpu  directive  defaults to the 16-Bit addressing range
+but this can be changed using these directives.  
+
+
+The .__.CPU.  Variable 
+
+   The value of the pre-defined symbol '.__.CPU.' corresponds to
+the selected processor type.  The default value is 0 which  cor-
+responds  to  the  default  processor type.  The following table
+lists the processor types and associated values for the AS8XCXXX
+assembler:  
+
+        Processor Type            .__.CPU. Value
+        --------------            --------------
+          .cpu                           0
+
+          .DS8XCXXX                      1
+          .DS80C310                      2
+          .DS80C320                      3
+          .DS80C323                      4
+          .DS80C390                      5
+          .DS83C520                      6
+          .DS83C530                      7
+          .DS83C550                      8
+          .DS87C520                      9
+          .DS87C530                     10
+          .DS87C550                     11
+
+
+   The  variable  '.__.CPU.'  is by default defined as local and
+will not be output to the created .rel file.  The assembler com-
+mand line options -g or -a will not cause the local symbol to be
+output to the created .rel file.  
+
+   The  assembler  .globl  directive  may  be used to change the
+variable type to global causing its definition to be  output  to
+the  .rel file.  The inclusion of the definition of the variable
+'.__.CPU.' might be a useful means of validating that seperately
+assembled  files have been compiled for the same processor type.
+The linker will report an error for variables with multiple  non
+equal definitions.  
 
 
 DS80C390 Addressing Mode Directive 
@@ -1546,5 +1614,6 @@ T2CON   0x80                                        0x10
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

@@ -14,21 +14,115 @@
 
 
 <H4><B><PRE>
-68HC08 REGISTER SET 
+PROCESSOR SPECIFIC DIRECTIVES 
 
-The  following  is  a  list  of  the  68HC08  registers  used by
-AS6808:  
+
+   The MC68HC(S)08 processor is a superset of the MC6805 proces-
+sors.  The AS6808 assembler supports the HC08, HCS08, 6805,  and
+HC05 cores.  
+
+
+.hc08 Directive 
+
+Format:  
+
+        .hc08 
+
+The .hc08 directive enables processing of only the HC08 specific
+mnemonics.  6805/HC05/HCS08 mnemonics  encountered  without  the
+.hc08 directive will be flagged with an 'o' error.  
+
+   The  .hc08  directive  also  selects the HC08 specific cycles
+count output when the -c command line option is specified.  
+
+
+.hcs08 Directive 
+
+Format:  
+
+        .hcs08 
+
+The  .hcs08  directive  enables processing of the HCS08 specific
+mnemonics.  
+
+   The  .hcs08  directive also selects the HCS08 specific cycles
+count output when the -c command line option is specified.  
+
+
+.6805 Directive 
+
+Format:  
+
+        .6805 
+
+The  .6805  directive  enables  processing of only the 6805/HC05
+specific mnemonics.  HC08/HCS08  mnemonics  encountered  without
+the .hc08/.hcs08 directives will be flagged with an 'o' error.  
+
+   The  .6805  directive also selects the MC6805 specific cycles
+count output when the -c command line option is specified.  
+
+
+.hc05 Directive 
+
+Format:  
+
+        .hc05 
+
+The  .hc05  directive  enables  processing of only the 6805/HC05
+specific mnemonics.  HC08/HCS08  mnemonics  encountered  without
+the .hc08/.hcs08 directives will be flagged with an 'o' error.  
+
+   The .hc05 directive also selects the MC68HC05/146805 specific
+cycles count output when the -c command line  option  is  speci-
+fied.  
+
+
+The .__.CPU.  Variable 
+
+   The value of the pre-defined symbol '.__.CPU.' corresponds to
+the selected processor type.  The default value is 0 which  cor-
+responds  to  the  default  processor type.  The following table
+lists the processor types and associated values for  the  AS6808
+assembler:  
+
+        Processor Type            .__.CPU. Value
+        --------------            --------------
+            .hc08                        0
+            .hcs08                       1
+            .6805                        2
+            .hc05                        3
+
+
+   The  variable  '.__.CPU.'  is by default defined as local and
+will not be output to the created .rel file.  The assembler com-
+mand line options -g or -a will not cause the local symbol to be
+output to the created .rel file.  
+
+   The  assembler  .globl  directive  may  be used to change the
+variable type to global causing its definition to be  output  to
+the  .rel file.  The inclusion of the definition of the variable
+'.__.CPU.' might be a useful means of validating that seperately
+assembled  files have been compiled for the same processor type.
+The linker will report an error for variables with multiple  non
+equal definitions.  
+
+
+68HC(S)08 REGISTER SET 
+
+The  following  is  a  list  of  the  68HC(S)08  registers  used
+by AS6808:  
 
         a       -       8-bit accumulator
         x       -       index register  &lt;H:X&gt;
         s       -       stack pointer
 
 
-68HC08 INSTRUCTION SET 
+68HC(S)08 INSTRUCTION SET 
 
 
-   The  following tables list all 68HC08 mnemonics recognized by
-the AS6808 assembler.  The designation [] refers to a required
+   The  following tables list all 68HC(S)08 mnemonics recognized
+by the AS6808 assembler.  The designation [] refers to a required
 addressing  mode  argument.   The  following  list specifies the
 format for each addressing mode supported by AS6808:  
 
@@ -67,7 +161,7 @@ format for each addressing mode supported by AS6808:
 The terms data, dir, offset, and ext may all be expressions.  
 
    Note  that  not all addressing modes are valid with every in-
-struction, refer to the 68HC08 technical data for valid modes.  
+struction, refer to the 68HC(S)08 technical data for valid modes.  
 
 
 Control Instructions 
@@ -200,5 +294,6 @@ Jump and Jump to Subroutine Instructions
 <B>...  Home Page</B></P>
 </H4>
 
+<H6><P><B>Last Updated: January 2006</B></P></H6>
 </BODY> 
 </HTML>

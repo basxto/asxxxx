@@ -1,7 +1,7 @@
 /* h8mch.c */
 
 /*
- * (C) Copyright 1994-2003
+ * (C) Copyright 1994-2005
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,9 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#include <stdio.h>
-#include <setjmp.h>
-#include <string.h>
 #include "asxxxx.h"
 #include "h8.h"
 
@@ -22,13 +19,50 @@ int	bm;
 int	bb[NB];
 
 /*
+ * Opcode Cycle Definitions
+ */
+#define	OPCY_SDP	(-1)
+#define	OPCY_ERR	(-2)
+
+/*	OPCY_NONE	(0x80)	*/
+/*	OPCY_MASK	(0x7F)	*/
+
+#define	UN	(OPCY_NONE | 0x00)
+
+/*
+ * H8 Cycle Count
+ *
+ *	opcycles = h8pg1[opcode]
+ */
+static char h8pg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*10*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*20*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*30*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*40*/   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*50*/  14,14,UN,UN, 8, 6,10,UN,UN, 4, 6, 8,UN, 6, 8, 8,
+/*60*/   2, 2, 2, 2,UN,UN,UN, 2, 4, 4, 6, 6, 6, 6, 6, 6,
+/*70*/   2, 2, 2, 2, 2, 2, 2, 2,UN, 4,UN, 8, 6, 8, 6, 8,
+/*80*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*90*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*A0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*B0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*C0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*D0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*E0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+/*F0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+};
+
+/*
  * Process a machine op.
  */
 VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, opflag;
+	int op, opflag;
 	int oplb, ophb;
 	int rf, opcode, c;
 	struct expr e1, e2;
@@ -40,13 +74,14 @@ struct mne *mp;
 	clrexpr(&e1);
 	clrexpr(&e2);
 	pc = dot.s_addr;
-	op = mp->m_valu;
+	op = (int) mp->m_valu;
 	opflag = mp->m_flag;
 	ophb = (op >> 8) & 0xFF;
 	oplb = op & 0xFF;
 	switch (rf = mp->m_type) {
 
 	case S_SDP:
+		opcycles = OPCY_SDP;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
@@ -636,7 +671,7 @@ struct mne *mp;
 			break;
 
 		case S_IMMB:
-			if ((v1 = e1.e_addr) & ~0x07) {
+			if ((v1 = (int) e1.e_addr) & ~0x07) {
 				aerr();
 			}
 			if (e1.e_flag != 0 || e1.e_base.e_ap != NULL) {
@@ -680,7 +715,7 @@ struct mne *mp;
 			aerr();
 
 		case S_IMMB:
-			if ((v1 = e1.e_addr) & ~0x07) {
+			if ((v1 = (int) e1.e_addr) & ~0x07) {
 				aerr();
 			}
 			if (e1.e_flag != 0 || e1.e_base.e_ap != NULL) {
@@ -724,7 +759,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(ophb);
 		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
+			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
@@ -736,22 +771,27 @@ struct mne *mp;
 		break;
 
 	default:
+		opcycles = OPCY_ERR;
 		err('o');
+		break;
 	}
 	if (pc & 0x0001) {
 		err('b');
 		dot.s_addr += 1;
 	}
+	if (opcycles == OPCY_NONE) {
+		opcycles = h8pg1[cb[0] & 0xFF];
+	}
 }
 
 VOID
 normbyte(esp)
-register struct expr *esp;
+struct expr *esp;
 {
-	register int v;
+	int v;
 
 	if (esp->e_flag == 0 && esp->e_base.e_ap == NULL) {
-		v = esp->e_addr;
+		v = (int) esp->e_addr;
 		if (((v & ~0x007F) != ~0x007F) && ((v & 0x00FF) != v)) {
 			aerr();
 		}
@@ -760,7 +800,7 @@ register struct expr *esp;
 
 VOID
 usgnbyte(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_flag == 0 && esp->e_base.e_ap == NULL) {
 		if (esp->e_addr & ~0x00FF) {
@@ -771,7 +811,7 @@ register struct expr *esp;
 
 VOID
 pagebyte(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_flag == 0 && esp->e_base.e_ap == NULL) {
 		if ((esp->e_addr & ~0x00FF) != ~0x00FF) {
@@ -782,7 +822,7 @@ register struct expr *esp;
 
 int
 abstype(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	a_uint espv;
 	struct area *espa;
@@ -814,7 +854,7 @@ register struct expr *esp;
 VOID
 minit()
 {
-	register char   **dp;
+	char **dp;
 
 	bp = bb;
 	bm = 1;
@@ -867,7 +907,7 @@ int b;
 int
 getbit()
 {
-	register int f;
+	int f;
 
 	if (bp >= &bb[NB])
 		return (1);
@@ -885,7 +925,7 @@ getbit()
  */
 int
 mchpcr(esp)
-register struct expr *esp;
+struct expr *esp;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
 		return(1);

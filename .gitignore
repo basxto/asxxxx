@@ -1,0 +1,13 @@
+*.zip
+*.o
+exe/
+build/
+backup/
+*.rel
+*.rst
+*.s19
+*.s28
+*.ihx
+*.bin
+release/
+
