@@ -287,7 +287,7 @@ struct	mne	mne[] = {
     {	NULL,	"call",		S_JMP11,	0,	0x14	},
     {	NULL,	"jmp",		S_JMP11,	0,	0x04	},
 
-    {	NULL,	"jmpp",		S_JMPP,		0,	0x83	},
+    {	NULL,	"jmpp",		S_JMPP,		0,	0xB3	},
 
     {	NULL,	"jb0",		S_BITBR,	0,	0x12	},
     {	NULL,	"jb1",		S_BITBR,	0,	0x32	},

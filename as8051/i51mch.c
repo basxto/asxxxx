@@ -1,7 +1,7 @@
 /* i51mch.c */
 
 /*
- *  Copyright (C) 1998-2009  Alan R. Baldwin
+ *  Copyright (C) 1998-2011  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,9 @@
  *	jhartman at compuserve dot com
  *	noice at noicedebugger dot com
  *
+ *  Benny Kim (2011/07/21)
+ *  bennykim at coreriver dot com
+ *  Fixed bugs in relative address with "."
  */
 
 #include "asxxxx.h"
@@ -430,16 +433,19 @@ struct mne *mp;
 		}
 		break;
 
-	case S_BITBR:
+	case S_BITBR:   // JB, JBC, JNB bit,rel
 		/* Branch on bit set/clear */
 		t = addr(&e);
 		if ((t != S_DIR) && (t != S_EXT))
 			aerr();
+
+		// Benny
+		comma(1);
+		expr(&e1, 0);
+
 		outab(op);
 		outrb(&e, R_PAG0);
 
-		comma(1);
-		expr(&e1, 0);
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
@@ -452,10 +458,12 @@ struct mne *mp;
 			rerr();
 		break;
 
-	case S_BR:
+	case S_BR:  // JC, JNC, JZ, JNZ
 		/* Relative branch */
-		outab(op);
+		// Benny
 		expr(&e1, 0);
+		outab(op);
+
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
@@ -473,8 +481,13 @@ struct mne *mp;
 		t = addr(&e);
 		comma(1);
 		t1 = addr(&e1);
+
+		// Benny
+		comma(1);
 		switch (t) {
 		case S_A:
+			clrexpr(&e);
+			expr(&e, 0);
 			if (t1 == S_IMMED) {
 				outab(op + 4);
 				outrb(&e1, R_NORM);
@@ -488,14 +501,20 @@ struct mne *mp;
 			break;
 
 		case S_AT_R:
-			outab(op + 6 + e.e_addr);
+			op = (op + 6 + e.e_addr);
+			clrexpr(&e);
+			expr(&e, 0);
+			outab(op);
 			if (t1 != S_IMMED)
 				aerr();
 			outrb(&e1, R_NORM);
 			break;
 	
 		case S_REG:
-			outab(op + 8 + e.e_addr);
+			op = (op + 8 + e.e_addr);
+			clrexpr(&e);
+			expr(&e, 0);
+			outab(op);
 			if (t1 != S_IMMED)
 				aerr();
 			outrb(&e1, R_NORM);
@@ -507,26 +526,26 @@ struct mne *mp;
 		}
 
 		/* branch destination */
-		comma(1);
-		clrexpr(&e1);
-		expr(&e1, 0);
-		if (mchpcr(&e1)) {
-			v1 = (int) (e1.e_addr - dot.s_addr - 1);
+		if (mchpcr(&e)) {
+			v1 = (int) (e.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
 				aerr();
 			outab(v1);
 		} else {
-			outrb(&e1, R_PCR);
+			outrb(&e, R_PCR);
 		}
-		if (e1.e_mode != S_USER)
+		if (e.e_mode != S_USER)
 			rerr();
 		break;
 
 	case S_DJNZ:
 		/* Dir,dest;  Reg,dest */
 		t = addr(&e);
-		switch (t) {
+		// Benny
+		comma(1);
+		expr(&e1, 0);
 
+		switch (t) {
 		case S_DIR:
 		case S_EXT:
 			outab(op + 5);
@@ -542,8 +561,6 @@ struct mne *mp;
 		}
 
 		/* branch destination */
-		comma(1);
-		expr(&e1, 0);
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))

@@ -498,6 +498,7 @@
 	mov	@r0,#DATA	; B0 FF
 	mov	@r1,#DATA	; B1 FF
 	jb5	ADDR8		; B2 12
+	jmpp	@a		; B3
 	call	ADDR11+0x500	; B4 FF
 	cpl	f1		; B5
 	jf0	ADDR8		; B6 12 
