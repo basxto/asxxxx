@@ -71,9 +71,9 @@ main:
 	bdf	again		;n33*67
 	bpz	again		;n33*67
 	bge	again		;n33*67
-	bnf	again		;n38*67
-	bm	again		;n38*67
-	bl	again		;n38*67
+	bnf	again		;n3B*67
+	bm	again		;n3B*67
+	bl	again		;n3B*67
 	bq	again		;n31*67
 	bnq	again		;n39*67
 	b1	again		;n34*67
@@ -146,9 +146,9 @@ Short_Begin_1:
 5$:	bdf	16$		;n33*0A
 6$:	bpz	15$		;n33*08
 7$:	bge	14$		;n33*06
-8$:	bnf	13$		;n38*04
-9$:	bm	12$		;n38*02
-10$:	bl	11$		;n38*00
+8$:	bnf	13$		;n3B*04
+9$:	bm	12$		;n3B*02
+10$:	bl	11$		;n3B*00
 ; ------------------		; Page Boundary
 11$:	bq	10$		;n31*FE
 12$:	bnq	9$		;n39*FC
@@ -174,9 +174,9 @@ Short_Begin_2:
 5$:	bdf	16$		;n33*1C
 6$:	bpz	15$		;n33*1A
 7$:	bge	14$		;n33*18
-8$:	bnf	13$		;n38*16
-9$:	bm	12$		;n38*14
-10$:	bl	11$		;n38*12
+8$:	bnf	13$		;n3B*16
+9$:	bm	12$		;n3B*14
+10$:	bl	11$		;n3B*12
 11$:	bq	10$		;n31*10
 12$:	bnq	9$		;n39*0E
 13$:	b1	8$		;n34*0C
@@ -200,9 +200,9 @@ Short_Begin_3:
 5$:	bdf	16$		;n33*F8
 6$:	bpz	15$		;n33*F6
 7$:	bge	14$		;n33*F4
-8$:	bnf	13$		;n38*F2
-9$:	bm	12$		;n38*F0
-10$:	bl	11$		;n38*EE
+8$:	bnf	13$		;n3B*F2
+9$:	bm	12$		;n3B*F0
+10$:	bl	11$		;n3B*EE
 11$:	bq	10$		;n31*EC
 12$:	bnq	9$		;n39*EA
 13$:	b1	8$		;n34*E8
@@ -228,9 +228,9 @@ Short_Begin_4:
 5$:	bdf	16$		;n33*1E
 6$:	bpz	15$		;n33*1C
 7$:	bge	14$		;n33*1A
-8$:	bnf	13$		;n38*18
-9$:	bm	12$		;n38*16
-10$:	bl	11$		;n38*14
+8$:	bnf	13$		;n3B*18
+9$:	bm	12$		;n3B*16
+10$:	bl	11$		;n3B*14
 11$:	bq	10$		;n31*12
 12$:	bnq	9$		;n39*10
 13$:	b1	8$		;n34*0E
@@ -254,9 +254,9 @@ Short_Begin_5:
 5$:	bdf	16$		;n33*F6
 6$:	bpz	15$		;n33*F4
 7$:	bge	14$		;n33*F2
-8$:	bnf	13$		;n38*F0
-9$:	bm	12$		;n38*EE
-10$:	bl	11$		;n38*EC
+8$:	bnf	13$		;n3B*F0
+9$:	bm	12$		;n3B*EE
+10$:	bl	11$		;n3B*EC
 11$:	bq	10$		;n31*EA
 12$:	bnq	9$		;n39*E8
 13$:	b1	8$		;n34*E6

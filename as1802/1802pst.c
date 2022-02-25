@@ -1,7 +1,7 @@
 /* 1802pst.c */
 
 /*
- * (C) Copyright 2002-2003
+ * (C) Copyright 2002-2004
  * All Rights Reserved
  *
  * Shujen Chen
@@ -209,13 +209,13 @@ struct	mne	mne[] = {
     {	NULL,	"B4",		S_BR,	0,	0x37	},
     {	NULL,	"BDF",		S_BR,	0,	0x33	},
     {	NULL,	"BGE",		S_BR,	0,	0x33	},
-    {	NULL,	"BL",		S_BR,	0,	0x38	},
-    {	NULL,	"BM",		S_BR,	0,	0x38	},
+    {	NULL,	"BL",		S_BR,	0,	0x3B	},
+    {	NULL,	"BM",		S_BR,	0,	0x3B	},
     {	NULL,	"BN1",		S_BR,	0,	0x3C	},
     {	NULL,	"BN2",		S_BR,	0,	0x3D	},
     {	NULL,	"BN3",		S_BR,	0,	0x3E	},
     {	NULL,	"BN4",		S_BR,	0,	0x3F	},
-    {	NULL,	"BNF",		S_BR,	0,	0x38	},
+    {	NULL,	"BNF",		S_BR,	0,	0x3B	},
     {	NULL,	"BNQ",		S_BR,	0,	0x39	},
     {	NULL,	"BNZ",		S_BR,	0,	0x3A	},
     {	NULL,	"BPZ",		S_BR,	0,	0x33	},
