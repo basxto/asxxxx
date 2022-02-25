@@ -102,8 +102,6 @@ struct mne *mp;
 
 	case S_RET:
 		if (more()) {
-			if (mchtyp == X_R2K)
-				err('o');
 			if ((v1 = admode(CND)) != 0) {
 				outab(op | v1<<3);
 			} else {
