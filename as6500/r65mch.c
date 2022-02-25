@@ -1,8 +1,21 @@
 /* r65mch.c */
 
 /*
- * (C) Copyright 1995-2006
- * All Rights Reserved
+ *  Copyright (C) 1995-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -22,6 +35,9 @@
 
 #include "asxxxx.h"
 #include "r6500.h"
+
+char *cpu  = "Rockwell 6502/6510/65C02";
+char *dsft = "asm";
 
 int r6500;
 int r65f11;
@@ -535,7 +551,7 @@ struct mne *mp;
 		if ((c = getnb()) != '*')
 			unget(c);
 		expr(&e1, 0);
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		outab(op);
 		outrb(&e1, R_PAG0);
@@ -665,22 +681,16 @@ struct expr *esp;
 }
 
 /*
- * The next character must be a
- * comma.
- */
-VOID
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-}
-
-/*
  * Machine dependent initialization
  */
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 0;
+
 	r6500  = 1;
 	r65f11 = 0;
 	r65c00 = 0;

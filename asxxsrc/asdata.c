@@ -1,8 +1,21 @@
 /* asdata.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -33,22 +46,143 @@ int	aserr;		/*	ASxxxx error counter
 jmp_buf	jump_env;	/*	compiler dependent structure
 			 *	used by setjmp() and longjmp()
 			 */
-int	inpfil;		/*	count of assembler
-			 *	input files specified
+
+/*
+ *	The asmf structure contains the information
+ *	pertaining to an assembler source file/macro.
+ *
+ * The Parameters:
+ *	next	is a pointer to the next object in the linked list
+ *	objtyp	specifies the object type - T_ASM, T_INCL, T_MACRO
+ *	line	is the saved line number of the parent object
+ *	fp	is the source FILE handle
+ *	afp	is the file path length (excludes the files name.ext)
+ *	afn[]	is the assembler/include file path/name.ext
+ *
+ *	struct	asmf
+ *	{
+ *		struct	asmf *next;	Link to Next Object
+ *		int	objtyp;		Object Type
+ *		int	line;		Saved Line Counter
+ *		int	flevel;		saved flevel
+ *		int	tlevel;		saved tlevel
+ *		int	lnlist;		saved lnlist
+ *		FILE *	fp;		FILE Handle
+ *		int	afp;		File Path Length
+ *		char	afn[FILSPC];	File Name
+ *	};
+ */
+struct	asmf	*asmp;	/*	The pointer to the first assembler
+			 *	source file structure of a linked list
 			 */
-int	incfil;		/*	current file handle index
-			 *	for include files
+struct	asmf	*asmc;	/*	Pointer to the current
+			 *	source input structure
 			 */
-int	cfile;		/*	current file handle index
-			 *	of input assembly files
+struct	asmf	*asmi;	/*	Queued pointer to an include file
+			 *	source input structure
 			 */
-int	flevel;		/*	IF-ELSE-ENDIF flag will be non
-			 *	zero for false conditional case
+struct	asmf	*asmq;	/*	Queued pointer to a macro
+			 *	source input structure
+			 */
+
+/*
+ *	The mcrdef structure contains the
+ *	information about a macro definition.
+ *
+ *	When the macro is defined the definition
+ *	arguments are packed into a linked list of
+ *	strings beginning with bgnarg and ending with
+ *	endarg. The number of args is placed in narg.
+ *
+ *	When the macro is invoked the expansion
+ *	argument strings are placed into a linked
+ *	list of strings beginning with bgnxrg and
+ *	ending with endxrg. The number of expansion
+ *	arguments is placed in xarg.
+ *
+ * The Parameters:
+ *	next	is a pointer to the next macro definition structure
+ *	name	is a pointer to the macro name string
+ *	bgnlst	is a pointer to the first text line of the macro
+ *	endlst	is a pointer to the last  text line of the macro
+ *	type	is the macro type - .macro, .irp, .irpc, or .rept
+ *	rptcnt	is the repeat count for the macro
+ *	nest	is the macro nesting counter
+ *	narg	is the number of macro definition arguments
+ *	bgnarg	is a pointer to the first definition argument string
+ *	endarg	is a pointer to the last  definition argument string
+ *	xarg	is the number of expansion arguments at macro invocation
+ *	bgnxrg	is a pointer to the first expansion argument string
+ *	endxrg	is a pointer to the last  expansion argument string
+ *
+ *	struct	mcrdef {
+ *		struct mcrdef *	next;		link to next macro definition
+ *		char *		name;		pointer to the macro name
+ *		struct strlst *	bgnlst;		link to first text line of macro
+ *		struct strlst *	endlst;		link to last text line of macro
+ *		int		type;		macro type
+ *		int		rptcnt;		repeat counter
+ *		int		nest;		macro nesting counter
+ *		int		narg;		number of macro defintion arguments
+ *		struct strlst * bgnarg;		link to first macro defintion argument
+ *		struct strlst * endarg;		link to last macro definition argument
+ *		int		xarg;		number of macro expansion arguments
+ *		struct strlst * bgnxrg;		link to first macro expansion argument
+ *		struct strlst * endxrg;		link to last macro xpansion argument
+ *	};
+ */
+struct mcrdef *	mcrlst;	/*	link to list of defined macros
+			 */
+struct mcrdef *	mcrp;	/*	link to list of defined macros
+			 */
+
+/*
+ *	The memlnk structure is a linked list
+ *	of memory allocations.
+ *
+ *	The function new() uses the memlnk structure
+ *	to create a linked list of allocated memory
+ *	that can be traversed by asfree() to release
+ *	the allocated memory.
+ *
+ *	The function mhunk() uses the memlnk structure
+ *	to create a linked list of allocated memory
+ *	that can be reused.
+ *
+ * The Parameters:
+ *	next	is a pointer to the next memlnk structure.
+ *	ptr	is a pointer to the allocated memory.
+ *
+ *	struct	memlnk {
+ *		struct memlnk *	next;		link to next memlnk
+ *		VOID *		ptr;		pointer to allocated memory
+ *	};
+ */
+struct memlnk * asxmem;	/*	Assembler Memory Allocation Structure
+			 */
+struct memlnk * pmcrmem;/*	First Macro Memory Allocation Structure
+			 */
+struct memlnk * mcrmem;	/*	Macro Memory Allocation Structure
+			 */
+int	asmblk;		/*	new data blocks allocated
+			 */
+int	mcrblk;		/*	new data blocks allocated
+			 */
+int	incfil;		/*	include file nesting counter
+			 */
+int	maxinc;		/*	maximum include file nesting encountered
+			 */
+int	mcrfil;		/*	macro nesting counter
+			 */
+int	maxmcr;		/*	maximum macro nesting encountered
+			 */
+int	flevel;		/*	IF-ELSE-ENDIF flag (false != 0)
+			 */
+int	ftflevel;	/*	IIFF-IIFT-IIFTF FLAG
 			 */
 int	tlevel;		/*	current conditional level
 			 */
-int	nlevel;		/*	LIST-NLIST flag will be non
-			 *	zero for nolist
+int	lnlist;		/*	LIST-NLIST options
 			 */
 int	ifcnd[MAXIF+1];	/*	array of IF statement condition
 			 *	values (0 = FALSE) indexed by tlevel
@@ -56,28 +190,22 @@ int	ifcnd[MAXIF+1];	/*	array of IF statement condition
 int	iflvl[MAXIF+1];	/*	array of IF-ELSE-ENDIF flevel
 			 *	values indexed by tlevel
 			 */
-
-char	afn[FILSPC];		/*	current input file specification
-				 */
-int	afp;			/*	current input file path length
-				 */
-char	afntmp[FILSPC];		/*	temporaryr input file specification
-				 */
-int	afptmp;			/*	temporary input file path length
-				 */
-char	srcfn[MAXFIL][FILSPC];	/*	array of source file names
-				 */
-int	srcfp[MAXFIL];		/*	array of source file path lengths
-				 */
-int	srcline[MAXFIL];	/*	source line number
-				 */
-char	incfn[MAXINC][FILSPC];	/*	array of include file names
-				 */
-int	incfp[MAXINC];		/*	array of include file path lengths
-				 */
-int	incline[MAXINC];	/*	include line number
-				 */
-
+char	afn[FILSPC];	/*	current input file specification
+			 */
+int	afp;		/*	current input file path length
+			 */
+char	afntmp[FILSPC];	/*	temporary input file specification
+			 */
+int	afptmp;		/*	temporary input file path length
+			 */
+int	srcline;	/*	current source line number
+			 */
+int	asmline;	/*	current assembler file line number
+			 */
+int	incline;	/*	current include file line number
+			 */
+int	mcrline;	/*	current macro line number
+			 */
 int	radix;		/*	current number conversion radix:
 			 *	2 (binary), 8 (octal), 10 (decimal),
 			 *	16 (hexadecimal)
@@ -95,11 +223,13 @@ int	aflag;		/*	-a, make all symbols global flag
 			 */
 int	bflag;		/*	-b(b), listing modes flag
 			 */
-int	cflag;		/*	-c, include cycle counts in listing flag
+int	cflag;		/*	-c, disable cycle counts in listing flag
 			 */
 int	fflag;		/*	-f(f), relocations flagged flag
 			 */
 int	gflag;		/*	-g, make undefined symbols global flag
+			 */
+int	hflag;		/*	-h, diagnostic help printout flag
 			 */
 int	jflag;		/*	-j, enable NoICE Debug Symbols
 			 */
@@ -107,7 +237,7 @@ int	lflag;		/*	-l, generate listing flag
 			 */
 int	oflag;		/*	-o, generate relocatable output flag
 			 */
-int	pflag;		/*	-p, enable listing pagination
+int	pflag;		/*	-p, disable listing pagination
 			 */
 int	sflag;		/*	-s, generate symbol table flag
 			 */
@@ -129,7 +259,7 @@ a_uint	s_mask;		/*	Sign Mask
 			 */
 a_uint	v_mask;		/*	Value Mask
 			 */
-int	as_msb	;	/*	current MSB byte select
+int	as_msb;		/*	current MSB byte select
 			 *	0 == low byte
 			 *	1 == high byte
 			 *	2 == third byte
@@ -235,9 +365,11 @@ struct	mne	*mnehash[NHASH];
  *	};
  */
 struct	sym	sym[] = {
-    {	NULL,	NULL,	".",	    S_USER, 0,			NULL,0,0    },
-    {	NULL,	NULL,	".__.ABS.", S_USER, S_ASG|S_GBL,	NULL,0,0    },
-    {	NULL,	NULL,	".__.CPU.", S_USER, S_ASG|S_LCL|S_EOL,	NULL,0,0    }
+    {	NULL,	NULL,	".",	    S_USER, 0,			NULL,0,0 },
+    {	NULL,	NULL,	".__.ABS.", S_USER, S_ASG|S_GBL,	NULL,0,0 },
+    {	NULL,	NULL,	".__.CPU.", S_USER, S_ASG|S_LCL,	NULL,0,0 },
+    {	NULL,	NULL,	".__.H$L.", S_USER, S_ASG|S_LCL,	NULL,0,0 },
+    {	NULL,	NULL,	".__.$$$.", S_USER, S_ASG|S_LCL|S_EOL,	NULL,0,0 }
 };
 
 struct	sym	*symp;		/*	pointer to a symbol structure
@@ -330,7 +462,6 @@ struct	bank	*bankp = &bank[1];
  *
  *	Pointer to a def structure
  */
-
 struct	def	*defp = NULL;
 
 
@@ -339,10 +470,6 @@ FILE	*lfp;		/*	list output file handle
 FILE	*ofp;		/*	relocation output file handle
 			 */
 FILE	*tfp;		/*	symbol table output file handle
-			 */
-FILE	*sfp[MAXFIL];	/*	array of assembler-source file handles
-			 */
-FILE	*ifp[MAXINC];	/*	array of include-file file handles
 			 */
 char	txt[NTXT];	/*	T Line Values
 			 */
@@ -397,4 +524,5 @@ char	ccase[128] = {
 /*h*/	'\150',	'\151',	'\152',	'\153',	'\154',	'\155',	'\156',	'\157',
 /*p*/	'\160',	'\161',	'\162',	'\163',	'\164',	'\165',	'\166',	'\167',
 /*x*/	'\170',	'\171',	'\172',	'\173',	'\174',	'\175',	'\176',	'\177'
-};	
+};
+

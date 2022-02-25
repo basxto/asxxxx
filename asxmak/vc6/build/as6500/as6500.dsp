@@ -111,6 +111,10 @@ SOURCE=..\..\..\..\asxxsrc\asmain.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\asxxsrc\asmcro.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\asxxsrc\asout.c
 # End Source File
 # Begin Source File
@@ -124,10 +128,6 @@ SOURCE=..\..\..\..\asxxsrc\assym.c
 # Begin Source File
 
 SOURCE=..\..\..\..\as6500\r65adr.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\as6500\r65ext.c
 # End Source File
 # Begin Source File
 

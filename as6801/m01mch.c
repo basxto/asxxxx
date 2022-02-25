@@ -1,8 +1,21 @@
 /* m01mch.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -11,6 +24,9 @@
 
 #include "asxxxx.h"
 #include "m6801.h"
+
+char	*cpu	= "Motorola 6801/6803 [Hitachi HD6303]";
+char	*dsft	= "asm";
 
 int	mchtyp;
 
@@ -151,7 +167,7 @@ struct mne *mp;
 		if (getnb() != '#')
 			aerr();
 		expr(&e2, 0);
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (t1 == S_DIR) {
 			outab(op|0x10);
@@ -386,23 +402,16 @@ struct expr *esp;
 }
 
 /*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine dependent initialization
  */
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
+
 	mchtyp = X_6801;
 	sym[2].s_addr = X_6801;
 }

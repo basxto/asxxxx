@@ -1,8 +1,21 @@
 /* m12mch.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -11,6 +24,9 @@
 
 #include "asxxxx.h"
 #include "m6812.h"
+
+char	*cpu	= "Motorola 68HC12";
+char	*dsft	= "asm";
 
 #define	NB	512
 
@@ -263,7 +279,7 @@ struct mne *mp;
 		if ((t1 = admode(abdxys)) == 0)
 			aerr();
 		op |= (t1 & 0xFF);
-		comma();
+		comma(1);
 		expr(&e1, 0);
 		outab(0x04);
 		if (mchpcr(&e1)) {
@@ -311,7 +327,7 @@ struct mne *mp;
 			aerr();
 		if ((v1 & 0xFF) > 0x20)
 			aerr();
-		comma();
+		comma(1);
 		if ((v2 = admode(dstreg)) == 0)
 			aerr();
 		if ((v2 & 0xFF) < 0x03)
@@ -323,7 +339,7 @@ struct mne *mp;
 	case S_TFR:
 		if ((v1 = admode(srcreg)) == 0)
 			aerr();
-		comma();
+		comma(1);
 		if ((v2 = admode(dstreg)) == 0)
 			aerr();
 		outab(op);
@@ -333,7 +349,7 @@ struct mne *mp;
 	case S_EXG:
 		if ((v1 = admode(srcreg)) == 0)
 			aerr();
-		comma();
+		comma(1);
 		if ((v2 = admode(dstreg)) == 0)
 			aerr();
 		outab(op);
@@ -407,7 +423,7 @@ struct mne *mp;
 		}
 		genout(cpg, op, rf, &e1);
 		if ((t1 != S_IND) && (t1 != S_AIND)) {
-			comma();
+			comma(1);
 			expr(&e2, 0);
 			outrb(&e2, R_USGN);
 		}
@@ -458,7 +474,7 @@ struct mne *mp;
 		if ((t1 == S_IND) || (t1 == S_AIND)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		genout(cpg, op, rf, &e1);
 		outrb(&e2, R_NORM);
@@ -473,9 +489,9 @@ struct mne *mp;
 		if ((t1 == S_IND) || (t1 == S_AIND)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		expr(&e2, 0);
-		comma();
+		comma(1);
 		expr(&e3, 0);
 		genout(cpg, op, rf, &e1);
 		outrb(&e2, R_NORM);
@@ -495,7 +511,7 @@ struct mne *mp;
 	case S_MOVW:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 
@@ -1041,6 +1057,11 @@ int i;
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
+
 	bp = bb;
 	bm = 1;
 	if (pass == 0) {
@@ -1115,14 +1136,3 @@ struct expr *esp;
 	return(0);
 }
 
-/*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}

@@ -1,8 +1,21 @@
 /* asmain.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -77,13 +90,14 @@
  *		char	afn[]		afile() constructed filespec
  *		int	afp		afile constructed path length
  *		area *	areap		pointer to an area structure
+ *		asmf *	asmc 		pointer to current assembler file structure
+ *		int	asmline		assembler source file line number
+ *		asmf *	asmp		pointer to first assembler file structure
  *		int	aserr		assembler error counter
  *		int	bflag		-b(b), listing mode flag
  *		int	cb[]		array of assembler output values
  *		int	cbt[]		array of assembler relocation types
  *					describing the data in cb[]
- *		int	cfile		current file handle index
- *					of input assembly files
  *		int *	cp		pointer to assembler output array cb[]
  *		int *	cpt		pointer to assembler relocation type
  *					output array cbt[]
@@ -93,21 +107,18 @@
  *		int	fflag		-f(f), relocations flagged flag
  *		int	flevel		IF-ELSE-ENDIF flag will be non
  *					zero for false conditional case
- *		int	nlevel		LIST-NLIST flag will be non
- *				 	zero for nolist
  *		a_uint	fuzz		tracks pass to pass changes in the
  *					address of symbols caused by
  *					variable length instruction formats
  *		int	gflag		-g, make undefined symbols global flag
+ *		int	hflag		-h, hidden option for diagnostic info dump
  *		char	ib[]		assembler-source text line
- *		int	inpfil		count of assembler
- *					input files specified
  *		int	ifcnd[]		array of IF statement condition
  *					values (0 = FALSE) indexed by tlevel
  *		int	iflvl[]		array of IF-ELSE-ENDIF flevel
  *					values indexed by tlevel
- *		int	incfil		current file handle index
- *					for include files
+ *		int	incfil		current include file count
+ *		int	incline		include source file line number
  *		char *	ip		pointer into the assembler-source
  *					text line in ib[]
  *		jmp_buf	jump_env	compiler dependent structure
@@ -115,7 +126,9 @@
  *		int	lflag		-l, generate listing flag
  *		int	line		current assembler source
  *					line number
+ *		int	lnlist		current LIST-NLIST state
  *		int	lop		current line number on page
+ *		int	maxinc		maximum include file nesting counter
  *		int	oflag		-o, generate relocatable output flag
  *		int	page		current page number
  *		int	pflag		enable listing pagination
@@ -124,9 +137,7 @@
  *					2 (binary), 8 (octal), 10 (decimal),
  *					16 (hexadecimal)
  *		int	sflag		-s, generate symbol table flag
- *		char	srcfn[][]	array of source file names
- *		int	srcfp[]		array of source file path lengths
- *		int	srcline[]	current source file line
+ *		int	srcline		current source line number
  *		char	stb[]		Subtitle string buffer
  *		sym *	symp		pointer to a symbol structure
  *		int	tlevel		current conditional level
@@ -137,7 +148,6 @@
  *		FILE *	lfp		list output file handle
  *		FILE *	ofp		relocation output file handle
  *		FILE *	tfp		symbol table output file handle
- *		FILE *	sfp[]		array of assembler-source file handles
  *
  *	called functions:
  *		FILE *	afile()		asmain.c
@@ -145,18 +155,22 @@
  *		VOID	asexit()	asmain.c
  *		VOID	diag()		assubr.c
  *		VOID	err()		assubr.c
- *		int	fprintf()	c-library
+ *		VOID	exprmasks()	asexpr.c
+ *		int	fprintf()	c_library
  *		int	getline()	aslex.c
  *		int	int32siz()	asmain.c
  *		VOID	list()		aslist.c
  *		VOID	lstsym()	aslist.c
+ *		VOID	mcrinit()	asmcro.c
  *		VOID	minit()		___mch.c
+ *		VOID *	new()		assym.c
  *		VOID	newdot()	asmain.c
  *		VOID	outbuf()	asout.c
  *		VOID	outchk()	asout.c
  *		VOID	outgsd()	asout.c
- *		int	rewind()	c-library
- *		int	setjmp()	c-library
+ *		int	rewind()	c_library
+ *		int	setjmp()	c_library
+ *		char *	strcpy()	c_library
  *		VOID	symglob()	assym.c
  *		VOID	syminit()	assym.c
  *		VOID	usage()		asmain.c
@@ -171,7 +185,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-	char *p;
+	char *p, *q;
 	int c, i;
 	struct area *ap;
 	struct def *dp;
@@ -182,15 +196,16 @@ char *argv[];
 	}
 
 	fprintf(stdout, "\n");
-	inpfil = -1;
-	pflag = 1;
+	q = NULL;
+	asmc = NULL;
+	asmp = NULL;
 	for (i=1; i<argc; ++i) {
 		p = argv[i];
 		if (*p == '-') {
-			if (inpfil >= 0)
+			if (asmc != NULL)
 				usage(ER_FATAL);
 			++p;
-			while ((c = *p++) != 0)
+			while ((c = *p++) != 0) {
 				switch(c) {
 
 				case 'a':
@@ -245,12 +260,13 @@ char *argv[];
 
 				case 'p':
 				case 'P':
-					pflag = 0;
+					++pflag;
 					break;
 
 				case 'u':
 				case 'U':
 					++uflag;
+					break;
 
 				case 'w':
 				case 'W':
@@ -282,29 +298,50 @@ char *argv[];
 					++fflag;
 					break;
 
+				case 'h':
+				case 'H':
+					++hflag;
+					break;
+
 				default:
 					usage(ER_FATAL);
 				}
+			}
 		} else {
-			if (++inpfil == MAXFIL) {
-				fprintf(stderr, "too many input files\n");
-				asexit(ER_FATAL);
+			if (asmc == NULL) {
+				q = p;
+				if (++i < argc) {
+					p = argv[i];
+					if (*p == '-')
+						usage(ER_FATAL);
+				}
+				asmp = (struct asmf *)
+						new (sizeof (struct asmf));
+				asmc = asmp;
+			} else {
+				asmc->next = (struct asmf *)
+						new (sizeof (struct asmf));
+				asmc = asmc->next;
 			}
-			sfp[inpfil] = afile(p, "", 0);
-			strcpy(srcfn[inpfil],afn);
-			srcfp[inpfil] = afp;
-			if (inpfil == 0) {
-				if (lflag)
-					lfp = afile(p, "lst", 1);
-				if (oflag)
-					ofp = afile(p, "rel", 1);
-				if (sflag)
-					tfp = afile(p, "sym", 1);
-			}
+			asmc->next = NULL;
+			asmc->objtyp = T_ASM;
+			asmc->line = 0;
+			asmc->flevel = 0;
+			asmc->tlevel = 0;
+			asmc->lnlist = LIST_NORM;
+			asmc->fp = afile(p, "", 0);
+			strcpy(asmc->afn,afn);
+			asmc->afp = afp;
 		}
 	}
-	if (inpfil < 0)
+	if (asmp == NULL)
 		usage(ER_WARNING);
+	if (lflag)
+		lfp = afile(q, "lst", 1);
+	if (oflag)
+		ofp = afile(q, "rel", 1);
+	if (sflag)
+		tfp = afile(q, "sym", 1);
 	exprmasks(2);
 	syminit();
 	if (bflag != 0) {
@@ -327,20 +364,27 @@ char *argv[];
 		}
 		flevel = 0;
 		tlevel = 0;
-		nlevel = 0;
+		lnlist = LIST_NORM;
 		ifcnd[0] = 0;
 		iflvl[0] = 0;
 		radix = 10;
-		srcline[0] = 0;
 		page = 0;
 		stb[0] = 0;
 		lop  = NLPP;
-		cfile = 0;
-		strcpy(afn, srcfn[cfile]);
-		afp = srcfp[cfile];
-		incfil = -1;
-		for (i = 0; i <= inpfil; i++)
-			rewind(sfp[i]);
+		incfil = 0;
+		maxinc = 0;
+		srcline = 0;
+		asmline = 0;
+		incline = 0;
+		asmc = asmp;
+		while (asmc) {
+			if (asmc->fp)
+				rewind(asmc->fp);
+			asmc = asmc->next;
+		}
+		asmc = asmp;
+		strcpy(afn, asmc->afn);
+		afp = asmc->afp;
 		ap = areap;
 		while (ap) {
 			ap->a_fuzz = 0;
@@ -354,19 +398,13 @@ char *argv[];
 		outbuf("I");
 		outchk(0,0);
 		symp = &dot;
+		mcrinit();
 		minit();
 		while ((i = getline()) != 0) {
 			cp = cb;
 			cpt = cbt;
 			ep = eb;
 			ip = ib;
-
-			/*
-			 * String substitution or recursion error.
-			 */
-			if (i != 1) {
-				err('s');
-			}
 
 			/* JLH: if line begins with ";!", then
 			 * pass this comment on to the output file
@@ -436,15 +474,16 @@ intsiz()
  *		int	j		loop counter
  *
  *	global variables:
- *		FILE *	ifp[]		array of include-file file handles
+ *		asmf *	asm 		pointer to current assembler file structure
+ *		asmf *	asmp		pointer to first assembler file structure
  *		FILE *	lfp		list output file handle
  *		FILE *	ofp		relocation output file handle
  *		FILE *	tfp		symbol table output file handle
- *		FILE *	sfp[]		array of assembler-source file handles
  *
  *	functions called:
- *		int	fclose()	c-library
- *		VOID	exit()		c-library
+ *		int	fclose()	c_library
+ *		VOID	exit()		c_library
+ *		VOID	old()		assym.c
  *
  *	side effects:
  *		All files closed. Program terminates.
@@ -454,19 +493,35 @@ VOID
 asexit(i)
 int i;
 {
-	int j;
-
 	if (lfp != NULL) fclose(lfp);
 	if (ofp != NULL) fclose(ofp);
 	if (tfp != NULL) fclose(tfp);
 
-	for (j=0; j<MAXFIL && sfp[j] != NULL; j++) {
-		fclose(sfp[j]);
+	while (asmc != NULL) {
+		if ((asmc->objtyp == T_INCL) && (asmc->fp != NULL)) {
+			fclose(asmc->fp);
+		}
+		asmc = asmc->next;
 	}
 
-	for (j=0; j<MAXINC && ifp[j] != NULL; j++) {
-		fclose(ifp[j]);
+	asmc = asmp;
+	while (asmc != NULL) {
+		if ((asmc->objtyp == T_ASM) && (asmc->fp != NULL)) {
+			fclose(asmc->fp);
+		}
+		asmc = asmc->next;
 	}
+
+	asfree();
+
+	if (hflag) {
+		fprintf(stderr, "maxinc(include file level)    = %3d\n", maxinc);
+		fprintf(stderr, "maxmcr(macro expansion level) = %3d\n", maxmcr);
+		fprintf(stderr, "asmblk(1K Byte Allocations)   = %3d\n", asmblk);
+		fprintf(stderr, "mcrblk(1K Byte Allocations)   = %3d\n", mcrblk);
+		fprintf(stderr, "\n");
+	}
+
 	exit(i);
 }
 
@@ -475,11 +530,13 @@ int i;
  *	The function asmbl() scans the assembler-source text for
  *	(1) labels, global labels, equates, global equates, and local
  *	symbols, (2) .if, .else, .endif, and .page directives,
- *	(3) machine independent assembler directives, and (4) machine
- *	dependent mnemonics.
+ *	(3) machine independent assembler directives, (4) macros and
+ *	macro definitions, and (5) machine dependent mnemonics.
  *
  *	local variables:
  *		mne *	mp		pointer to a mne structure
+ *		mne *	xp		pointer to a mne structure
+ *		mcrdef *np		pointer to a macro definition structure
  *		sym *	sp		pointer to a sym structure
  *		tsym *	tp		pointer to a tsym structure
  *		int	c		character from assembler-source
@@ -495,7 +552,6 @@ int i;
  *		char	fn[]		filename string
  *		char *	p		pointer into a string
  *		int	d		temporary value
- *		int	n		temporary value
  *		int	uf		area options
  *		int	con_ovr		concatenate / overlay flag
  *		int	rel_abs		relocatable / absolute flag
@@ -504,9 +560,12 @@ int i;
  *		a_uint	base		bank base address
  *		a_uint	size		bank size limit
  *		a_uint	map		bank map parameter
+ *		a_uint	n		temporary value
  *		a_uint	v		temporary value
  *		int	cnt	        temporary counter
  *		int	flags		temporary flag
+ *		FILE *	fp		include file handle
+ *		int	m_type		mnemonic type
  *
  *	global variables:
  *		area *	areap		pointer to an area structure
@@ -515,8 +574,7 @@ int i;
  *					ASCII character
  *		int	flevel		IF-ELSE-ENDIF flag will be non
  *					zero for false conditional case
- *		int	nlevel		LIST-NLIST flag will be non
- *				 	zero for nolist
+ *		int	lnlist		current LIST-NLIST state
  *		a_uint	fuzz		tracks pass to pass changes in the
  *					address of symbols caused by
  *					variable length instruction formats
@@ -524,12 +582,8 @@ int i;
  *					values (0 = FALSE) indexed by tlevel
  *		int	iflvl[]		array of IF-ELSE-ENDIF flevel
  *					values indexed by tlevel
- *		FILE *	ifp[]		array of include-file file handles
- *		char	incfn[][]	array of include file names
- *		int	incfp[]		array of include file path lengths
- *		int	incline[]	current include file line
- *		int	incfil		current file handle index
- *					for include files
+ *		int	incline		current include file line
+ *		int	incfil		current include file count
  *		a_uint	laddr		address of current assembler line
  *					or value of .if argument
  *		int	lmode		listing mode
@@ -556,16 +610,20 @@ int i;
  *		VOID	err()		assubr.c
  *		VOID	expr()		asexpr.c
  *		int	fndidx()	asmain.c
- *		FILE *	fopen()		c-library
+ *		FILE *	fopen()		c_library
  *		int	get()		aslex.c
  *		VOID	getid()		aslex.c
  *		int	getmap()	aslex.c
  *		int	getnb()		aslex.c
  *		VOID	getst()		aslex.c
+ *		VOID	getxstr()	asmcro.c
  *		sym *	lookup()	assym.c
  *		VOID	machine()	___mch.c
+ *		int	macro()		asmcro.c
+ *		int	mcrprc()	asmcro.c
  *		mne *	mlookup()	assym.c
  *		int	more()		aslex.c
+ *		mcrdef *nlookup()	asmcro.c
  *		VOID *	new()		assym.c
  *		VOID	newdot()	asmain.c
  *		VOID	outall()	asout.c
@@ -575,9 +633,9 @@ int i;
  *		VOID	outrw()		asout.c
  *		VOID	phase()		asmain.c
  *		VOID	qerr()		assubr.c
- *		int	strcmp()	c-library
- *		char *	strcpy()	c-library
- *		char *	strncpy()	c-library
+ *		int	strcmp()	c_library
+ *		char *	strcpy()	c_library
+ *		char *	strncpy()	c_library
  *		char *	strsto()	assym.c
  *		VOID	unget()		aslex.c
  */
@@ -585,7 +643,8 @@ int i;
 VOID
 asmbl()
 {
-	struct mne *mp;
+	struct mne *mp, *xp;
+	struct mcrdef *np;
 	struct sym *sp;
 	struct tsym *tp;
 	int c;
@@ -604,11 +663,31 @@ asmbl()
 	int con_ovr, rel_abs, npg_pag, csg_dsg;
 	a_uint base, size, map, n, v;
 	int cnt, flags;
+	FILE * fp;
+	int m_type;
 
 	laddr = dot.s_addr;
 	lmode = SLIST;
+
+	/*
+	 * Check iiff-iift-iiftf processing
+	 */
+	if (ftflevel != 0) {
+		flevel = ftflevel - 1;
+		ftflevel = 0;
+	}
+
+	/*
+	 * Check if Building a Macro
+	 * Check if Exiting  a Macro
+	 */
+	if (mcrprc(O_CHECK) != 0) {
+		return;
+	}
+
 loop:
 	if ((c=endline()) == 0) { return; }
+
 	/*
 	 * If the first character is a digit then assume
 	 * a reusable symbol is being specified.  The symbol
@@ -662,7 +741,7 @@ loop:
 		goto loop;
 	}
 	/*
-	 * If the first character is a letter then assume a lable,
+	 * If the first character is a letter then assume a label,
 	 * symbol, assembler directive, or assembler mnemonic is
 	 * being processed.
 	 */
@@ -744,7 +823,7 @@ loop:
 	 *     [labels] sym .glbequ value   defines a global equate
 	 *     [labels] sym .lclequ value   defines a local equate
 	 */
-	if (mlookup(id) == NULL) {
+	if ((mlookup(id) == NULL) && (nlookup(id) == NULL)) {
 		if (flevel)
                		return;
 		/*
@@ -761,79 +840,314 @@ loop:
 	}
 	/*
 	 * Completed scan for lables , equates, and symbols.
-	 *
-	 * An assembler directive or mnemonic is
-	 * required to continue processing line.
 	 */
 	lmode = flevel ? SLIST : CLIST;
-	if ((mp = mlookup(id)) == NULL) {
-		if (!flevel)
+	/*
+	 * An assembler directive, mnemonic, or macro is
+	 * required to continue processing line.
+	 */
+	mp = mlookup(id);
+	np = nlookup(id);
+	if ((mp == NULL) && (np == NULL)) {
+		if (!flevel) {
 			err('o');
+		}
 		return;
 	}
 	/*
 	 * If we have gotten this far then we have found an
-	 * assembler directive or an assembler mnemonic.
+	 * assembler directive an assembler mnemonic or
+	 * an assembler macro.
 	 *
-	 * Check for .if, .ifeq, .ifne, .ifgt, .iflt, .ifle,
-         * .ifge, .else, .endif, .list, .nlist, and .page
-         * directives which are not controlled by the
-         * conditional flags
+	 * Check for .if[], .iif[], .else, .endif,
+	 * .list, .nlist, and .page directives.
 	 */
-	switch (mp->m_type) {
+	m_type = (mp != NULL) ? mp->m_type : ~0;
+
+	switch (m_type) {
+
 	case S_CONDITIONAL:
 		/*
-		 * BGP
-		 *
-		 * Conditionals .ifne, .ifeq, .ifgt,
-		 * .iflt, .ifge, and .ifle added.
+		 * BGP - .ifeq, .ifne, .ifgt, .iflt, .ifge, .ifle
 		 */
-		switch(mp->m_valu) {
-		case O_IF:
-		case O_IFNE:
-		case O_IFEQ:
-		case O_IFGT:
-		case O_IFLT:
-		case O_IFGE:
-		case O_IFLE:
+		if (mp->m_valu < O_IFEND) {
+			if (mp->m_valu == O_IF) {
+				/*
+				 * Process conditionals of the form
+				 *
+				 *	.if	cnd(,)	arg1 (, arg2)
+				 *
+				 * where cnd is one of the following:
+				 *
+				 *	eq	ne
+				 *	gt	lt	ge	le
+				 *	def	ndef
+				 *	b	nb	idn	dif
+				 *	t	f	tf
+				 */
+				p = ip;
+				strcpy(id,".if");
+				getid(&id[3],getnb());
+				xp = mlookup(id);
+				if ((xp != NULL) &&
+				    (xp->m_type == S_CONDITIONAL) &&
+				    (xp->m_valu != O_IF)) {
+			    		mp = xp;
+					comma(0);
+				} else {
+					ip = p;
+				}
+			}
 			if (flevel) {
-				while (get()) ;
 				n = 0;
 			} else {
-				n = absexpr();
+				switch (mp->m_valu) {
+				case O_IF:
+				case O_IFNE:	/* .if ne,.... */
+				case O_IFEQ:	/* .if eq,.... */
+				case O_IFGT:	/* .if gt,.... */
+				case O_IFLT:	/* .if lt,.... */
+				case O_IFGE:	/* .if ge,.... */
+				case O_IFLE:	/* .if le,.... */
+					n = absexpr();
+					switch (mp->m_valu) {
+					default:
+					case O_IF:
+					case O_IFNE:	n = (((v_sint) n) != 0);	break;
+					case O_IFEQ:	n = (((v_sint) n) == 0);	break;
+					case O_IFGT:	n = (((v_sint) n) >  0);	break;
+					case O_IFLT:	n = (((v_sint) n) <  0);	break;
+					case O_IFGE:	n = (((v_sint) n) >= 0);	break;
+					case O_IFLE:	n = (((v_sint) n) <= 0);	break;
+					}
+					break;
+
+				case O_IFB:	/* .if b,.... */
+				case O_IFNB:	/* .if nb,.... */
+					n = comma(0) ? 0 : 1;
+					if (n) {
+						getxstr(id);
+						if (*id == '\0') {
+							n = 0;
+						}
+						comma(0);
+					}
+					switch (mp->m_valu) {
+					default:
+					case O_IFB:	n = (((v_sint) n) == 0);	break;
+					case O_IFNB:	n = (((v_sint) n) != 0);	break;
+					}
+					break;
+
+				case O_IFDEF:	/* .if def,.... */
+				case O_IFNDEF:	/* .if ndef,.... */
+					getid(id, -1);
+					if (((dp = dlookup(id)) != NULL) && (dp->d_dflag != 0)) {
+						n = 1;
+					} else
+					if ((sp = slookup(id)) != NULL) {
+						n = (sp->s_type == S_USER) ? 1 : 0;
+					} else {
+						n = 0;
+					}
+					switch (mp->m_valu) {
+					default:
+					case O_IFDEF:	n = (((v_sint) n) != 0);	break;
+					case O_IFNDEF:	n = (((v_sint) n) == 0);	break;
+					}
+					break;
+
+				case O_IFIDN:	/* .if idn,.... */
+				case O_IFDIF:	/* .if dif,.... */
+					getxstr(id);
+					getxstr(equ);
+					n = symeq(id, equ, zflag);
+					switch (mp->m_valu) {
+					default:
+					case O_IFIDN:	n = (((v_sint) n) != 0);	break;
+					case O_IFDIF:	n = (((v_sint) n) == 0);	break;
+					}
+					break;
+
+				case O_IFF:	/* .if f */
+				case O_IFT:	/* .if t */
+				case O_IFTF:	/* .if tf */
+					n = 0;
+					break;
+
+				default:
+					n = 0;
+					qerr();
+					break;
+				}
 			}
-			if (tlevel < MAXIF) {
+			switch (mp->m_valu) {
+			default:
+				if (tlevel < MAXIF) {
+					++tlevel;
+					ifcnd[tlevel] = (int) n;
+					iflvl[tlevel] = flevel;
+					if (!n) {
+						++flevel;
+					}
+				} else {
+					err('i');
+				}
+				if (!iflvl[tlevel]) {
+					lmode = ELIST;
+					laddr = n;
+				} else {
+					lmode = SLIST;
+				}
+				break;
+
+			case O_IFF:	/* .if f */
+			case O_IFT:	/* .if t */
+			case O_IFTF:	/* .if tf */
+				if (tlevel == 0) {
+					err('i');
+					lmode = SLIST;
+					break;
+				}
+				if (iflvl[tlevel] == 0) {
+					if (ifcnd[tlevel]) {
+						switch (mp->m_valu) {
+						default:
+						case O_IFF:	flevel = 1;	break;
+						case O_IFT:	flevel = 0;	break;
+						case O_IFTF:	flevel = 0;	break;
+						}
+					} else {
+						switch (mp->m_valu) {
+						default:
+						case O_IFF:	flevel = 0;	break;
+						case O_IFT:	flevel = 1;	break;
+						case O_IFTF:	flevel = 0;	break;
+						}
+					}
+					lmode = ELIST;
+					laddr = flevel ? 0 : 1;
+				} else {
+					lmode = SLIST;
+				}
+				break;
+			}
+			return;
+		} else
+		if (mp->m_valu < O_IIFEND) {
+			if (mp->m_valu == O_IIF) {
+				/*
+				 * Process conditionals of the form
+				 *
+				 *	.iif	cnd(,)	arg1 (, arg2)
+				 *
+				 * where cnd is one of the following:
+				 *
+				 *	eq	ne
+				 *	gt	lt	ge	le
+				 *	def	ndef
+				 *	b	nb	idn	dif
+				 *	t	f	tf
+				 */
+				p = ip;
+				strcpy(id,".iif");
+				getid(&id[4],getnb());
+				xp = mlookup(id);
+				if ((xp != NULL) &&
+				    (xp->m_type == S_CONDITIONAL) &&
+				    (xp->m_valu != O_IIF)) {
+				    	mp = xp;
+					comma(0);
+				} else {
+					ip = p;
+				}
+			}
+			switch (mp->m_valu) {
+			case O_IIFF:	/* .iif f */
+			case O_IIFT:	/* .iif t */
+			case O_IIFTF:	/* .iif tf */
+				if (tlevel == 0) {
+					err('i');
+					lmode = SLIST;
+					return;
+				}
+				if (iflvl[tlevel] == 0) {
+					ftflevel = flevel + 1;
+					if (ifcnd[tlevel] != 0) {
+						switch (mp->m_valu) {
+						default:
+						case O_IIFF:	flevel = 1;	break;
+						case O_IIFT:	flevel = 0;	break;
+						case O_IIFTF:	flevel = 0;	break;
+						}
+					} else {
+						switch (mp->m_valu) {
+						default:
+						case O_IIFF:	flevel = 0;	break;
+						case O_IIFT:	flevel = 1;	break;
+						case O_IIFTF:	flevel = 0;	break;
+						}
+					}
+				}
+				n = flevel ? 0 : 1;
+				/*
+				 * Skip trailing ','
+				 */
+				comma(0);
+				lmode = SLIST;
+				if (n) {
+					goto loop;
+				}
+				return;
+
+			default:
+				if (flevel) {
+					return;
+				}
+				break;
+			}
+			switch (mp->m_valu) {
+			case O_IIF:
+			case O_IIFNE:	/* .iif ne,.... */
+			case O_IIFEQ:	/* .iif eq,.... */
+			case O_IIFGT:	/* .iif gt,.... */
+			case O_IIFLT:	/* .iif lt,.... */
+			case O_IIFGE:	/* .iif ge,.... */
+			case O_IIFLE:	/* .iif le,.... */
+				n = absexpr();
 				switch (mp->m_valu) {
 				default:
-				case O_IF:
-				case O_IFNE:	n = (((v_sint) n) != 0);	break;
-				case O_IFEQ:	n = (((v_sint) n) == 0);	break;
-				case O_IFGT:	n = (((v_sint) n) >  0);	break;
-				case O_IFLT:	n = (((v_sint) n) <  0);	break;
-				case O_IFGE:	n = (((v_sint) n) >= 0);	break;
-				case O_IFLE:	n = (((v_sint) n) <= 0);	break;
+				case O_IIF:
+				case O_IIFNE:	n = (((v_sint) n) != 0);	break;
+				case O_IIFEQ:	n = (((v_sint) n) == 0);	break;
+				case O_IIFGT:	n = (((v_sint) n) >  0);	break;
+				case O_IIFLT:	n = (((v_sint) n) <  0);	break;
+				case O_IIFGE:	n = (((v_sint) n) >= 0);	break;
+				case O_IIFLE:	n = (((v_sint) n) <= 0);	break;
 				}
-				++tlevel;
-				ifcnd[tlevel] = (int) n;
-				iflvl[tlevel] = flevel;
-				if (!n) {
-					++flevel;
-				}
-			} else {
-				err('i');
-			}
-			lmode = ELIST;
-			laddr = n;
-			break;
+				break;
 
-		case O_IFDEF:
-		case O_IFNDEF:
-			if (flevel) {
-				while (get()) ;
-				n = 0;
-			} else {
+			case O_IIFB:	/* .iif b,.... */
+			case O_IIFNB:	/* .iif nb,.... */
+				n = comma(0) ? 0 : 1;
+				if (n) {
+					getxstr(id);
+					if (*id == '\0') {
+						n = 0;
+					}
+					comma(0);
+				}
+				switch (mp->m_valu) {
+				default:
+				case O_IIFB:	n = (((v_sint) n) == 0);	break;
+				case O_IIFNB:	n = (((v_sint) n) != 0);	break;
+				}
+				break;
+
+			case O_IIFDEF:	/* .iif def,.... */
+			case O_IIFNDEF:	/* .iif ndef,.... */
 				getid(id, -1);
-				if ((dp = dlookup(id)) != NULL) {
+				if (((dp = dlookup(id)) != NULL) && (dp->d_dflag != 0)) {
 					n = 1;
 				} else
 				if ((sp = slookup(id)) != NULL) {
@@ -841,36 +1155,61 @@ loop:
 				} else {
 					n = 0;
 				}
-				if (mp->m_valu == O_IFNDEF) {
-					n = n ? 0 : 1;
+				switch (mp->m_valu) {
+				default:
+				case O_IIFDEF:	n = (((v_sint) n) != 0);	break;
+				case O_IIFNDEF:	n = (((v_sint) n) == 0);	break;
 				}
+				break;
+
+			case O_IIFIDN:	/* .iif idn,.... */
+			case O_IIFDIF:	/* .iif dif,.... */
+				getxstr(id);
+				getxstr(equ);
+				n = symeq(id, equ, zflag);
+				switch (mp->m_valu) {
+				default:
+				case O_IIFIDN:	n = (((v_sint) n) != 0);	break;
+				case O_IIFDIF:	n = (((v_sint) n) == 0);	break;
+				}
+				break;
+
+			default:
+				n = 0;
+				qerr();
+				break;
 			}
-			if (tlevel < MAXIF) {
-				++tlevel;
-				ifcnd[tlevel] = (int) n;
-				iflvl[tlevel] = flevel;
-				if (n == 0) {
-					++flevel;
+			/*
+			 * Skip trailing ','
+			 */
+			comma(0);
+			lmode = SLIST;
+			if (n) {
+				goto loop;
+			}
+			return;
+		}
+
+		switch (mp->m_valu) {
+		case O_ELSE:
+			if (tlevel != 0) {
+				if (ifcnd[tlevel]) {
+					flevel = iflvl[tlevel] + 1;
+					ifcnd[tlevel] = 0;
+				} else {
+					flevel = iflvl[tlevel];
+					ifcnd[tlevel] = 1;
+				}
+				if (!iflvl[tlevel]) {
+					lmode = ELIST;
+					laddr = ifcnd[tlevel];
+					return;
 				}
 			} else {
 				err('i');
 			}
-			lmode = ELIST;
-			laddr = n ? 1 : 0;
-			break;
-
-		case O_ELSE:
-			if (ifcnd[tlevel]) {
-				if (++flevel > (iflvl[tlevel]+1)) {
-					err('i');
-				}
-			} else {
-				if (--flevel < iflvl[tlevel]) {
-					err('i');
-				}
-			}
 			lmode = SLIST;
-			break;;
+			return;
 
 		case O_ENDIF:
 			if (tlevel) {
@@ -879,37 +1218,82 @@ loop:
 				err('i');
 			}
 			lmode = SLIST;
-			break;
-
-		default:
-			break;
-		}
-		return;
-
-	case S_LISTING:
-		lmode = NLIST;
-		if (more()) {
-			n = absexpr() ? 1 : 0;
-		} else {
-			n = 0;
-		}
-		if (!n && flevel)
 			return;
 
-		switch(mp->m_valu) {
-		case O_LIST:
-			if (nlevel) {
-				nlevel -= 1;
-			}
-			break;;
-
-		case O_NLIST:
-			nlevel += 1;
-			break;
-
 		default:
 			break;
 		}
+		qerr();
+		break;
+
+	case S_LISTING:
+		flags = 0;
+		while ((c=endline()) != 0) {
+			if (c == ',') {
+				c = getnb();
+			}
+			if (c == '(') {
+				do {
+					if ((c = getnb()) == '!') {
+						flags |= LIST_NOT;
+ 					} else {
+						unget(c);
+						getid(id, -1);
+						if (symeq(id, "err", 1)) { flags |= LIST_ERR; } else
+						if (symeq(id, "loc", 1)) { flags |= LIST_LOC; } else
+						if (symeq(id, "bin", 1)) { flags |= LIST_BIN; } else
+						if (symeq(id, "eqt", 1)) { flags |= LIST_EQT; } else
+						if (symeq(id, "cyc", 1)) { flags |= LIST_CYC; } else
+						if (symeq(id, "lin", 1)) { flags |= LIST_LIN; } else
+						if (symeq(id, "src", 1)) { flags |= LIST_SRC; } else
+						if (symeq(id, "pag", 1)) { flags |= LIST_PAG; } else
+						if (symeq(id, "lst", 1)) { flags |= LIST_LST; } else
+						if (symeq(id, "md" , 1)) { flags |= LIST_MD;  } else
+						if (symeq(id, "me" , 1)) { flags |= LIST_ME;  } else
+						if (symeq(id, "meb", 1)) { flags |= LIST_MEB; } else {
+							err('u');
+						}
+					}
+					c = endline();
+				} while (c == ',') ;
+				if (c != ')') {
+					qerr();
+				}
+			} else {
+				unget(c);
+				if (absexpr()) {
+					flags |=  LIST_TORF;
+				} else {
+					flags &= ~LIST_TORF;
+				}
+			}
+		}
+		if (!(flags & LIST_TORF) && flevel) {
+			return;
+		}
+		if (flags & ~LIST_TORF) {
+			if (flags & LIST_NOT) {
+				switch(mp->m_valu) {
+				case O_LIST:	lnlist = LIST_NONE;	break;
+				case O_NLIST:	lnlist = LIST_NORM;	break;
+				default:				break;
+				}
+			}
+			if (flags & LIST_BITS) {
+				switch(mp->m_valu) {
+				case O_LIST:	lnlist |=  (flags & LIST_BITS);	break;
+				case O_NLIST:	lnlist &= ~(flags & LIST_BITS);	break;
+				default:					break;
+				}
+			}
+		} else {
+			switch(mp->m_valu) {
+			case O_LIST:	lnlist = LIST_NORM;	break;
+			case O_NLIST:	lnlist = LIST_NONE;	break;
+			default:				break;
+			}
+		}
+		lmode = (lnlist & LIST_LST) ? SLIST : NLIST;
 		return;
 
 	case S_PAGE:
@@ -919,7 +1303,7 @@ loop:
 		} else {
 			n = 0;
 		}
-		if (!n && nlevel)
+		if (!n && flevel)
 			return;
 
 		lop = NLPP;
@@ -934,7 +1318,7 @@ loop:
 	 * If we are not in a false state for .if/.else then
 	 * process the assembler directives here.
 	 */
-	switch (mp->m_type) {
+	switch (m_type) {
 
 	case S_HEADER:
 		switch(mp->m_valu) {
@@ -983,31 +1367,22 @@ loop:
 
 	case S_INCL:
 		lmode = SLIST;
-    		if (++incfil == MAXINC) {
+    		if (++incfil > MAXINC) {
 			--incfil;
 			err('i');
 			break;
+		}
+		if (incfil > maxinc) {
+			maxinc = incfil;
 		}
 		/*
 		 * Copy path of file opening the include file
 		 */
 		strncpy(fn,afn,afp);
-		p = fn + afp;
 		/*
 		 * Concatenate the .include file specification
 		 */
-		d = getnb();
-		while ((c = get()) != d) {
-			if (c == '\0') {
-				qerr();
-			}
-			if (p < &fn[FILSPC+FILSPC-1]) {
-				*p++ = c;
-			} else {
-				break;
-			}
-		}
-		*p = 0;
+		getdstr(fn + afp, FILSPC + FILSPC - afp);
 		/*
 		 * If .include specifies a path
 		 * 	use it
@@ -1022,16 +1397,21 @@ loop:
 		/*
 		 * Open File
 		 */
-    		if ((ifp[incfil] = fopen(afntmp, "r")) == NULL) {
+    		if ((fp = fopen(afntmp, "r")) == NULL) {
 			--incfil;
 			err('i');
 		} else {
-			incline[incfil] = 0;
-			strcpy(afn, afntmp);
-			afp = afptmp;
-			strcpy(incfn[incfil],afn);
-			incfp[incfil] = afp;
-			if (!nlevel) {
+			asmi = (struct asmf *) new (sizeof (struct asmf));
+			asmi->next = asmc;
+			asmi->objtyp = T_INCL;
+			asmi->line = srcline;
+			asmi->flevel = flevel;
+			asmi->tlevel = tlevel;
+			asmi->lnlist = lnlist;
+			asmi->fp = fp;
+			asmi->afp = afptmp;
+			strcpy(asmi->afn,afntmp);
+			if (lnlist & LIST_PAG) {
 				lop = NLPP;
 			}
 		}
@@ -1297,8 +1677,7 @@ loop:
 			sp = lookup(id);
 			sp->s_flag &= ~S_LCL;
 			sp->s_flag |=  S_GBL;
-		} while ((c = getnb()) == ',');
-		unget(c);
+		} while (comma(0));
 		lmode = SLIST;
 		break;
 
@@ -1308,8 +1687,7 @@ loop:
 			sp = lookup(id);
 			sp->s_flag &= ~S_GBL;
 			sp->s_flag |=  S_LCL;
-		} while ((c = getnb()) == ',');
-		unget(c);
+		} while (comma(0));
 		lmode = SLIST;
 		break;
 
@@ -1321,9 +1699,7 @@ loop:
 		 *     [labels] .lclequ sym, value   defines a local equate
 		 */
 		getid(id, -1);
-		if ((c = getnb()) != ',') {
-			qerr();
-		}
+		comma(1);
 		equate(id, &e1, mp->m_valu);
 		break;
 
@@ -1362,8 +1738,7 @@ loop:
 				case 3: outr3b(&e1, R_NORM); break;
 				case 4: outr4b(&e1, R_NORM); break;
 				}
-			} while ((c = getnb()) == ',');
-			unget(c);
+			} while (comma(0));
 		} else
 		/*
 		 * Data size == 1
@@ -1385,7 +1760,7 @@ loop:
 				}
 				if (!is_abs(&e1))
 					err('r');
-				if (hilo) {
+				if ((int) hilo) {
 					cnt += 1;
 					v |= ((e1.e_addr & 0xFF) << 8 * (n - cnt));
 				} else {
@@ -1403,8 +1778,7 @@ loop:
 					cnt = 0;
 					v = 0;
 				}
-			} while ((c = getnb()) == ',');
-			unget(c);
+			} while (comma(0));
 			if (cnt != 0) {
 				switch(n) {
 				default:
@@ -1435,8 +1809,7 @@ loop:
 				case 3: outr3b(&e1, R_NORM); break;
 				case 4: outr4b(&e1, R_NORM); break;
 				}
-			} while ((c = getnb()) == ',');
-			unget(c);
+			} while (comma(0));
 		}
 		break;
 
@@ -1457,13 +1830,12 @@ loop:
 		switch(mp->m_valu) {
 		case O_ASCII:
 		case O_ASCIZ:
-			if ((d = getnb()) == '\0')
-				qerr();
+			d = getdlm();
 			size = 1 + ((dot.s_area->a_flag) & A_BYTES);
 			cnt = 0;
 			v = 0;
 			while ((c = getmap(d)) >= 0) {
-				if (hilo) {
+				if ((int) hilo) {
 					cnt += 1;
 					v |= ((c & 0x7F) << 8 * (size - cnt));
 				} else {
@@ -1497,8 +1869,7 @@ loop:
 			break;
 
 		case O_ASCIS:
-			if ((d = getnb()) == '\0')
-				qerr();
+			d = getdlm();
 			size = 1 + ((dot.s_area->a_flag) & A_BYTES);
 			cnt = 0;
 			v = 0;
@@ -1508,7 +1879,7 @@ loop:
 				if ((nc = getmap(d)) < 0) {
 					c |= 0x80;
 				}
-				if (hilo) {
+				if ((int) hilo) {
 					cnt += 1;
 					v |= (c << 8 * (size - cnt));
 				} else {
@@ -1548,30 +1919,17 @@ loop:
 		 * Extract the .(un)define key word.
 		 */
 		getid(id, -1);
-		/*
-		 * Extract the substitution string
-		 */
-		if ((c = getnb()) != ',') {
-			unget(c);
-		}
-		p = opt;
-		if (more()) {
-			d = getnb();
-			while ((c = get()) != d) {
-				if (c == '\0') {
-					qerr();
-				}
-				if (p < &opt[NCPS-2]) {
-					*p++ = c;
-				} else {
-					break;
-				}
-			}
-		}
-		*p = 0;
 
 		switch(mp->m_valu) {
 		case O_DEF:
+			/*
+			 * Extract the substitution string
+			 */
+			comma(0);
+			*opt = 0;
+			if (more()) {
+				getdstr(opt, NCPS);
+			}
 			/*
 			 * Verify the definition or
 			 * add a new definition.
@@ -1625,6 +1983,17 @@ loop:
 			lmode = ALIST;
 			break;
 
+		case O_BNDRY:
+			v = absexpr();
+			n = dot.s_addr % v;
+			if (n != 0) {
+				dot.s_addr += (v - n);
+			}
+			outall();
+			laddr = dot.s_addr;
+			lmode = ALIST;
+			break;
+
 		default:
 			break;
 		}
@@ -1635,19 +2004,7 @@ loop:
 		/*
 		 * Print the .msg message
 		 */
-		p = fn;
-		d = getnb();
-		while ((c = get()) != d) {
-			if (c == '\0') {
-				qerr();
-			}
-			if (p < &fn[FILSPC+FILSPC-1]) {
-				*p++ = c;
-			} else {
-				break;
-			}
-		}
-		*p = 0;
+		getdstr(fn, FILSPC+FILSPC);
 		if (pass == 2) {
 			printf("%s\n", fn);
 		}
@@ -1665,15 +2022,29 @@ loop:
 		break;
 
 	case S_MSB:
-		clrexpr(&e1);
-		expr(&e1, 0);
-		if (!is_abs(&e1)) {
-			err('o');
-		}
-		if (e1.e_addr >= (a_uint) a_bytes) {
-			err('o');
-		} else {
-			as_msb = (int) e1.e_addr;
+		switch (mp->m_valu) {
+		default:
+		case O_MSB:
+			clrexpr(&e1);
+			expr(&e1, 0);
+			if (!is_abs(&e1)) {
+				err('o');
+			}
+			if (e1.e_addr >= (a_uint) a_bytes) {
+				err('o');
+			} else {
+				as_msb = (int) e1.e_addr;
+			}
+			break;
+
+		case O_HILO:
+		case O_LOHI:
+			c = (mp->m_valu == O_HILO) ? 1 : 0;
+			if ((pass != 0) && ((int) hilo != c)) {
+				err('m');
+			}
+			hilo = c;
+			break;
 		}
 		lmode = SLIST;
 		break;
@@ -1694,18 +2065,30 @@ loop:
 		}
 		break;
 
+	case S_MACRO:
+		lmode = SLIST;
+		mcrprc((int) mp->m_valu);
+		return;
+
 	/*
-	 * If not an assembler directive then go to
-	 * the machine dependent function which handles
-	 * all the assembler mnemonics.
+	 * If not an assembler directive then go to the
+	 * macro function or machine dependent function
+	 * which handles all the assembler mnemonics.
+	 *
+	 * MACRO Definitions take precedence
+	 * over machine specific mmnemonics.
 	 */
 	default:
-		machine(mp);
+		if (np != NULL) {
+			macro(np);
+		} else {
+			machine(mp);
+		}
 
 		/*
-		 * Include Files are not Debugged
+		 * Include Files and Macros are not Debugged
 		 */
-		if (incfil < 0) {
+		if (asmc->objtyp == T_ASM) {
 
 #if NOICE
 	                /*
@@ -1849,7 +2232,7 @@ int wf;
 	afilex(fn, ft);
 
 	if ((fp = fopen(afntmp, wf?"w":"r")) == NULL) {
-	    fprintf(stderr, "%s: cannot %s.\n", afntmp, wf?"create":"open");
+	    fprintf(stderr, "?ASxxxx-Error-<cannot %s> : \"%s\"\n", wf?"create":"open", afntmp);
 	    asexit(ER_FATAL);
 	}
 
@@ -1903,11 +2286,11 @@ afilex(fn, ft)
 char *fn;
 char *ft;
 {
-	char *p1, *p2, *p3;
+	char *p1, *p2;
 	int c;
 
-	if (strlen(fn) > (FILSPC-5)) {
-		fprintf(stderr, "File Specification %s is too long.", fn);
+	if (strlen(fn) > (FILSPC-7)) {
+		fprintf(stderr, "?ASxxxx-Error-<filspc to long> : \"%s\"\n", fn);
 		asexit(ER_FATAL);
 	}
 
@@ -1916,29 +2299,28 @@ char *ft;
 	 */
 	strcpy(afntmp, fn);
 	afptmp = fndidx(afntmp);
-	p1 = &afntmp[afptmp];
-	p2 = &fn[afptmp];
 
 	/*
-	 * Skip to File Extension Seperator
+	 * Skip to File Extension separator
 	 */
-	while (((c = *p2++) != 0) && (c != FSEPX)) {
-		p1++;
-	}
-	*p1++ = FSEPX;
+	p1 = strrchr(&afntmp[afptmp], FSEPX);
 
 	/*
 	 * Copy File Extension
 	 */
-	 p3 = ft;
-	 if (*p3 == 0) {
-		if (c == FSEPX) {
-			p3 = p2;
+	 p2 = ft;
+	 if (*p2 == 0) {
+		if (p1 == NULL) {
+			p2 = dsft;
 		} else {
-			p3 = dsft;
+			p2 = strrchr(&fn[afptmp], FSEPX) + 1;
 		}
 	}
-	while ((c = *p3++) != 0) {
+	if (p1 == NULL) {
+		p1 = &afntmp[strlen(afntmp)];
+	}
+	*p1++ = FSEPX;
+	while ((c = *p2++) != 0) {
 		if (p1 < &afntmp[FILSPC-1])
 			*p1++ = c;
 	}
@@ -2064,7 +2446,8 @@ a_uint a;
 }
 
 char *usetxt[] = {
-	"Usage: [-options] file1 [file2 file3 ...]",
+	"Usage: [-Options] file",
+	"Usage: [-Options] outfile file1 [file2 file3 ...]",
 	"  -d   Decimal listing",
 	"  -q   Octal   listing",
 	"  -x   Hex     listing (default)",
@@ -2072,17 +2455,17 @@ char *usetxt[] = {
 	"  -a   All user symbols made global",
 	"  -b   Display .define substitutions in listing",
 	"  -bb  and display without .define substitutions",
-	"  -c   Enable instruction cycle count in listing",
+	"  -c   Disable instruction cycle count in listing",
 #if NOICE
 	"  -j   Enable NoICE Debug Symbols",
 #endif
 #if SDCDB
 	"  -y   Enable SDCC  Debug Symbols",
 #endif
-	"  -l   Create list   output file1[.lst]",
-	"  -o   Create object output file1[.rel]",
-	"  -s   Create symbol output file1[.sym]",
-	"  -p   Disable listing pagination",
+	"  -l   Create list   file/outfile[.lst]",
+	"  -o   Create object file/outfile[.rel]",
+	"  -s   Create symbol file/outfile[.sym]",
+	"  -p   Disable automatic listing pagination",
 	"  -u   Disable .list/.nlist processing",
 	"  -w   Wide listing format for symbol table",
 	"  -z   Disable case sensitivity for symbols",
@@ -2091,6 +2474,13 @@ char *usetxt[] = {
 	"",
 	NULL
 };
+
+/*
+ *	The unlisted -h option is a diagnostic which
+ *	prints the maximum include file and macro nesting
+ *	during the assembly process and also prints the
+ *	'hunk' allocations required during the assembly.
+ */
 
 /*)Function	VOID	usage(n)
  *
@@ -2121,7 +2511,9 @@ int n;
 {
 	char   **dp;
 
-	fprintf(stderr, "\nASxxxx Assembler %s  (%s)\n\n", VERSION, cpu);
+	fprintf(stderr, "\nASxxxx Assembler %s  (%s)", VERSION, cpu);
+	fprintf(stderr, "\nCopyright (C) 2009  Alan R. Baldwin");
+	fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	asexit(n);

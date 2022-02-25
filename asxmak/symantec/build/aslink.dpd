@@ -1,49 +1,49 @@
 # Symantec SC++ generated .dpd file. V: 7200
-r:\asxv4pxx\asxmak\symantec\build\lkarea.OBJ: \
+..\build\lkarea.OBJ: \
 	..\..\..\linksrc\lkarea.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lkbank.OBJ: \
+..\build\lkbank.OBJ: \
 	..\..\..\linksrc\lkbank.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lkdata.OBJ: \
+..\build\lkdata.OBJ: \
 	..\..\..\linksrc\lkdata.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lkeval.OBJ: \
+..\build\lkeval.OBJ: \
 	..\..\..\linksrc\lkeval.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lkhead.OBJ: \
+..\build\lkhead.OBJ: \
 	..\..\..\linksrc\lkhead.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lklex.OBJ: \
+..\build\lklex.OBJ: \
 	..\..\..\linksrc\lklex.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lklibr.OBJ: \
+..\build\lklibr.OBJ: \
 	..\..\..\linksrc\lklibr.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lklist.OBJ: \
+..\build\lklist.OBJ: \
 	..\..\..\linksrc\lklist.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lkmain.OBJ: \
+..\build\lkmain.OBJ: \
 	..\..\..\linksrc\lkmain.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lknoice.OBJ: \
+..\build\lknoice.OBJ: \
 	..\..\..\linksrc\lknoice.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lkout.OBJ: \
+..\build\lkout.OBJ: \
 	..\..\..\linksrc\lkout.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lkrloc.OBJ: \
+..\build\lkrloc.OBJ: \
 	..\..\..\linksrc\lkrloc.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lksdcdb.OBJ: \
+..\build\lksdcdb.OBJ: \
 	..\..\..\linksrc\lksdcdb.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lksym.OBJ: \
+..\build\lksym.OBJ: \
 	..\..\..\linksrc\lksym.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lkrloc3.OBJ: \
+..\build\lkrloc3.OBJ: \
 	..\..\..\linksrc\lkrloc3.c \
 	..\..\..\LINKSRC\aslink.h 
-r:\asxv4pxx\asxmak\symantec\build\lkrloc4.OBJ: \
+..\build\lkrloc4.OBJ: \
 	..\..\..\linksrc\lkrloc4.c \
 	..\..\..\LINKSRC\aslink.h 

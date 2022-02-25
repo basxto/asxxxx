@@ -1,4 +1,4 @@
 # Symantec SC++ generated .dpd file. V: 7200
-r:\asxv4pxx\asxmak\symantec\build\asxxscan.OBJ: \
+..\build\asxxscan.OBJ: \
 	..\..\..\asxxmisc\asxxscan.c \
 	..\..\..\asxxsrc\asxxxx.h 

@@ -1,21 +1,21 @@
 82569
-R:\ASXV4PXX\asxmak\Symantec\build\as6811.prj
+R:\ASXV5PXX\ASXMAK\SYMANTEC\BUILD\as6811.prj
 as6811.OPN
 novcs
 as6811.DEF
 6
-1092880190
+1150355460
 0 0 0 0 0 "..\..\..\ASXXSRC\asdata.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asdbg.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asexpr.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\aslex.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\aslist.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asmain.c"
+0 0 0 0 0 "..\..\..\ASXXSRC\asmcro.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asout.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\assubr.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\assym.c"
 0 0 0 0 0 "..\..\..\AS6811\m11adr.c"
-0 0 0 0 0 "..\..\..\AS6811\m11ext.c"
 0 0 0 0 0 "..\..\..\AS6811\m11mch.c"
 0 0 0 0 0 "..\..\..\AS6811\m11pst.c"
 0 0 0 0 0 "as6811.DEF"

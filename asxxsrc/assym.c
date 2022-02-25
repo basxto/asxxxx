@@ -1,8 +1,21 @@
 /* assym.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -24,6 +37,7 @@
  *	assym.c contains the following functions:
  *		VOID	allglob()
  *		area *	alookup()
+ *		VOID	asfree()
  *		bank *	blookup()
  *		def *	dlookup()
  *		int	hash()
@@ -480,7 +494,6 @@ char *p1, *p2;
 int flag;
 {
 	int n;
-
 	n = strlen(p1) + 1;
 	if(flag) {
 		/*
@@ -563,17 +576,20 @@ int flag;
  *		jhartman at compuserve dot com
  *
  *	local variables:
- *		int	l		string length + 1
  *		int	bytes		bytes remaining in buffer area
+ *		int	bofst		structure alignment offset
+ *		int	len		string length + 1
  *		char *	p		pointer to head of copied string
  *		char *	pnext		next location in buffer area
  *
  *	global variables:
- *		none
+ *		int	asmblk		number of memory blocks allocated
+ *		int	bndry		structure alignment
  *
  *	functions called:
  *		VOID *	new()		assym.c
- *		char *	strncpy()	c_library
+ *		char *	strcpy()	c_library
+ *		int *	strlen()	c_library
  *
  *	side effects:
  *		Space allocated for string, string copied
@@ -583,10 +599,11 @@ int flag;
 /*
  * To avoid wasting memory headers on small allocations, we
  * allocate a big chunk and parcel it out as required.
- * These static variables remember our hunk
+ * These static variables remember our hunk.
  */
 
 #define	STR_SPC	1024
+
 static	char *	pnext = NULL;
 static	int	bytes = 0;
    
@@ -594,15 +611,15 @@ char *
 strsto(str)
 char *str;
 {
-	int  l;
+	int  len;
 	char *p;
    
 	/*
 	 * What we need, including a null.
 	 */
-	l = strlen(str) + 1;
+	len = strlen(str) + 1;
 
-	if (l > bytes) {
+	if (len > bytes) {
 		/*
 		 * No space.  Allocate a new hunk.
 		 * We lose the pointer to any old hunk.
@@ -610,16 +627,17 @@ char *str;
 		*/
 		pnext = (char *) new (STR_SPC);
 		bytes = STR_SPC;
+		asmblk += 1;
 	}
 
 	/*
 	 * Copy the name and terminating null.
 	 */
 	p = pnext;
-	strncpy(p, str, l);
+	strcpy(p, str);
 
-	pnext += l;
-	bytes -= l;
+	pnext += len;
+	bytes -= len;
 
 	return(p);
 }
@@ -633,10 +651,11 @@ char *str;
  *	assembly is terminated.
  *
  *	local variables:
+ *		memlnk *lnk		an allocation structure link
  *		VOID *	p		a general pointer
  *
  *	global variables:
- *		none
+ *		memlnk *asxmem		a linked list of allocation structures
  *
  *	functions called:
  *		VOID	asexit()	asmain.c
@@ -645,20 +664,63 @@ char *str;
  *
  *	side effects:
  *		Memory is allocated, if allocation fails
- *		the assembly is terminated.
+ *		the assembly is terminated.  A linked
+ *		memory allocation list is created to
+ *		enable memory deallocation by asfree().
  */
 
 char *
 new(n)
 unsigned int n;
 {
+	struct memlnk *lnk;
 	VOID *p;
 
-	if ((p = (VOID *) malloc(n)) == NULL) {
+	if ((lnk = (struct memlnk *) malloc (sizeof(struct memlnk))) == NULL) {
 		fprintf(stderr, "Out of space!\n");
 		asexit(ER_FATAL);
 	}
+	lnk->next = (asxmem == NULL) ? NULL : asxmem;
+	lnk->ptr = NULL;
+	asxmem = lnk;
+
+	if ((p = (VOID *) malloc (n)) == NULL) {
+		fprintf(stderr, "Out of space!\n");
+		asexit(ER_FATAL);
+	}
+	asxmem->ptr = p;
 	return (p);
 }
 
+/*)Function	VOID	asfree()
+ *
+ *	The function asfree() frees all space allocated by new().
+ *
+ *	local variables:
+ *		VOID *	p		a general pointer
+ *
+ *	global variables:
+ *		memlnk *asxmem		a linked list of allocation structures
+ *
+ *	functions called:
+ *		int	free()		c_library
+ *
+ *	side effects:
+ *		Memory is freed.
+ */
+
+VOID
+asfree()
+{
+	VOID *p;
+
+	while (asxmem != NULL) {
+		if ((p = asxmem->ptr) != NULL) {
+			free(p);
+		}
+		p = (VOID *) asxmem;
+		asxmem = asxmem->next;
+		free(p);
+	}
+}
 

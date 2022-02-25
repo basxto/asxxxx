@@ -1,21 +1,21 @@
 82569
-R:\ASXV4PXX\ASXMAK\SYMANTEC\BUILD\asez80.prj
+R:\ASXV5PXX\ASXMAK\SYMANTEC\BUILD\asez80.prj
 asez80.OPN
 novcs
 asez80.DEF
 6
-1092880402
+1150355460
 0 0 0 0 0 "..\..\..\ASXXSRC\asdata.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asdbg.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asexpr.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\aslex.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\aslist.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asmain.c"
+0 0 0 0 0 "..\..\..\ASXXSRC\asmcro.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asout.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\assubr.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\assym.c"
 0 0 0 0 0 "..\..\..\ASEZ80\ez80adr.c"
-0 0 0 0 0 "..\..\..\ASEZ80\ez80ext.c"
 0 0 0 0 0 "..\..\..\ASEZ80\ez80mch.c"
 0 0 0 0 0 "..\..\..\ASEZ80\ez80pst.c"
 0 0 0 0 0 "asez80.DEF"

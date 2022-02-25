@@ -41,14 +41,14 @@ CFLAGS		=  -ms -C -S -3 -a2 -c -g -gd
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
-OUTPUTDIR	= r:\asxv4pxx\asxmak\symantec\build
-!IF EXIST (r:\asxv4pxx\asxmak\symantec\build)
+OUTPUTDIR	= ..\build
+!IF EXIST (..\build)
 CREATEOUTPUTDIR	=
 !ELSE
 CREATEOUTPUTDIR	= if not exist $(OUTPUTDIR)\*.* md $(OUTPUTDIR)
 !ENDIF
-TARGETDIR	= r:\asxv4pxx\asxmak\symantec\exe
-!IF EXIST (r:\asxv4pxx\asxmak\symantec\exe)
+TARGETDIR	= ..\exe
+!IF EXIST (..\exe)
 CREATETARGETDIR	=
 !ELSE
 CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
@@ -75,13 +75,13 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -Ir:\asxv4pxx\asxxsrc
+INCLUDES	= -I..\..\..\asxxsrc
 
 INCLUDEDOBJS	= 
 
-OBJS		=  $(OUTPUTDIR)\1802ext.OBJ  $(OUTPUTDIR)\1802mch.OBJ  $(OUTPUTDIR)\1802pst.OBJ  \
-		 $(OUTPUTDIR)\asdata.OBJ  $(OUTPUTDIR)\asdbg.OBJ  $(OUTPUTDIR)\asexpr.OBJ  $(OUTPUTDIR)\aslex.OBJ  \
-		 $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asout.OBJ  $(OUTPUTDIR)\assubr.OBJ  \
+OBJS		=  $(OUTPUTDIR)\1802mch.OBJ  $(OUTPUTDIR)\1802pst.OBJ  $(OUTPUTDIR)\asdata.OBJ  \
+		 $(OUTPUTDIR)\asdbg.OBJ  $(OUTPUTDIR)\asexpr.OBJ  $(OUTPUTDIR)\aslex.OBJ  $(OUTPUTDIR)\aslist.OBJ  \
+		 $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asmcro.OBJ  $(OUTPUTDIR)\asout.OBJ  $(OUTPUTDIR)\assubr.OBJ  \
 		 $(OUTPUTDIR)\assym.OBJ 
 
 RCFILES		= 
@@ -208,11 +208,6 @@ link:
 
 
 
-$(OUTPUTDIR)\1802ext.OBJ:	..\..\..\AS1802\1802ext.c
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\1802ext.obj ..\..\..\AS1802\1802ext.c
-
-
-
 $(OUTPUTDIR)\1802mch.OBJ:	..\..\..\AS1802\1802mch.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\1802mch.obj ..\..\..\AS1802\1802mch.c
 
@@ -250,6 +245,11 @@ $(OUTPUTDIR)\aslist.OBJ:	..\..\..\ASXXSRC\aslist.c
 
 $(OUTPUTDIR)\asmain.OBJ:	..\..\..\ASXXSRC\asmain.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asmain.obj ..\..\..\ASXXSRC\asmain.c
+
+
+
+$(OUTPUTDIR)\asmcro.OBJ:	..\..\..\ASXXSRC\asmcro.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asmcro.obj ..\..\..\ASXXSRC\asmcro.c
 
 
 

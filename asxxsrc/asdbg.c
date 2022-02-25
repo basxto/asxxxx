@@ -1,8 +1,21 @@
 /* asdbg.c */
 
 /*
- * (C) Copyright 2003-2006
- * All Rights Reserved
+ *  Copyright (C) 2003-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -55,15 +68,14 @@
  *	        struct sym *	pSym	pointer to the created symbol structure
  *
  *	global variables:
- *		int	cfile		current source file number
- *		int	srcline[]	array of source file line numbers
+ *		int	srcline		array of source file line numbers
  *		a_uint	laddr		current assembler address
  *		area	dot.s_area	pointer to the current area
  *
  *	functions called:
  *		char *	BaseFileName()	asdbg.c
  *		sym *	lookup()	assym.c
- *		int	sprintf()	c-library
+ *		int	sprintf()	c_library
  *
  *	side effects:
  *		A new symbol of the form A$FILE$nnn is created.
@@ -79,7 +91,7 @@ DefineSDCC_Line()
 	/*
 	 * Symbol is A$FILE$nnn
 	 */
-        sprintf( name, "A$%s$%u", BaseFileName( cfile ), srcline[ cfile ] );
+        sprintf( name, "A$%s$%u", BaseFileName( asmc ), srcline );
 
         pSym = lookup( name );
         pSym->s_type = S_USER;
@@ -103,14 +115,14 @@ DefineSDCC_Line()
  *
  *	global variables:
  *		int	cfile		current source file number
- *		int	srcline[]	array of source file line numbers
+ *		int	srcline		array of source file line numbers
  *		a_uint	laddr		current assembler address
  *		area	dot.s_area	pointer to the current area
  *
  *	functions called:
  *		char *	BaseFileName()	asdbg.c
  *		sym *	lookup()	assym.c
- *		int	sprintf()	c-library
+ *		int	sprintf()	c_library
  *
  *	side effects:
  *		A new symbol of the form FILE.nnn is created.
@@ -126,7 +138,7 @@ DefineNoICE_Line()
 	/*
 	 * Symbol is FILE.nnn
 	 */
-        sprintf( name, "%s.%u", BaseFileName( cfile ), srcline[ cfile ] );
+        sprintf( name, "%s.%u", BaseFileName( asmc ), srcline );
 
         pSym = lookup( name );
         pSym->s_type = S_USER;
@@ -137,26 +149,28 @@ DefineNoICE_Line()
 #endif
 
 
-/*)Function	char *	BaseFileName()
+/*)Function	char *	BaseFileName(currFile)
  *
  *	The function BaseFileName() is called to extract
  *	the file name from a string containing a path,
  *	filename, and extension.
  *
+ *		currFile		is a pointer to the
+ *					current assembler object
+ *
  *	local variables:
  *		char	baseName[]	a place to put the file name
- *	        int	prevFile	file number
+ *	        int	prevFile	previous assembler object
  *		char *	p1		temporary string pointer
  *		char *	p2		temporary string pointer
  *
  *	global variables:
- *		char *	srcfn[]		array of file name string pointers
  *		FILE *	ofp		output file handle
  *
  *	functions called:
- *		int	fprintf()	c-library
- *		char *	strcpy()	c-library
- *		char *	strrchr()	c-library
+ *		int	fprintf()	c_library
+ *		char *	strcpy()	c_library
+ *		char *	strrchr()	c_library
  *
  *	side effects:
  *		A FILE command of the form ';!FILE string'
@@ -164,19 +178,20 @@ DefineNoICE_Line()
  */
 
 #if (NOICE || SDCDB)
-static	int	prevFile = -1;
+static	struct	asmf *	prevFile = NULL;
 static	char	baseName[FILSPC];
 
 char*
-BaseFileName(fileNumber)
-int fileNumber;
+BaseFileName(currFile)
+struct	asmf * currFile;
 {
         char *p1, *p2;
 
-	if (fileNumber != prevFile) {
-        	prevFile = fileNumber;
+	if (currFile != prevFile) {
+        	prevFile = currFile;
 
-                p1 = srcfn[prevFile];
+		strcpy(baseName, afn);
+                p1 = baseName;
 
                 /*
 	         * Dump a FILE command with full path and extension

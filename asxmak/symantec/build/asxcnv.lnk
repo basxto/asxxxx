@@ -1,5 +1,5 @@
 +
-r:\asxv4pxx\asxmak\symantec\build\asxxconv.OBJ
-r:\asxv4pxx\asxmak\symantec\exe\$SCW$.EXE
+..\build\asxxconv.OBJ
+..\exe\$SCW$.EXE
 NUL
   

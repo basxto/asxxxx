@@ -1,8 +1,21 @@
 /* s6186mch.c */
 
 /*
- * (C) Copyright 2003-2006
- * All Rights Reserved
+ *  Copyright (C) 2003-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -13,6 +26,9 @@
 
 #include "asxxxx.h"
 #include "s61860.h"
+
+char	*cpu	= "Sharp SC61860";
+char	*dsft	= "asm";
 
 /*
  * Opcode Cycle Definitions
@@ -213,7 +229,7 @@ struct mne *mp;
 
 	case S_PTC:
 		expr(&e1, 0);
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		outab(op);
 		outrb(&e1, 0);
@@ -222,7 +238,7 @@ struct mne *mp;
 
 	case S_CASE:
 		expr(&e1, 0);
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		outrb(&e1, 0);
 		outrw(&e2, 0);
@@ -311,17 +327,6 @@ int c;
 }
 
 /*
- * Is the next character a comma ?
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Branch/Jump PCR Mode Check
  */
 int
@@ -347,9 +352,13 @@ struct expr *esp;
 }
 
 /*
- * Dummy machine specific init.
+ * Machine specific init.
  */
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
 }

@@ -1,10 +1,10 @@
 82569
-R:\ASXV4PXX\ASXMAK\SYMANTEC\BUILD\asxcnv.prj
+R:\asxv5pxx\asxmak\symantec\build\asxcnv.prj
 asxcnv.OPN
 novcs
 asxcnv.DEF
 6
-1092876954
+1150355460
 0 0 0 0 0 "asxcnv.DEF"
 0 0 0 0 0 "..\..\..\ASXXMISC\asxxconv.c"
 0 -1 0 0 0 "..\..\..\asxxsrc\asxxxx.h"

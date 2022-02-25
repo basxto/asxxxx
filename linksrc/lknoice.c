@@ -1,19 +1,33 @@
 /* lknoice.c */
 
 /*
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ *
+ *
  * Extensions to produce NoICE debug files
  *
  * 31-Oct-1997 by John Hartman
  * 30-Jan-98 JLH add page to DefineNoICE for 8051
  *  2-Feb-98 JLH Allow optional .nest on local vars - C scoping rules...
  * 27-May-01 ARB Updated for ASxxxx V4
- *
- * (C) Copyright 2001-2006
- * All Rights Reserved
- *
- * Alan R. Baldwin
- * 721 Berkeley St.
- * Kent, Ohio  44240
  */
 
 #include "aslink.h"

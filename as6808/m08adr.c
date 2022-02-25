@@ -1,8 +1,21 @@
 /* m08adr.c */
 
 /*
- * (C) Copyright 1993-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -46,7 +59,7 @@ struct expr *esp;
 		expr(esp, 0);
 		esp->e_mode = S_DIR;
 		if (more()) {
-			comma();
+			comma(1);
 			tcp = ip;
 			switch(admode(axs)) {
 			case S_X:
@@ -74,7 +87,7 @@ struct expr *esp;
 			espa = esp->e_base.e_ap;
 			espv = esp->e_addr;
 			if (more()) {
-				comma();
+				comma(1);
 				c = admode(axs);
 				if (esp->e_flag == 0 &&
 				    espa == NULL &&

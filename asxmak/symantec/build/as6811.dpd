@@ -1,44 +1,43 @@
 # Symantec SC++ generated .dpd file. V: 7200
-r:\asxv4pxx\asxmak\symantec\build\asdata.OBJ: \
+..\build\asdata.OBJ: \
 	..\..\..\asxxsrc\asdata.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\asdbg.OBJ: \
+..\build\asdbg.OBJ: \
 	..\..\..\asxxsrc\asdbg.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\asexpr.OBJ: \
+..\build\asexpr.OBJ: \
 	..\..\..\asxxsrc\asexpr.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\aslex.OBJ: \
+..\build\aslex.OBJ: \
 	..\..\..\asxxsrc\aslex.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\aslist.OBJ: \
+..\build\aslist.OBJ: \
 	..\..\..\asxxsrc\aslist.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\asmain.OBJ: \
+..\build\asmain.OBJ: \
 	..\..\..\asxxsrc\asmain.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\asout.OBJ: \
+..\build\asmcro.OBJ: \
+	..\..\..\asxxsrc\asmcro.c \
+	..\..\..\ASXXSRC\asxxxx.h 
+..\build\asout.OBJ: \
 	..\..\..\asxxsrc\asout.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\assubr.OBJ: \
+..\build\assubr.OBJ: \
 	..\..\..\asxxsrc\assubr.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\assym.OBJ: \
+..\build\assym.OBJ: \
 	..\..\..\asxxsrc\assym.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\m11adr.OBJ: \
+..\build\m11adr.OBJ: \
 	..\..\..\as6811\m11adr.c \
 	..\..\..\asxxsrc\asxxxx.h \
 	..\..\..\AS6811\m6811.h 
-r:\asxv4pxx\asxmak\symantec\build\m11ext.OBJ: \
-	..\..\..\as6811\m11ext.c \
-	..\..\..\asxxsrc\asxxxx.h \
-	..\..\..\AS6811\m6811.h 
-r:\asxv4pxx\asxmak\symantec\build\m11mch.OBJ: \
+..\build\m11mch.OBJ: \
 	..\..\..\as6811\m11mch.c \
 	..\..\..\asxxsrc\asxxxx.h \
 	..\..\..\AS6811\m6811.h 
-r:\asxv4pxx\asxmak\symantec\build\m11pst.OBJ: \
+..\build\m11pst.OBJ: \
 	..\..\..\as6811\m11pst.c \
 	..\..\..\asxxsrc\asxxxx.h \
 	..\..\..\AS6811\m6811.h 

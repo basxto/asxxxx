@@ -1,8 +1,21 @@
 /* asxcnv.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -19,12 +32,6 @@ int aserr;		/* Error Counter	*/
 
 FILE *nfp;		/* Input File Handle	*/
 FILE *dfp;		/* Output File Handle	*/
-
-/*
- * Opcode Cycle definitions (Must Be The Same As ASxxxx / ASLink)
- */
-#define	CYCNT_BGN	'['	/* Cycle count begin delimiter */
-#define	CYCNT_END	']'	/* Cycle count end   delimiter */
 
 char scline[256];	/* Input text line	*/
 
@@ -149,7 +156,7 @@ char *argv[];
 				}
 		} else {
 			if (++inpfil > 1) {
-				fprintf(stderr, "\r\nToo many files.\r\n");
+				printf("\r\nToo many files.\r\n");
 				asexit(ER_FATAL);
 			}
 			nfp = fopen(p, "r");
@@ -469,7 +476,8 @@ char *str;
  *		none
  *
  *	global variables:
- *		FILE *	nfp		scan file
+ *		FILE *	nfp		Input  File Handle
+ *		FILE *	dfp		Output File Handle
  *
  *	functions called:
  *		int	fclose()	c-library
@@ -529,8 +537,9 @@ int n;
 {
 	char   **dp;
 
-	fprintf(stderr,
-		"\nASxxxx Assembler Listing Converter %s\n\n", VERSION);
+	fprintf(stderr, "\nASxxxx Assembler Listing Converter %s", VERSION);
+	fprintf(stderr, "\nCopyright (C) 2009  Alan R. Baldwin");
+	fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	asexit(n);

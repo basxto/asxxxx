@@ -1,8 +1,21 @@
 /* asout.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -385,7 +398,7 @@ outatxb(i, v)
 int i;
 a_uint v;
 {
-	if (hilo) {
+	if ((int) hilo) {
 		if (i >= 4) *txtp++ = frthbyte(v);
 		if (i >= 3) *txtp++ = thrdbyte(v);
 		if (i >= 2) *txtp++ = hibyte(v);
@@ -876,7 +889,7 @@ a_uint base;
 	r = (r >> 8) & 0x0F;
 
 	if ((mp = modep[r]) == NULL) {
-		fprintf(stderr, "undefined G mode\n");
+		fprintf(stderr, "?ASxxxx-OUTMERGE-UNDEFINED-G-MODE error.\n\n");
 		asexit(ER_FATAL);
 	}
 
@@ -1216,15 +1229,15 @@ outgsd()
 	 * Output Radix and number of  areas and symbols
 	 */
 	if (xflag == 0) {
-		fprintf(ofp, "X%c%d\n", hilo ? 'H' : 'L', a_bytes);
+		fprintf(ofp, "X%c%d\n", (int) hilo ? 'H' : 'L', a_bytes);
 		fprintf(ofp, "H %X areas %X global symbols %X banks %X modes\n", narea, nglob, nbank, nmode);
 	} else
 	if (xflag == 1) {
-		fprintf(ofp, "Q%c%d\n", hilo ? 'H' : 'L', a_bytes);
+		fprintf(ofp, "Q%c%d\n", (int) hilo ? 'H' : 'L', a_bytes);
 		fprintf(ofp, "H %o areas %o global symbols %o banks %o modes\n", narea, nglob, nbank, nmode);
 	} else
 	if (xflag == 2) {
-		fprintf(ofp, "D%c%d\n", hilo ? 'H' : 'L', a_bytes);
+		fprintf(ofp, "D%c%d\n", (int) hilo ? 'H' : 'L', a_bytes);
 		fprintf(ofp, "H %u areas %u global symbols %u banks %u modes\n", narea, nglob, nbank, nmode);
 	}		
 
@@ -1727,7 +1740,7 @@ int i;
 a_uint v;
 int t;
 {
-	if (hilo) {
+	if ((int) hilo) {
 		if (i >= 4) out_lb(frthbyte(v),t&R_RELOC ? t|R_BYT4 : 0);
 		if (i >= 3) out_lb(thrdbyte(v),t&R_RELOC ? t|R_BYT3 : 0);
 		if (i >= 2) out_lb(hibyte(v),t&R_RELOC ? t|R_HIGH : 0);
@@ -1765,7 +1778,7 @@ VOID
 out_rw(v)
 a_uint v;
 {
-	if (hilo) {
+	if ((int) hilo) {
 		*relp++ = hibyte(v);
 		*relp++ = lobyte(v);
 	} else {
@@ -1803,7 +1816,7 @@ out_txb(i, v)
 int i;
 a_uint v;
 {
-	if (hilo) {
+	if ((int) hilo) {
 		if (i >= 4) *txtp++ = frthbyte(v);
 		if (i >= 3) *txtp++ = thrdbyte(v);
 		if (i >= 2) *txtp++ = hibyte(v);

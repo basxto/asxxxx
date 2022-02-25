@@ -1,8 +1,21 @@
 /* picpst.c */
 
 /*
- * (C) Copyright 2001-2007
- * All Rights Reserved
+ *  Copyright (C) 2001-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -253,6 +266,26 @@ struct	mode	mode[16] = {
 };
 #endif
 
+#if 0
+struct	mode	mode[16] = {
+    {	&mode0[0],	0,	((a_uint) 0x0000FFFF),	((a_uint) 0x0000FFFF)	},	/* R_NORM  */
+    {	&mode1[0],	0,	((a_uint) 0x0000000F),	((a_uint) 0x0000000F)	},	/* R_4BTB  */
+    {	&mode2[0],	1,	((a_uint) 0x000000F0),	((a_uint) 0x0000000F)	},	/* R_4BTR  */
+    {	&mode3[0],	0,	((a_uint) 0x0000001F),	((a_uint) 0x0000001F)	},	/* R_5BIT  */
+    {	&mode4[0],	0,	((a_uint) 0x0000003F),	((a_uint) 0x0000003F)	},	/* R_6BIT  */
+    {	&mode5[0],	0,	((a_uint) 0x0000007F),	((a_uint) 0x0000007F)	},	/* R_7BIT  */
+    {	&mode6[0],	0,	((a_uint) 0x000000FF),	((a_uint) 0x000000FF)	},	/* R_8BIT  */
+    {	&mode7[0],	0,	((a_uint) 0x000001FF),	((a_uint) 0x000001FF)	},	/* R_9BIT  */
+    {	&mode8[0],	0,	((a_uint) 0x000007FF),	((a_uint) 0x000007FF)	},	/* R_11BIT */
+    {	&mode9[0],	0,	((a_uint) 0x00000FFF),	((a_uint) 0x00000FFF)	},	/* R_12BIT */
+    {	&mode10[0],	0,	((a_uint) 0x00001FFF),	((a_uint) 0x00001FFF)	},	/* R_13BIT */
+    {	&mode11[0],	1,	((a_uint) 0x0FFF00FF),	((a_uint) 0x000FFFFF)	},	/* R_20BIT */
+    {	&mode12[0],	1,	((a_uint) 0x000000FF),	((a_uint) 0x000001FF)	},	/* R_CBRA  */
+    {	&mode13[0],	1,	((a_uint) 0x000007FF),	((a_uint) 0x00000FFF)	},	/* R_BRA   */
+    {	&mode14[0],	1,	((a_uint) 0x00FF000F),	((a_uint) 0x00000FFF)	},	/* R_LFSR  */
+    {	&mode15[0],	1,	((a_uint) 0x0FFF00FF),	((a_uint) 0x001FFFFF)	}	/* R_CALL  */
+};
+#endif
 /*
  * Array of Pointers to mode Structures
  */
@@ -316,8 +349,9 @@ struct	mne	mne[] = {
     {	NULL,	".globl",	S_GLOBL,	0,	0	},
     {	NULL,	".local",	S_LOCAL,	0,	0	},
     {	NULL,	".if",		S_CONDITIONAL,	0,	O_IF	},
-    {	NULL,	".else",	S_CONDITIONAL,	0,	O_ELSE	},
-    {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
+    {	NULL,	".iff",		S_CONDITIONAL,	0,	O_IFF	},
+    {	NULL,	".ift",		S_CONDITIONAL,	0,	O_IFT	},
+    {	NULL,	".iftf",	S_CONDITIONAL,	0,	O_IFTF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
     {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
@@ -326,6 +360,28 @@ struct	mne	mne[] = {
     {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
     {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
     {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
+    {	NULL,	".ifb",		S_CONDITIONAL,	0,	O_IFB	},
+    {	NULL,	".ifnb",	S_CONDITIONAL,	0,	O_IFNB	},
+    {	NULL,	".ifidn",	S_CONDITIONAL,	0,	O_IFIDN	},
+    {	NULL,	".ifdif",	S_CONDITIONAL,	0,	O_IFDIF	},
+    {	NULL,	".iif",		S_CONDITIONAL,	0,	O_IIF	},
+    {	NULL,	".iiff",	S_CONDITIONAL,	0,	O_IIFF	},
+    {	NULL,	".iift",	S_CONDITIONAL,	0,	O_IIFT	},
+    {	NULL,	".iiftf",	S_CONDITIONAL,	0,	O_IIFTF	},
+    {	NULL,	".iifdef",	S_CONDITIONAL,	0,	O_IIFDEF},
+    {	NULL,	".iifndef",	S_CONDITIONAL,	0,	O_IIFNDEF},
+    {	NULL,	".iifgt",	S_CONDITIONAL,	0,	O_IIFGT	},
+    {	NULL,	".iiflt",	S_CONDITIONAL,	0,	O_IIFLT	},
+    {	NULL,	".iifge",	S_CONDITIONAL,	0,	O_IIFGE	},
+    {	NULL,	".iifle",	S_CONDITIONAL,	0,	O_IIFLE	},
+    {	NULL,	".iifeq",	S_CONDITIONAL,	0,	O_IIFEQ	},
+    {	NULL,	".iifne",	S_CONDITIONAL,	0,	O_IIFNE	},
+    {	NULL,	".iifb",	S_CONDITIONAL,	0,	O_IIFB	},
+    {	NULL,	".iifnb",	S_CONDITIONAL,	0,	O_IIFNB	},
+    {	NULL,	".iifidn",	S_CONDITIONAL,	0,	O_IIFIDN},
+    {	NULL,	".iifdif",	S_CONDITIONAL,	0,	O_IIFDIF},
+    {	NULL,	".else",	S_CONDITIONAL,	0,	O_ELSE	},
+    {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},
@@ -359,15 +415,36 @@ struct	mne	mne[] = {
     {	NULL,	".undefine",	S_DEFINE,	0,	O_UNDEF	},
     {	NULL,	".even",	S_BOUNDARY,	0,	O_EVEN	},
     {	NULL,	".odd",		S_BOUNDARY,	0,	O_ODD	},
+    {	NULL,	".bndry",	S_BOUNDARY,	0,	O_BNDRY	},
     {	NULL,	".msg"	,	S_MSG,		0,	0	},
     {	NULL,	".assume",	S_ERROR,	0,	O_ASSUME},
     {	NULL,	".error",	S_ERROR,	0,	O_ERROR	},
     {	NULL,	".msb",		S_MSB,		0,	0	},
+/*    {	NULL,	".lohi",	S_MSB,		0,	O_LOHI	},	*/
+/*    {	NULL,	".hilo",	S_MSB,		0,	O_HILO	},	*/
 /*    {	NULL,	".8bit",	S_BITS,		0,	O_1BYTE	},	*/
     {	NULL,	".16bit",	S_BITS,		0,	O_2BYTE	},
 /*    {	NULL,	".24bit",	S_BITS,		0,	O_3BYTE	},	*/
     {	NULL,	".32bit",	S_BITS,		0,	O_4BYTE	},
     {	NULL,	".end",		S_END,		0,	0	},
+
+	/* Macro Processor */
+
+    {	NULL,	".macro",	S_MACRO,	0,	O_MACRO	},
+    {	NULL,	".endm",	S_MACRO,	0,	O_ENDM	},
+    {	NULL,	".mexit",	S_MACRO,	0,	O_MEXIT	},
+
+    {	NULL,	".narg",	S_MACRO,	0,	O_NARG	},
+    {	NULL,	".nchr",	S_MACRO,	0,	O_NCHR	},
+    {	NULL,	".ntyp",	S_MACRO,	0,	O_NTYP	},
+
+    {	NULL,	".irp",		S_MACRO,	0,	O_IRP	},
+    {	NULL,	".irpc",	S_MACRO,	0,	O_IRPC	},
+    {	NULL,	".rept",	S_MACRO,	0,	O_REPT	},
+
+    {	NULL,	".nval",	S_MACRO,	0,	O_NVAL	},
+
+    {	NULL,	".mdelete",	S_MACRO,	0,	O_MDEL	},
 
     	/* machine */
 
@@ -655,7 +732,7 @@ struct CpuDef picDef[] = {
     {	"callw",    {	~0,	~0,	~0,	~0,	0x0014	}   },	/* PIC:--:--:--:20 */
     {	"movsf",    {	~0,	~0,	~0,	~0,	0xEB00	}   },	/* PIC:--:--:--:20 */
     {	"movss",    {	~0,	~0,	~0,	~0,	0xEB80	}   },	/* PIC:--:--:--:20 */
-    {	"pushl",    {	~0,	~0,	~0,	~0,	0xFA00	}   },	/* PIC:--:--:--:20 */
+    {	"pushl",    {	~0,	~0,	~0,	~0,	0xEA00	}   },	/* PIC:--:--:--:20 */
     {	"subfsr",   {	~0,	~0,	~0,	~0,	0xE900	}   },	/* PIC:--:--:--:20 */
     {	"subulnk",  {	~0,	~0,	~0,	~0,	0xE9C0	}   },	/* PIC:--:--:--:20 */
 

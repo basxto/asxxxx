@@ -1,8 +1,21 @@
 /* asxscn.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -143,14 +156,14 @@ char *argv[];
 				}
 		} else {
 			if (++inpfil > 1) {
-				fprintf(stderr, "too many input files\n\n");
+				printf("?ASXSCN-E-Too many input files\n\n");
 				asexit(ER_FATAL);
 			}
 			sfp[0] = fopen(p, "r");
 			if (sfp[0] != NULL) {
 				strcpy(scfile, p);
 			} else {
-				fprintf(stderr, "File %s not found\n\n", p);
+				printf("?ASXSCN-E-File %s not found\n\n", p);
 				asexit(ER_FATAL);
 			}
 		}
@@ -483,7 +496,9 @@ int n;
 {
 	char **dp;
 
-	fprintf(stderr, "\nASxxxx Assembler Listing Scanner %s\n\n", VERSION);
+	fprintf(stderr, "\nASxxxx Assembler Listing Scanner %s", VERSION);
+	fprintf(stderr, "\nCopyright (C) 2009  Alan R. Baldwin");
+	fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	asexit(n);

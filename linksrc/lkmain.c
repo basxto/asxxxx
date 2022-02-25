@@ -1,8 +1,21 @@
 /* lkmain.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -61,7 +74,6 @@
  *	in one of the supported formats.
  *
  *	local variables:
- *		char *	frmt		temporary format specifier
  *		int	c		character from argument string
  *		int	i		loop counter
  *		int	j		loop counter
@@ -101,7 +113,6 @@
  *		FILE *	stdout		c_library
  *
  *	functions called:
- *		FILE *	afile()		lkmain.c
  *		VOID	chkbank()	lkbank.c
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
@@ -138,7 +149,7 @@ char *argv[];
 	int c, i, j, k;
 
 	if (intsiz() < 4) {
-		fprintf(stderr, "?ASlink-Error-Size of INT32 is not 32 bits or larger.\n\r\n");
+		fprintf(stderr, "?ASlink-Error-Size of INT32 is not 32 bits or larger.\n\n");
 		exit(ER_FATAL);
 	}
 
@@ -1233,13 +1244,13 @@ char *fn;
 char *ft;
 int wf;
 {
-	char *p1, *p2, *p3;
+	char *p1, *p2;
 	int c;
 	char * frmt;
 	FILE *fp;
 
-	if (strlen(fn) > (FILSPC-5)) {
-		fprintf(stderr, "File Specification %s is too long.", fn);
+	if (strlen(fn) > (FILSPC-7)) {
+		fprintf(stderr, "?ASlink-Error-<filspc to long> : \"%s\"\n", fn);
 		lkerr++;
 		return(NULL);
 	}
@@ -1249,29 +1260,28 @@ int wf;
 	 */
 	strcpy(afspec, fn);
 	c = fndidx(afspec);
-	p1 = &afspec[c];
-	p2 = &fn[c];
 
 	/*
-	 * Skip to File Extension Seperator
+	 * Skip to File Extension separator
 	 */
-	while ((c = *p2++) != 0 && c != FSEPX) {
-		p1++;
-	}
-	*p1++ = FSEPX;
+	p1 = strrchr(&afspec[c], FSEPX);
 
 	/*
 	 * Copy File Extension
 	 */
-	 p3 = ft;
-	 if (*p3 == 0) {
-		if (c == FSEPX) {
-			p3 = p2;
+	 p2 = ft;
+	 if (*p2 == 0) {
+		if (p1 == NULL) {
+			p2 = "rel";
 		} else {
-			p3 = "rel";
+			p2 = strrchr(&fn[c], FSEPX) + 1;
 		}
 	}
-	while ((c = *p3++) != 0) {
+	if (p1 == NULL) {
+		p1 = &afspec[strlen(afspec)];
+	}
+	*p1++ = FSEPX;
+	while ((c = *p2++) != 0) {
 		if (p1 < &afspec[FILSPC-1])
 			*p1++ = c;
 	}
@@ -1291,7 +1301,7 @@ int wf;
 #endif
 	}
 	if ((fp = fopen(afspec, frmt)) == NULL) {
-		fprintf(stderr, "%s: cannot %s.\n", afspec, wf?"create":"open");
+		fprintf(stderr, "?ASlink-Error-<cannot %s> : \"%s\"\n", wf?"create":"open", afspec);
 		lkerr++;
 	}
 	return (fp);
@@ -1344,7 +1354,7 @@ char *str;
  *		char *	str		file specification string
  *
  *	The function fndext() scans the file specification string
- *	to find the file.ext seperater.
+ *	to find the file.ext separater.
  *
  *	fndext() returns the index to FSEPX or the end of the string.
  *
@@ -1369,7 +1379,7 @@ char * str;
 	char *p1, *p2;
 
 	/*
-	 * Find the file seperator
+	 * Find the file separator
 	 */
 	p1 = str + strlen(str);
 	if ((p2 = strrchr(str,  FSEPX)) != NULL) { p1 = p2; }
@@ -1379,7 +1389,8 @@ char * str;
 
 
 char *usetxt[] = {
-	"Usage: [-Options] [-Option with arg] outfile file [file ...]",
+	"Usage: [-Options] [-Option with arg] file",
+	"Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
 	"  -p   Echo commands to stdout (default)",
 	"  -n   No echo of commands to stdout",
 	"Alternates to Command Line Input:",
@@ -1392,20 +1403,20 @@ char *usetxt[] = {
 	"  -b   area base address=expression",
 	"  -g   global symbol=expression",
 	"Map format:",
-	"  -m   Map output generated as outfile[.map]",
+	"  -m   Map output generated as (out)file[.map]",
 	"  -w   Wide listing format for map file",
 	"  -x   Hexidecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
-	"  -i   Intel Hex as outfile[.i--]",
-	"  -s   Motorola S Record as outfile[.s--]",
-	"  -t   Tandy CoCo Disk BASIC binary as outfile[.bi-]",
+	"  -i   Intel Hex as (out)file[.i--]",
+	"  -s   Motorola S Record as (out)file[.s--]",
+	"  -t   Tandy CoCo Disk BASIC binary as (out)file[.bi-]",
 #if NOICE
-	"  -j   NoICE Debug output as outfile[.noi]",
+	"  -j   NoICE Debug output as (out)file[.noi]",
 #endif
 #if SDCDB
-	"  -y   SDCDB Debug output as outfile[.cdb]",
+	"  -y   SDCDB Debug output as (out)file[.cdb]",
 #endif
 	"  -o   Linked file/library object output enable (default)",
 	"  -v   Linked file/library object output disable",
@@ -1446,7 +1457,9 @@ int n;
 {
 	char	**dp;
 
-	fprintf(stderr, "\nASxxxx Linker %s\n\n", VERSION);
+	fprintf(stderr, "\nASxxxx Linker %s", VERSION);
+	fprintf(stderr, "\nCopyright (C) 2009  Alan R. Baldwin");
+	fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	lkexit(n);

@@ -1,8 +1,21 @@
 /* f8mch.c */
 
 /*
- * (C) Copyright 2005
- * All Rights Reserved
+ *  Copyright (C) 2005-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -11,6 +24,9 @@
 
 #include "asxxxx.h"
 #include "f2mc8.h"
+
+char	*cpu	= "Fujitsu F2MC8 Series";
+char	*dsft	= "asm";
 
 /*
  * Opcode Cycle Definitions
@@ -145,7 +161,7 @@ struct mne *mp;
 	case S_MOV:
 		t1 = addr(&e1);
 		v1 = aindex;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindex;
 		if (t1 == S_A) {
@@ -233,7 +249,7 @@ struct mne *mp;
 	case S_MOVW:
 		t1 = addr(&e1);
 		v1 = aindex;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindex;
 		if (t1 == S_A) {
@@ -336,7 +352,7 @@ struct mne *mp;
 		if (mp->m_flag) {
 			aerr();				/* OPW	opcode error	*/
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindex;
 		if ((t2 == S_IMMED) && (op == 0x12)) {		/* CMP	__,#	*/
@@ -434,7 +450,7 @@ struct mne *mp;
 
 	case S_XCH:
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if ((t1 == S_A) && (t2 == S_T)) {	/* XCH	A,T	*/
 			outab(op);
@@ -447,7 +463,7 @@ struct mne *mp;
 		if ((t1 = addr(&e1)) != S_A) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t2 == S_T) {			/* XCHW	A,T	*/
 			outab(op);
@@ -486,7 +502,7 @@ struct mne *mp;
 			break;
 		}
 		expr(&e2, 0);
-		comma();
+		comma(1);
 		expr(&e3, 0);
 		outrbm(&e2, R_3BIT | R_MBRO, op);
 		outrb(&e1, R_PAG0);
@@ -580,25 +596,19 @@ struct expr *esp;
 }
 
 /*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine dependent initialization
  */
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
+
 	if (pass == 0) {
 		mchtyp = X_8L;
 		sym[2].s_addr = X_8L;
 	}
 }
+

@@ -1,15 +1,28 @@
 /* PtoA.h */
 
 /*
- * (C) Copyright 2002-2006
- * All Rights Reserved
+ *  Copyright (C) 2002-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  */
 
-#define	VERSION	"V01.00"
+#define	VERSION	"V05.00"
 
 /* DECUS C void definition */
 /* File/extension seperator */
@@ -98,7 +111,7 @@ extern	char	ccase[128];	/*	an array of characters which
 #define	LTR16	(LETTER|RAD16)
 
 /*
- *	The def structure is used by the .define assembler
+ *	The def structure is used by the cnvstr assembler
  *	directive to define a substitution string for a
  *	single word.  The def structure contains the
  *	string being defined, the string to substitute
@@ -125,7 +138,7 @@ struct	def	defs[];			/* substitution definitions list */
 /* pictoasx.c */
 extern	FILE *		afile(char *fn, char *ft, int wf);
 extern	VOID		afilex(char *fn, char *ft);
-extern	VOID		asexit(int i);
+extern	VOID		ptoaexit(int i);
 extern	int		changekey(char *id);
 extern	VOID		changestr(void);
 extern	VOID		chopcrlf(char *str);
@@ -150,7 +163,7 @@ extern	char		endline(void);
 /* pictoasx.c */
 extern	FILE *		afile();
 extern	VOID		afilex();
-extern	VOID		asexit();
+extern	VOID		ptoaexit();
 extern	int		changekey();
 extern	VOID		changestr();
 extern	VOID		chopcrlf();

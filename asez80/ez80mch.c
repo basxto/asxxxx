@@ -1,8 +1,21 @@
 /* ez80mch.c */
 
 /*
- * (C) Copyright 1989-2005
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -17,6 +30,9 @@
 
 #include "asxxxx.h"
 #include "ez80.h"
+
+char	*cpu	= "Zilog eZ80";
+char	*dsft	= "asm";
 
 char	imtab[3] = { 0x46, 0x56, 0x5E };
 int	m_mode;
@@ -403,7 +419,7 @@ struct mne *mp;
 	case S_BIT:
 		expr(&e1, 0);
 		t1 = (is_abs(&e1) && (e1.e_addr & ~7)) ? 1 : 0;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		/*
 		 * bit  b,(hl)
@@ -471,7 +487,7 @@ struct mne *mp;
 			 */
 			if ((t1 != S_R8) || (e1.e_addr != A))
 				aerr();
-			comma();
+			comma(1);
 			clrexpr(&e1);
 			t1 = addr(&e1);
 			if (t1 == S_USER)
@@ -540,7 +556,7 @@ struct mne *mp;
 			t1 = e1.e_mode = S_IMMED;
 		t2 = 0;
 		if (more()) {
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 			if (t2 == S_USER)
 				t2 = e2.e_mode = S_IMMED;
@@ -682,7 +698,7 @@ struct mne *mp;
 		 */
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = (int) e2.e_addr;
 		if (t2 == S_USER)
@@ -1323,7 +1339,7 @@ struct mne *mp;
 
 	case S_EX:
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t2 == S_RX) {
 			v1 = (int) e1.e_addr;
@@ -1369,11 +1385,11 @@ struct mne *mp;
 	case S_OUT:
 		if (rf == S_IN) {
 			t1 = addr(&e1);
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		} else {
 			t2 = addr(&e2);
-			comma();
+			comma(1);
 			t1 = addr(&e1);
 		}
 		if (t1 == S_R8) {
@@ -1405,11 +1421,11 @@ struct mne *mp;
 	case S_OUT0:
 		if (rf == S_IN0) {
 			t1 = addr(&e1);
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		} else {
 			t2 = addr(&e2);
-			comma();
+			comma(1);
 			t1 = addr(&e1);
 		}
 		if (t1 == S_R8) {
@@ -1518,7 +1534,7 @@ struct mne *mp;
 			} else {
 				aerr();
 			}
-			comma();
+			comma(1);
 		}
 		/*
 		 * jr  e
@@ -1543,7 +1559,7 @@ struct mne *mp;
 			 * call  cc,n
 			 */
 			op |= (v1&0xFF)<<3;
-			comma();
+			comma(1);
 		} else {
 			/*
 			 * call  n
@@ -1586,7 +1602,7 @@ struct mne *mp;
 		 */
 		if ((v1 = admode(CND)) != 0) {
 			op |= (v1&0xFF)<<3;
-			comma();
+			comma(1);
 		}
 		/*
 		 * jp  mn
@@ -1703,7 +1719,7 @@ struct mne *mp;
 			 */
 			if ((t1 != S_R8) || (e1.e_addr != A))
 				aerr();
-			comma();
+			comma(1);
 			clrexpr(&e1);
 			t1 = addr(&e1);
 			if (t1 == S_USER)
@@ -1762,7 +1778,7 @@ struct mne *mp;
 	case S_LEA:
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = (int) e2.e_addr;
 		if ((t1 == S_RX) && (v1 != SP) && (t2 == S_RX) && (v2==IX || v2==IY)) {
@@ -2359,23 +2375,16 @@ struct expr *esp;
 }
 
 /*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine dependent initialization
  */
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 0;
+
 	exprmasks(3);
 	m_mode = MM_Z80;
 }

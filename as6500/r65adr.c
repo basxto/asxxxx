@@ -1,8 +1,21 @@
 /* r65adr.c */
 
 /*
- * (C) Copyright 1995-2006
- * All Rights Reserved
+ *  Copyright (C) 1995-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -36,7 +49,7 @@ struct expr *esp;
 		expr(esp, 0);
 		esp->e_mode = S_DIR;
 		if (more()) {
-			comma();
+			comma(1);
 			switch(admode(axy)) {
 			case S_X:
 				esp->e_mode = S_DINDX;
@@ -55,7 +68,7 @@ struct expr *esp;
 		expr(esp, 0);
 		if ((c = getnb()) == ']') {
 			if (more()) {
-				comma();
+				comma(1);
 				if (admode(axy) != S_Y)
 					qerr();
 				esp->e_mode = S_IPSTY;
@@ -64,7 +77,7 @@ struct expr *esp;
 			}
 		} else {
 			unget(c);
-			comma();
+			comma(1);
 			if (admode(axy) != S_X)
 				qerr();
 			esp->e_mode = S_IPREX;
@@ -87,7 +100,7 @@ struct expr *esp;
 			} else {
 			    expr(esp, 0);
 			    if (more()) {
-				comma();
+				comma(1);
 				switch(admode(axy)) {
 				case S_X:
 					if ((!esp->e_flag)

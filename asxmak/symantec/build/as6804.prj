@@ -1,21 +1,21 @@
 82569
-R:\ASXV4PXX\asxmak\Symantec\build\as6804.prj
+R:\ASXV5PXX\ASXMAK\SYMANTEC\BUILD\as6804.prj
 as6804.OPN
 novcs
 as6804.DEF
 6
-1092880116
+1150355460
 0 0 0 0 0 "..\..\..\ASXXSRC\asdata.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asdbg.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asexpr.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\aslex.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\aslist.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asmain.c"
+0 0 0 0 0 "..\..\..\ASXXSRC\asmcro.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asout.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\assubr.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\assym.c"
 0 0 0 0 0 "..\..\..\AS6804\m04adr.c"
-0 0 0 0 0 "..\..\..\AS6804\m04ext.c"
 0 0 0 0 0 "..\..\..\AS6804\m04mch.c"
 0 0 0 0 0 "..\..\..\AS6804\m04pst.c"
 0 0 0 0 0 "as6804.DEF"

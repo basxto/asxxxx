@@ -41,14 +41,14 @@ CFLAGS		=  -ms -C -S -3 -a2 -c -g -gd
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
-OUTPUTDIR	= r:\asxv4pxx\asxmak\symantec\build
-!IF EXIST (r:\asxv4pxx\asxmak\symantec\build)
+OUTPUTDIR	= ..\build
+!IF EXIST (..\build)
 CREATEOUTPUTDIR	=
 !ELSE
 CREATEOUTPUTDIR	= if not exist $(OUTPUTDIR)\*.* md $(OUTPUTDIR)
 !ENDIF
-TARGETDIR	= r:\asxv4pxx\asxmak\symantec\exe
-!IF EXIST (r:\asxv4pxx\asxmak\symantec\exe)
+TARGETDIR	= ..\exe
+!IF EXIST (..\exe)
 CREATETARGETDIR	=
 !ELSE
 CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
@@ -75,13 +75,13 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -Ir:\asxv4pxx\asxxsrc
+INCLUDES	= -I..\..\..\asxxsrc
 
 INCLUDEDOBJS	= 
 
 OBJS		=  $(OUTPUTDIR)\asdata.OBJ  $(OUTPUTDIR)\asdbg.OBJ  $(OUTPUTDIR)\asexpr.OBJ  \
-		 $(OUTPUTDIR)\aslex.OBJ  $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asout.OBJ  \
-		 $(OUTPUTDIR)\assubr.OBJ  $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\m12adr.OBJ  $(OUTPUTDIR)\m12ext.OBJ  \
+		 $(OUTPUTDIR)\aslex.OBJ  $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asmcro.OBJ  \
+		 $(OUTPUTDIR)\asout.OBJ  $(OUTPUTDIR)\assubr.OBJ  $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\m12adr.OBJ  \
 		 $(OUTPUTDIR)\m12mch.OBJ  $(OUTPUTDIR)\m12pst.OBJ 
 
 RCFILES		= 
@@ -238,6 +238,11 @@ $(OUTPUTDIR)\asmain.OBJ:	..\..\..\ASXXSRC\asmain.c
 
 
 
+$(OUTPUTDIR)\asmcro.OBJ:	..\..\..\ASXXSRC\asmcro.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asmcro.obj ..\..\..\ASXXSRC\asmcro.c
+
+
+
 $(OUTPUTDIR)\asout.OBJ:	..\..\..\ASXXSRC\asout.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asout.obj ..\..\..\ASXXSRC\asout.c
 
@@ -255,11 +260,6 @@ $(OUTPUTDIR)\assym.OBJ:	..\..\..\ASXXSRC\assym.c
 
 $(OUTPUTDIR)\m12adr.OBJ:	..\..\..\AS6812\m12adr.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\m12adr.obj ..\..\..\AS6812\m12adr.c
-
-
-
-$(OUTPUTDIR)\m12ext.OBJ:	..\..\..\AS6812\m12ext.c
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\m12ext.obj ..\..\..\AS6812\m12ext.c
 
 
 

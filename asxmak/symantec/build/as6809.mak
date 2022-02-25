@@ -24,8 +24,8 @@ DISASM		= OBJ2ASM
 LNK		= LINK
 DLLS		= 
 
-HEADERS		= C:\SC\INCLUDE\stdio.h C:\SC\INCLUDE\setjmp.h ..\..\..\asxxsrc\asxxxx.h  \
-		..\..\..\AS6809\m6809.h C:\SC\INCLUDE\string.h C:\SC\INCLUDE\alloc.h C:\SC\INCLUDE\stdlib.h 
+HEADERS		= C:\SC\INCLUDE\alloc.h ..\..\..\asxxsrc\asxxxx.h C:\SC\INCLUDE\stdlib.h  \
+		C:\SC\INCLUDE\stdio.h C:\SC\INCLUDE\setjmp.h C:\SC\INCLUDE\string.h ..\..\..\AS6809\m6809.h 
 
 DEFFILE		= as6809.DEF
 
@@ -41,14 +41,14 @@ CFLAGS		=  -ms -C -S -3 -a2 -c -g -gd
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
-OUTPUTDIR	= r:\asxv4pxx\asxmak\symantec\build
-!IF EXIST (r:\asxv4pxx\asxmak\symantec\build)
+OUTPUTDIR	= ..\build
+!IF EXIST (..\build)
 CREATEOUTPUTDIR	=
 !ELSE
 CREATEOUTPUTDIR	= if not exist $(OUTPUTDIR)\*.* md $(OUTPUTDIR)
 !ENDIF
-TARGETDIR	= r:\asxv4pxx\asxmak\symantec\exe
-!IF EXIST (r:\asxv4pxx\asxmak\symantec\exe)
+TARGETDIR	= ..\exe
+!IF EXIST (..\exe)
 CREATETARGETDIR	=
 !ELSE
 CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
@@ -75,13 +75,13 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -Ir:\asxv4pxx\asxxsrc
+INCLUDES	= -I..\..\..\asxxsrc
 
 INCLUDEDOBJS	= 
 
 OBJS		=  $(OUTPUTDIR)\asdata.OBJ  $(OUTPUTDIR)\asdbg.OBJ  $(OUTPUTDIR)\asexpr.OBJ  \
-		 $(OUTPUTDIR)\aslex.OBJ  $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asout.OBJ  \
-		 $(OUTPUTDIR)\assubr.OBJ  $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\m09adr.OBJ  $(OUTPUTDIR)\m09ext.OBJ  \
+		 $(OUTPUTDIR)\aslex.OBJ  $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asmcro.OBJ  \
+		 $(OUTPUTDIR)\asout.OBJ  $(OUTPUTDIR)\assubr.OBJ  $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\m09adr.OBJ  \
 		 $(OUTPUTDIR)\m09mch.OBJ  $(OUTPUTDIR)\m09pst.OBJ 
 
 RCFILES		= 
@@ -238,6 +238,11 @@ $(OUTPUTDIR)\asmain.OBJ:	..\..\..\ASXXSRC\asmain.c
 
 
 
+$(OUTPUTDIR)\asmcro.OBJ:	..\..\..\ASXXSRC\asmcro.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asmcro.obj ..\..\..\ASXXSRC\asmcro.c
+
+
+
 $(OUTPUTDIR)\asout.OBJ:	..\..\..\ASXXSRC\asout.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asout.obj ..\..\..\ASXXSRC\asout.c
 
@@ -255,11 +260,6 @@ $(OUTPUTDIR)\assym.OBJ:	..\..\..\ASXXSRC\assym.c
 
 $(OUTPUTDIR)\m09adr.OBJ:	..\..\..\AS6809\m09adr.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\m09adr.obj ..\..\..\AS6809\m09adr.c
-
-
-
-$(OUTPUTDIR)\m09ext.OBJ:	..\..\..\AS6809\m09ext.c
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\m09ext.obj ..\..\..\AS6809\m09ext.c
 
 
 

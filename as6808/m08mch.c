@@ -1,8 +1,21 @@
 /* m08mch.c */
 
 /*
- * (C) Copyright 1993-2006
- * All Rights Reserved
+ *  Copyright (C) 1993-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -11,6 +24,9 @@
 
 #include "asxxxx.h"
 #include "m6808.h"
+
+char	*cpu	= "Motorola 68HC(S)08";
+char	*dsft	= "asm";
 
 /*
  * Opcode Cycle Definitions
@@ -374,7 +390,7 @@ struct mne *mp;
 		espv = e1.e_addr;
 		if (t1 != S_IMMED || espv & ~0x07)
 			aerr();
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t2 != S_DIR)
 			aerr();
@@ -387,11 +403,11 @@ struct mne *mp;
 		espv = e1.e_addr;
 		if (t1 != S_IMMED || espv & ~0x07)
 			aerr();
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t2 != S_DIR)
 			aerr();
-		comma();
+		comma(1);
 		expr(&e3, 0);
 		outab(op + 2*(espv&0x07));
 		outrb(&e2, R_PAG0);
@@ -502,7 +518,7 @@ struct mne *mp;
 			break;
 		}
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		if (t1 == S_IMMED) {
 			outab(op);
@@ -548,7 +564,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		if (t1 != S_IMMED)
 			aerr();
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		outab(op);
 		outrb(&e1, 0);
@@ -571,7 +587,7 @@ struct mne *mp;
 			break;
 		}
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		if (t1 == S_DIR || t1 == S_EXT) {
 			outab(op);
@@ -636,7 +652,7 @@ struct mne *mp;
 			outrb(&e1, R_PAG0);
 			break;
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t1 == S_IMMED) {
 			if (t2 == S_DIR || t2 == S_EXT) {
@@ -720,23 +736,16 @@ struct expr *esp;
 }
 
 /*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine specific initialization.
  */
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
+
 	if (pass == 0) {
 		mchtyp = X_HC08;
 		sym[2].s_addr = X_HC08;

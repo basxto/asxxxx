@@ -6,7 +6,6 @@
 
 	.include	"tpic16cx.def"
 
-
 	.area	DATA
 
 	triscode =	6
@@ -24,937 +23,937 @@
 
 	nop			; 00 00
 
-	return			; 00 08
-	retfie			; 00 09
-
-	sleep			; 00 63
-	clrwdt			; 00 64
-
-	tris	6		; 00 66
-	tris	#6		; 00 66
-	tris	triscode	; 00 66
-	tris	#triscode	; 00 66
-
-	movwf	0x00		; 00 80
-	movwf	0x7F		; 00 FF
-	movwf	extreg		;n00*80
-
-	movwf	*0x00		; 00 80
-	movwf	*0x7F		; 00 FF
-	movwf	*extreg		;n00*80
-
-	clrw			; 01 00
-
-	clrf	0x00		; 01 80
-	clrf	0x7F		; 01 FF
-	clrf	extreg		;n01*80
-
-	clrf	*0x00		; 01 80
-	clrf	*0x7F		; 01 FF
-	clrf	*extreg		;n01*80
-
-	subwf	0x00,w		; 02 00
-	subwf	0x7F,w		; 02 7F
-	subwf	extreg,w	;n02*00
-
-	subwf	*0x00,w		; 02 00
-	subwf	*0x7F,w		; 02 7F
-	subwf	*extreg,w	;n02*00
-
-	subwf	0x00,f		; 02 80
-	subwf	0x7F,f		; 02 FF
-	subwf	extreg,f	;n02*80
-
-	subwf	*0x00,f		; 02 80
-	subwf	*0x7F,f		; 02 FF
-	subwf	*extreg,f	;n02*80
-
-	subwf	0x00,0		; 02 00
-	subwf	*0x00,0		; 02 00
-	subwf	extreg,0	;n02*00
-	subwf	*extreg,0	;n02*00
-	subwf	0x00,#0		; 02 00
-	subwf	*0x00,#0	; 02 00
-	subwf	extreg,#0	;n02*00
-	subwf	*extreg,#0	;n02*00
-	subwf	0x00,wcode	; 02 00
-	subwf	*0x00,wcode	; 02 00
-	subwf	extreg,wcode	;n02*00
-	subwf	*extreg,wcode	;n02*00
-	subwf	0x00,#wcode	; 02 00
-	subwf	*0x00,#wcode	; 02 00
-	subwf	extreg,#wcode	;n02*00
-	subwf	*extreg,#wcode	;n02*00
-
-	subwf	0x00,1		; 02 80
-	subwf	*0x00,1		; 02 80
-	subwf	extreg,1	;n02*80
-	subwf	*extreg,1	;n02*80
-	subwf	0x00,#1		; 02 80
-	subwf	*0x00,#1	; 02 80
-	subwf	extreg,#1	;n02*80
-	subwf	*extreg,#1	;n02*80
-	subwf	0x00,fcode	; 02 80
-	subwf	*0x00,fcode	; 02 80
-	subwf	extreg,fcode	;n02*80
-	subwf	*extreg,fcode	;n02*80
-	subwf	0x00,#fcode	; 02 80
-	subwf	*0x00,#fcode	; 02 80
-	subwf	extreg,#fcode	;n02*80
-	subwf	*extreg,#fcode	;n02*80
-
-	decf	0x00,w		; 03 00
-	decf	0x7F,w		; 03 7F
-	decf	extreg,w	;n03*00
-
-	decf	0x00,f		; 03 80
-	decf	0x7F,f		; 03 FF
-	decf	extreg,f	;n03*80
-
-	decf	*0x00,w		; 03 00
-	decf	*0x7F,w		; 03 7F
-	decf	*extreg,w	;n03*00
-
-	decf	*0x00,f		; 03 80
-	decf	*0x7F,f		; 03 FF
-	decf	*extreg,f	;n03*80
-
-	decf	0x00,0		; 03 00
-	decf	*0x00,0		; 03 00
-	decf	extreg,0	;n03*00
-	decf	*extreg,0	;n03*00
-	decf	0x00,#0		; 03 00
-	decf	*0x00,#0	; 03 00
-	decf	extreg,#0	;n03*00
-	decf	*extreg,#0	;n03*00
-	decf	0x00,wcode	; 03 00
-	decf	*0x00,wcode	; 03 00
-	decf	extreg,wcode	;n03*00
-	decf	*extreg,wcode	;n03*00
-	decf	0x00,#wcode	; 03 00
-	decf	*0x00,#wcode	; 03 00
-	decf	extreg,#wcode	;n03*00
-	decf	*extreg,#wcode	;n03*00
-
-	decf	0x00,1		; 03 80
-	decf	*0x00,1		; 03 80
-	decf	extreg,1	;n03*80
-	decf	*extreg,1	;n03*80
-	decf	0x00,#1		; 03 80
-	decf	*0x00,#1	; 03 80
-	decf	extreg,#1	;n03*80
-	decf	*extreg,#1	;n03*80
-	decf	0x00,fcode	; 03 80
-	decf	*0x00,fcode	; 03 80
-	decf	extreg,fcode	;n03*80
-	decf	*extreg,fcode	;n03*80
-	decf	0x00,#fcode	; 03 80
-	decf	*0x00,#fcode	; 03 80
-	decf	extreg,#fcode	;n03*80
-	decf	*extreg,#fcode	;n03*80
-
-	iorwf	0x00,w		; 04 00
-	iorwf	0x7F,w		; 04 7F
-	iorwf	extreg,w	;n04*00
-
-	iorwf	0x00,f		; 04 80
-	iorwf	0x7F,f		; 04 FF
-	iorwf	extreg,f	;n04*80
-
-	iorwf	*0x00,w		; 04 00
-	iorwf	*0x7F,w		; 04 7F
-	iorwf	*extreg,w	;n04*00
-
-	iorwf	*0x00,f		; 04 80
-	iorwf	*0x7F,f		; 04 FF
-	iorwf	*extreg,f	;n04*80
-
-	iorwf	0x00,0		; 04 00
-	iorwf	*0x00,0		; 04 00
-	iorwf	extreg,0	;n04*00
-	iorwf	*extreg,0	;n04*00
-	iorwf	0x00,#0		; 04 00
-	iorwf	*0x00,#0	; 04 00
-	iorwf	extreg,#0	;n04*00
-	iorwf	*extreg,#0	;n04*00
-	iorwf	0x00,wcode	; 04 00
-	iorwf	*0x00,wcode	; 04 00
-	iorwf	extreg,wcode	;n04*00
-	iorwf	*extreg,wcode	;n04*00
-	iorwf	0x00,#wcode	; 04 00
-	iorwf	*0x00,#wcode	; 04 00
-	iorwf	extreg,#wcode	;n04*00
-	iorwf	*extreg,#wcode	;n04*00
-
-	iorwf	0x00,1		; 04 80
-	iorwf	*0x00,1		; 04 80
-	iorwf	extreg,1	;n04*80
-	iorwf	*extreg,1	;n04*80
-	iorwf	0x00,#1		; 04 80
-	iorwf	*0x00,#1	; 04 80
-	iorwf	extreg,#1	;n04*80
-	iorwf	*extreg,#1	;n04*80
-	iorwf	0x00,fcode	; 04 80
-	iorwf	*0x00,fcode	; 04 80
-	iorwf	extreg,fcode	;n04*80
-	iorwf	*extreg,fcode	;n04*80
-	iorwf	0x00,#fcode	; 04 80
-	iorwf	*0x00,#fcode	; 04 80
-	iorwf	extreg,#fcode	;n04*80
-	iorwf	*extreg,#fcode	;n04*80
-
-	andwf	0x00,w		; 05 00
-	andwf	0x7F,w		; 05 7F
-	andwf	extreg,w	;n05*00
-
-	andwf	0x00,f		; 05 80
-	andwf	0x7F,f		; 05 FF
-	andwf	extreg,f	;n05*80
-
-	andwf	*0x00,w		; 05 00
-	andwf	*0x7F,w		; 05 7F
-	andwf	*extreg,w	;n05*00
-
-	andwf	*0x00,f		; 05 80
-	andwf	*0x7F,f		; 05 FF
-	andwf	*extreg,f	;n05*80
-
-	andwf	0x00,0		; 05 00
-	andwf	*0x00,0		; 05 00
-	andwf	extreg,0	;n05*00
-	andwf	*extreg,0	;n05*00
-	andwf	0x00,#0		; 05 00
-	andwf	*0x00,#0	; 05 00
-	andwf	extreg,#0	;n05*00
-	andwf	*extreg,#0	;n05*00
-	andwf	0x00,wcode	; 05 00
-	andwf	*0x00,wcode	; 05 00
-	andwf	extreg,wcode	;n05*00
-	andwf	*extreg,wcode	;n05*00
-	andwf	0x00,#wcode	; 05 00
-	andwf	*0x00,#wcode	; 05 00
-	andwf	extreg,#wcode	;n05*00
-	andwf	*extreg,#wcode	;n05*00
-
-	andwf	0x00,1		; 05 80
-	andwf	*0x00,1		; 05 80
-	andwf	extreg,1	;n05*80
-	andwf	*extreg,1	;n05*80
-	andwf	0x00,#1		; 05 80
-	andwf	*0x00,#1	; 05 80
-	andwf	extreg,#1	;n05*80
-	andwf	*extreg,#1	;n05*80
-	andwf	0x00,fcode	; 05 80
-	andwf	*0x00,fcode	; 05 80
-	andwf	extreg,fcode	;n05*80
-	andwf	*extreg,fcode	;n05*80
-	andwf	0x00,#fcode	; 05 80
-	andwf	*0x00,#fcode	; 05 80
-	andwf	extreg,#fcode	;n05*80
-	andwf	*extreg,#fcode	;n05*80
-
-	xorwf	0x00,w		; 06 00
-	xorwf	0x7F,w		; 06 7F
-	xorwf	extreg,w	;n06*00
-
-	xorwf	0x00,f		; 06 80
-	xorwf	0x7F,f		; 06 FF
-	xorwf	extreg,f	;n06*80
-
-	xorwf	*0x00,w		; 06 00
-	xorwf	*0x7F,w		; 06 7F
-	xorwf	*extreg,w	;n06*00
-
-	xorwf	*0x00,f		; 06 80
-	xorwf	*0x7F,f		; 06 FF
-	xorwf	*extreg,f	;n06*80
-
-	xorwf	0x00,0		; 06 00
-	xorwf	*0x00,0		; 06 00
-	xorwf	extreg,0	;n06*00
-	xorwf	*extreg,0	;n06*00
-	xorwf	0x00,#0		; 06 00
-	xorwf	*0x00,#0	; 06 00
-	xorwf	extreg,#0	;n06*00
-	xorwf	*extreg,#0	;n06*00
-	xorwf	0x00,wcode	; 06 00
-	xorwf	*0x00,wcode	; 06 00
-	xorwf	extreg,wcode	;n06*00
-	xorwf	*extreg,wcode	;n06*00
-	xorwf	0x00,#wcode	; 06 00
-	xorwf	*0x00,#wcode	; 06 00
-	xorwf	extreg,#wcode	;n06*00
-	xorwf	*extreg,#wcode	;n06*00
-
-	xorwf	0x00,1		; 06 80
-	xorwf	*0x00,1		; 06 80
-	xorwf	extreg,1	;n06*80
-	xorwf	*extreg,1	;n06*80
-	xorwf	0x00,#1		; 06 80
-	xorwf	*0x00,#1	; 06 80
-	xorwf	extreg,#1	;n06*80
-	xorwf	*extreg,#1	;n06*80
-	xorwf	0x00,fcode	; 06 80
-	xorwf	*0x00,fcode	; 06 80
-	xorwf	extreg,fcode	;n06*80
-	xorwf	*extreg,fcode	;n06*80
-	xorwf	0x00,#fcode	; 06 80
-	xorwf	*0x00,#fcode	; 06 80
-	xorwf	extreg,#fcode	;n06*80
-	xorwf	*extreg,#fcode	;n06*80
-
-	addwf	0x00,w		; 07 00
-	addwf	0x7F,w		; 07 7F
-	addwf	extreg,w	;n07*00
-
-	addwf	0x00,f		; 07 80
-	addwf	0x7F,f		; 07 FF
-	addwf	extreg,f	;n07*80
-
-	addwf	*0x00,w		; 07 00
-	addwf	*0x7F,w		; 07 7F
-	addwf	*extreg,w	;n07*00
-
-	addwf	*0x00,f		; 07 80
-	addwf	*0x7F,f		; 07 FF
- 	addwf	*extreg,f	;n07*80
-
-	addwf	0x00,0		; 07 00
-	addwf	*0x00,0		; 07 00
-	addwf	extreg,0	;n07*00
-	addwf	*extreg,0	;n07*00
-	addwf	0x00,#0		; 07 00
-	addwf	*0x00,#0	; 07 00
-	addwf	extreg,#0	;n07*00
-	addwf	*extreg,#0	;n07*00
-	addwf	0x00,wcode	; 07 00
-	addwf	*0x00,wcode	; 07 00
-	addwf	extreg,wcode	;n07*00
-	addwf	*extreg,wcode	;n07*00
-	addwf	0x00,#wcode	; 07 00
-	addwf	*0x00,#wcode	; 07 00
-	addwf	extreg,#wcode	;n07*00
-	addwf	*extreg,#wcode	;n07*00
-
-	addwf	0x00,1		; 07 80
-	addwf	*0x00,1		; 07 80
-	addwf	extreg,1	;n07*80
-	addwf	*extreg,1	;n07*80
-	addwf	0x00,#1		; 07 80
-	addwf	*0x00,#1	; 07 80
-	addwf	extreg,#1	;n07*80
-	addwf	*extreg,#1	;n07*80
-	addwf	0x00,fcode	; 07 80
-	addwf	*0x00,fcode	; 07 80
-	addwf	extreg,fcode	;n07*80
-	addwf	*extreg,fcode	;n07*80
-	addwf	0x00,#fcode	; 07 80
-	addwf	*0x00,#fcode	; 07 80
-	addwf	extreg,#fcode	;n07*80
-	addwf	*extreg,#fcode	;n07*80
-
-	movf	0x00,w		; 08 00
-	movf	0x7F,w		; 08 7F
-	movf	extreg,w	;n08*00
-
-	movf	0x00,f		; 08 80
-	movf	0x7F,f		; 08 FF
-	movf	extreg,f	;n08*80
-
-	movf	*0x00,w		; 08 00
-	movf	*0x7F,w		; 08 7F
-	movf	*extreg,w	;n08*00
-
-	movf	*0x00,f		; 08 80
-	movf	*0x7F,f		; 08 FF
-	movf	*extreg,f	;n08*80
-
-	movf	0x00,0		; 08 00
-	movf	*0x00,0		; 08 00
-	movf	extreg,0	;n08*00
-	movf	*extreg,0	;n08*00
-	movf	0x00,#0		; 08 00
-	movf	*0x00,#0	; 08 00
-	movf	extreg,#0	;n08*00
-	movf	*extreg,#0	;n08*00
-	movf	0x00,wcode	; 08 00
-	movf	*0x00,wcode	; 08 00
-	movf	extreg,wcode	;n08*00
-	movf	*extreg,wcode	;n08*00
-	movf	0x00,#wcode	; 08 00
-	movf	*0x00,#wcode	; 08 00
-	movf	extreg,#wcode	;n08*00
-	movf	*extreg,#wcode	;n08*00
-
-	movf	0x00,1		; 08 80
-	movf	*0x00,1		; 08 80
-	movf	extreg,1	;n08*80
-	movf	*extreg,1	;n08*80
-	movf	0x00,#1		; 08 80
-	movf	*0x00,#1	; 08 80
-	movf	extreg,#1	;n08*80
-	movf	*extreg,#1	;n08*80
-	movf	0x00,fcode	; 08 80
-	movf	*0x00,fcode	; 08 80
-	movf	extreg,fcode	;n08*80
-	movf	*extreg,fcode	;n08*80
-	movf	0x00,#fcode	; 08 80
-	movf	*0x00,#fcode	; 08 80
-	movf	extreg,#fcode	;n08*80
-	movf	*extreg,#fcode	;n08*80
-
-	comf	0x00,w		; 09 00
-	comf	0x7F,w		; 09 7F
-	comf	extreg,w	;n09*00
-
-	comf	0x00,f		; 09 80
-	comf	0x7F,f		; 09 FF
- 	comf	extreg,f	;n09*80
-
-	comf	*0x00,w		; 09 00
-	comf	*0x7F,w		; 09 7F
-	comf	*extreg,w	;n09*00
-
-	comf	*0x00,f		; 09 80
-	comf	*0x7F,f		; 09 FF
- 	comf	*extreg,f	;n09*80
-
-	comf	0x00,0		; 09 00
-	comf	*0x00,0		; 09 00
-	comf	extreg,0	;n09*00
-	comf	*extreg,0	;n09*00
-	comf	0x00,#0		; 09 00
-	comf	*0x00,#0	; 09 00
-	comf	extreg,#0	;n09*00
-	comf	*extreg,#0	;n09*00
-	comf	0x00,wcode	; 09 00
-	comf	*0x00,wcode	; 09 00
-	comf	extreg,wcode	;n09*00
-	comf	*extreg,wcode	;n09*00
-	comf	0x00,#wcode	; 09 00
-	comf	*0x00,#wcode	; 09 00
-	comf	extreg,#wcode	;n09*00
-	comf	*extreg,#wcode	;n09*00
-
-	comf	0x00,1		; 09 80
-	comf	*0x00,1		; 09 80
-	comf	extreg,1	;n09*80
-	comf	*extreg,1	;n09*80
-	comf	0x00,#1		; 09 80
-	comf	*0x00,#1	; 09 80
-	comf	extreg,#1	;n09*80
-	comf	*extreg,#1	;n09*80
-	comf	0x00,fcode	; 09 80
-	comf	*0x00,fcode	; 09 80
-	comf	extreg,fcode	;n09*80
-	comf	*extreg,fcode	;n09*80
-	comf	0x00,#fcode	; 09 80
-	comf	*0x00,#fcode	; 09 80
-	comf	extreg,#fcode	;n09*80
-	comf	*extreg,#fcode	;n09*80
-
-	incf	0x00,w		; 0A 00
-	incf	0x7F,w		; 0A 7F
-	incf	extreg,w	;n0A*00
-
-	incf	0x00,f		; 0A 80
-	incf	0x7F,f		; 0A FF
-	incf	extreg,f	;n0A*80
-
-	incf	*0x00,w		; 0A 00
-	incf	*0x7F,w		; 0A 7F
-	incf	*extreg,w	;n0A*00
-
-	incf	*0x00,f		; 0A 80
-	incf	*0x7F,f		; 0A FF
-	incf	*extreg,f	;n0A*80
-
-	incf	0x00,0		; 0A 00
-	incf	*0x00,0		; 0A 00
-	incf	extreg,0	;n0A*00
-	incf	*extreg,0	;n0A*00
-	incf	0x00,#0		; 0A 00
-	incf	*0x00,#0	; 0A 00
-	incf	extreg,#0	;n0A*00
-	incf	*extreg,#0	;n0A*00
-	incf	0x00,wcode	; 0A 00
-	incf	*0x00,wcode	; 0A 00
-	incf	extreg,wcode	;n0A*00
-	incf	*extreg,wcode	;n0A*00
-	incf	0x00,#wcode	; 0A 00
-	incf	*0x00,#wcode	; 0A 00
-	incf	extreg,#wcode	;n0A*00
-	incf	*extreg,#wcode	;n0A*00
-
-	incf	0x00,1		; 0A 80
-	incf	*0x00,1		; 0A 80
-	incf	extreg,1	;n0A*80
-	incf	*extreg,1	;n0A*80
-	incf	0x00,#1		; 0A 80
-	incf	*0x00,#1	; 0A 80
-	incf	extreg,#1	;n0A*80
-	incf	*extreg,#1	;n0A*80
-	incf	0x00,fcode	; 0A 80
-	incf	*0x00,fcode	; 0A 80
-	incf	extreg,fcode	;n0A*80
-	incf	*extreg,fcode	;n0A*80
-	incf	0x00,#fcode	; 0A 80
-	incf	*0x00,#fcode	; 0A 80
-	incf	extreg,#fcode	;n0A*80
-	incf	*extreg,#fcode	;n0A*80
-
-	decfsz	0x00,w		; 0B 00
-	decfsz	0x7F,w		; 0B 7F
-	decfsz	extreg,w	;n0B*00
-
-	decfsz	0x00,f		; 0B 80
-	decfsz	0x7F,f		; 0B FF
-	decfsz	extreg,f	;n0B*80
-
-	decfsz	*0x00,w		; 0B 00
-	decfsz	*0x7F,w		; 0B 7F
-	decfsz	*extreg,w	;n0B*00
-
-	decfsz	*0x00,f		; 0B 80
-	decfsz	*0x7F,f		; 0B FF
- 	decfsz	*extreg,f	;n0B*80
-
-	decfsz	0x00,0		; 0B 00
-	decfsz	*0x00,0		; 0B 00
-	decfsz	extreg,0	;n0B*00
-	decfsz	*extreg,0	;n0B*00
-	decfsz	0x00,#0		; 0B 00
-	decfsz	*0x00,#0	; 0B 00
-	decfsz	extreg,#0	;n0B*00
-	decfsz	*extreg,#0	;n0B*00
-	decfsz	0x00,wcode	; 0B 00
-	decfsz	*0x00,wcode	; 0B 00
-	decfsz	extreg,wcode	;n0B*00
-	decfsz	*extreg,wcode	;n0B*00
-	decfsz	0x00,#wcode	; 0B 00
-	decfsz	*0x00,#wcode	; 0B 00
-	decfsz	extreg,#wcode	;n0B*00
-	decfsz	*extreg,#wcode	;n0B*00
-
-	decfsz	0x00,1		; 0B 80
-	decfsz	*0x00,1		; 0B 80
-	decfsz	extreg,1	;n0B*80
-	decfsz	*extreg,1	;n0B*80
-	decfsz	0x00,#1		; 0B 80
-	decfsz	*0x00,#1	; 0B 80
-	decfsz	extreg,#1	;n0B*80
-	decfsz	*extreg,#1	;n0B*80
-	decfsz	0x00,fcode	; 0B 80
-	decfsz	*0x00,fcode	; 0B 80
-	decfsz	extreg,fcode	;n0B*80
-	decfsz	*extreg,fcode	;n0B*80
-	decfsz	0x00,#fcode	; 0B 80
-	decfsz	*0x00,#fcode	; 0B 80
-	decfsz	extreg,#fcode	;n0B*80
-	decfsz	*extreg,#fcode	;n0B*80
-
-	rrf	0x00,w		; 0C 00
-	rrf	0x7F,w		; 0C 7F
-	rrf	extreg,w	;n0C*00
-
-	rrf	0x00,f		; 0C 80
-	rrf	0x7F,f		; 0C FF
-	rrf	extreg,f	;n0C*80
-
-	rrf	*0x00,w		; 0C 00
-	rrf	*0x7F,w		; 0C 7F
-	rrf	*extreg,w	;n0C*00
-
-	rrf	*0x00,f		; 0C 80
-	rrf	*0x7F,f		; 0C FF
- 	rrf	*extreg,f	;n0C*80
-
-	rrf	0x00,0		; 0C 00
-	rrf	*0x00,0		; 0C 00
-	rrf	extreg,0	;n0C*00
-	rrf	*extreg,0	;n0C*00
-	rrf	0x00,#0		; 0C 00
-	rrf	*0x00,#0	; 0C 00
-	rrf	extreg,#0	;n0C*00
-	rrf	*extreg,#0	;n0C*00
-	rrf	0x00,wcode	; 0C 00
-	rrf	*0x00,wcode	; 0C 00
-	rrf	extreg,wcode	;n0C*00
-	rrf	*extreg,wcode	;n0C*00
-	rrf	0x00,#wcode	; 0C 00
-	rrf	*0x00,#wcode	; 0C 00
-	rrf	extreg,#wcode	;n0C*00
-	rrf	*extreg,#wcode	;n0C*00
-
-	rrf	0x00,1		; 0C 80
-	rrf	*0x00,1		; 0C 80
-	rrf	extreg,1	;n0C*80
-	rrf	*extreg,1	;n0C*80
-	rrf	0x00,#1		; 0C 80
-	rrf	*0x00,#1	; 0C 80
-	rrf	extreg,#1	;n0C*80
-	rrf	*extreg,#1	;n0C*80
-	rrf	0x00,fcode	; 0C 80
-	rrf	*0x00,fcode	; 0C 80
-	rrf	extreg,fcode	;n0C*80
-	rrf	*extreg,fcode	;n0C*80
-	rrf	0x00,#fcode	; 0C 80
-	rrf	*0x00,#fcode	; 0C 80
-	rrf	extreg,#fcode	;n0C*80
-	rrf	*extreg,#fcode	;n0C*80
-
-	rlf	0x00,w		; 0D 00
-	rlf	0x7F,w		; 0D 7F
-	rlf	extreg,w	;n0D*00
-
-	rlf	0x00,f		; 0D 80
-	rlf	0x7F,f		; 0D FF
-	rlf	extreg,f	;n0D*80
-
-	rlf	*0x00,w		; 0D 00
-	rlf	*0x7F,w		; 0D 7F
-	rlf	*extreg,w	;n0D*00
-
-	rlf	*0x00,f		; 0D 80
-	rlf	*0x7F,f		; 0D FF
-	rlf	*extreg,f	;n0D*80
-
-	rlf	0x00,0		; 0D 00
-	rlf	*0x00,0		; 0D 00
-	rlf	extreg,0	;n0D*00
-	rlf	*extreg,0	;n0D*00
-	rlf	0x00,#0		; 0D 00
-	rlf	*0x00,#0	; 0D 00
-	rlf	extreg,#0	;n0D*00
-	rlf	*extreg,#0	;n0D*00
-	rlf	0x00,wcode	; 0D 00
-	rlf	*0x00,wcode	; 0D 00
-	rlf	extreg,wcode	;n0D*00
-	rlf	*extreg,wcode	;n0D*00
-	rlf	0x00,#wcode	; 0D 00
-	rlf	*0x00,#wcode	; 0D 00
-	rlf	extreg,#wcode	;n0D*00
-	rlf	*extreg,#wcode	;n0D*00
-
-	rlf	0x00,1		; 0D 80
-	rlf	*0x00,1		; 0D 80
-	rlf	extreg,1	;n0D*80
-	rlf	*extreg,1	;n0D*80
-	rlf	0x00,#1		; 0D 80
-	rlf	*0x00,#1	; 0D 80
-	rlf	extreg,#1	;n0D*80
-	rlf	*extreg,#1	;n0D*80
-	rlf	0x00,fcode	; 0D 80
-	rlf	*0x00,fcode	; 0D 80
-	rlf	extreg,fcode	;n0D*80
-	rlf	*extreg,fcode	;n0D*80
-	rlf	0x00,#fcode	; 0D 80
-	rlf	*0x00,#fcode	; 0D 80
-	rlf	extreg,#fcode	;n0D*80
-	rlf	*extreg,#fcode	;n0D*80
-
-	swapf	0x00,w		; 0E 00
-	swapf	0x7F,w		; 0E 7F
-	swapf	extreg,w	;n0E*00
-
-	swapf	0x00,f		; 0E 80
-	swapf	0x7F,f		; 0E FF
-	swapf	extreg,f	;n0E*80
-
-	swapf	*0x00,w		; 0E 00
-	swapf	*0x7F,w		; 0E 7F
-	swapf	*extreg,w	;n0E*00
-
-	swapf	*0x00,f		; 0E 80
-	swapf	*0x7F,f		; 0E FF
-	swapf	*extreg,f	;n0E*80
-
-	swapf	0x00,0		; 0E 00
-	swapf	*0x00,0		; 0E 00
-	swapf	extreg,0	;n0E*00
-	swapf	*extreg,0	;n0E*00
-	swapf	0x00,#0		; 0E 00
-	swapf	*0x00,#0	; 0E 00
-	swapf	extreg,#0	;n0E*00
-	swapf	*extreg,#0	;n0E*00
-	swapf	0x00,wcode	; 0E 00
-	swapf	*0x00,wcode	; 0E 00
-	swapf	extreg,wcode	;n0E*00
-	swapf	*extreg,wcode	;n0E*00
-	swapf	0x00,#wcode	; 0E 00
-	swapf	*0x00,#wcode	; 0E 00
-	swapf	extreg,#wcode	;n0E*00
-	swapf	*extreg,#wcode	;n0E*00
-
-	swapf	0x00,1		; 0E 80
-	swapf	*0x00,1		; 0E 80
-	swapf	extreg,1	;n0E*80
-	swapf	*extreg,1	;n0E*80
-	swapf	0x00,#1		; 0E 80
-	swapf	*0x00,#1	; 0E 80
-	swapf	extreg,#1	;n0E*80
-	swapf	*extreg,#1	;n0E*80
-	swapf	0x00,fcode	; 0E 80
-	swapf	*0x00,fcode	; 0E 80
-	swapf	extreg,fcode	;n0E*80
-	swapf	*extreg,fcode	;n0E*80
-	swapf	0x00,#fcode	; 0E 80
-	swapf	*0x00,#fcode	; 0E 80
-	swapf	extreg,#fcode	;n0E*80
-	swapf	*extreg,#fcode	;n0E*80
-
-	incfsz	0x00,w		; 0F 00
-	incfsz	0x7F,w		; 0F 7F
-	incfsz	extreg,w	;n0F*00
-
-	incfsz	0x00,f		; 0F 80
-	incfsz	0x7F,f		; 0F FF
-	incfsz	extreg,f	;n0F*80
-
-	incfsz	*0x00,w		; 0F 00
-	incfsz	*0x7F,w		; 0F 7F
-	incfsz	*extreg,w	;n0F*00
-
-	incfsz	*0x00,f		; 0F 80
-	incfsz	*0x7F,f		; 0F FF
-	incfsz	*extreg,f	;n0F*80
-
-	incfsz	0x00,0		; 0F 00
-	incfsz	*0x00,0		; 0F 00
-	incfsz	extreg,0	;n0F*00
-	incfsz	*extreg,0	;n0F*00
-	incfsz	0x00,#0		; 0F 00
-	incfsz	*0x00,#0	; 0F 00
-	incfsz	extreg,#0	;n0F*00
-	incfsz	*extreg,#0	;n0F*00
-	incfsz	0x00,wcode	; 0F 00
-	incfsz	*0x00,wcode	; 0F 00
-	incfsz	extreg,wcode	;n0F*00
-	incfsz	*extreg,wcode	;n0F*00
-	incfsz	0x00,#wcode	; 0F 00
-	incfsz	*0x00,#wcode	; 0F 00
-	incfsz	extreg,#wcode	;n0F*00
-	incfsz	*extreg,#wcode	;n0F*00
-
-	incfsz	0x00,1		; 0F 80
-	incfsz	*0x00,1		; 0F 80
-	incfsz	extreg,1	;n0F*80
-	incfsz	*extreg,1	;n0F*80
-	incfsz	0x00,#1		; 0F 80
-	incfsz	*0x00,#1	; 0F 80
-	incfsz	extreg,#1	;n0F*80
-	incfsz	*extreg,#1	;n0F*80
-	incfsz	0x00,fcode	; 0F 80
-	incfsz	*0x00,fcode	; 0F 80
-	incfsz	extreg,fcode	;n0F*80
-	incfsz	*extreg,fcode	;n0F*80
-	incfsz	0x00,#fcode	; 0F 80
-	incfsz	*0x00,#fcode	; 0F 80
-	incfsz	extreg,#fcode	;n0F*80
-	incfsz	*extreg,#fcode	;n0F*80
-
-	bcf	0x00,0		; 10 00
-	bcf	0x7F,0		; 10 7F
-	bcf	extreg,0	;n10*00
-
-	bcf	0x00,7		; 13 80
-	bcf	0x7F,7		; 13 FF
-	bcf	extreg,7	;n13*80
-
-	bcf	*0x00,0		; 10 00
-	bcf	*0x7F,0		; 10 7F
-	bcf	*extreg,0	;n10*00
-
-	bcf	*0x00,7		; 13 80
-	bcf	*0x7F,7		; 13 FF
-	bcf	*extreg,7	;n13*80
-
-	bcf	0x00,num0	; 10 00
-	bcf	*0x00,num0	; 10 00
-	bcf	extreg,num0	;n10*00
-	bcf	*extreg,num0	;n10*00
-	bcf	0x00,#num0	; 10 00
-	bcf	*0x00,#num0	; 10 00
-	bcf	extreg,#num0	;n10*00
-	bcf	*extreg,#num0	;n10*00
-	bcf	0x00,num7	; 13 80
-	bcf	*0x00,num7	; 13 80
-	bcf	extreg,num7	;n13*80
-	bcf	*extreg,num7	;n13*80
-	bcf	0x00,#num7	; 13 80
-	bcf	*0x00,#num7	; 13 80
-	bcf	extreg,#num7	;n13*80
-	bcf	*extreg,#num7	;n13*80
-
-	bsf	0x00,0		; 14 00
-	bsf	0x7F,0		; 14 7F
-	bsf	extreg,0	;n14*00
-
-	bsf	0x00,7		; 17 80
-	bsf	0x7F,7		; 17 FF
-	bsf	extreg,7	;n17*80
-
-	bsf	*0x00,0		; 14 00
-	bsf	*0x7F,0		; 14 7F
-	bsf	*extreg,0	;n14*00
-
-	bsf	*0x00,7		; 17 80
-	bsf	*0x7F,7		; 17 FF
- 	bsf	*extreg,7	;n17*80
-
-	bsf	0x00,num0	; 14 00
-	bsf	*0x00,num0	; 14 00
-	bsf	extreg,num0	;n14*00
-	bsf	*extreg,num0	;n14*00
-	bsf	0x00,#num0	; 14 00
-	bsf	*0x00,#num0	; 14 00
-	bsf	extreg,#num0	;n14*00
-	bsf	*extreg,#num0	;n14*00
-	bsf	0x00,num7	; 17 80
-	bsf	*0x00,num7	; 17 80
-	bsf	extreg,num7	;n17*80
-	bsf	*extreg,num7	;n17*80
-	bsf	0x00,#num7	; 17 80
-	bsf	*0x00,#num7	; 17 80
-	bsf	extreg,#num7	;n17*80
-	bsf	*extreg,#num7	;n17*80
-
-	btfsc	0x00,0		; 18 00
-	btfsc	0x7F,0		; 18 7F
-	btfsc	extreg,0	;n18*00
-
-	btfsc	0x00,7		; 1B 80
-	btfsc	0x7F,7		; 1B FF
-	btfsc	extreg,7	;n1B*80
-
-	btfsc	*0x00,0		; 18 00
-	btfsc	*0x7F,0		; 18 7F
-	btfsc	*extreg,0	;n18*00
-
-	btfsc	*0x00,7		; 1B 80
-	btfsc	*0x7F,7		; 1B FF
-	btfsc	*extreg,7	;n1B*80
-
-	btfsc	0x00,num0	; 18 00
-	btfsc	*0x00,num0	; 18 00
-	btfsc	extreg,num0	;n18*00
-	btfsc	*extreg,num0	;n18*00
-	btfsc	0x00,#num0	; 18 00
-	btfsc	*0x00,#num0	; 18 00
-	btfsc	extreg,#num0	;n18*00
-	btfsc	*extreg,#num0	;n18*00
-	btfsc	0x00,num7	; 1B 80
-	btfsc	*0x00,num7	; 1B 80
-	btfsc	extreg,num7	;n1B*80
-	btfsc	*extreg,num7	;n1B*80
-	btfsc	0x00,#num7	; 1B 80
-	btfsc	*0x00,#num7	; 1B 80
-	btfsc	extreg,#num7	;n1B*80
-	btfsc	*extreg,#num7	;n1B*80
-
-	btfss	0x00,0		; 1C 00
-	btfss	0x7F,0		; 1C 7F
-	btfss	extreg,0	;n1C*00
-
-	btfss	0x00,7		; 1F 80
-	btfss	0x7F,7		; 1F FF
-	btfss	extreg,7	;n1F*80
-
-	btfss	*0x00,0		; 1C 00
-	btfss	*0x7F,0		; 1C 7F
-	btfss	*extreg,0	;n1C*00
-
-	btfss	*0x00,7		; 1F 80
-	btfss	*0x7F,7		; 1F FF
-	btfss	*extreg,7	;n1F*80
-
-	btfss	0x00,num0	; 1C 00
-	btfss	*0x00,num0	; 1C 00
-	btfss	extreg,num0	;n1C*00
-	btfss	*extreg,num0	;n1C*00
-	btfss	0x00,#num0	; 1C 00
-	btfss	*0x00,#num0	; 1C 00
-	btfss	extreg,#num0	;n1C*00
-	btfss	*extreg,#num0	;n1C*00
-	btfss	0x00,num7	; 1F 80
-	btfss	*0x00,num7	; 1F 80
-	btfss	extreg,num7	;n1F*80
-	btfss	*extreg,num7	;n1F*80
-	btfss	0x00,#num7	; 1F 80
-	btfss	*0x00,#num7	; 1F 80
-	btfss	extreg,#num7	;n1F*80
-	btfss	*extreg,#num7	;n1F*80
-
-	retlw	0x00		; 34 00
-	retlw	0xFF		; 34 FF
-	retlw	extvalu		;s34r00
-
-	retlw	#0x00		; 34 00
-	retlw	#0xFF		; 34 FF
-	retlw	#extvalu	;s34r00
-
-	call	0x00		; 20 00
-	call	0x7FF		; 27 FF
-
-	call	addr_00		;s20r00
-	call	addr_7FF	;s27rFF
-
-	call	extaddr		;s20r00
-
-	goto	0x00		; 28 00
-	goto	0x7FF		; 2F FF
-
-	goto	addr_00		;s28r00
-	goto	addr_7FF	;s2FrFF
-
-	goto	extaddr		;s28r00
-
-	movlw	0x00		; 30 00
-	movlw	0xFF		; 30 FF
-	movlw	extvalu		;s30r00
-
-	movlw	#0x00		; 30 00
-	movlw	#0xFF		; 30 FF
-	movlw	#extvalu	;s30r00
-
-	iorlw	0x00		; 38 00
-	iorlw	0xFF		; 38 FF
-	iorlw	extvalu		;s38r00
-
-	iorlw	#0x00		; 38 00
-	iorlw	#0xFF		; 38 FF
-	iorlw	#extvalu	;s38r00
-
-	andlw	0x00		; 39 00
-	andlw	0xFF		; 39 FF
-	andlw	extvalu		;s39r00
-
-	andlw	#0x00		; 39 00
-	andlw	#0xFF		; 39 FF
-	andlw	#extvalu	;s39r00
-
-	xorlw	0x00		; 3A 00
-	xorlw	0xFF		; 3A FF
-	xorlw	extvalu		;s3Ar00
-
-	xorlw	#0x00		; 3A 00
-	xorlw	#0xFF		; 3A FF
-	xorlw	#extvalu	;s3Ar00
-
-	sublw	0x00		; 3C 00
-	sublw	0xFF		; 3C FF
-	sublw	extvalu		;s3Cr00
-
-	sublw	#0x00		; 3C 00
-	sublw	#0xFF		; 3C FF
-	sublw	#extvalu	;s3Cr00
-
-	addlw	0x00		; 3E 00
-	addlw	0xFF		; 3E FF
-	addlw	extvalu		;s3Er00
-
-	addlw	#0x00		; 3E 00
-	addlw	#0xFF		; 3E FF
-	addlw	#extvalu	;s3Er00
+	return			; 08 00
+	retfie			; 09 00
+
+	sleep			; 63 00
+	clrwdt			; 64 00
+
+	tris	6		; 66 00
+	tris	#6		; 66 00
+	tris	triscode	; 66 00
+	tris	#triscode	; 66 00
+
+	movwf	0x00		; 80 00
+	movwf	0x7F		; FF 00
+	movwf	extreg		;*80n00
+
+	movwf	*0x00		; 80 00
+	movwf	*0x7F		; FF 00
+	movwf	*extreg		;*80n00
+
+	clrw			; 00 01
+
+	clrf	0x00		; 80 01
+	clrf	0x7F		; FF 01
+	clrf	extreg		;*80n01
+
+	clrf	*0x00		; 80 01
+	clrf	*0x7F		; FF 01
+	clrf	*extreg		;*80n01
+
+	subwf	0x00,w		; 00 02
+	subwf	0x7F,w		; 7F 02
+	subwf	extreg,w	;*00n02
+
+	subwf	*0x00,w		; 00 02
+	subwf	*0x7F,w		; 7F 02
+	subwf	*extreg,w	;*00n02
+
+	subwf	0x00,f		; 80 02
+	subwf	0x7F,f		; FF 02
+	subwf	extreg,f	;*80n02
+
+	subwf	*0x00,f		; 80 02
+	subwf	*0x7F,f		; FF 02
+	subwf	*extreg,f	;*80n02
+
+	subwf	0x00,0		; 00 02
+	subwf	*0x00,0		; 00 02
+	subwf	extreg,0	;*00n02
+	subwf	*extreg,0	;*00n02
+	subwf	0x00,#0		; 00 02
+	subwf	*0x00,#0	; 00 02
+	subwf	extreg,#0	;*00n02
+	subwf	*extreg,#0	;*00n02
+	subwf	0x00,wcode	; 00 02
+	subwf	*0x00,wcode	; 00 02
+	subwf	extreg,wcode	;*00n02
+	subwf	*extreg,wcode	;*00n02
+	subwf	0x00,#wcode	; 00 02
+	subwf	*0x00,#wcode	; 00 02
+	subwf	extreg,#wcode	;*00n02
+	subwf	*extreg,#wcode	;*00n02
+
+	subwf	0x00,1		; 80 02
+	subwf	*0x00,1		; 80 02
+	subwf	extreg,1	;*80n02
+	subwf	*extreg,1	;*80n02
+	subwf	0x00,#1		; 80 02
+	subwf	*0x00,#1	; 80 02
+	subwf	extreg,#1	;*80n02
+	subwf	*extreg,#1	;*80n02
+	subwf	0x00,fcode	; 80 02
+	subwf	*0x00,fcode	; 80 02
+	subwf	extreg,fcode	;*80n02
+	subwf	*extreg,fcode	;*80n02
+	subwf	0x00,#fcode	; 80 02
+	subwf	*0x00,#fcode	; 80 02
+	subwf	extreg,#fcode	;*80n02
+	subwf	*extreg,#fcode	;*80n02
+
+	decf	0x00,w		; 00 03
+	decf	0x7F,w		; 7F 03
+	decf	extreg,w	;*00n03
+
+	decf	0x00,f		; 80 03
+	decf	0x7F,f		; FF 03
+	decf	extreg,f	;*80n03
+
+	decf	*0x00,w		; 00 03
+	decf	*0x7F,w		; 7F 03
+	decf	*extreg,w	;*00n03
+
+	decf	*0x00,f		; 80 03
+	decf	*0x7F,f		; FF 03
+	decf	*extreg,f	;*80n03
+
+	decf	0x00,0		; 00 03
+	decf	*0x00,0		; 00 03
+	decf	extreg,0	;*00n03
+	decf	*extreg,0	;*00n03
+	decf	0x00,#0		; 00 03
+	decf	*0x00,#0	; 00 03
+	decf	extreg,#0	;*00n03
+	decf	*extreg,#0	;*00n03
+	decf	0x00,wcode	; 00 03
+	decf	*0x00,wcode	; 00 03
+	decf	extreg,wcode	;*00n03
+	decf	*extreg,wcode	;*00n03
+	decf	0x00,#wcode	; 00 03
+	decf	*0x00,#wcode	; 00 03
+	decf	extreg,#wcode	;*00n03
+	decf	*extreg,#wcode	;*00n03
+
+	decf	0x00,1		; 80 03
+	decf	*0x00,1		; 80 03
+	decf	extreg,1	;*80n03
+	decf	*extreg,1	;*80n03
+	decf	0x00,#1		; 80 03
+	decf	*0x00,#1	; 80 03
+	decf	extreg,#1	;*80n03
+	decf	*extreg,#1	;*80n03
+	decf	0x00,fcode	; 80 03
+	decf	*0x00,fcode	; 80 03
+	decf	extreg,fcode	;*80n03
+	decf	*extreg,fcode	;*80n03
+	decf	0x00,#fcode	; 80 03
+	decf	*0x00,#fcode	; 80 03
+	decf	extreg,#fcode	;*80n03
+	decf	*extreg,#fcode	;*80n03
+
+	iorwf	0x00,w		; 00 04
+	iorwf	0x7F,w		; 7F 04
+	iorwf	extreg,w	;*00n04
+
+	iorwf	0x00,f		; 80 04
+	iorwf	0x7F,f		; FF 04
+	iorwf	extreg,f	;*80n04
+
+	iorwf	*0x00,w		; 00 04
+	iorwf	*0x7F,w		; 7F 04
+	iorwf	*extreg,w	;*00n04
+
+	iorwf	*0x00,f		; 80 04
+	iorwf	*0x7F,f		; FF 04
+	iorwf	*extreg,f	;*80n04
+
+	iorwf	0x00,0		; 00 04
+	iorwf	*0x00,0		; 00 04
+	iorwf	extreg,0	;*00n04
+	iorwf	*extreg,0	;*00n04
+	iorwf	0x00,#0		; 00 04
+	iorwf	*0x00,#0	; 00 04
+	iorwf	extreg,#0	;*00n04
+	iorwf	*extreg,#0	;*00n04
+	iorwf	0x00,wcode	; 00 04
+	iorwf	*0x00,wcode	; 00 04
+	iorwf	extreg,wcode	;*00n04
+	iorwf	*extreg,wcode	;*00n04
+	iorwf	0x00,#wcode	; 00 04
+	iorwf	*0x00,#wcode	; 00 04
+	iorwf	extreg,#wcode	;*00n04
+	iorwf	*extreg,#wcode	;*00n04
+
+	iorwf	0x00,1		; 80 04
+	iorwf	*0x00,1		; 80 04
+	iorwf	extreg,1	;*80n04
+	iorwf	*extreg,1	;*80n04
+	iorwf	0x00,#1		; 80 04
+	iorwf	*0x00,#1	; 80 04
+	iorwf	extreg,#1	;*80n04
+	iorwf	*extreg,#1	;*80n04
+	iorwf	0x00,fcode	; 80 04
+	iorwf	*0x00,fcode	; 80 04
+	iorwf	extreg,fcode	;*80n04
+	iorwf	*extreg,fcode	;*80n04
+	iorwf	0x00,#fcode	; 80 04
+	iorwf	*0x00,#fcode	; 80 04
+	iorwf	extreg,#fcode	;*80n04
+	iorwf	*extreg,#fcode	;*80n04
+
+	andwf	0x00,w		; 00 05
+	andwf	0x7F,w		; 7F 05
+	andwf	extreg,w	;*00n05
+
+	andwf	0x00,f		; 80 05
+	andwf	0x7F,f		; FF 05
+	andwf	extreg,f	;*80n05
+
+	andwf	*0x00,w		; 00 05
+	andwf	*0x7F,w		; 7F 05
+	andwf	*extreg,w	;*00n05
+
+	andwf	*0x00,f		; 80 05
+	andwf	*0x7F,f		; FF 05
+	andwf	*extreg,f	;*80n05
+
+	andwf	0x00,0		; 00 05
+	andwf	*0x00,0		; 00 05
+	andwf	extreg,0	;*00n05
+	andwf	*extreg,0	;*00n05
+	andwf	0x00,#0		; 00 05
+	andwf	*0x00,#0	; 00 05
+	andwf	extreg,#0	;*00n05
+	andwf	*extreg,#0	;*00n05
+	andwf	0x00,wcode	; 00 05
+	andwf	*0x00,wcode	; 00 05
+	andwf	extreg,wcode	;*00n05
+	andwf	*extreg,wcode	;*00n05
+	andwf	0x00,#wcode	; 00 05
+	andwf	*0x00,#wcode	; 00 05
+	andwf	extreg,#wcode	;*00n05
+	andwf	*extreg,#wcode	;*00n05
+
+	andwf	0x00,1		; 80 05
+	andwf	*0x00,1		; 80 05
+	andwf	extreg,1	;*80n05
+	andwf	*extreg,1	;*80n05
+	andwf	0x00,#1		; 80 05
+	andwf	*0x00,#1	; 80 05
+	andwf	extreg,#1	;*80n05
+	andwf	*extreg,#1	;*80n05
+	andwf	0x00,fcode	; 80 05
+	andwf	*0x00,fcode	; 80 05
+	andwf	extreg,fcode	;*80n05
+	andwf	*extreg,fcode	;*80n05
+	andwf	0x00,#fcode	; 80 05
+	andwf	*0x00,#fcode	; 80 05
+	andwf	extreg,#fcode	;*80n05
+	andwf	*extreg,#fcode	;*80n05
+
+	xorwf	0x00,w		; 00 06
+	xorwf	0x7F,w		; 7F 06
+	xorwf	extreg,w	;*00n06
+
+	xorwf	0x00,f		; 80 06
+	xorwf	0x7F,f		; FF 06
+	xorwf	extreg,f	;*80n06
+
+	xorwf	*0x00,w		; 00 06
+	xorwf	*0x7F,w		; 7F 06
+	xorwf	*extreg,w	;*00n06
+
+	xorwf	*0x00,f		; 80 06
+	xorwf	*0x7F,f		; FF 06
+	xorwf	*extreg,f	;*80n06
+
+	xorwf	0x00,0		; 00 06
+	xorwf	*0x00,0		; 00 06
+	xorwf	extreg,0	;*00n06
+	xorwf	*extreg,0	;*00n06
+	xorwf	0x00,#0		; 00 06
+	xorwf	*0x00,#0	; 00 06
+	xorwf	extreg,#0	;*00n06
+	xorwf	*extreg,#0	;*00n06
+	xorwf	0x00,wcode	; 00 06
+	xorwf	*0x00,wcode	; 00 06
+	xorwf	extreg,wcode	;*00n06
+	xorwf	*extreg,wcode	;*00n06
+	xorwf	0x00,#wcode	; 00 06
+	xorwf	*0x00,#wcode	; 00 06
+	xorwf	extreg,#wcode	;*00n06
+	xorwf	*extreg,#wcode	;*00n06
+
+	xorwf	0x00,1		; 80 06
+	xorwf	*0x00,1		; 80 06
+	xorwf	extreg,1	;*80n06
+	xorwf	*extreg,1	;*80n06
+	xorwf	0x00,#1		; 80 06
+	xorwf	*0x00,#1	; 80 06
+	xorwf	extreg,#1	;*80n06
+	xorwf	*extreg,#1	;*80n06
+	xorwf	0x00,fcode	; 80 06
+	xorwf	*0x00,fcode	; 80 06
+	xorwf	extreg,fcode	;*80n06
+	xorwf	*extreg,fcode	;*80n06
+	xorwf	0x00,#fcode	; 80 06
+	xorwf	*0x00,#fcode	; 80 06
+	xorwf	extreg,#fcode	;*80n06
+	xorwf	*extreg,#fcode	;*80n06
+
+	addwf	0x00,w		; 00 07
+	addwf	0x7F,w		; 7F 07
+	addwf	extreg,w	;*00n07
+
+	addwf	0x00,f		; 80 07
+	addwf	0x7F,f		; FF 07
+	addwf	extreg,f	;*80n07
+
+	addwf	*0x00,w		; 00 07
+	addwf	*0x7F,w		; 7F 07
+	addwf	*extreg,w	;*00n07
+
+	addwf	*0x00,f		; 80 07
+	addwf	*0x7F,f		; FF 07
+ 	addwf	*extreg,f	;*80n07
+
+	addwf	0x00,0		; 00 07
+	addwf	*0x00,0		; 00 07
+	addwf	extreg,0	;*00n07
+	addwf	*extreg,0	;*00n07
+	addwf	0x00,#0		; 00 07
+	addwf	*0x00,#0	; 00 07
+	addwf	extreg,#0	;*00n07
+	addwf	*extreg,#0	;*00n07
+	addwf	0x00,wcode	; 00 07
+	addwf	*0x00,wcode	; 00 07
+	addwf	extreg,wcode	;*00n07
+	addwf	*extreg,wcode	;*00n07
+	addwf	0x00,#wcode	; 00 07
+	addwf	*0x00,#wcode	; 00 07
+	addwf	extreg,#wcode	;*00n07
+	addwf	*extreg,#wcode	;*00n07
+
+	addwf	0x00,1		; 80 07
+	addwf	*0x00,1		; 80 07
+	addwf	extreg,1	;*80n07
+	addwf	*extreg,1	;*80n07
+	addwf	0x00,#1		; 80 07
+	addwf	*0x00,#1	; 80 07
+	addwf	extreg,#1	;*80n07
+	addwf	*extreg,#1	;*80n07
+	addwf	0x00,fcode	; 80 07
+	addwf	*0x00,fcode	; 80 07
+	addwf	extreg,fcode	;*80n07
+	addwf	*extreg,fcode	;*80n07
+	addwf	0x00,#fcode	; 80 07
+	addwf	*0x00,#fcode	; 80 07
+	addwf	extreg,#fcode	;*80n07
+	addwf	*extreg,#fcode	;*80n07
+
+	movf	0x00,w		; 00 08
+	movf	0x7F,w		; 7F 08
+	movf	extreg,w	;*00n08
+
+	movf	0x00,f		; 80 08
+	movf	0x7F,f		; FF 08
+	movf	extreg,f	;*80n08
+
+	movf	*0x00,w		; 00 08
+	movf	*0x7F,w		; 7F 08
+	movf	*extreg,w	;*00n08
+
+	movf	*0x00,f		; 80 08
+	movf	*0x7F,f		; FF 08
+	movf	*extreg,f	;*80n08
+
+	movf	0x00,0		; 00 08
+	movf	*0x00,0		; 00 08
+	movf	extreg,0	;*00n08
+	movf	*extreg,0	;*00n08
+	movf	0x00,#0		; 00 08
+	movf	*0x00,#0	; 00 08
+	movf	extreg,#0	;*00n08
+	movf	*extreg,#0	;*00n08
+	movf	0x00,wcode	; 00 08
+	movf	*0x00,wcode	; 00 08
+	movf	extreg,wcode	;*00n08
+	movf	*extreg,wcode	;*00n08
+	movf	0x00,#wcode	; 00 08
+	movf	*0x00,#wcode	; 00 08
+	movf	extreg,#wcode	;*00n08
+	movf	*extreg,#wcode	;*00n08
+
+	movf	0x00,1		; 80 08
+	movf	*0x00,1		; 80 08
+	movf	extreg,1	;*80n08
+	movf	*extreg,1	;*80n08
+	movf	0x00,#1		; 80 08
+	movf	*0x00,#1	; 80 08
+	movf	extreg,#1	;*80n08
+	movf	*extreg,#1	;*80n08
+	movf	0x00,fcode	; 80 08
+	movf	*0x00,fcode	; 80 08
+	movf	extreg,fcode	;*80n08
+	movf	*extreg,fcode	;*80n08
+	movf	0x00,#fcode	; 80 08
+	movf	*0x00,#fcode	; 80 08
+	movf	extreg,#fcode	;*80n08
+	movf	*extreg,#fcode	;*80n08
+
+	comf	0x00,w		; 00 09
+	comf	0x7F,w		; 7F 09
+	comf	extreg,w	;*00n09
+
+	comf	0x00,f		; 80 09
+	comf	0x7F,f		; FF 09
+ 	comf	extreg,f	;*80n09
+
+	comf	*0x00,w		; 00 09
+	comf	*0x7F,w		; 7F 09
+	comf	*extreg,w	;*00n09
+
+	comf	*0x00,f		; 80 09
+	comf	*0x7F,f		; FF 09
+ 	comf	*extreg,f	;*80n09
+
+	comf	0x00,0		; 00 09
+	comf	*0x00,0		; 00 09
+	comf	extreg,0	;*00n09
+	comf	*extreg,0	;*00n09
+	comf	0x00,#0		; 00 09
+	comf	*0x00,#0	; 00 09
+	comf	extreg,#0	;*00n09
+	comf	*extreg,#0	;*00n09
+	comf	0x00,wcode	; 00 09
+	comf	*0x00,wcode	; 00 09
+	comf	extreg,wcode	;*00n09
+	comf	*extreg,wcode	;*00n09
+	comf	0x00,#wcode	; 00 09
+	comf	*0x00,#wcode	; 00 09
+	comf	extreg,#wcode	;*00n09
+	comf	*extreg,#wcode	;*00n09
+
+	comf	0x00,1		; 80 09
+	comf	*0x00,1		; 80 09
+	comf	extreg,1	;*80n09
+	comf	*extreg,1	;*80n09
+	comf	0x00,#1		; 80 09
+	comf	*0x00,#1	; 80 09
+	comf	extreg,#1	;*80n09
+	comf	*extreg,#1	;*80n09
+	comf	0x00,fcode	; 80 09
+	comf	*0x00,fcode	; 80 09
+	comf	extreg,fcode	;*80n09
+	comf	*extreg,fcode	;*80n09
+	comf	0x00,#fcode	; 80 09
+	comf	*0x00,#fcode	; 80 09
+	comf	extreg,#fcode	;*80n09
+	comf	*extreg,#fcode	;*80n09
+
+	incf	0x00,w		; 00 0A
+	incf	0x7F,w		; 7F 0A
+	incf	extreg,w	;*00n0A
+
+	incf	0x00,f		; 80 0A
+	incf	0x7F,f		; FF 0A
+	incf	extreg,f	;*80n0A
+
+	incf	*0x00,w		; 00 0A
+	incf	*0x7F,w		; 7F 0A
+	incf	*extreg,w	;*00n0A
+
+	incf	*0x00,f		; 80 0A
+	incf	*0x7F,f		; FF 0A
+	incf	*extreg,f	;*80n0A
+
+	incf	0x00,0		; 00 0A
+	incf	*0x00,0		; 00 0A
+	incf	extreg,0	;*00n0A
+	incf	*extreg,0	;*00n0A
+	incf	0x00,#0		; 00 0A
+	incf	*0x00,#0	; 00 0A
+	incf	extreg,#0	;*00n0A
+	incf	*extreg,#0	;*00n0A
+	incf	0x00,wcode	; 00 0A
+	incf	*0x00,wcode	; 00 0A
+	incf	extreg,wcode	;*00n0A
+	incf	*extreg,wcode	;*00n0A
+	incf	0x00,#wcode	; 00 0A
+	incf	*0x00,#wcode	; 00 0A
+	incf	extreg,#wcode	;*00n0A
+	incf	*extreg,#wcode	;*00n0A
+
+	incf	0x00,1		; 80 0A
+	incf	*0x00,1		; 80 0A
+	incf	extreg,1	;*80n0A
+	incf	*extreg,1	;*80n0A
+	incf	0x00,#1		; 80 0A
+	incf	*0x00,#1	; 80 0A
+	incf	extreg,#1	;*80n0A
+	incf	*extreg,#1	;*80n0A
+	incf	0x00,fcode	; 80 0A
+	incf	*0x00,fcode	; 80 0A
+	incf	extreg,fcode	;*80n0A
+	incf	*extreg,fcode	;*80n0A
+	incf	0x00,#fcode	; 80 0A
+	incf	*0x00,#fcode	; 80 0A
+	incf	extreg,#fcode	;*80n0A
+	incf	*extreg,#fcode	;*80n0A
+
+	decfsz	0x00,w		; 00 0B
+	decfsz	0x7F,w		; 7F 0B
+	decfsz	extreg,w	;*00n0B
+
+	decfsz	0x00,f		; 80 0B
+	decfsz	0x7F,f		; FF 0B
+	decfsz	extreg,f	;*80n0B
+
+	decfsz	*0x00,w		; 00 0B
+	decfsz	*0x7F,w		; 7F 0B
+	decfsz	*extreg,w	;*00n0B
+
+	decfsz	*0x00,f		; 80 0B
+	decfsz	*0x7F,f		; FF 0B
+ 	decfsz	*extreg,f	;*80n0B
+
+	decfsz	0x00,0		; 00 0B
+	decfsz	*0x00,0		; 00 0B
+	decfsz	extreg,0	;*00n0B
+	decfsz	*extreg,0	;*00n0B
+	decfsz	0x00,#0		; 00 0B
+	decfsz	*0x00,#0	; 00 0B
+	decfsz	extreg,#0	;*00n0B
+	decfsz	*extreg,#0	;*00n0B
+	decfsz	0x00,wcode	; 00 0B
+	decfsz	*0x00,wcode	; 00 0B
+	decfsz	extreg,wcode	;*00n0B
+	decfsz	*extreg,wcode	;*00n0B
+	decfsz	0x00,#wcode	; 00 0B
+	decfsz	*0x00,#wcode	; 00 0B
+	decfsz	extreg,#wcode	;*00n0B
+	decfsz	*extreg,#wcode	;*00n0B
+
+	decfsz	0x00,1		; 80 0B
+	decfsz	*0x00,1		; 80 0B
+	decfsz	extreg,1	;*80n0B
+	decfsz	*extreg,1	;*80n0B
+	decfsz	0x00,#1		; 80 0B
+	decfsz	*0x00,#1	; 80 0B
+	decfsz	extreg,#1	;*80n0B
+	decfsz	*extreg,#1	;*80n0B
+	decfsz	0x00,fcode	; 80 0B
+	decfsz	*0x00,fcode	; 80 0B
+	decfsz	extreg,fcode	;*80n0B
+	decfsz	*extreg,fcode	;*80n0B
+	decfsz	0x00,#fcode	; 80 0B
+	decfsz	*0x00,#fcode	; 80 0B
+	decfsz	extreg,#fcode	;*80n0B
+	decfsz	*extreg,#fcode	;*80n0B
+
+	rrf	0x00,w		; 00 0C
+	rrf	0x7F,w		; 7F 0C
+	rrf	extreg,w	;*00n0C
+
+	rrf	0x00,f		; 80 0C
+	rrf	0x7F,f		; FF 0C
+	rrf	extreg,f	;*80n0C
+
+	rrf	*0x00,w		; 00 0C
+	rrf	*0x7F,w		; 7F 0C
+	rrf	*extreg,w	;*00n0C
+
+	rrf	*0x00,f		; 80 0C
+	rrf	*0x7F,f		; FF 0C
+ 	rrf	*extreg,f	;*80n0C
+
+	rrf	0x00,0		; 00 0C
+	rrf	*0x00,0		; 00 0C
+	rrf	extreg,0	;*00n0C
+	rrf	*extreg,0	;*00n0C
+	rrf	0x00,#0		; 00 0C
+	rrf	*0x00,#0	; 00 0C
+	rrf	extreg,#0	;*00n0C
+	rrf	*extreg,#0	;*00n0C
+	rrf	0x00,wcode	; 00 0C
+	rrf	*0x00,wcode	; 00 0C
+	rrf	extreg,wcode	;*00n0C
+	rrf	*extreg,wcode	;*00n0C
+	rrf	0x00,#wcode	; 00 0C
+	rrf	*0x00,#wcode	; 00 0C
+	rrf	extreg,#wcode	;*00n0C
+	rrf	*extreg,#wcode	;*00n0C
+
+	rrf	0x00,1		; 80 0C
+	rrf	*0x00,1		; 80 0C
+	rrf	extreg,1	;*80n0C
+	rrf	*extreg,1	;*80n0C
+	rrf	0x00,#1		; 80 0C
+	rrf	*0x00,#1	; 80 0C
+	rrf	extreg,#1	;*80n0C
+	rrf	*extreg,#1	;*80n0C
+	rrf	0x00,fcode	; 80 0C
+	rrf	*0x00,fcode	; 80 0C
+	rrf	extreg,fcode	;*80n0C
+	rrf	*extreg,fcode	;*80n0C
+	rrf	0x00,#fcode	; 80 0C
+	rrf	*0x00,#fcode	; 80 0C
+	rrf	extreg,#fcode	;*80n0C
+	rrf	*extreg,#fcode	;*80n0C
+
+	rlf	0x00,w		; 00 0D
+	rlf	0x7F,w		; 7F 0D
+	rlf	extreg,w	;*00n0D
+
+	rlf	0x00,f		; 80 0D
+	rlf	0x7F,f		; FF 0D
+	rlf	extreg,f	;*80n0D
+
+	rlf	*0x00,w		; 00 0D
+	rlf	*0x7F,w		; 7F 0D
+	rlf	*extreg,w	;*00n0D
+
+	rlf	*0x00,f		; 80 0D
+	rlf	*0x7F,f		; FF 0D
+	rlf	*extreg,f	;*80n0D
+
+	rlf	0x00,0		; 00 0D
+	rlf	*0x00,0		; 00 0D
+	rlf	extreg,0	;*00n0D
+	rlf	*extreg,0	;*00n0D
+	rlf	0x00,#0		; 00 0D
+	rlf	*0x00,#0	; 00 0D
+	rlf	extreg,#0	;*00n0D
+	rlf	*extreg,#0	;*00n0D
+	rlf	0x00,wcode	; 00 0D
+	rlf	*0x00,wcode	; 00 0D
+	rlf	extreg,wcode	;*00n0D
+	rlf	*extreg,wcode	;*00n0D
+	rlf	0x00,#wcode	; 00 0D
+	rlf	*0x00,#wcode	; 00 0D
+	rlf	extreg,#wcode	;*00n0D
+	rlf	*extreg,#wcode	;*00n0D
+
+	rlf	0x00,1		; 80 0D
+	rlf	*0x00,1		; 80 0D
+	rlf	extreg,1	;*80n0D
+	rlf	*extreg,1	;*80n0D
+	rlf	0x00,#1		; 80 0D
+	rlf	*0x00,#1	; 80 0D
+	rlf	extreg,#1	;*80n0D
+	rlf	*extreg,#1	;*80n0D
+	rlf	0x00,fcode	; 80 0D
+	rlf	*0x00,fcode	; 80 0D
+	rlf	extreg,fcode	;*80n0D
+	rlf	*extreg,fcode	;*80n0D
+	rlf	0x00,#fcode	; 80 0D
+	rlf	*0x00,#fcode	; 80 0D
+	rlf	extreg,#fcode	;*80n0D
+	rlf	*extreg,#fcode	;*80n0D
+
+	swapf	0x00,w		; 00 0E
+	swapf	0x7F,w		; 7F 0E
+	swapf	extreg,w	;*00n0E
+
+	swapf	0x00,f		; 80 0E
+	swapf	0x7F,f		; FF 0E
+	swapf	extreg,f	;*80n0E
+
+	swapf	*0x00,w		; 00 0E
+	swapf	*0x7F,w		; 7F 0E
+	swapf	*extreg,w	;*00n0E
+
+	swapf	*0x00,f		; 80 0E
+	swapf	*0x7F,f		; FF 0E
+	swapf	*extreg,f	;*80n0E
+
+	swapf	0x00,0		; 00 0E
+	swapf	*0x00,0		; 00 0E
+	swapf	extreg,0	;*00n0E
+	swapf	*extreg,0	;*00n0E
+	swapf	0x00,#0		; 00 0E
+	swapf	*0x00,#0	; 00 0E
+	swapf	extreg,#0	;*00n0E
+	swapf	*extreg,#0	;*00n0E
+	swapf	0x00,wcode	; 00 0E
+	swapf	*0x00,wcode	; 00 0E
+	swapf	extreg,wcode	;*00n0E
+	swapf	*extreg,wcode	;*00n0E
+	swapf	0x00,#wcode	; 00 0E
+	swapf	*0x00,#wcode	; 00 0E
+	swapf	extreg,#wcode	;*00n0E
+	swapf	*extreg,#wcode	;*00n0E
+
+	swapf	0x00,1		; 80 0E
+	swapf	*0x00,1		; 80 0E
+	swapf	extreg,1	;*80n0E
+	swapf	*extreg,1	;*80n0E
+	swapf	0x00,#1		; 80 0E
+	swapf	*0x00,#1	; 80 0E
+	swapf	extreg,#1	;*80n0E
+	swapf	*extreg,#1	;*80n0E
+	swapf	0x00,fcode	; 80 0E
+	swapf	*0x00,fcode	; 80 0E
+	swapf	extreg,fcode	;*80n0E
+	swapf	*extreg,fcode	;*80n0E
+	swapf	0x00,#fcode	; 80 0E
+	swapf	*0x00,#fcode	; 80 0E
+	swapf	extreg,#fcode	;*80n0E
+	swapf	*extreg,#fcode	;*80n0E
+
+	incfsz	0x00,w		; 00 0F
+	incfsz	0x7F,w		; 7F 0F
+	incfsz	extreg,w	;*00n0F
+
+	incfsz	0x00,f		; 80 0F
+	incfsz	0x7F,f		; FF 0F
+	incfsz	extreg,f	;*80n0F
+
+	incfsz	*0x00,w		; 00 0F
+	incfsz	*0x7F,w		; 7F 0F
+	incfsz	*extreg,w	;*00n0F
+
+	incfsz	*0x00,f		; 80 0F
+	incfsz	*0x7F,f		; FF 0F
+	incfsz	*extreg,f	;*80n0F
+
+	incfsz	0x00,0		; 00 0F
+	incfsz	*0x00,0		; 00 0F
+	incfsz	extreg,0	;*00n0F
+	incfsz	*extreg,0	;*00n0F
+	incfsz	0x00,#0		; 00 0F
+	incfsz	*0x00,#0	; 00 0F
+	incfsz	extreg,#0	;*00n0F
+	incfsz	*extreg,#0	;*00n0F
+	incfsz	0x00,wcode	; 00 0F
+	incfsz	*0x00,wcode	; 00 0F
+	incfsz	extreg,wcode	;*00n0F
+	incfsz	*extreg,wcode	;*00n0F
+	incfsz	0x00,#wcode	; 00 0F
+	incfsz	*0x00,#wcode	; 00 0F
+	incfsz	extreg,#wcode	;*00n0F
+	incfsz	*extreg,#wcode	;*00n0F
+
+	incfsz	0x00,1		; 80 0F
+	incfsz	*0x00,1		; 80 0F
+	incfsz	extreg,1	;*80n0F
+	incfsz	*extreg,1	;*80n0F
+	incfsz	0x00,#1		; 80 0F
+	incfsz	*0x00,#1	; 80 0F
+	incfsz	extreg,#1	;*80n0F
+	incfsz	*extreg,#1	;*80n0F
+	incfsz	0x00,fcode	; 80 0F
+	incfsz	*0x00,fcode	; 80 0F
+	incfsz	extreg,fcode	;*80n0F
+	incfsz	*extreg,fcode	;*80n0F
+	incfsz	0x00,#fcode	; 80 0F
+	incfsz	*0x00,#fcode	; 80 0F
+	incfsz	extreg,#fcode	;*80n0F
+	incfsz	*extreg,#fcode	;*80n0F
+
+	bcf	0x00,0		; 00 10
+	bcf	0x7F,0		; 7F 10
+	bcf	extreg,0	;*00n10
+
+	bcf	0x00,7		; 80 13
+	bcf	0x7F,7		; FF 13
+	bcf	extreg,7	;*80n13
+
+	bcf	*0x00,0		; 00 10
+	bcf	*0x7F,0		; 7F 10
+	bcf	*extreg,0	;*00n10
+
+	bcf	*0x00,7		; 80 13
+	bcf	*0x7F,7		; FF 13
+	bcf	*extreg,7	;*80n13
+
+	bcf	0x00,num0	; 00 10
+	bcf	*0x00,num0	; 00 10
+	bcf	extreg,num0	;*00n10
+	bcf	*extreg,num0	;*00n10
+	bcf	0x00,#num0	; 00 10
+	bcf	*0x00,#num0	; 00 10
+	bcf	extreg,#num0	;*00n10
+	bcf	*extreg,#num0	;*00n10
+	bcf	0x00,num7	; 80 13
+	bcf	*0x00,num7	; 80 13
+	bcf	extreg,num7	;*80n13
+	bcf	*extreg,num7	;*80n13
+	bcf	0x00,#num7	; 80 13
+	bcf	*0x00,#num7	; 80 13
+	bcf	extreg,#num7	;*80n13
+	bcf	*extreg,#num7	;*80n13
+
+	bsf	0x00,0		; 00 14
+	bsf	0x7F,0		; 7F 14
+	bsf	extreg,0	;*00n14
+
+	bsf	0x00,7		; 80 17
+	bsf	0x7F,7		; FF 17
+	bsf	extreg,7	;*80n17
+
+	bsf	*0x00,0		; 00 14
+	bsf	*0x7F,0		; 7F 14
+	bsf	*extreg,0	;*00n14
+
+	bsf	*0x00,7		; 80 17
+	bsf	*0x7F,7		; FF 17
+ 	bsf	*extreg,7	;*80n17
+
+	bsf	0x00,num0	; 00 14
+	bsf	*0x00,num0	; 00 14
+	bsf	extreg,num0	;*00n14
+	bsf	*extreg,num0	;*00n14
+	bsf	0x00,#num0	; 00 14
+	bsf	*0x00,#num0	; 00 14
+	bsf	extreg,#num0	;*00n14
+	bsf	*extreg,#num0	;*00n14
+	bsf	0x00,num7	; 80 17
+	bsf	*0x00,num7	; 80 17
+	bsf	extreg,num7	;*80n17
+	bsf	*extreg,num7	;*80n17
+	bsf	0x00,#num7	; 80 17
+	bsf	*0x00,#num7	; 80 17
+	bsf	extreg,#num7	;*80n17
+	bsf	*extreg,#num7	;*80n17
+
+	btfsc	0x00,0		; 00 18
+	btfsc	0x7F,0		; 7F 18
+	btfsc	extreg,0	;*00n18
+
+	btfsc	0x00,7		; 80 1B
+	btfsc	0x7F,7		; FF 1B
+	btfsc	extreg,7	;*80n1B
+
+	btfsc	*0x00,0		; 00 18
+	btfsc	*0x7F,0		; 7F 18
+	btfsc	*extreg,0	;*00n18
+
+	btfsc	*0x00,7		; 80 1B
+	btfsc	*0x7F,7		; FF 1B
+	btfsc	*extreg,7	;*80n1B
+
+	btfsc	0x00,num0	; 00 18
+	btfsc	*0x00,num0	; 00 18
+	btfsc	extreg,num0	;*00n18
+	btfsc	*extreg,num0	;*00n18
+	btfsc	0x00,#num0	; 00 18
+	btfsc	*0x00,#num0	; 00 18
+	btfsc	extreg,#num0	;*00n18
+	btfsc	*extreg,#num0	;*00n18
+	btfsc	0x00,num7	; 80 1B
+	btfsc	*0x00,num7	; 80 1B
+	btfsc	extreg,num7	;*80n1B
+	btfsc	*extreg,num7	;*80n1B
+	btfsc	0x00,#num7	; 80 1B
+	btfsc	*0x00,#num7	; 80 1B
+	btfsc	extreg,#num7	;*80n1B
+	btfsc	*extreg,#num7	;*80n1B
+
+	btfss	0x00,0		; 00 1C
+	btfss	0x7F,0		; 7F 1C
+	btfss	extreg,0	;*00n1C
+
+	btfss	0x00,7		; 80 1F
+	btfss	0x7F,7		; FF 1F
+	btfss	extreg,7	;*80n1F
+
+	btfss	*0x00,0		; 00 1C
+	btfss	*0x7F,0		; 7F 1C
+	btfss	*extreg,0	;*00n1C
+
+	btfss	*0x00,7		; 80 1F
+	btfss	*0x7F,7		; FF 1F
+	btfss	*extreg,7	;*80n1F
+
+	btfss	0x00,num0	; 00 1C
+	btfss	*0x00,num0	; 00 1C
+	btfss	extreg,num0	;*00n1C
+	btfss	*extreg,num0	;*00n1C
+	btfss	0x00,#num0	; 00 1C
+	btfss	*0x00,#num0	; 00 1C
+	btfss	extreg,#num0	;*00n1C
+	btfss	*extreg,#num0	;*00n1C
+	btfss	0x00,num7	; 80 1F
+	btfss	*0x00,num7	; 80 1F
+	btfss	extreg,num7	;*80n1F
+	btfss	*extreg,num7	;*80n1F
+	btfss	0x00,#num7	; 80 1F
+	btfss	*0x00,#num7	; 80 1F
+	btfss	extreg,#num7	;*80n1F
+	btfss	*extreg,#num7	;*80n1F
+
+	retlw	0x00		; 00 34
+	retlw	0xFF		; FF 34
+	retlw	extvalu		;r00s34
+
+	retlw	#0x00		; 00 34
+	retlw	#0xFF		; FF 34
+	retlw	#extvalu	;r00s34
+
+	call	0x00		; 00 20
+	call	0x7FF		; FF 27
+
+	call	addr_00		;r00s20
+	call	addr_7FF	;rFFs27
+
+	call	extaddr		;r00s20
+
+	goto	0x00		; 00 28
+	goto	0x7FF		; FF 2F
+
+	goto	addr_00		;r00s28
+	goto	addr_7FF	;rFFs2F
+
+	goto	extaddr		;r00s28
+
+	movlw	0x00		; 00 30
+	movlw	0xFF		; FF 30
+	movlw	extvalu		;r00s30
+
+	movlw	#0x00		; 00 30
+	movlw	#0xFF		; FF 30
+	movlw	#extvalu	;r00s30
+
+	iorlw	0x00		; 00 38
+	iorlw	0xFF		; FF 38
+	iorlw	extvalu		;r00s38
+
+	iorlw	#0x00		; 00 38
+	iorlw	#0xFF		; FF 38
+	iorlw	#extvalu	;r00s38
+
+	andlw	0x00		; 00 39
+	andlw	0xFF		; FF 39
+	andlw	extvalu		;r00s39
+
+	andlw	#0x00		; 00 39
+	andlw	#0xFF		; FF 39
+	andlw	#extvalu	;r00s39
+
+	xorlw	0x00		; 00 3A
+	xorlw	0xFF		; FF 3A
+	xorlw	extvalu		;r00s3A
+
+	xorlw	#0x00		; 00 3A
+	xorlw	#0xFF		; FF 3A
+	xorlw	#extvalu	;r00s3A
+
+	sublw	0x00		; 00 3C
+	sublw	0xFF		; FF 3C
+	sublw	extvalu		;r00s3C
+
+	sublw	#0x00		; 00 3C
+	sublw	#0xFF		; FF 3C
+	sublw	#extvalu	;r00s3C
+
+	addlw	0x00		; 00 3E
+	addlw	0xFF		; FF 3E
+	addlw	extvalu		;r00s3E
+
+	addlw	#0x00		; 00 3E
+	addlw	#0xFF		; FF 3E
+	addlw	#extvalu	;r00s3E
 
 

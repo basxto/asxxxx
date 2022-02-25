@@ -14,6 +14,7 @@ make as6811
 make as6812
 make as6816
 make as61860
+make as8048
 make as8051
 make as8085
 make asez80
@@ -26,6 +27,7 @@ make asf2mc8
 make ash8
 make asavr
 make aspic
+make asscmp
 make ascheck
 make aslink
 make asxscn

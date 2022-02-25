@@ -1,8 +1,21 @@
 /* avrmch.c */
 
 /*
- * (C) Copyright 2001-2006
- * All Rights Reserved
+ *  Copyright (C) 2001-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -11,6 +24,9 @@
 
 #include "asxxxx.h"
 #include "avr.h"
+
+char	*cpu	= "Atmel AVR 8-Bit RISC";
+char	*dsft	= "asm";
 
 static char buff[80];
 static int avr_4k;
@@ -218,7 +234,7 @@ struct mne *mp;
 		if (!is_abs(&e) || (e.e_addr < 16) || (e.e_addr > 31)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (is_abs(&e1)) {
 			if (e1.e_addr > 255)
@@ -239,7 +255,7 @@ struct mne *mp;
 		if (!is_abs(&e) || (e.e_addr < 16) || (e.e_addr > 31)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (is_abs(&e1)) {
 			if (e1.e_addr > 255)
@@ -268,7 +284,7 @@ struct mne *mp;
 		if (!is_abs(&e) || ((e.e_addr & 0x19) != 0x18)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (is_abs(&e1)) {
 			if (e1.e_addr > 63)
@@ -323,7 +339,7 @@ struct mne *mp;
 		if (!is_abs(&e) ||  (e.e_addr > 31)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (!is_abs(&e1) ||  (e1.e_addr > 31)) {
 			aerr();
@@ -349,7 +365,7 @@ struct mne *mp;
 		if (!is_abs(&e) || (e.e_addr > 31) || (e.e_addr & 0x01)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (!is_abs(&e1) || (e1.e_addr > 31) || (e1.e_addr & 0x01)) {
 			aerr();
@@ -379,7 +395,7 @@ struct mne *mp;
 		if (!is_abs(&e) ||  (e.e_addr > 31)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (!is_abs(&e1) ||  (e1.e_addr > 31)) {
 			aerr();
@@ -409,7 +425,7 @@ struct mne *mp;
 		if (!is_abs(&e) || (e.e_addr < 16) || (e.e_addr > 31)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (!is_abs(&e1) || (e1.e_addr < 16) || (e1.e_addr > 31)) {
 			aerr();
@@ -442,7 +458,7 @@ struct mne *mp;
 		if (!is_abs(&e) || (e.e_addr < 16) || (e.e_addr > 23)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (!is_abs(&e1) || (e1.e_addr < 16) || (e1.e_addr > 23)) {
 			aerr();
@@ -480,7 +496,7 @@ struct mne *mp;
 		if (!is_abs(&e) ||  (e.e_addr > 31)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		expr(&e1, 0);
 		abscheck(&e1);
 		if (e1.e_addr > 7)
@@ -509,7 +525,7 @@ struct mne *mp;
 		abscheck(&e);
 		if (e.e_addr > 7)
 			aerr();
-		comma();
+		comma(1);
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
 			v = (int) (e1.e_addr - dot.s_addr - 1);
@@ -565,7 +581,7 @@ struct mne *mp;
 		if ((t != S_IMMED) && (t != S_EXT)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		expr(&e1, 0);
 		abscheck(&e1);
 		if (e1.e_addr > 7)
@@ -582,7 +598,7 @@ struct mne *mp;
 		if (!is_abs(&e) ||  (e.e_addr > 31)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (is_abs(&e1)) {
 			if (e1.e_addr > 63)
@@ -603,7 +619,7 @@ struct mne *mp;
 		if ((t != S_IMMED) && (t != S_EXT)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		/*
 		 * The addressing mode can be S_REG
 		 * or any constant from 0 to 31.
@@ -624,7 +640,7 @@ struct mne *mp;
 		if (!is_abs(&e) || (e.e_addr > 31)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (t1 != S_IND)
 			aerr();
@@ -655,7 +671,7 @@ struct mne *mp;
 		}
 #endif
 
-		comma();
+		comma(1);
 		/*
 		 * The addressing mode can be S_REG
 		 * or any constant from 0 to 31.
@@ -684,7 +700,7 @@ struct mne *mp;
 		if (!is_abs(&e) || (e.e_addr > 31)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		c = getnb();
 		if (getnb() != '+')
 			qerr();
@@ -730,7 +746,7 @@ struct mne *mp;
 		if ((t != S_IMMED) && (t != S_EXT)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		/*
 		 * The addressing mode can be S_REG
 		 * or any constant from 0 to 31.
@@ -770,7 +786,7 @@ struct mne *mp;
 		if (!is_abs(&e) ||  (e.e_addr > 31)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (t1 != S_EXT)
 			aerr();
@@ -790,7 +806,7 @@ struct mne *mp;
 		t = addr(&e);
 		if (t != S_EXT)
 			aerr();
-		comma();
+		comma(1);
 		/*
 		 * The addressing mode can be S_REG
 		 * or any constant from 0 to 31.
@@ -822,7 +838,7 @@ struct mne *mp;
 			if (!is_abs(&e) ||  (e.e_addr > 31)) {
 				aerr();
 			}
-			comma();
+			comma(1);
 			t1 = addr(&e1);
 			if (t1 != S_IND)
 				aerr();
@@ -868,7 +884,7 @@ struct mne *mp;
 			if (!is_abs(&e) ||  (e.e_addr > 31)) {
 				aerr();
 			}
-			comma();
+			comma(1);
 			t1 = addr(&e1);
 			if (t1 != S_IND)
 				aerr();
@@ -1097,23 +1113,17 @@ struct expr *esp;
 }
 
 /*
- * Is the next character a comma ?
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine specific initialization
  */
 
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 0;
+
 	avr_4k = 0;
 	if (pass == 0) {
 		avr_bytes = 0;

@@ -1,44 +1,43 @@
 # Symantec SC++ generated .dpd file. V: 7200
-r:\asxv4pxx\asxmak\symantec\build\asdata.OBJ: \
+..\build\asdata.OBJ: \
 	..\..\..\asxxsrc\asdata.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\asdbg.OBJ: \
+..\build\asdbg.OBJ: \
 	..\..\..\asxxsrc\asdbg.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\asexpr.OBJ: \
+..\build\asexpr.OBJ: \
 	..\..\..\asxxsrc\asexpr.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\aslex.OBJ: \
+..\build\aslex.OBJ: \
 	..\..\..\asxxsrc\aslex.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\aslist.OBJ: \
+..\build\aslist.OBJ: \
 	..\..\..\asxxsrc\aslist.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\asmain.OBJ: \
+..\build\asmain.OBJ: \
 	..\..\..\asxxsrc\asmain.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\asout.OBJ: \
+..\build\asout.OBJ: \
 	..\..\..\asxxsrc\asout.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\assubr.OBJ: \
+..\build\assubr.OBJ: \
 	..\..\..\asxxsrc\assubr.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\assym.OBJ: \
+..\build\assym.OBJ: \
 	..\..\..\asxxsrc\assym.c \
 	..\..\..\ASXXSRC\asxxxx.h 
-r:\asxv4pxx\asxmak\symantec\build\chkadr.OBJ: \
+..\build\chkadr.OBJ: \
 	..\..\..\ascheck\chkadr.c \
 	..\..\..\asxxsrc\asxxxx.h \
 	..\..\..\ASCHECK\chk.h 
-r:\asxv4pxx\asxmak\symantec\build\chkext.OBJ: \
-	..\..\..\ascheck\chkext.c \
-	..\..\..\asxxsrc\asxxxx.h \
-	..\..\..\ASCHECK\chk.h 
-r:\asxv4pxx\asxmak\symantec\build\chkmch.OBJ: \
+..\build\chkmch.OBJ: \
 	..\..\..\ascheck\chkmch.c \
 	..\..\..\asxxsrc\asxxxx.h \
 	..\..\..\ASCHECK\chk.h 
-r:\asxv4pxx\asxmak\symantec\build\chkpst.OBJ: \
+..\build\chkpst.OBJ: \
 	..\..\..\ascheck\chkpst.c \
 	..\..\..\asxxsrc\asxxxx.h \
 	..\..\..\ASCHECK\chk.h 
+..\build\asmcro.OBJ: \
+	..\..\..\asxxsrc\asmcro.c \
+	..\..\..\ASXXSRC\asxxxx.h 

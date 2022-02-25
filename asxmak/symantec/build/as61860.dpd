@@ -1,39 +1,4 @@
 # Symantec SC++ generated .dpd file. V: 7200
-.\asdata.OBJ: \
-	..\..\..\asxxsrc\asdata.c \
-	..\..\..\ASXXSRC\asxxxx.h 
-.\asdbg.OBJ: \
-	..\..\..\asxxsrc\asdbg.c \
-	..\..\..\ASXXSRC\asxxxx.h 
-.\asexpr.OBJ: \
-	..\..\..\asxxsrc\asexpr.c \
-	..\..\..\ASXXSRC\asxxxx.h 
-.\aslex.OBJ: \
-	..\..\..\asxxsrc\aslex.c \
-	..\..\..\ASXXSRC\asxxxx.h 
-.\aslist.OBJ: \
-	..\..\..\asxxsrc\aslist.c \
-	..\..\..\ASXXSRC\asxxxx.h 
-.\asmain.OBJ: \
-	..\..\..\asxxsrc\asmain.c \
-	..\..\..\ASXXSRC\asxxxx.h 
-.\asout.OBJ: \
-	..\..\..\asxxsrc\asout.c \
-	..\..\..\ASXXSRC\asxxxx.h 
-.\assubr.OBJ: \
-	..\..\..\asxxsrc\assubr.c \
-	..\..\..\ASXXSRC\asxxxx.h 
-.\assym.OBJ: \
-	..\..\..\asxxsrc\assym.c \
-	..\..\..\ASXXSRC\asxxxx.h 
-.\s6186adr.OBJ: \
-	..\..\..\as61860\s6186adr.c \
-	..\..\..\asxxsrc\asxxxx.h \
-	..\..\..\AS61860\s61860.h 
-.\s6186ext.OBJ: \
-	..\..\..\as61860\s6186ext.c \
-	..\..\..\asxxsrc\asxxxx.h \
-	..\..\..\AS61860\s61860.h 
 .\s6186mch.OBJ: \
 	..\..\..\as61860\s6186mch.c \
 	..\..\..\asxxsrc\asxxxx.h \

@@ -1,8 +1,21 @@
 /* picmch.c */
 
 /*
- * (C) Copyright 2001-2007
- * All Rights Reserved
+ *  Copyright (C) 2001-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -17,6 +30,9 @@
 
 #include "asxxxx.h"
 #include "pic.h"
+
+char	*cpu	= "Microchip Technology Inc.,  [User Defined]";
+char	*dsft	= "asm";
 
 static char buff[NINPUT];
 static char pic_cpu[80];
@@ -95,7 +111,7 @@ struct mne *mp;
 			}
 			br = brp;
 			br->b_lo = e1.e_addr;
-			br->b_hi = ~0;
+			br->b_hi = ~((a_uint) 0);
 			if (is_abs(&e1) == 0) {
 				err('e');
 			}
@@ -149,7 +165,9 @@ struct mne *mp;
 		 */
 		if (more()) {
 			cp = p = id;
-			d = getnb();
+			if ((d = getnb()) == '^') {
+				d = get();
+			}
 			while ((c = get()) != d) {
 				if (c == '\0') {
 					qerr();
@@ -255,7 +273,9 @@ struct mne *mp;
 			qerr();
 		}
 		p = id;
-		d = getnb();
+		if ((d = getnb()) == '^') {
+			d = get();
+		}
 		while ((c = get()) != d) {
 			if (c == '\0') {
 				qerr();
@@ -270,12 +290,14 @@ struct mne *mp;
 		/*
 		 * Get the mnemonic
 		 */
-		comma();
+		comma(1);
 		if (!more()) {
 			qerr();
 		}
 		p = picmne;
-		d = getnb();
+		if ((d = getnb()) == '^') {
+			d = get();
+		}
 		while ((c = get()) != d) {
 			if (c == '\0') {
 				qerr();
@@ -290,7 +312,7 @@ struct mne *mp;
 		/*
 		 * Get the new opcode value
 		 */
-		comma();
+		comma(1);
 		if (!more()) {
 			qerr();
 		}
@@ -367,7 +389,12 @@ struct mne *mp;
 		if (more()) {
 			expr(&e1, 0);
 			abscheck(&e1);
-			e1.e_addr *= 0x20;
+			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
+				if (e1.e_addr & 0x1F) {
+					err('b');
+				}
+			}
+			e1.e_addr &= ~((a_uint) 0x1F);
 			if ((c = getnb()) == ',') {
 				getid(id, -1);
 				espa = alookup(id);
@@ -379,7 +406,7 @@ struct mne *mp;
 			}
 			pic_fsr = e1.e_addr;
 		} else {
-			pic_fsr = ~0;
+			pic_fsr = 0;
 		}
 		if (espa) {
 			outdp(espa, &e1, 0);
@@ -396,7 +423,7 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* d */
 		if (t2 == S_WREG) {
 			e2.e_addr = 0;
@@ -405,7 +432,7 @@ struct mne *mp;
 			e2.e_addr = 1;
 		} else {
 			abscheck(&e2);
-			if (e2.e_addr & ~0x01) {
+			if (e2.e_addr & ~((a_uint) 0x01)) {
 				aerr();
 				e2.e_addr &= 0x01;
 			}
@@ -448,13 +475,13 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* b */
 		if ((t2 != S_IMMED) && (t2 != S_EXT)) {
 			aerr();
 		}
 		abscheck(&e2);
-		if (e2.e_addr & ~0x07) {
+		if (e2.e_addr & ~((a_uint) 0x07)) {
 			aerr();
 			e2.e_addr &= 0x07;
 		}
@@ -536,16 +563,14 @@ struct mne *mp;
 }
 
 /*
- * File Select Register Map
+ * Select Register File Map
  */
 VOID
 mch12fsr(esp)
 struct expr *esp;
 {
-	if (pic_fsr != ~0) {
-		if ((esp->e_addr & ~0x1F) != pic_fsr) {
-			aerr();
-		}
+	if ((esp->e_addr & ~((a_uint) 0x1F)) != pic_fsr) {
+		aerr();
 	}
 }
 
@@ -580,11 +605,13 @@ struct mne *mp;
 		espa = NULL;
 		if (more()) {
 			expr(&e1, 0);
+			abscheck(&e1);
 			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
 				if (e1.e_addr & 0x7F) {
 					err('b');
 				}
 			}
+			e1.e_addr &= ~((a_uint) 0x7F);
 			if ((c = getnb()) == ',') {
 				getid(id, -1);
 				espa = alookup(id);
@@ -594,6 +621,9 @@ struct mne *mp;
 			} else {
 				unget(c);
 			}
+			pic_fsr = e1.e_addr;
+		} else {
+			pic_fsr = 0;
 		}
 		if (espa) {
 			outdp(espa, &e1, 0);
@@ -610,7 +640,7 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* d */
 		if (t2 == S_WREG) {
 			e2.e_addr = 0;
@@ -619,7 +649,7 @@ struct mne *mp;
 			e2.e_addr = 1;
 		} else {
 			abscheck(&e2);
-			if (e2.e_addr & ~0x01) {
+			if (e2.e_addr & ~((a_uint) 0x01)) {
 				aerr();
 				e2.e_addr &= 0x01;
 			}
@@ -628,9 +658,10 @@ struct mne *mp;
 			}
 		}
 		if (is_abs(&e1)) {
-			r_mode = R_MBRO | R_7BIT;
+			mch14fsr(&e1);
+			r_mode = R_7BIT;
 		} else {
-			r_mode = R_PAG0 | R_7BIT;
+			r_mode = R_PAGN | R_7BIT;
 		}
 		outrwm(&e1, r_mode, op + (e2.e_addr << 7));
 		break;
@@ -645,9 +676,10 @@ struct mne *mp;
 			aerr();
 		}
 		if (is_abs(&e1)) {
-			r_mode = R_MBRO | R_7BIT;
+			mch14fsr(&e1);
+			r_mode = R_7BIT;
 		} else {
-			r_mode = R_PAG0 | R_7BIT;
+			r_mode = R_PAGN | R_7BIT;
 		}
 		outrwm(&e1, r_mode, op);
 		break;
@@ -660,20 +692,21 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* b */
 		if ((t2 != S_IMMED) && (t2 != S_EXT)) {
 			aerr();
 		}
 		abscheck(&e2);
-		if (e2.e_addr & ~0x07) {
+		if (e2.e_addr & ~((a_uint) 0x07)) {
 			aerr();
 			e2.e_addr &= 0x07;
 		}
 		if (is_abs(&e1)) {
-			r_mode = R_MBRO | R_7BIT;
+			mch14fsr(&e1);
+			r_mode = R_7BIT;
 		} else {
-			r_mode = R_PAG0 | R_7BIT;
+			r_mode = R_PAGN | R_7BIT;
 		}
 		outrwm(&e1, r_mode, op + (e2.e_addr << 7));
 		break;
@@ -741,6 +774,19 @@ struct mne *mp;
 				opcycles = 2;
 			}			break;
 		}
+	}
+}
+
+
+/*
+ * Select Register File Map
+ */
+VOID
+mch14fsr(esp)
+struct expr *esp;
+{
+	if ((esp->e_addr & ~((a_uint) 0x7F)) != pic_fsr) {
+		aerr();
 	}
 }
 
@@ -833,6 +879,7 @@ struct mne *mp;
 					err('b');
 				}
 			}
+			e1.e_addr &= ~((a_uint) 0xFF);
 			if ((c = getnb()) == ',') {
 				getid(id, -1);
 				espa = alookup(id);
@@ -842,6 +889,9 @@ struct mne *mp;
 			} else {
 				unget(c);
 			}
+			pic_fsr = e1.e_addr;
+		} else {
+			pic_fsr = 0;
 		}
 		if (espa) {
 			outdp(espa, &e1, 0);
@@ -861,7 +911,7 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* d/s */
 		if (t2 == S_WREG) {
 			e2.e_addr = 0;
@@ -870,7 +920,7 @@ struct mne *mp;
 			e2.e_addr = 1;
 		} else {
 			abscheck(&e2);
-			if (e2.e_addr & ~0x01) {
+			if (e2.e_addr & ~((a_uint) 0x01)) {
 				aerr();
 				e2.e_addr &= 0x01;
 			}
@@ -879,9 +929,10 @@ struct mne *mp;
 			}
 		}
 		if (is_abs(&e1)) {
-			r_mode = R_MBRO | R_8BIT;
+			mch16fsr(&e1);
+			r_mode = R_8BIT;
 		} else {
-			r_mode = R_PAG0 | R_8BIT;
+			r_mode = R_PAGN | R_8BIT;
 		}
 		outrwm(&e1, r_mode, op + (e2.e_addr << 8));
 		break;
@@ -895,9 +946,10 @@ struct mne *mp;
 			aerr();
 		}
 		if (is_abs(&e1)) {
-			r_mode = R_MBRO | R_8BIT;
+			mch16fsr(&e1);
+			r_mode = R_8BIT;
 		} else {
-			r_mode = R_PAG0 | R_8BIT;
+			r_mode = R_PAGN | R_8BIT;
 		}
 		outrwm(&e1, r_mode, op);
 		break;
@@ -910,20 +962,21 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* b */
 		if ((t2 != S_IMMED) && (t2 != S_EXT)) {
 			aerr();
 		}
 		abscheck(&e2);
-		if (e2.e_addr & ~0x07) {
+		if (e2.e_addr & ~((a_uint) 0x07)) {
 			aerr();
 			e2.e_addr &= 0x07;
 		}
 		if (is_abs(&e1)) {
-			r_mode = R_MBRO | R_8BIT;
+			mch16fsr(&e1);
+			r_mode = R_8BIT;
 		} else {
-			r_mode = R_PAG0 | R_8BIT;
+			r_mode = R_PAGN | R_8BIT;
 		}
 		outrwm(&e1, r_mode, op + (e2.e_addr << 8));
 		break;
@@ -977,20 +1030,21 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* p */
 		if ((t2 != S_DIR) && (t2 != S_EXT)) {
 			aerr();
 		}
 		abscheck(&e2);
-		if (e2.e_addr & ~0x1F) {
+		if (e2.e_addr & ~((a_uint) 0x1F)) {
 			aerr();
 			e2.e_addr &= 0x1F;
 		}
 		if (is_abs(&e1)) {
-			r_mode = R_MBRO | R_8BIT;
+			mch16fsr(&e1);
+			r_mode = R_8BIT;
 		} else {
-			r_mode = R_PAG0 | R_8BIT;
+			r_mode = R_PAGN | R_8BIT;
 		}
 		outrwm(&e1, r_mode, op + (e2.e_addr << 8));
 		break;
@@ -1001,11 +1055,11 @@ struct mne *mp;
 			aerr();
 		}
 		abscheck(&e2);
-		if (e2.e_addr & ~0x1F) {
+		if (e2.e_addr & ~((a_uint) 0x1F)) {
 			aerr();
 			e2.e_addr &= 0x1F;
 		}
-		comma();
+		comma(1);
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
@@ -1014,9 +1068,10 @@ struct mne *mp;
 			aerr();
 		}
 		if (is_abs(&e1)) {
-			r_mode = R_MBRO | R_8BIT;
+			mch16fsr(&e1);
+			r_mode = R_8BIT;
 		} else {
-			r_mode = R_PAG0 | R_8BIT;
+			r_mode = R_PAGN | R_8BIT;
 		}
 		outrwm(&e1, r_mode, op + (e2.e_addr << 8));
 		break;
@@ -1024,11 +1079,11 @@ struct mne *mp;
 	case S_TF:			/* inst t,f */
 		t1 = addr(&e1);		/* t */
 		abscheck(&e1);
-		if (e1.e_addr & ~0x01) {
+		if (e1.e_addr & ~((a_uint) 0x01)) {
 			aerr();
 			e1.e_addr &= 0x01;
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* f */
 		if ((t2 != S_DIR) && (t2 != S_EXT)) {
 			aerr();
@@ -1037,9 +1092,10 @@ struct mne *mp;
 			aerr();
 		}
 		if (is_abs(&e2)) {
-			r_mode = R_MBRO | R_8BIT;
+			mch16fsr(&e2);
+			r_mode = R_8BIT;
 		} else {
-			r_mode = R_PAG0 | R_8BIT;
+			r_mode = R_PAGN | R_8BIT;
 		}
 		outrwm(&e2, r_mode, op + (e1.e_addr << 9));
 		break;
@@ -1047,18 +1103,18 @@ struct mne *mp;
 	case S_TIF:			/* inst t,i,f */
 		t1 = addr(&e1);		/* t */
 		abscheck(&e1);
-		if (e1.e_addr & ~0x01) {
+		if (e1.e_addr & ~((a_uint) 0x01)) {
 			aerr();
 			e1.e_addr &= 0x01;
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* i */
 		abscheck(&e2);
-		if (e2.e_addr & ~0x01) {
+		if (e2.e_addr & ~((a_uint) 0x01)) {
 			aerr();
 			e2.e_addr &= 0x01;
 		}
-		comma();
+		comma(1);
 		t3 = addr(&e3);		/* f */
 		if ((t3 != S_DIR) && (t3 != S_EXT)) {
 			aerr();
@@ -1067,9 +1123,10 @@ struct mne *mp;
 			aerr();
 		}
 		if (is_abs(&e3)) {
-			r_mode = R_MBRO | R_8BIT;
+			mch16fsr(&e3);
+			r_mode = R_8BIT;
 		} else {
-			r_mode = R_PAG0 | R_8BIT;
+			r_mode = R_PAGN | R_8BIT;
 		}
 		outrwm(&e3, r_mode, op + (e1.e_addr << 9) + (e2.e_addr << 8));
 		break;
@@ -1091,6 +1148,19 @@ struct mne *mp;
 		if ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
 			opcycles = P16Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
 		}
+	}
+}
+
+
+/*
+ * Select Register File Map
+ */
+VOID
+mch16fsr(esp)
+struct expr *esp;
+{
+	if ((esp->e_addr & ~((a_uint) 0xFF)) != pic_fsr) {
+		aerr();
 	}
 }
 
@@ -1167,6 +1237,11 @@ struct mne *mp;
 	clrexpr(&e2);
 	clrexpr(&e3);
 
+	if (((dot.s_area->a_flag & (A_CSEG|A_DSEG)) == A_CSEG) && (dot.s_addr & (a_uint) 0x0001)) {
+		err('b');
+		;dot.s_addr += 1;
+	}
+
 	op = mp->m_valu;
 	if (op == ~0) {			/* Undefined Instructions */
 		err('o');
@@ -1209,7 +1284,7 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* d */
 		if (t2 == S_WREG) {
 			e2.e_addr = 0;
@@ -1218,7 +1293,7 @@ struct mne *mp;
 			e2.e_addr = 1;
 		} else {
 			abscheck(&e2);
-			if (e2.e_addr & ~0x01) {
+			if (e2.e_addr & ~((a_uint) 0x01)) {
 				aerr();
 				e2.e_addr &= 0x01;
 			}
@@ -1227,10 +1302,10 @@ struct mne *mp;
 			}
 		}
 		if (more()) {
-			comma();
+			comma(1);
 			expr(&e3, 0);	/* a */
 			abscheck(&e3);
-			if (e3.e_addr & ~0x01) {
+			if (e3.e_addr & ~((a_uint) 0x01)) {
 				aerr();
 				e3.e_addr &= 0x01;
 			}
@@ -1242,8 +1317,8 @@ struct mne *mp;
 				 * report an error.
 				 */
 				if (e3.e_addr == 0) {
-					if (((e1.e_addr & ~0x7F) != 0x000) &&
-					    ((e1.e_addr & ~0x7F) != 0xF80)) {
+					if (((e1.e_addr & ~((a_uint) 0x7F)) != 0x000) &&
+					    ((e1.e_addr & ~((a_uint) 0x7F)) != 0xF80)) {
 						aerr();
 					}
 				}
@@ -1255,8 +1330,8 @@ struct mne *mp;
 				 * 0x00-0x7F or 0xF80-0xFFF
 				 * then a = 0.  Force Access Bank.
 				 */
-				if (((e1.e_addr & ~0x7F) == 0x000) ||
-				    ((e1.e_addr & ~0x7F) == 0xF80)) {
+				if (((e1.e_addr & ~((a_uint) 0x7F)) == 0x000) ||
+				    ((e1.e_addr & ~((a_uint) 0x7F)) == 0xF80)) {
 					e3.e_addr = 0;
 				/*
 				 * Else use Bank Select Register (BSR).
@@ -1294,10 +1369,10 @@ struct mne *mp;
 			aerr();
 		}
 		if (more()) {
-			comma();
+			comma(1);
 			expr(&e2, 0);	/* a */
 			abscheck(&e2);
-			if (e2.e_addr & ~0x01) {
+			if (e2.e_addr & ~((a_uint) 0x01)) {
 				aerr();
 				e2.e_addr &= 0x01;
 			}
@@ -1309,8 +1384,8 @@ struct mne *mp;
 				 * report an error.
 				 */
 				if (e2.e_addr == 0) {
-					if (((e1.e_addr & ~0x7F) != 0x000) &&
-					    ((e1.e_addr & ~0x7F) != 0xF80)) {
+					if (((e1.e_addr & ~((a_uint) 0x7F)) != 0x000) &&
+					    ((e1.e_addr & ~((a_uint) 0x7F)) != 0xF80)) {
 						aerr();
 					}
 				}
@@ -1322,8 +1397,8 @@ struct mne *mp;
 				 * 0x00-0x7F or 0xF80-0xFFF
 				 * then a = 0.  Force Access Bank.
 				 */
-				if (((e1.e_addr & ~0x7F) == 0x000) ||
-				    ((e1.e_addr & ~0x7F) == 0xF80)) {
+				if (((e1.e_addr & ~((a_uint) 0x7F)) == 0x000) ||
+				    ((e1.e_addr & ~((a_uint) 0x7F)) == 0xF80)) {
 					e2.e_addr = 0;
 				/*
 				 * Else use Bank Select Register (BSR).
@@ -1358,21 +1433,21 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* b */
 		if ((t2 != S_IMMED) && (t2 != S_EXT)) {
 			aerr();
 		}
 		abscheck(&e2);
-		if (e2.e_addr & ~0x07) {
+		if (e2.e_addr & ~((a_uint) 0x07)) {
 			aerr();
 			e2.e_addr &= 0x07;
 		}
 		if (more()) {
-			comma();
+			comma(1);
 			expr(&e3, 0);	/* a */
 			abscheck(&e3);
-			if (e3.e_addr & ~0x01) {
+			if (e3.e_addr & ~((a_uint) 0x01)) {
 				aerr();
 				e3.e_addr &= 0x01;
 			}
@@ -1384,8 +1459,8 @@ struct mne *mp;
 				 * report an error.
 				 */
 				if (e3.e_addr == 0) {
-					if (((e1.e_addr & ~0x7F) != 0x000) &&
-					    ((e1.e_addr & ~0x7F) != 0xF80)) {
+					if (((e1.e_addr & ~((a_uint) 0x7F)) != 0x000) &&
+					    ((e1.e_addr & ~((a_uint) 0x7F)) != 0xF80)) {
 						aerr();
 					}
 				}
@@ -1397,8 +1472,8 @@ struct mne *mp;
 				 * 0x00-0x7F or 0xF80-0xFFF
 				 * then a = 0.  Force Access Bank.
 				 */
-				if (((e1.e_addr & ~0x7F) == 0x000) ||
-				    ((e1.e_addr & ~0x7F) == 0xF80)) {
+				if (((e1.e_addr & ~((a_uint) 0x7F)) == 0x000) ||
+				    ((e1.e_addr & ~((a_uint) 0x7F)) == 0xF80)) {
 					e3.e_addr = 0;
 				/*
 				 * Else use Bank Select Register (BSR).
@@ -1436,10 +1511,10 @@ struct mne *mp;
 	case S_CALL:			/* call k */
 		t1 = addr(&e1);		/* k */
 		if (more()) {
-			comma();
+			comma(1);
 			expr(&e2, 0);	/* s */
 			abscheck(&e2);
-			if (e2.e_addr & ~0x01) {
+			if (e2.e_addr & ~((a_uint) 0x01)) {
 				aerr();
 				e2.e_addr &= 0x01;
 			}
@@ -1553,11 +1628,11 @@ struct mne *mp;
 			aerr();
 		}
 		abscheck(&e1);
-		if ((e1.e_addr & ~0x03) || (e1.e_addr == 3)) {
+		if ((e1.e_addr & ~((a_uint) 0x03)) || (e1.e_addr == 3)) {
 			aerr();
 			e1.e_addr = 0x00;
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* k */
 		if (t2 != S_IMMED) {
 			aerr();
@@ -1578,7 +1653,7 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* f */
 		if ((t2 != S_DIR) && (t2 != S_EXT)) {
 			aerr();
@@ -1621,7 +1696,7 @@ struct mne *mp;
 		if (more()) {
 			expr(&e1, 0);   /* s */
 			abscheck(&e1);
-			if (e1.e_addr & ~0x01) {
+			if (e1.e_addr & ~((a_uint) 0x01)) {
 				aerr();
 				e1.e_addr &= 0x01;
 			}
@@ -1639,11 +1714,11 @@ struct mne *mp;
 	case S_ADDFSR:			/* addfsr, subfsr */
 		expr(&e1, 0);		/* f */
 		abscheck(&e1);
-		if ((e1.e_addr & ~0x03) || (e1.e_addr == 3)) {
+		if ((e1.e_addr & ~((a_uint) 0x03)) || (e1.e_addr == 3)) {
 			aerr();
 			e1.e_addr = 0x00;
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* k */
 		if ((t2 != S_IMMED) && (t2 != S_EXT)) {
 			aerr();
@@ -1676,7 +1751,7 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* Zd */
 		if ((t2 != S_DIR) && (t2 != S_EXT)) {
 			aerr();
@@ -1696,7 +1771,7 @@ struct mne *mp;
 		if (mchramchk(&e1)) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);		/* f */
 		if ((t2 != S_DIR) && (t2 != S_EXT)) {
 			aerr();
@@ -1712,6 +1787,11 @@ struct mne *mp;
 		opcycles = OPCY_ERR;
 		err('o');
 		break;
+	}
+
+	if (((dot.s_area->a_flag & (A_CSEG|A_DSEG)) == A_CSEG) && (dot.s_addr & (a_uint) 0x0001)) {
+		err('b');
+		dot.s_addr += 1;
 	}
 
 	if (opcycles == OPCY_NONE) {
@@ -1792,29 +1872,23 @@ struct expr *esp;
 }
 
 /*
- * Is the next character a comma ?
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine specific initialization
  */
 
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 0;
+
 	if (pass == 0) {
 		pic_bytes = 0;
 		br = NULL;
 	}
 	pic_type = 0;
-	pic_fsr = ~0;
+	pic_fsr  = 0;
 	pic_goto = 0;
 }
 

@@ -1,19 +1,19 @@
 ;	.sbttl	OS9 Module Header
 
-	; This file: OS9_Mod.asm, is used to configure
+	; This file: os9_mod.asm, is used to configure
 	; one of the standard module formats for OS9.
 	;
 	; The following example can be built
 	; using the file BldMod.asm::
 	;
 	;
-	;	.title	OS9_Mod Test Assembly
+	;	.title	os9_mod Test Assembly
 	;
 	;	OS9_Module = 2
-	;  ;	.include	"OS9_Mod.asm"
+	;  ;	.include	"os9_mod.asm"
 	;
 	;	.nlist
-	;	.include	"OS9_Mod.asm"
+	;	.include	"os9_mod.asm"
 	;	.list
 	;
 
@@ -30,9 +30,9 @@
 	; Step 1:
 	; Use the .define assembler directive
 	; to insert the parameters into the
-	; OS9_Mod.asm's header structure.
+	; os9_mod.asm's header structure.
 	;
-	;	Note:	See the file OS9_Mod.asm for
+	;	Note:	See the file os9_mod.asm for
 	;		parameter names and definitions.
 	;
 	
@@ -46,12 +46,12 @@
 	
 	; Step 2:
 	; Set the symbol OS9_Module equal to 1
-	; and .include the file OS9_Mod.asm.
+	; and .include the file os9_mod.asm.
 
 	OS9_Module = 1		; OS9 Module Begin (==1)
-;	.include	"OS9_Mod.asm"
+;	.include	"os9_mod.asm"
 	.nlist
-	.include	"OS9_Mod.asm"
+	.include	"os9_mod.asm"
 	.list
 
 	; Step 3:
@@ -111,12 +111,12 @@ LIST50:	os9	F$EXIT		; ... terminate
 
 	; Step 5:
 	; Set the symbol OS9_Module equal to 0
-	; and .include the file OS9_Mod.asm.
+	; and .include the file os9_mod.asm.
 
 	OS9_Module = 0			; OS9 Module End (==0)
-;	.include	"OS9_Mod.asm"
+;	.include	"os9_mod.asm"
 	.nlist
-	.include	"OS9_Mod.asm"
+	.include	"os9_mod.asm"
 	.list
 
 	.nlist
@@ -125,7 +125,7 @@ LIST50:	os9	F$EXIT		; ... terminate
 ;[ This Statement NOT Required in a Normal Build
 .endif
 
-	; Include this file, OS9_Mod.asm, to define the
+	; Include this file, os9_mod.asm, to define the
 	; OS9 Module Header.  Preceeding the file Inclusion
 	; the header parameters must be specified in a series
 	; of define statements:
@@ -157,10 +157,10 @@ LIST50:	os9	F$EXIT		; ... terminate
 	;	.define	OS9_DType,	"Descriptor Data Type"
 	;
 
-	.define	os9,	"swi2	.byte"	; os9 macro
-
 .ifeq	OS9_Module - 1		; ==1: Begin OS9 Module
 	.list
+
+	.define	os9,	"swi2	.byte"	; os9 macro
 
 	; Include OS9 Definition Files
 	; os9_sys.def Listing Disabled

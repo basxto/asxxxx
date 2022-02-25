@@ -1,8 +1,21 @@
 /* gb.h */
 
 /*
- * (C) Copyright 1989-2005
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -66,7 +79,6 @@
 		GB.H
 	}
 	$(FILES) = {
-		GBEXT.C
 		GBMCH.C
 		GBADR.C
 		GBPST.C
@@ -194,7 +206,6 @@ extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 
 	/* z80mch.c */
-extern	int		comma(void);
 extern	int		genop(int pop, int op, struct expr *esp, int f);
 extern	int		gixiy(int v);
 extern	VOID		machine(struct mne *mp);
@@ -210,7 +221,6 @@ extern	int		any();
 extern	int		srch();
 
 	/* z80mch.c */
-extern	int		comma();
 extern	int		genop();
 extern	int		gixiy();
 extern	VOID		machine();

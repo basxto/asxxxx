@@ -41,14 +41,14 @@ CFLAGS		=  -ms -C -S -3 -a2 -c -g -gd
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
-OUTPUTDIR	= r:\asxv4pxx\asxmak\symantec\build
-!IF EXIST (r:\asxv4pxx\asxmak\symantec\build)
+OUTPUTDIR	= ..\build
+!IF EXIST (..\build)
 CREATEOUTPUTDIR	=
 !ELSE
 CREATEOUTPUTDIR	= if not exist $(OUTPUTDIR)\*.* md $(OUTPUTDIR)
 !ENDIF
-TARGETDIR	= r:\asxv4pxx\asxmak\symantec\exe
-!IF EXIST (r:\asxv4pxx\asxmak\symantec\exe)
+TARGETDIR	= ..\exe
+!IF EXIST (..\exe)
 CREATETARGETDIR	=
 !ELSE
 CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
@@ -56,7 +56,7 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 
 LIBS		= 
 
-CFLAGS		=  -A -r -J -ml -o+time -3 -a2 -c 
+CFLAGS		=  -A -r -J -ml -o+time -S -3 -a2 -c 
 LFLAGS		=  /DE /PACKF /XN
 DEFINES		= 
 !ENDIF
@@ -75,14 +75,14 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -Ir:\asxv4pxx\asxxsrc
+INCLUDES	= -I..\..\..\asxxsrc
 
 INCLUDEDOBJS	= 
 
 OBJS		=  $(OUTPUTDIR)\asdata.OBJ  $(OUTPUTDIR)\asdbg.OBJ  $(OUTPUTDIR)\asexpr.OBJ  \
 		 $(OUTPUTDIR)\aslex.OBJ  $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asout.OBJ  \
-		 $(OUTPUTDIR)\assubr.OBJ  $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\chkadr.OBJ  $(OUTPUTDIR)\chkext.OBJ  \
-		 $(OUTPUTDIR)\chkmch.OBJ  $(OUTPUTDIR)\chkpst.OBJ 
+		 $(OUTPUTDIR)\assubr.OBJ  $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\chkadr.OBJ  $(OUTPUTDIR)\chkmch.OBJ  \
+		 $(OUTPUTDIR)\chkpst.OBJ  $(OUTPUTDIR)\asmcro.OBJ 
 
 RCFILES		= 
 
@@ -258,11 +258,6 @@ $(OUTPUTDIR)\chkadr.OBJ:	..\..\..\ASCHECK\chkadr.c
 
 
 
-$(OUTPUTDIR)\chkext.OBJ:	..\..\..\ASCHECK\chkext.c
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\chkext.obj ..\..\..\ASCHECK\chkext.c
-
-
-
 $(OUTPUTDIR)\chkmch.OBJ:	..\..\..\ASCHECK\chkmch.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\chkmch.obj ..\..\..\ASCHECK\chkmch.c
 
@@ -270,6 +265,11 @@ $(OUTPUTDIR)\chkmch.OBJ:	..\..\..\ASCHECK\chkmch.c
 
 $(OUTPUTDIR)\chkpst.OBJ:	..\..\..\ASCHECK\chkpst.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\chkpst.obj ..\..\..\ASCHECK\chkpst.c
+
+
+
+$(OUTPUTDIR)\asmcro.OBJ:	..\..\..\ASXXSRC\asmcro.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asmcro.obj ..\..\..\ASXXSRC\asmcro.c
 
 
 

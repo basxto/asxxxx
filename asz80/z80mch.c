@@ -12,6 +12,9 @@
 #include "asxxxx.h"
 #include "z80.h"
 
+char	*cpu	= "Zilog Z80 / Hitachi HD64180";
+char	*dsft	= "asm";
+
 char	imtab[3] = { 0x46, 0x56, 0x5E };
 int	mchtyp;
 
@@ -431,7 +434,7 @@ struct mne *mp;
 			v1 &= 0x07;
 		}
 		op |= (v1<<3);
-		comma();
+		comma(1);
 		addr(&e2);
 		abscheck(&e1);
 		if (genop(0xCB, op, &e2, 0) || t1)
@@ -444,7 +447,8 @@ struct mne *mp;
 		if (more()) {
 			if ((t2 != S_R8) || (e2.e_addr != A))
 				++t1;
-			comma();
+			comma(1);
+			clrexpr(&e2);
 			t2 = addr(&e2);
 		}
 		if (genop(0xCB, op, &e2, 0) || t1)
@@ -460,7 +464,8 @@ struct mne *mp;
 		if (more()) {
 			if ((t2 != S_R8) || (e2.e_addr != A))
 				++t1;
-			comma();
+			comma(1);
+			clrexpr(&e2);
 			t2 = addr(&e2);
 			if (t2 == S_USER)
 				t2 = e2.e_mode = S_IMMED;
@@ -475,7 +480,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		t2 = 0;
 		if (more()) {
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 			if (t2 == S_USER)
 				t2 = e2.e_mode = S_IMMED;
@@ -531,7 +536,7 @@ struct mne *mp;
 
 	case S_LD:
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t2 == S_USER)
 			t2 = e2.e_mode = S_IMMED;
@@ -630,7 +635,7 @@ struct mne *mp;
 
 	case S_EX:
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t2 == S_R16) {
 			v1 = (int) e1.e_addr;
@@ -659,11 +664,11 @@ struct mne *mp;
 	case S_OUT:
 		if (rf == S_IN) {
 			t1 = addr(&e1);
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		} else {
 			t2 = addr(&e2);
-			comma();
+			comma(1);
 			t1 = addr(&e1);
 		}
 		v1 = (int) e1.e_addr;
@@ -716,13 +721,13 @@ struct mne *mp;
 
 	case S_DJNZ:
 	case S_JR:
-		if ((v1 = admode(CND)) != 0 && rf != S_DJNZ) {
-			if ((v1 &= 0xFF) <= 0x18) {
+		if (rf == S_JR && (v1 = admode(CND)) != 0) {
+			if ((v1 &= 0xFF) <= 0x03) {
 				op += (v1+1)<<3;
 			} else {
 				aerr();
 			}
-			comma();
+			comma(1);
 		}
 		expr(&e2, 0);
 		outab(op);
@@ -741,7 +746,7 @@ struct mne *mp;
 	case S_CALL:
 		if ((v1 = admode(CND)) != 0) {
 			op |= (v1&0xFF)<<3;
-			comma();
+			comma(1);
 		} else {
 			op = 0xCD;
 		}
@@ -753,7 +758,7 @@ struct mne *mp;
 	case S_JP:
 		if ((v1 = admode(CND)) != 0) {
 			op |= (v1&0xFF)<<3;
-			comma();
+			comma(1);
 			expr(&e1, 0);
 			outab(op);
 			outrw(&e1, 0);
@@ -788,11 +793,11 @@ struct mne *mp;
 	case X_OUT:
 		if (rf == X_IN) {
 			t1 = addr(&e1);
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		} else {
 			t2 = addr(&e2);
-			comma();
+			comma(1);
 			t1 = addr(&e1);
 		}
 		if ((t1 == S_R8) && (t2 == S_INDM)) {
@@ -994,25 +999,19 @@ struct expr *esp;
 }
 
 /*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine dependent initialization
  */
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 0;
+
 	if (pass == 0) {
 		mchtyp = X_Z80;
 		sym[2].s_addr = X_Z80;
 	}
 }
+

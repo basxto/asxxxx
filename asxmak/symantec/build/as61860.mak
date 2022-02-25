@@ -24,8 +24,8 @@ DISASM		= OBJ2ASM
 LNK		= LINK
 DLLS		= 
 
-HEADERS		= C:\SC\INCLUDE\stdio.h C:\SC\INCLUDE\setjmp.h ..\..\..\asxxsrc\asxxxx.h  \
-		..\..\..\AS61860\s61860.h C:\SC\INCLUDE\string.h C:\SC\INCLUDE\alloc.h C:\SC\INCLUDE\stdlib.h 
+HEADERS		= C:\SC\INCLUDE\alloc.h ..\..\..\asxxsrc\asxxxx.h C:\SC\INCLUDE\stdlib.h  \
+		C:\SC\INCLUDE\stdio.h C:\SC\INCLUDE\setjmp.h C:\SC\INCLUDE\string.h ..\..\..\AS61860\s61860.h 
 
 DEFFILE		= as61860.DEF
 
@@ -56,7 +56,7 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 
 LIBS		= 
 
-CFLAGS		=  -A -ml -o+time -3 -a2 -c 
+CFLAGS		=  -A -J -ml -o+time -3 -a2 -c 
 LFLAGS		=  /DE /PACKF /XN
 DEFINES		= 
 !ENDIF
@@ -80,8 +80,8 @@ INCLUDES	= -I..\..\..\asxxsrc
 INCLUDEDOBJS	= 
 
 OBJS		=  $(OUTPUTDIR)\asdata.OBJ  $(OUTPUTDIR)\asdbg.OBJ  $(OUTPUTDIR)\asexpr.OBJ  \
-		 $(OUTPUTDIR)\aslex.OBJ  $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asout.OBJ  \
-		 $(OUTPUTDIR)\assubr.OBJ  $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\s6186adr.OBJ  $(OUTPUTDIR)\s6186ext.OBJ  \
+		 $(OUTPUTDIR)\aslex.OBJ  $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asmcro.OBJ  \
+		 $(OUTPUTDIR)\asout.OBJ  $(OUTPUTDIR)\assubr.OBJ  $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\s6186adr.OBJ  \
 		 $(OUTPUTDIR)\s6186mch.OBJ  $(OUTPUTDIR)\s6186pst.OBJ 
 
 RCFILES		= 
@@ -238,6 +238,11 @@ $(OUTPUTDIR)\asmain.OBJ:	..\..\..\ASXXSRC\asmain.c
 
 
 
+$(OUTPUTDIR)\asmcro.OBJ:	..\..\..\ASXXSRC\asmcro.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asmcro.obj ..\..\..\ASXXSRC\asmcro.c
+
+
+
 $(OUTPUTDIR)\asout.OBJ:	..\..\..\ASXXSRC\asout.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asout.obj ..\..\..\ASXXSRC\asout.c
 
@@ -255,11 +260,6 @@ $(OUTPUTDIR)\assym.OBJ:	..\..\..\ASXXSRC\assym.c
 
 $(OUTPUTDIR)\s6186adr.OBJ:	..\..\..\AS61860\s6186adr.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\s6186adr.obj ..\..\..\AS61860\s6186adr.c
-
-
-
-$(OUTPUTDIR)\s6186ext.OBJ:	..\..\..\AS61860\s6186ext.c
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\s6186ext.obj ..\..\..\AS61860\s6186ext.c
 
 
 

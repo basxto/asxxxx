@@ -1,8 +1,21 @@
 /* h8mch.c */
 
 /*
- * (C) Copyright 1994-2005
- * All Rights Reserved
+ *  Copyright (C) 1994-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -11,6 +24,9 @@
 
 #include "asxxxx.h"
 #include "h8.h"
+
+char	*cpu	= "Hitachi H8/3xx";
+char	*dsft	= "asm";
 
 #define	NB	512
 
@@ -112,7 +128,7 @@ struct mne *mp;
 	case S_OPS:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 		if ((t1 != S_IMMB) || (t2 != S_WREG)) {
@@ -132,7 +148,7 @@ struct mne *mp;
 	case S_OPX:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 		if (t2 != S_BREG) {
@@ -159,7 +175,7 @@ struct mne *mp;
 	case S_OP:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 		switch(t1) {
@@ -199,7 +215,7 @@ struct mne *mp;
 	case S_MOV:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 		/*
@@ -401,7 +417,7 @@ struct mne *mp;
 	case S_SUB:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 		if ((rf != S_SUB) && ((t1 == S_IMMB) || (t1 == S_IMMW))) {
@@ -474,7 +490,7 @@ struct mne *mp;
 			 * Optional ,ccr
 			 */
 			if (more()) {
-				comma();
+				comma(1);
 				if (!admode(ccr_reg)) {
 					aerr();
 				}
@@ -492,7 +508,7 @@ struct mne *mp;
 			 * Optional ,ccr
 			 */
 			if (more()) {
-				comma();
+				comma(1);
 				if (!admode(ccr_reg)) {
 					aerr();
 				}
@@ -508,7 +524,7 @@ struct mne *mp;
 		 * (ccr,) Rs		stc
 		 */
 		if ((opflag == 2) && (t1 == S_CREG)) {
-			comma();
+			comma(1);
 			t2 = addr(&e1);
 			v2 = aindx;
 			outab(0x02);
@@ -540,7 +556,7 @@ struct mne *mp;
 	case S_MLDV:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 		if (t1 != S_BREG) {
@@ -573,7 +589,7 @@ struct mne *mp;
 	case S_MVFPE:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 		if ((t1 != S_EXT) && (t1 != S_DIR)) {
@@ -589,7 +605,7 @@ struct mne *mp;
 	case S_MVTPE:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 		if (t1 != S_BREG) {
@@ -637,7 +653,7 @@ struct mne *mp;
 	case S_BIT1:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 		switch(t1) {
@@ -707,7 +723,7 @@ struct mne *mp;
 	case S_BIT2:
 		t1 = addr(&e1);
 		v1 = aindx;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = aindx;
 		switch(t1) {
@@ -856,6 +872,11 @@ minit()
 {
 	char **dp;
 
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
+
 	bp = bb;
 	bm = 1;
 
@@ -945,14 +966,4 @@ struct expr *esp;
 	return(0);
 }
 
-/*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
+

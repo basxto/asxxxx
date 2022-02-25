@@ -1,8 +1,21 @@
 /* s19os9.c */
 
 /*
- * (C) Copyright 2006
- * All Rights Reserved
+ *  Copyright (C) 2006-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -76,16 +89,16 @@ unsigned char	os9crc[3];	/* OS9 CRC			*/
  *		FILE *	stdout		c_library
  *
  *	functions called:
- *		VOID		asexit()	asx0s9.c
- *		VOID		chopcrlf()	asxos9.c
- *		int		digit()		asxos9.c
+ *		VOID		asexit()	s19os9.c
+ *		VOID		chopcrlf()	s19os9.c
+ *		int		digit()		s19os9.c
  *		int		fclose()	c_library
  *		FILE		fopen()		c_library
  *		int		fprintf()	c_library
- *		int		getline()	asxos9.c
- *		VOID		usage()		asxos9.c
- *		unsigned char	os9_chk()	asxos9.c
- *		int		os9_hdr()	asxos9.c
+ *		int		getline()	s19os9.c
+ *		VOID		usage()		s19os9.c
+ *		unsigned char	os9_chk()	s19os9.c
+ *		int		os9_hdr()	s19os9.c
  *
  *	side effects:
  *		Completion of main() completes the translation of
@@ -456,7 +469,7 @@ unsigned char *crc;
  *		FILE	inpfp		file handle for S19 file
  *
  *	called functions:
- *		VOID	chopcrlf()	asxos9.c
+ *		VOID	chopcrlf()	s19os9.c
  *		int	fclose()	c-library
  *		char *	fgets()		c-library
  *
@@ -680,7 +693,7 @@ char *usetxt[] = {
  *		char *	usetxt[]	array of string pointers
  *
  *	functions called:
- *		VOID	asexit()	asxos9.c
+ *		VOID	asexit()	s19os9.c
  *		int	fprintf()	c_library
  *
  *	side effects:

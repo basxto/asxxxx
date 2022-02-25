@@ -480,10 +480,10 @@
 	ande	address		;37 76 11 22
 	ande	external	;37 76s00r00
 
-	andp	#imm8		;37 2A 00 01
-	andp	#num8		;37 2As00r00
-	andp	#imm16		;37 2A 23 45
-	andp	#num16		;37 2As00r00
+	andp	#imm8		;37 3A 00 01
+	andp	#num8		;37 3As00r00
+	andp	#imm16		;37 3A 23 45
+	andp	#num16		;37 3As00r00
 
 	asl	,x		;04 00
 	asl	,y		;14 00

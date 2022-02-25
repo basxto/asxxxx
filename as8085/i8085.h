@@ -1,8 +1,21 @@
 /* i8085.h */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -16,7 +29,6 @@
 		I8085.H
 	}
 	$(FILES) = {
-		I85EXT.C
 		I85MCH.C
 		I85PST.C
 		ASMAIN.C
@@ -73,7 +85,6 @@
 #ifdef	OTHERSYSTEM
 	
 	/* 85mch.c */
-extern	int		comma(void);
 extern	VOID		machine(struct mne *mp);
 extern	VOID		minit(void);
 extern	VOID		out3(int a, int b);
@@ -83,7 +94,6 @@ extern	int		regpair(int r, int s);
 #else
 
 	/* 85mch.c */
-extern	int		comma();
 extern	VOID		machine();
 extern	VOID		minit();
 extern	VOID		out3();

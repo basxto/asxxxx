@@ -2138,7 +2138,7 @@ lbl7:
 	callw			; 14 00
 	movsf	*0x7F,*0xFFF	; 7F EB FF FF
 	movss	*0x7F,*0x7F	; FF EB 7F F0
-	pushl   #0x45		; 45 FA
+	pushl   #0x45		; 45 EA
 	subfsr	2,#0x3F		; BF E9
 	subulnk #0x3F		; FF E9
 

@@ -1,8 +1,21 @@
 /* z8mch.c */
 
 /*
- * (C) Copyright 2005-2006
- * All Rights Reserved
+ *  Copyright (C) 2005-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -11,6 +24,9 @@
 
 #include "asxxxx.h"
 #include "z8.h"
+
+char	*cpu	= "Zilog Z8";
+char	*dsft	= "asm";
 
 char	imtab[3] = { 0x46, 0x56, 0x5E };
 int	hd64;
@@ -126,7 +142,7 @@ struct mne *mp;
 	case S_DOP:
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = (int) e2.e_addr;
 		if ((t1 == S_R) && (t2 == S_R)) {	/* op   r,r   */
@@ -194,7 +210,7 @@ struct mne *mp;
 	case S_LD:
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = (int) e2.e_addr;
 		if ((t1 == S_R) && (t2 == S_R)) {	/* LD   r,r   */
@@ -286,7 +302,7 @@ struct mne *mp;
 	case S_LDCE:
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = (int) e2.e_addr;
 		if ((t1 == S_R) && (t2 == S_IRR)) {	/* op  r,@rr  */
@@ -304,7 +320,7 @@ struct mne *mp;
 	case S_LDCEI:
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		v2 = (int) e2.e_addr;
 		if ((t1 == S_IR) && (t2 == S_IRR)) {	/* op  @r,@rr */
@@ -322,7 +338,7 @@ struct mne *mp;
 	case S_DJNZ:
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
-		comma();
+		comma(1);
 		expr(&e2, 0);
 		if (t1 == S_R) {
 			op |= (v1 << 4);
@@ -345,7 +361,7 @@ struct mne *mp;
 	case S_JR:
 		if ((v1 = admode(CND)) != 0) {
 			op |= (v1 << 4);		/* op CC,_  */
-			comma();
+			comma(1);
 		} else {
 			op |= 0x80;			/* op  T,_  */
 		}
@@ -366,7 +382,7 @@ struct mne *mp;
 	case S_JP:
 		if ((v1 = admode(CND)) != 0) {
 			op |= (v1 << 4);		/* JP  CC,_  */
-			comma();
+			comma(1);
 		} else {
 			op |= 0x80;			/* JP   T,_  */
 		}
@@ -459,21 +475,14 @@ struct expr *esp;
 }
 
 /*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine dependent initialization
  */
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
 }
+

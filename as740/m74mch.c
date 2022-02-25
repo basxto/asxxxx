@@ -1,8 +1,21 @@
 /* m74mch.c */
 
 /*
- * (C) Copyright 2005-2006
- * All Rights Reserved
+ *  Copyright (C) 2005-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -17,6 +30,9 @@
 
 #include "asxxxx.h"
 #include "m740.h"
+
+char *cpu  = "Mitsubishi 740 family";
+char *dsft = "asm";
 
 /*
  * Opcode Cycle Definitions
@@ -388,19 +404,19 @@ struct mne *mp;
 		t1 = addr(&e1);
 		switch (t1) {
 		case S_NBITA:
-			comma();
+			comma(1);
 			expr(&e3, 0);
 			outrbm(&e1, R_3BIT | R_USGN, op);
 			genbad(&e3);
 			break;
 
 		case S_NBIT:
-			comma();
+			comma(1);
 			if ((c = getnb()) != '*') {
 				unget(c);
 			}
 			expr(&e2, 0);
-			comma();
+			comma(1);
 			expr(&e3, 0);
 			outrbm(&e1, R_3BIT | R_USGN, op + 0x04);
 			outrb(&e2, R_PAG0);
@@ -418,7 +434,7 @@ struct mne *mp;
 		if (t1 != S_IMMED) {
 			aerr();
 		}
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 		if (t2 != S_ZP && t2 != S_ABS) {
 			aerr();
@@ -454,7 +470,7 @@ struct mne *mp;
 			outrbm(&e1, R_3BIT | R_USGN, op);
 			break;
 		case S_NBIT:
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 			if (t2 != S_ZP && t2 != S_ABS) {
 				aerr();
@@ -504,22 +520,15 @@ struct expr *esp;
 }
 
 /*
- * The next character must be a
- * comma.
- */
-VOID
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-}
-
-/*
  * Machine dependent initialization
  */
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 0;
 }
 
 

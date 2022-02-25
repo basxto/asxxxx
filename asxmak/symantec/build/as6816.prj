@@ -1,21 +1,21 @@
 82569
-R:\ASXV4PXX\ASXMAK\SYMANTEC\BUILD\as6816.prj
+R:\ASXV5PXX\ASXMAK\SYMANTEC\BUILD\as6816.prj
 as6816.OPN
 novcs
 as6816.DEF
 6
-1092880230
+1150355460
 0 0 0 0 0 "..\..\..\ASXXSRC\asdata.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asdbg.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asexpr.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\aslex.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\aslist.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asmain.c"
+0 0 0 0 0 "..\..\..\ASXXSRC\asmcro.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asout.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\assubr.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\assym.c"
 0 0 0 0 0 "..\..\..\AS6816\m16adr.c"
-0 0 0 0 0 "..\..\..\AS6816\m16ext.c"
 0 0 0 0 0 "..\..\..\AS6816\m16mch.c"
 0 0 0 0 0 "..\..\..\AS6816\m16pst.c"
 0 0 0 0 0 "as6816.DEF"

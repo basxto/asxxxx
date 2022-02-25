@@ -1,8 +1,21 @@
 /* assubr.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -79,19 +92,16 @@ int c;
  *		char *	p		pointer to error code array eb[]
  *
  *	global variables:
- *		int	cfile		current source file index
  *		char	eb[]		array of generated error codes
  *		char *	ep		pointer into error list
- *		int	incfile		current include file index
- *		char	incfn[]		array of include file names
- *		int	incline[]	array of include line numbers
- *		char	srcfn[]		array of source file names
- *		int	srcline[]	array of source line numbers
+ *		int	incline		include file line number
+ *		int	srcline		source file line number
  *		FILE *	stderr		c_library
  *
  *	functions called:
  *		int	fprintf()	c_library
  *		char *	geterr()	assubr.c
+ *		int	getlnm()	assubr.c
  *
  *	side effects:
  *		none
@@ -109,13 +119,8 @@ diag()
 			fprintf(stderr, "%c", *p++);
 		}
 		fprintf(stderr, "> in line ");
-		if (incfil >= 0) {
-			fprintf(stderr, "%d", incline[incfil]);
-			fprintf(stderr, " of %s\n", incfn[incfil]);
-		} else {
-			fprintf(stderr, "%d", srcline[cfile]);
-			fprintf(stderr, " of %s\n", srcfn[cfile]);
-		}
+		fprintf(stderr, "%d", getlnm());
+		fprintf(stderr, " of %s\n", afn);
 		p = eb;
 		while (p < ep) {
 			if ((errstr = geterr(*p++)) != NULL) {
@@ -180,10 +185,11 @@ qerr()
 char *errors[] = {
 	"<.> use \". = . + <arg>\" not \". = <arg>\"",
 	"<a> machine specific addressing or addressing mode error",
-	"<b> direct page boundary error",
+	"<b> address / direct page boundary error",
 	"<d> direct page addressing error",
 	"<i> .include file error or an .if/.endif mismatch",
-	"<m> multiple definitions error",
+	"<m> multiple definitions error or macro recursion error",
+	"<n> .endm, .mexit, or .narg outside of a macro",
 	"<o> .org in REL area or directive / mnemonic error",
 	"<p> phase error: label location changing between passes 2 and 3",
 	"<q> missing or improper operators, terminators, or delimiters",
@@ -229,4 +235,5 @@ int c;
 	sprintf(erb, "<e> %.*s", (int) (sizeof(erb)-5), ib);
 	return(erb);
 }
+
 

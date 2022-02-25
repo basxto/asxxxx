@@ -1,7 +1,0 @@
-# Symantec SC++ generated .dpd file. V: 7200
-r:\asxv4pxx\asxmak\symantec\build\inctodef.OBJ: \
-	..\..\..\aspic\ptoa\inctodef.c \
-	..\..\..\ASPIC\PTOA\ptoa.h 
-r:\asxv4pxx\asxmak\symantec\build\ptoa.OBJ: \
-	..\..\..\aspic\ptoa\ptoa.c \
-	..\..\..\ASPIC\PTOA\ptoa.h 

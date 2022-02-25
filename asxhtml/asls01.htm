@@ -19,11 +19,12 @@
    Starting  ASlink without any arguments provides the following
 option list and then exits:  
 
+Usage: [-Options] [-Option with arg] file
 Usage: [-Options] [-Option with arg] outfile file [file ...]
   -p   Echo commands to stdout (default)
   -n   No echo of commands to stdout
 Alternates to Command Line Input:
-  -c                   ASlink >> prompt input
+  -c                   ASlink &gt;&gt; prompt input
   -f   file[.lnk]      Command File input
 Librarys:
   -k   Library path specification, one per -k
@@ -32,17 +33,17 @@ Relocation:
   -b   area base address=expression
   -g   global symbol=expression
 Map format:
-  -m   Map output generated as outfile[.map]
+  -m   Map output generated as (out)file[.map]
   -w   Wide listing format for map file
   -x   Hexidecimal (default)
   -d   Decimal
   -q   Octal
 Output:
-  -i   Intel Hex as outfile[.i--]
-  -s   Motorola S Record as outfile[.s--]
-  -t   Tandy CoCo Disk BASIC binary as outfile[.bi-]
-  -j   NoICE Debug output as outfile[.noi]
-  -y   SDCDB Debug output as outfile[.cdb]
+  -i   Intel Hex as (out)file[.i--]
+  -s   Motorola S Record as (out)file[.s--]
+  -t   Tandy CoCo Disk BASIC binary as (out)file[.bi-]
+  -j   NoICE Debug output as (out)file[.noi]
+  -y   SDCDB Debug output as (out)file[.cdb]
   -o   Linked file/library object output enable (default)
   -v   Linked file/library object output disable
 List:
@@ -51,6 +52,7 @@ Case Sensitivity:
   -z   Disable Case Sensitivity for Symbols
 End:
   -e   or null line terminates input
+
 
 
 
@@ -63,16 +65,23 @@ End:
      When  ASlink  is  invoked  with multiple filenames the
      first filename is the output filename and the  remain-
      ing  filenames  are  linked  together  into the output
+
+
+THE LINKER                                              PAGE 3-3
+INVOKING ASLINK
+
+
      filename.  
+
 
 
 
 Most  sytems  require  the  options to be entered on the command
 line:  
 
-  aslink [-Options] [-Options with args] iofile
+  aslink [-Options] [-Options with args] file
 
-  aslink [-Options] [-Options with args] ofile ifile [ifile ...]
+  aslink [-Options] [-Options with args] outfile file1 [file2 ...]
 
 
 Some  systems  may  request  the  arguments  after the linker is
@@ -82,13 +91,13 @@ started at a system specific prompt:
   argv: -[options] -[option arg] file
 
   aslink
-  argv: [-Options] [-Options with args] ofile ifile [ifile ...]
+  argv: [-Options] [-Options with args] outfile file1 [file2 ...]
 
 
 The linker commands are explained in some more detail:  
 
-     1.  -c        ASlink >> prompt mode.  
-         The  ASlink >>  prompt  mode reads linker commands from
+     1.  -c        ASlink &gt;&gt; prompt mode.  
+         The  ASlink &gt;&gt;  prompt  mode reads linker commands from
          stdin.  
 
      2.  -f file   Command file mode.  
@@ -111,6 +120,12 @@ The linker commands are explained in some more detail:
          was specified) 
 
      6.  -z        Disable Case Sensitivity for Symbols 
+
+
+
+THE LINKER                                              PAGE 3-4
+INVOKING ASLINK
+
 
      7.  -m        Generate  a  map  file (file.map).  This file
          contains a list of the symbols (by area) with  absolute
@@ -316,7 +331,7 @@ libraries for object code inclusion or suppression.
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 <A NAME = "Input4"></A>
 <H3><B>
-<IMG SRC = "green.gif" ALT = "-">... Linker V4.xx Input Format</A>
+<IMG SRC = "green.gif" ALT = "-">... Linker V5.xx (V4.xx) Input Format</A>
 </B></H3>
 
 <H4><B><PRE>
@@ -591,7 +606,7 @@ uses the second byte of the 2, 3, or 4-byte data.
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 <A NAME = "Error4"></A>
 <H3><B>
-<IMG SRC = "green.gif" ALT = "-">... Linker V4.xx Error Messages</A>
+<IMG SRC = "green.gif" ALT = "-">... Linker V5.xx (V4.xx) Error Messages</A>
 </B></H3>
 
 <H4><B><PRE>
@@ -1330,6 +1345,6 @@ is the execution address.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: June 2006</B></P></H6>
+<H6><P><B>Last Updated: April 2009</B></P></H6>
 </BODY> 
 </HTML>

@@ -1,12 +1,21 @@
 /* ds8mch.c */
 
 /*
- * Modified from i51mch.c
- * Bill McKinnon
- * w_mckinnon at conknet dot com
+ *  Copyright (C) 1998-2009  Alan R. Baldwin
  *
- * (C) Copyright 1998-2006
- * All Rights Reserved
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -16,10 +25,17 @@
  *	jhartman at compuserve dot com
  *	noice at noicedebugger dot com
  *
+ *   Modified from i51pst.c
+ *	Bill McKinnon
+ *	w_mckinnon at conknet dot com
+ *
  */
 
 #include "asxxxx.h"
 #include "ds8.h"
+
+char	*cpu	= "Dallas Semiconductor [User Defined]";
+char	*dsft	= "asm";
 
 static int amode;
 static char buff[80];
@@ -273,7 +289,7 @@ struct mne *mp;
 		t = addr(&e);
 		if (t != S_A)
 			aerr();
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		
 		switch (t1) {
@@ -307,7 +323,7 @@ struct mne *mp;
 		 * C,direct;  C,/direct
 		 */
 		t = addr(&e);
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 
 		switch (t) {
@@ -388,7 +404,7 @@ struct mne *mp;
 		t = addr(&e);
 		if (t != S_A)
 			aerr();
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 
 		switch (t1) {
@@ -414,7 +430,7 @@ struct mne *mp;
 	/* MOV instruction, all modes */
 	case S_MOV:
 		t = addr(&e);
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 
 		switch (t) {
@@ -559,7 +575,7 @@ struct mne *mp;
 		outab(op);
 		outrb(&e, R_PAG0);
 
-		comma();
+		comma(1);
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
@@ -592,7 +608,7 @@ struct mne *mp;
 	case S_CJNE:
 		/* A,#;  A,dir;  @R0,#;  @R1,#;  Rn,# */
 		t = addr(&e);
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		switch (t) {
 		case S_A:
@@ -627,7 +643,7 @@ struct mne *mp;
 		}
 
 		/* branch destination */
-		comma();
+		comma(1);
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
@@ -661,7 +677,7 @@ struct mne *mp;
 		}
 
 		/* branch destination */
-		comma();
+		comma(1);
 		expr(&e1, 0);
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
@@ -688,7 +704,7 @@ struct mne *mp;
 		t = addr(&e);
 		if (t != S_A)
 			aerr();
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		if (t1 == S_AT_ADP)
 			outab(0x93);
@@ -701,7 +717,7 @@ struct mne *mp;
 	case S_MOVX:
 		/* A,@DPTR  A,@R0  A,@R1  @DPTR,A  @R0,A  @R1,A */
 		t = addr(&e);
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 
 		switch (t) {
@@ -807,7 +823,7 @@ struct mne *mp;
 		t = addr(&e);
 		if (t != S_A)
 			aerr();
-		comma();
+		comma(1);
 		t1 = addr(&e1);
 		switch (t1) {
 		case S_AT_R:
@@ -855,23 +871,17 @@ struct expr *esp;
 }
 
 /*
- * Is the next character a comma ?
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine specific initialization
  */
 
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
+
 	amode = 0;
 	if (pass == 0) {
 		ds8_bytes = 0;

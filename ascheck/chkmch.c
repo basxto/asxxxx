@@ -1,8 +1,21 @@
 /* chkmch.c */
 
 /*
- * (C) Copyright 2001-2006
- * All Rights Reserved
+ *  Copyright (C) 2001-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -11,6 +24,9 @@
 
 #include "asxxxx.h"
 #include "chk.h"
+
+char	*cpu	= "ASxxxx Test Assembler";
+char	*dsft	= "asm";
 
 /*
  * Opcode Cycle Definitions
@@ -49,7 +65,6 @@ static char  chkpg1[256] = {
 
 int	mchtyp;
 
-
 /*
  * Process a machine op.
  */
@@ -58,7 +73,7 @@ machine(mp)
 struct mne *mp;
 {
 	int c;
-	register a_uint op;
+	a_uint op;
 	struct expr e1;
 	struct area *espa;
 	char id[NCPS];
@@ -69,7 +84,7 @@ struct mne *mp;
 
 	case S_CPU:
 		opcycles = OPCY_CPU;
-		mchtyp = op;
+		mchtyp = (int) op;
 		sym[2].s_addr = op;
 		lmode = SLIST;
 		break;
@@ -154,24 +169,13 @@ struct expr *esp;
 }
 
 /*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine dependent initialization
  */
 VOID
 minit()
 {
 	if (pass == 0) {
+		hilo = 1;
 		mchtyp = X_NOCPU;
 		sym[2].s_addr = X_NOCPU;
 	}

@@ -1,8 +1,21 @@
 /* gbmch.c */
 
 /*
- * (C) Copyright 1989-2005
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -14,6 +27,9 @@
 
 #include "asxxxx.h"
 #include "gb.h"
+
+char	*cpu	= "Gameboy";
+char	*dsft	= "asm";
 
 char	imtab[3] = { 0x46, 0x56, 0x5E };
 
@@ -154,7 +170,7 @@ struct mne *mp;
 			v1 &= 0x07;
 		}
 		op |= (v1<<3);
-		comma();
+		comma(1);
 		addr(&e2);
 		abscheck(&e1);
 		if (genop(0xCB, op, &e2, 0) || t1)
@@ -167,7 +183,7 @@ struct mne *mp;
 		if (more()) {
 			if ((t2 != S_R8) || (e2.e_addr != A))
 				++t1;
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		}
 		if (genop(0xCB, op, &e2, 0) || t1)
@@ -191,7 +207,7 @@ struct mne *mp;
 		if (more()) {
 			if ((t2 != S_R8) || (e2.e_addr != A))
 				++t1;
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		}
 		if (genop(0, op, &e2, 1) || t1)
@@ -203,7 +219,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		t2 = 0;
 		if (more()) {
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		}
 		if (t2 == 0) {
@@ -223,7 +239,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		t2 = 0;
 		if (more()) {
-			comma();
+			comma(1);
 			t2 = addr(&e2);
 		}
 		if (t2 == 0) {
@@ -283,7 +299,7 @@ struct mne *mp;
 		 */
 
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 
 		if( ( t1 == S_R8 ) && ( t2 == S_IDHL ) )
@@ -321,7 +337,7 @@ struct mne *mp;
 
 	case S_LD:
 		t1 = addr(&e1);
-		comma();
+		comma(1);
 		t2 = addr(&e2);
 
 		if (t1 == S_R8) {
@@ -446,12 +462,12 @@ struct mne *mp;
 
 	case S_JR:
 		if ((v1 = admode(CND)) != 0 ) {
-			if ((v1 &= 0xFF) <= 0x18) {
+			if ((v1 &= 0xFF) <= 0x03) {
 				op += (v1+1)<<3;
 			} else {
 				aerr();
 			}
-			comma();
+			comma(1);
 		}
 		expr(&e2, 0);
 		outab(op);
@@ -470,7 +486,7 @@ struct mne *mp;
 	case S_CALL:
 		if ((v1 = admode(CND)) != 0) {
 			op |= (v1&0xFF)<<3;
-			comma();
+			comma(1);
 		} else {
 			op = 0xCD;
 		}
@@ -482,7 +498,7 @@ struct mne *mp;
 	case S_JP:
 		if ((v1 = admode(CND)) != 0) {
 			op |= (v1&0xFF)<<3;
-			comma();
+			comma(1);
 			expr(&e1, 0);
 			outab(op);
 			outrw(&e1, 0);
@@ -523,7 +539,7 @@ struct mne *mp;
 		 */
 
 		t1 = addr( &e1 );
-		comma();
+		comma(1);
 		t2 = addr( &e2 );
 		v1 = (int) e1.e_addr;
 		v2 = (int) e2.e_addr;
@@ -567,7 +583,7 @@ struct mne *mp;
 		 */
 
 		t1 = addr( &e1 );
-		comma();
+		comma(1);
 		t2 = addr( &e2 );
 		v1 = (int) e1.e_addr;
 		v2 = (int) e2.e_addr;
@@ -603,7 +619,7 @@ struct mne *mp;
 		 */
 
 		t1 = addr( &e1 );
-		comma();
+		comma(1);
 		t2 = addr( &e2 );
 		v1 = (int) e1.e_addr;
 		v2 = (int) e2.e_addr;
@@ -632,8 +648,12 @@ struct mne *mp;
 		 * as the string delimiter. Get it.
 		 */
 
-		if( ( d = getnb() ) == '\0' )
+		if ((d = getnb()) == '^') {
+		  d = get();
+		}
+		if(d == '\0' ) {
 		  qerr();
+		}
 
 		/* .tile deals with chunks of 8 characters. We need to
 		 * generate an error if we get fewer than 8 characters in
@@ -800,21 +820,14 @@ struct expr *esp;
 }
 
 /*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
-
-/*
  * Machine dependent initialization
  */
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 0;
 }
+
