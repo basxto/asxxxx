@@ -120,6 +120,9 @@ struct mne *mp;
 		switch(t1) {
 		case S_REG8:
 			if (t2 == S_REG8) {
+				if ((x1 == REG8_A) && (x2 == REG8_A)) {
+					xerr('a', "A,A is invalid.");
+				} else
 				/* A,R8n */
 				if (x1 == REG8_A) {
 					outab(RK0SPG1);
@@ -130,7 +133,8 @@ struct mne *mp;
 					outab(RK0SPG1);
 					outab(op + (x1 << 1));
 				} else {
-					xerr('a', "A,A is invalid.");
+				/* R8n,R8n */
+					xerr('a', "One of the arguments must be A.");
 				}
 			} else
 			if (x1 == REG8_A) {
@@ -478,11 +482,17 @@ struct mne *mp;
 		if ((t1 == S_REG16) && (x1 == REG16_AX) && (t2 == S_SADDR)) {
 			outab(0xD6);
 			outrb(&e2, 0);
+			if (is_abs(&e2) && (e2.e_addr & 0x01)) {
+				xerr('a', "Address must be even.");
+			}
 		} else
 		/* saddr,AX */
 		if ((t1 == S_SADDR) && (t2 == S_REG16) && (x2 == REG16_AX)) {
 			outab(0xE6);
 			outrb(&e1, 0);
+			if (is_abs(&e1) && (e1.e_addr & 0x01)) {
+				xerr('a', "Address must be even.");
+			}
 		} else
 		if ((t1 == S_REG16) && (t2 == S_REG16)) {
 			/* AX,R16n    R16n != AX */

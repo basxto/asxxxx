@@ -217,6 +217,9 @@ struct mne *mp;
 				if (x2 == REG8_A) {
 					outab(RK0PG61);
 					outab(op + x1);
+				} else {
+				/* R8n,R8n */
+					xerr('a', "One of the arguments must be A.");
 				}
 			} else
 			if (x1 == REG8_A) {
@@ -264,7 +267,7 @@ struct mne *mp;
 					break;
 				}
 			} else {
-				xerr('a', "A is the only 8-Bit register allowed.");
+				xerr('a', "The first argument must be A.");
 			}
 			break;
 		case S_SADDR:	/* saddr,#Byte */
@@ -290,7 +293,7 @@ struct mne *mp;
 			outab(op);
 			outrw(&e2, 0);
 		} else {
-			xerr('a', "AX is the only 16-Bit register allowed.");
+			xerr('a', "The correct form is AX,#Word.");
 		}
 		break;
 
@@ -427,7 +430,8 @@ struct mne *mp;
 						outab(op | x1);
 					}
 				} else {
-					xerr('a', "Invalid Addressing Mode.");
+				/* R8n,R8n */
+					xerr('a', "One of the arguments must be A.");
 				}
 			} else
 			if (x1 == REG8_A) {
@@ -713,6 +717,9 @@ struct mne *mp;
 				outab(0xEE);
 				outrb(&e1, 0);
 				outrw(&e2, 0);
+				if (is_abs(&e1) && (e1.e_addr & 0x01)) {
+					xerr('a', "Address must be even.");
+				}
 				break;
 			case S_SFR:	/* sfr,#Word */
 				outab(0xFE);
@@ -736,6 +743,9 @@ struct mne *mp;
 			case S_SADDR:	/* AX,saddr */
 				outab(0x89);
 				outrb(&e2, 0);
+				if (is_abs(&e2) && (e2.e_addr & 0x01)) {
+					xerr('a', "Address must be even.");
+				}
 				break;
 			case S_SFR:	/* AX,sfr */
 				outab(0xA9);
@@ -763,6 +773,9 @@ struct mne *mp;
 			case S_SADDR:	/* saddr,AX */
 				outab(0x99);
 				outrb(&e1, 0);
+				if (is_abs(&e1) && (e1.e_addr & 0x01)) {
+					xerr('a', "Address must be even.");
+				}
 				break;
 			case S_SFR:	/* sfr,AX */
 				outab(0xB9);

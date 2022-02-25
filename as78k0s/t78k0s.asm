@@ -301,7 +301,7 @@
 						; D3
 	movw	ax,bc				; D4
 	dec	saddrFE20			; D5 20
-	movw	ax,saddrFF17			; D6 17
+	movw	ax,saddrFE20			; D6 20
 						; D7
 	movw	ax,de				; D8
 						; D9
@@ -318,7 +318,7 @@
 						; E3
 	movw	bc,ax				; E4
 	mov	saddrFE20,a			; E5 20
-	movw	saddrFF17,ax			; E6 17
+	movw	saddrFE20,ax			; E6 20
 	mov	sfrFF21,a			; E7 21
 	movw	de,ax				; E8
 	mov	addr16,a			; E9 16 E0
@@ -575,7 +575,7 @@
 						; D3
 	movw	ax,rp1				; D4
 	dec	saddrFE20			; D5 20
-	movw	ax,saddrFF17			; D6 17
+	movw	ax,saddrFE20			; D6 20
 						; D7
 	movw	ax,rp2				; D8
 						; D9
@@ -592,7 +592,7 @@
 						; E3
 	movw	rp1,ax				; E4
 	mov	saddrFE20,a			; E5 20
-	movw	saddrFF17,ax			; E6 17
+	movw	saddrFE20,ax			; E6 20
 	mov	sfrFF21,a			; E7 21
 	movw	rp2,ax				; E8
 	mov	addr16,a			; E9 16 E0
@@ -918,7 +918,7 @@
 	bf	a.bit1,.			; 0A 10 FD
 	cmp	a,r0				; 0A 11
 	set1	a.bit1				; 0A 12
-	cmp	a,r1				; 0A 13
+;	cmp	a,r1				; 0A 13
 	bf	sfrFF21.bit1,.			; 0A 14 21 FC
 	cmp	a,c				; 0A 15
 	set1	sfrFF21.bit1			; 0A 16 21
@@ -969,7 +969,7 @@
 	bf	a.bit4,.			; 0A 40 FD
 	xor	a,r0				; 0A 41
 	set1	a.bit4				; 0A 42
-	xor	a,r1				; 0A 43
+;	xor	a,r1				; 0A 43
 	bf	sfrFF21.bit4,.			; 0A 44 21 FC
 	xor	a,c				; 0A 45
 	set1	sfrFF21.bit4			; 0A 46 21
@@ -1003,7 +1003,7 @@
 	bf	a.bit6,.			; 0A 60 FD
 	and	a,r0				; 0A 61
 	set1	a.bit6				; 0A 62
-	and	a,r1				; 0A 63
+;	and	a,r1				; 0A 63
 	bf	sfrFF21.bit6,.			; 0A 64 21 FC
 	and	a,c				; 0A 65
 	set1	sfrFF21.bit6			; 0A 66 21
@@ -1020,7 +1020,7 @@
 	bf	a.bit7,.			; 0A 70 FD
 	or	a,r0				; 0A 71
 	set1	a.bit7				; 0A 72
-	or	a,r1				; 0A 73
+;	or	a,r1				; 0A 73
 	bf	sfrFF21.bit7,.			; 0A 74 21 FC
 	or	a,c				; 0A 75
 	set1	sfrFF21.bit7			; 0A 76 21
@@ -1037,7 +1037,7 @@
 	bt	a.bit0,.			; 0A 80 FD
 	add	a,r0				; 0A 81
 	clr1	a.bit0				; 0A 82
-	add	a,r1				; 0A 83
+;	add	a,r1				; 0A 83
 	bt	sfrFF21.bit0,.			; 0A 84 21 FC
 	add	a,c				; 0A 85
 	clr1	sfrFF21.bit0			; 0A 86 21
@@ -1054,7 +1054,7 @@
 	bt	a.bit1,.			; 0A 90 FD
 	sub	a,r0				; 0A 91
 	clr1	a.bit1				; 0A 92
-	sub	a,r1				; 0A 93
+;	sub	a,r1				; 0A 93
 	bt	sfrFF21.bit1,.			; 0A 94 21 FC
 	sub	a,c				; 0A 95
 	clr1	sfrFF21.bit1			; 0A 96 21
@@ -1071,7 +1071,7 @@
 	bt	a.bit2,.			; 0A A0 FD
 	addc	a,r0				; 0A A1
 	clr1	a.bit2				; 0A A2
-	addc	a,r1				; 0A A3
+;	addc	a,r1				; 0A A3
 	bt	sfrFF21.bit2,.			; 0A A4 21 FC
 	addc	a,c				; 0A A5
 	clr1	sfrFF21.bit2			; 0A A6 21
@@ -1088,7 +1088,7 @@
 	bt	a.bit3,.			; 0A B0 FD
 	subc	a,r0				; 0A B1
 	clr1	a.bit3				; 0A B2
-	subc	a,r1				; 0A B3
+;	subc	a,r1				; 0A B3
 	bt	sfrFF21.bit3,.			; 0A B4 21 FC
 	subc	a,c				; 0A B5
 	clr1	sfrFF21.bit3			; 0A B6 21
@@ -1193,7 +1193,7 @@
 	bf	a.bit1,.			; 0A 10 FD
 	cmp	a,r0				; 0A 11
 	set1	a.bit1				; 0A 12
-	cmp	a,r1				; 0A 13
+;	cmp	a,r1				; 0A 13
 	bf	sfrFF21.bit1,.			; 0A 14 21 FC
 	cmp	a,r2				; 0A 15
 	set1	sfrFF21.bit1			; 0A 16 21
@@ -1244,7 +1244,7 @@
 	bf	a.bit4,.			; 0A 40 FD
 	xor	a,r0				; 0A 41
 	set1	a.bit4				; 0A 42
-	xor	a,r1				; 0A 43
+;	xor	a,r1				; 0A 43
 	bf	sfrFF21.bit4,.			; 0A 44 21 FC
 	xor	a,r2				; 0A 45
 	set1	sfrFF21.bit4			; 0A 46 21
@@ -1278,7 +1278,7 @@
 	bf	a.bit6,.			; 0A 60 FD
 	and	a,r0				; 0A 61
 	set1	a.bit6				; 0A 62
-	and	a,r1				; 0A 63
+;	and	a,r1				; 0A 63
 	bf	sfrFF21.bit6,.			; 0A 64 21 FC
 	and	a,r2				; 0A 65
 	set1	sfrFF21.bit6			; 0A 66 21
@@ -1295,7 +1295,7 @@
 	bf	a.bit7,.			; 0A 70 FD
 	or	a,r0				; 0A 71
 	set1	a.bit7				; 0A 72
-	or	a,r1				; 0A 73
+;	or	a,r1				; 0A 73
 	bf	sfrFF21.bit7,.			; 0A 74 21 FC
 	or	a,r2				; 0A 75
 	set1	sfrFF21.bit7			; 0A 76 21
@@ -1312,7 +1312,7 @@
 	bt	a.bit0,.			; 0A 80 FD
 	add	a,r0				; 0A 81
 	clr1	a.bit0				; 0A 82
-	add	a,r1				; 0A 83
+;	add	a,r1				; 0A 83
 	bt	sfrFF21.bit0,.			; 0A 84 21 FC
 	add	a,r2				; 0A 85
 	clr1	sfrFF21.bit0			; 0A 86 21
@@ -1329,7 +1329,7 @@
 	bt	a.bit1,.			; 0A 90 FD
 	sub	a,r0				; 0A 91
 	clr1	a.bit1				; 0A 92
-	sub	a,r1				; 0A 93
+;	sub	a,r1				; 0A 93
 	bt	sfrFF21.bit1,.			; 0A 94 21 FC
 	sub	a,r2				; 0A 95
 	clr1	sfrFF21.bit1			; 0A 96 21
@@ -1346,7 +1346,7 @@
 	bt	a.bit2,.			; 0A A0 FD
 	addc	a,r0				; 0A A1
 	clr1	a.bit2				; 0A A2
-	addc	a,r1				; 0A A3
+;	addc	a,r1				; 0A A3
 	bt	sfrFF21.bit2,.			; 0A A4 21 FC
 	addc	a,r2				; 0A A5
 	clr1	sfrFF21.bit2			; 0A A6 21
@@ -1363,7 +1363,7 @@
 	bt	a.bit3,.			; 0A B0 FD
 	subc	a,r0				; 0A B1
 	clr1	a.bit3				; 0A B2
-	subc	a,r1				; 0A B3
+;	subc	a,r1				; 0A B3
 	bt	sfrFF21.bit3,.			; 0A B4 21 FC
 	subc	a,r2				; 0A B5
 	clr1	sfrFF21.bit3			; 0A B6 21
@@ -1468,7 +1468,7 @@
 	bf	a,#bit1,.			; 0A 10 FD
 	cmp	a,r0				; 0A 11
 	set1	a,#bit1				; 0A 12
-	cmp	a,r1				; 0A 13
+;	cmp	a,r1				; 0A 13
 	bf	sfrFF21,#bit1,.			; 0A 14 21 FC
 	cmp	a,r2				; 0A 15
 	set1	sfrFF21,#bit1			; 0A 16 21
@@ -1519,7 +1519,7 @@
 	bf	a,#bit4,.			; 0A 40 FD
 	xor	a,r0				; 0A 41
 	set1	a,#bit4				; 0A 42
-	xor	a,r1				; 0A 43
+;	xor	a,r1				; 0A 43
 	bf	sfrFF21,#bit4,.			; 0A 44 21 FC
 	xor	a,r2				; 0A 45
 	set1	sfrFF21,#bit4			; 0A 46 21
@@ -1553,7 +1553,7 @@
 	bf	a,#bit6,.			; 0A 60 FD
 	and	a,r0				; 0A 61
 	set1	a,#bit6				; 0A 62
-	and	a,r1				; 0A 63
+;	and	a,r1				; 0A 63
 	bf	sfrFF21,#bit6,.			; 0A 64 21 FC
 	and	a,r2				; 0A 65
 	set1	sfrFF21,#bit6			; 0A 66 21
@@ -1570,7 +1570,7 @@
 	bf	a,#bit7,.			; 0A 70 FD
 	or	a,r0				; 0A 71
 	set1	a,#bit7				; 0A 72
-	or	a,r1				; 0A 73
+;	or	a,r1				; 0A 73
 	bf	sfrFF21,#bit7,.			; 0A 74 21 FC
 	or	a,r2				; 0A 75
 	set1	sfrFF21,#bit7			; 0A 76 21
@@ -1587,7 +1587,7 @@
 	bt	a,#bit0,.			; 0A 80 FD
 	add	a,r0				; 0A 81
 	clr1	a,#bit0				; 0A 82
-	add	a,r1				; 0A 83
+;	add	a,r1				; 0A 83
 	bt	sfrFF21,#bit0,.			; 0A 84 21 FC
 	add	a,r2				; 0A 85
 	clr1	sfrFF21,#bit0			; 0A 86 21
@@ -1604,7 +1604,7 @@
 	bt	a,#bit1,.			; 0A 90 FD
 	sub	a,r0				; 0A 91
 	clr1	a,#bit1				; 0A 92
-	sub	a,r1				; 0A 93
+;	sub	a,r1				; 0A 93
 	bt	sfrFF21,#bit1,.			; 0A 94 21 FC
 	sub	a,r2				; 0A 95
 	clr1	sfrFF21,#bit1			; 0A 96 21
@@ -1621,7 +1621,7 @@
 	bt	a,#bit2,.			; 0A A0 FD
 	addc	a,r0				; 0A A1
 	clr1	a,#bit2				; 0A A2
-	addc	a,r1				; 0A A3
+;	addc	a,r1				; 0A A3
 	bt	sfrFF21,#bit2,.			; 0A A4 21 FC
 	addc	a,r2				; 0A A5
 	clr1	sfrFF21,#bit2			; 0A A6 21
@@ -1638,7 +1638,7 @@
 	bt	a,#bit3,.			; 0A B0 FD
 	subc	a,r0				; 0A B1
 	clr1	a,#bit3				; 0A B2
-	subc	a,r1				; 0A B3
+;	subc	a,r1				; 0A B3
 	bt	sfrFF21,#bit3,.			; 0A B4 21 FC
 	subc	a,r2				; 0A B5
 	clr1	sfrFF21,#bit3			; 0A B6 21
@@ -1743,7 +1743,7 @@
 	bf	a,#exbit+1,.			; 0Ar10 FD
 	cmp	a,r0				; 0A 11
 	set1	a,#exbit+1			; 0Ar12
-	cmp	a,r1				; 0A 13
+;	cmp	a,r1				; 0A 13
 	bf	*exsfr+0xFF21,#exbit+1,.	; 0Ar14r21 FC
 	cmp	a,r2				; 0A 15
 	set1	*exsfr+0xFF21,#exbit+1		; 0Ar16r21
@@ -1794,7 +1794,7 @@
 	bf	a,#exbit+4,.			; 0Ar40 FD
 	xor	a,r0				; 0A 41
 	set1	a,#exbit+4			; 0Ar42
-	xor	a,r1				; 0A 43
+;	xor	a,r1				; 0A 43
 	bf	*exsfr+0xFF21,#exbit+4,.	; 0Ar44r21 FC
 	xor	a,r2				; 0A 45
 	set1	*exsfr+0xFF21,#exbit+4		; 0Ar46r21
@@ -1828,7 +1828,7 @@
 	bf	a,#exbit+6,.			; 0Ar60 FD
 	and	a,r0				; 0A 61
 	set1	a,#exbit+6			; 0Ar62
-	and	a,r1				; 0A 63
+;	and	a,r1				; 0A 63
 	bf	*exsfr+0xFF21,#exbit+6,.	; 0Ar64r21 FC
 	and	a,r2				; 0A 65
 	set1	*exsfr+0xFF21,#exbit+6		; 0Ar66r21
@@ -1845,7 +1845,7 @@
 	bf	a,#exbit+7,.			; 0Ar70 FD
 	or	a,r0				; 0A 71
 	set1	a,#exbit+7			; 0Ar72
-	or	a,r1				; 0A 73
+;	or	a,r1				; 0A 73
 	bf	*exsfr+0xFF21,#exbit+7,.	; 0Ar74r21 FC
 	or	a,r2				; 0A 75
 	set1	*exsfr+0xFF21,#exbit+7		; 0Ar76r21
@@ -1862,7 +1862,7 @@
 	bt	a,#exbit+0,.			; 0Ar80 FD
 	add	a,r0				; 0A 81
 	clr1	a,#exbit+0			; 0Ar82
-	add	a,r1				; 0A 83
+;	add	a,r1				; 0A 83
 	bt	*exsfr+0xFF21,#exbit+0,.	; 0Ar84r21 FC
 	add	a,r2				; 0A 85
 	clr1	*exsfr+0xFF21,#exbit+0		; 0Ar86r21
@@ -1879,7 +1879,7 @@
 	bt	a,#exbit+1,.			; 0Ar90 FD
 	sub	a,r0				; 0A 91
 	clr1	a,#exbit+1			; 0Ar92
-	sub	a,r1				; 0A 93
+;	sub	a,r1				; 0A 93
 	bt	*exsfr+0xFF21,#exbit+1,.	; 0Ar94r21 FC
 	sub	a,r2				; 0A 95
 	clr1	*exsfr+0xFF21,#exbit+1		; 0Ar96r21
@@ -1896,7 +1896,7 @@
 	bt	a,#exbit+2,.			; 0ArA0 FD
 	addc	a,r0				; 0A A1
 	clr1	a,#exbit+2			; 0ArA2
-	addc	a,r1				; 0A A3
+;	addc	a,r1				; 0A A3
 	bt	*exsfr+0xFF21,#exbit+2,.	; 0ArA4r21 FC
 	addc	a,r2				; 0A A5
 	clr1	*exsfr+0xFF21,#exbit+2		; 0ArA6r21
@@ -1913,7 +1913,7 @@
 	bt	a,#exbit+3,.			; 0ArB0 FD
 	subc	a,r0				; 0A B1
 	clr1	a,#exbit+3			; 0ArB2
-	subc	a,r1				; 0A B3
+;	subc	a,r1				; 0A B3
 	bt	*exsfr+0xFF21,#exbit+3,.	; 0ArB4r21 FC
 	subc	a,r2				; 0A B5
 	clr1	*exsfr+0xFF21,#exbit+3		; 0ArB6r21
