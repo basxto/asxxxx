@@ -10,4 +10,5 @@ backup/
 *.ihx
 *.bin
 release/
-
+*.lst
+*.map

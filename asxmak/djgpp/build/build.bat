@@ -30,4 +30,5 @@ make ascheck
 make aslink
 make asxscn
 make asxcnv
+make s19os9
 

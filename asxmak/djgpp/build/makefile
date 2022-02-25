@@ -3,7 +3,7 @@
 #		DJGPP V02.03  'GNU make' Version
 #		================================
 #
-#   8  January  2006		GCC 4.0.1 / make 3.79.1
+#   9  October  2006		GCC 4.0.1 / make 3.79.1
 #
 ####################################################################
 
@@ -37,7 +37,8 @@ ASXXXX =	as430		\
 		ascheck		\
 		aslink		\
 		asxscn		\
-		asxcnv
+		asxcnv		\
+		s19os9
 	
 ####################################################################
 # Option Definitions
@@ -62,6 +63,7 @@ ASXBAS=		../../../
 SRCASX=		$(ASXBAS)asxxsrc/
 SRCLNK=		$(ASXBAS)linksrc/
 SRCMISC=	$(ASXBAS)asxxmisc/
+SRCS19OS9=	$(ASXBAS)s19os9/
 DSTEXE=		../exe/
 
 SRC430=		$(ASXBAS)as430/
@@ -796,6 +798,21 @@ asxscn :	$(ASXSCN)
 		$(LD) $(LDFLAGS) -o asxscn $(ASXSCN)
 		mv asxscn.exe $(DSTEXE)asxscn.exe
 		strip $(DSTEXE)asxscn.exe
+
+
+####################################################################
+# S19OS9
+####################################################################
+
+S19OS9 =	s19os9.o
+
+s19os9.o :	$(SRCS19OS9)s19os9.c $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+s19os9 :	$(S19OS9)
+		$(LD) $(LDFLAGS) -o s19os9 $(S19OS9)
+		mv s19os9.exe $(DSTEXE)s19os9.exe
+		strip $(DSTEXE)s19os9.exe
 
 
 ### end #########################################################

@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#   15 June 2005			Created for LINUX     / make /
+#   9 October 2006			Created for LINUX     / make /
 #
 ######################################################################
 
@@ -21,12 +21,13 @@ all:	as430 as740 as1802 as2650	\
 	asavr aspic			\
 	ascheck				\
 	aslink				\
-	asxcnv asxscn
+	asxcnv asxscn s19os9
 
 clean:
 	rm -f $(SRCASX)*.o
 	rm -f $(SRCLNK)*.o
 	rm -f $(SRCMISC)*.o
+	rm -f $(S19OS9)*.o
 	rm -f $(SRC430)*.o
 	rm -f $(SRC740)*.o
 	rm -f $(SRC1802)*.o
@@ -72,6 +73,7 @@ ASXBAS:=	../../../
 SRCASX:=	$(ASXBAS)asxxsrc/
 SRCLNK:=	$(ASXBAS)linksrc/
 SRCMISC:=	$(ASXBAS)asxxmisc/
+SRCS19OS9=	$(ASXBAS)s19os9/
 DSTEXE:=	$(ASXBAS)asxmak/linux/exe/
 
 SRC430=		$(ASXBAS)as430/
@@ -549,6 +551,15 @@ asxcnv.new:	$(SRCMISC)asxxconv.o
 $(SRCMISC)asxxscan.o:	$(SRCASX)asxxxx.h
 asxscn.new:	$(SRCMISC)asxxscan.o
 	$(LD) $(LDFLAGS) $(SRCMISC)asxxscan.o -o asxscn.new
+
+
+####################################################################
+# S19OS9
+####################################################################
+
+$(SRCS19OS9)s19os9.o:	$(SRCASX)asxxxx.h
+s19os9.new:	$(SRCS19OS9)s19os9.o
+	$(LD) $(LDFLAGS) $(SRCS19OS9)s19os9.o -o s19os9.new
 
 
 ### end #########################################################

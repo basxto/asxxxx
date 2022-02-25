@@ -11,6 +11,181 @@ ASxxxx Cross Assembler Updates
 <H2>ASxxxx Cross Assembler Updates</H2>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<B><PRE>
+*---*---*---*---*
+Version 4.11 Optional Update 2
+2006_11_01
+<BR><a href="ftp://shop-pdp.kent.edu/u02411.zip">
+Update_02 for the ASxxxx Assembler and Linker Version 4.11 (50K)</a><BR>
+(use 'pkunzip -d U02411.ZIP' for extraction with MS-DOS)<BR>
+(use 'unzip -L -a U02411.ZIP' for extraction with Linux)<BR>
+<BR>
+   This  update  for  Version  4.11  of the  ASxxxx Cross
+Assemblers includes:
+
+   1)  OS9  definition files and an  OS9 assembler module
+       which creates the OS9 header, code and data areas,
+       and the module CRC block:
+
+            os9_mod.def       OS9 Module Definitions
+            os9_sys.def       OS9 Sytem  Definitions
+            os9_mod.asm       OS9 Module Begin &#47; End Code
+
+   2)  a program, s19os9, to post-process  assembled  OS9
+       modules in  S19  format into  binary  OS9  modules
+       with the appropriate  header  checksum  and module
+       CRC values calculated.
+
+   3)  new  make  and  project files which may be used to
+       compile the s19os9 program.
+	    
+
+   Merge the update asxv4pxx directory and subdirectories
+with the V4.11 distribution.
+
+        Note:
+           It is recommended that Optional Update 01 also
+           be installed to update the  default pagination
+           behavior  of  the  ASxxxx  Assemblers   .list,
+           nlist, .page, and .include directives.
+
+
+   Prepare your  OS9  module as described in os9_mod.asm.
+os9_mod.asm  contains a working  OS9  module which can be
+built using the included module.asm and bldmod.bat files.
+
+   Once you have assembled your module  into an  s19 file
+use the program  s19os9  to create the  binary OS9 module
+file.
+
+The  program s19os9 is invoked from the command line:
+
+   s19os9 mod.s19 -o mod.bin
+
+where  mod.s19 is the input s19  file and  mod.bin is the
+os9 binary output file.
+
+
+   The following  OS9 Driver assembler  program shows the
+steps required when  creating  an  OS9  Driver  using the
+os9_mod.asm file.  os9_mod.asm loads the os9_mod.def  and
+os9_sys.def files,  defines the software interrupt  macro
+os9, and creates the os9 driver header and crc blocks.
+
+
+        ;****
+        ; Step 1:
+        ; Use the .define assembler directive
+        ; to insert the parameters into the
+        ; os9_mod.asm's header structure.
+        ;
+        ;       Note:   See the file os9_mod.asm for
+        ;               parameter names and definitions.
+        ;
+        
+        .define OS9_ModNam,     "LSTNAM"
+        .define OS9_Typ,        "PRGRM"
+        .define OS9_Lng,        "OBJCT"
+        .define OS9_Att,        "REENT"
+        .define OS9_Rev,        "1"
+        .define OS9_ModExe,     "LSTENT"
+        .define OS9_ModMem,     "LSTMEM"
+        
+        ; Step 2:
+        ; Set the symbol OS9_Module equal to 1
+        ; and .include the file os9_mod.asm.
+
+        OS9_Module = 1          ; OS9 Module Begin (==1)
+;       .include	"os9_mod.asm"
+        .nlist
+        .include	"os9_mod.asm"
+        .list
+
+        ;***
+;*******; Driver Code Begins
+        ;***
+
+        ;*****-----*****-----*****-----*****-----*****-----*****
+        ;  LIST UTILITY COMMAND
+        ;  Syntax: list <pathname> 
+        ;  COPIES INPUT FROM SPECIFIED FILE TO STANDARD OUTPUT
+
+        ; Step 3:
+        ; Allocate the storage in .area OS9_Data
+
+        .area   OS9_Data
+
+        ; STATIC STORAGE OFFSETS 
+        
+        BUFSIZ  .equ    200     ; size of input buffer
+        
+        Base = .
+IPATH = . - Base
+        .rmb    1               ; input path number
+PRMPTR = . - Base
+        .rmb    2               ; parameter pointer
+BUFFER = . - Base
+        .rmb    BUFSIZ          ; allocate line buffer
+        .rmb    200             ; allocate stack
+        .rmb    200             ; room for parameter list
+LSTMEM = . - Base
+        
+        ; Step 4:
+        ; Insert the Module Code into .area OS9_Module
+
+        .area   OS9_Module
+
+LSTNAM: .strs   "List"          ; String with last byte or'd with 0x80
+        
+LSTENT: stx     *PRMPTR         ; save parameter ptr
+        lda     #READ.          ; select read access mode
+        os9     I$OPEN          ; open input file
+        bcs     LIST50          ; exit if error
+        sta     *IPATH          ; save input path number
+        stx     *PRMPTR         ; save updated param ptr
+LIST20: lda     *IPATH          ; load input path number
+        leax    *BUFFER,U       ; load buffer pointer
+        ldy     #BUFSIZ         ; maximum bytes to read
+        os9     I$READLN        ; read line of input
+        bcs     LIST30          ; exit if error
+        lda     #1              ; load std. out. path #
+        os9     I$WRITLN        ; output line
+        bcc     LIST20          ; Repeat if no error
+        bra     LIST50          ; exit if error
+
+LIST30: cmpb    #E$EOF          ; at end of file?
+        bne     LIST50          ; branch if not
+        lda     *IPATH          ; load input path number
+        os9     I$CLOSE         ; close input path
+        bcs     LIST50          ; ..exit if error
+        ldx     *PRMPTR         ; restore parameter ptr
+        lda     ,X
+        cmpa    #0x0D           ; End of parameter line?
+        bne     LSTENT          ; ..no, list next file
+        clrb
+LIST50: os9     F$EXIT          ; ... terminate
+
+        ;
+        ;*****-----*****-----*****-----*****-----*****-----*****
+
+        ;***
+;*******; Driver Code Ends
+        ;***
+
+        ; Step 5:
+        ; Set the symbol OS9_Module equal to 0
+        ; and .include the file os9_mod.asm.
+
+        OS9_Module = 0                  ; OS9 Module End (==0)
+;       .include        "os9_mod.asm"
+        .nlist
+        .include	"os9_mod.asm"
+        .list
+
+*---*---*---*---*
+</PRE></B>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
 <B><PRE><H4>
 Version 4.11 Optional Update 1
 2006_11_01
