@@ -1,7 +1,7 @@
 /* asmain.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2017  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@
  *	is checked for proper termination.
  *
  *	The function main() is also responsible for opening all
- *	output files (REL, LST, and SYM), sequencing the global (-g)
+ *	output files (REL, LST, HLR, and SYM), sequencing the global (-g)
  *	and all-global (-a) variable definitions, and dumping the
  *	REL file header information.
  *
@@ -149,6 +149,7 @@
  *		int	zflag		-z, disable symbol case sensitivity
  *		FILE *	lfp		list output file handle
  *		FILE *	ofp		relocation output file handle
+ *		FILE *	hfp		relocation helper file handle
  *		FILE *	tfp		symbol table output file handle
  *
  *	called functions:
@@ -180,7 +181,7 @@
  *
  *	side effects:
  *		Completion of main() completes the assembly process.
- *		REL, LST, and/or SYM files may be generated.
+ *		REL, LST, HLR, and/or SYM files may be generated.
  */
 
 int
@@ -205,8 +206,10 @@ char *argv[];
 	for (i=1; i<argc; ++i) {
 		p = argv[i];
 		if (*p == '-') {
-			if (asmc != NULL)
-				usage(ER_FATAL);
+			if (asmc != NULL) {
+				usage();
+				asexit(ER_FATAL);
+			}
 			++p;
 			while ((c = *p++) != 0) {
 				switch(c) {
@@ -313,13 +316,15 @@ char *argv[];
 
 				case 't':
 				case 'T':
-					++tflag;
+					tflag = 1;
 					break;
 
 				case 'h':
 				case 'H':
 				default:
-					usage(ER_FATAL);
+					hflag = 1;
+					usage();
+					break;
 				}
 			}
 		} else {
@@ -327,8 +332,10 @@ char *argv[];
 				q = p;
 				if (++i < argc) {
 					p = argv[i];
-					if (*p == '-')
-						usage(ER_FATAL);
+					if (*p == '-') {
+						usage();
+						asexit(ER_FATAL);
+					}
 				}
 				asmp = (struct asmf *)
 						new (sizeof (struct asmf));
@@ -349,8 +356,12 @@ char *argv[];
 			asmc->afp = afp;
 		}
 	}
-	if (asmp == NULL)
-		usage(ER_WARNING);
+	if (asmp == NULL) {
+		if (!hflag) {
+			usage();
+		}
+		asexit(ER_WARNING);
+	}
 	if (lflag)
 		lfp = afile(q, "lst", 1);
 	if (oflag)
@@ -1539,6 +1550,8 @@ loop:
 			ap->a_ref = areap->a_ref + 1;
 			ap->a_size = 0;
 			ap->a_fuzz = 0;
+			ap->a_bn = NULL;
+			ap->a_bndry = 0;
 			/*
 			 * The default PC increment is defined in ___pst.c as area[0]
 			 */
@@ -1649,7 +1662,7 @@ loop:
 		break;
 
 	case S_ORG:
-		if (dot.s_area->a_flag & A_ABS) {
+		if ((dot.s_area->a_flag & A_ABS) == A_ABS) {
 			outall();
 			laddr = dot.s_addr = absexpr();
 		} else {
@@ -2004,12 +2017,14 @@ loop:
 	case S_BOUNDARY:
 		switch(mp->m_valu) {
 		case O_EVEN:
+			boundary(0);
 			outall();
 			laddr = dot.s_addr = (dot.s_addr + 1) & ~1;
 			lmode = ALIST;
 			break;
 
 		case O_ODD:
+			boundary(1);
 			outall();
 			laddr = dot.s_addr |= 1;
 			lmode = ALIST;
@@ -2021,6 +2036,7 @@ loop:
 			if (n != 0) {
 				dot.s_addr += (v - n);
 			}
+			boundary(v);
 			outall();
 			laddr = dot.s_addr;
 			lmode = ALIST;
@@ -2139,6 +2155,127 @@ loop:
 		break;
 	}
 	goto loop;
+}
+
+/*)Function	VOID	boundary(n)
+ *
+ *		a_uint		n		boundary value
+ *
+ *	The function boundary() adds a boundary value required
+ *	by the assembled code in the current area and determines
+ *	the smallest common boundary of all boundaries.
+ *
+ *	boundary has no return value
+ *
+ *	local variables:
+ *		struct area *	ap	pointer to current area structure
+ *		struct bndry *	bn	pointer to a boundary structure
+ *		struct bndry *	ibn	pointer to a boundary structure
+ *		struct bndry *	jbn	pointer to a boundary structure
+ *		struct bndry *	kbn	pointer to a boundary structure
+ *		a_uint		m	modulus factor
+ *
+ *	global variables:
+ *		dot.s_area		current area pointer
+ *
+ *	functions called:
+ *		VOID	err()		assubr.c
+ *              char *	new()		assym.c
+ *
+ *	side effects:
+ *		A new boundary structure may be created
+ *		and added to the linked boundary list.
+ *		The smallest common boudary is determined
+ *		and saved in the current area structure.
+ */
+
+VOID
+boundary(n)
+a_uint n;
+{
+	struct area *ap;
+	struct bndry *bn, *ibn, *jbn, *kbn;
+	a_uint m;
+
+	ap = dot.s_area;
+
+	if (ap->a_bndry >= 0x00010000) {
+		err('c');
+		return;
+	} else 
+	if (n >= 0x00010000) {
+		err('c');
+		return;
+	} else
+	/*
+	 * .even and .odd
+	 */
+	if (n <= 1) {
+		n = 2;
+	}
+
+	/*
+	 * Scan boundary entries and
+	 * exit on a duplicate.
+	 */
+	bn = ap->a_bn;
+	while (bn != NULL) {
+		if (bn->a_bndry == n) {
+			return;
+		}
+		bn = bn->a_bn;
+	}
+	/*
+	 * Create new boundary entry and
+	 * place at beginning of list.
+	 */
+	bn = (struct bndry *) new (sizeof(struct bndry));
+	bn->a_bndry = n;
+	bn->a_bn = ap->a_bn;
+	ap->a_bn = bn;
+
+	/*
+	 * Exit on first boundary definition
+	 */
+	if (bn->a_bn == NULL) {
+		ap->a_bndry = n;
+		return;
+	}
+
+	/*
+	 * Compute smallest common boundary
+	 */
+	ap->a_bndry *= n;
+	ibn = ap->a_bn;
+	while (ibn != NULL) {
+		for (jbn=ap->a_bn; jbn!=NULL; jbn=jbn->a_bn) {
+			m = ibn->a_bndry % jbn->a_bndry;
+			for (kbn=ap->a_bn; kbn!=NULL; kbn=kbn->a_bn) {
+				if (m < 2) {
+					break;
+				}
+				if ((ap->a_bndry / m) < kbn->a_bndry) {
+					break;
+				}
+				if (((ap->a_bndry / m) % kbn->a_bndry) != 0) {
+					break;
+				}
+			}
+			if (kbn == NULL) {
+				ap->a_bndry /= m;
+				break;
+			}
+		}
+		if (jbn != NULL) {
+			ibn = ap->a_bn;
+		} else {
+			ibn = ibn->a_bn;
+		}
+	}
+	if (ap->a_bndry >= 0x00010000) {
+		ap->a_bndry = 0x00010000;
+		err('c');
+	}
 }
 
 /*)Function	VOID	equate(id,e1,equtype)
@@ -2500,6 +2637,7 @@ a_uint a;
 char *usetxt[] = {
 	"Usage: [-Options] file",
 	"Usage: [-Options] outfile file1 [file2 file3 ...]",
+	"  -h   or NO ARGUMENTS  Show this help list",
 	"  -d   Decimal listing",
 	"  -q   Octal   listing",
 	"  -x   Hex     listing (default)",
@@ -2535,9 +2673,7 @@ char *usetxt[] = {
  *	'hunk' allocations required during the assembly.
  */
 
-/*)Function	VOID	usage(n)
- *
- *		int	n		exit code
+/*)Function	VOID	usage()
  *
  *	The function usage() outputs to the stderr device the
  *	assembler name and version and a list of valid assembler options.
@@ -2551,24 +2687,22 @@ char *usetxt[] = {
  *		char *	usetxt[]	array of string pointers
  *
  *	functions called:
- *		VOID	asexit()	asmain.c
  *		int	fprintf()	c_library
  *
  *	side effects:
- *		program is terminated
+ *		none
  */
 
 VOID
-usage(n)
-int n;
+usage()
 {
 	char   **dp;
 
 	fprintf(stderr, "\nASxxxx Assembler %s  (%s)", VERSION, cpu);
 	fprintf(stderr, "\nCopyright (C) %s  Alan R. Baldwin", COPYRIGHT);
 	fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
-	for (dp = usetxt; *dp; dp++)
+	for (dp = usetxt; *dp; dp++) {
 		fprintf(stderr, "%s\n", *dp);
-	asexit(n);
+	}
 }
 

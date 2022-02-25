@@ -21,6 +21,7 @@ the following option list and then exits:
 
 Usage: [-Options] file
 Usage: [-Options] outfile file1 [file2 file3 ...]
+  -h   or NO ARGUMENTS  Show this help list
   -d   Decimal listing
   -q   Octal   listing
   -x   Hex     listing (default)
@@ -63,6 +64,8 @@ started at a system specific prompt:
 
 
 The ASxxxx options in some more detail:  
+
+        -h      List the ASxxxx options
 
         -d      decimal listing
         -q      octal   listing
@@ -159,8 +162,6 @@ have different radices.
    The  ASxxxx  assemblers  also  have  several 'hidden' options
 which are not shown in the usage message.  These are:  
 
-        -h      Print the usage message and exit
-
         -r      Include assembler line numbers
                 in the .hlr hint file
         -rr     Also include non listed line
@@ -203,6 +204,8 @@ is the source/include file.
             ing mode error.  
 
       (b)   Indicates a direct page boundary error.  
+
+      (c)   Indicates modulus of .bndry directives to large.  
 
       (d)   Indicates a direct page addressing error.  
 
@@ -467,9 +470,8 @@ Octal:           111 222 333
 Decimal:         111 222 333
 Hex:             11 22 33
 
-Parameter 1 specifies the parameters listed in the line.
-A bit is set for each listing option enabled during the
-assembly of the line.
+Parameter 1 is the listed parameters for the
+line designated by a bit position in the parameter:
 
         BIT 0   - LIST_ERR      Error Code(s)
         BIT 1   - LIST_LOC      Location
@@ -539,6 +541,6 @@ action.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: April 2009</B></P></H6>
+<H6><P><B>Last Updated: January 2017</B></P></H6>
 </BODY> 
 </HTML>

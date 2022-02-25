@@ -618,34 +618,57 @@ of n.
 changes  the current location to be at a multiple of 4, a 4-byte
 boundary.  
 
-   The  relocation  and/or  concatenation  of an area containing
-.bndry directives to place code at specific boundaries will  NOT
-maintain  the  specified  boundaries.  When relocating such code
-areas you must specify the base addresses to the linker manually
-and/or  you must pad the allocated space of an area to match the
-boundary conditions.  
+   The boundary specifications are propagated to the linker as a
+boundary modulus, ie the smallest common boundary for all  .odd,
+.even, and .bndry directives contained within the area.  A boun-
+dary value of 1 is equivalent to .odd and a boundary value of  2
+is equivalent to .even.  Because areas are always assembled with
+an initial address of 0, an even address, both  .odd  and  .even
+are modulus 2 boundaries.  
 
-   As  an  example  suppose  you wish to link multiple assembled
-code sections, each of which has code for the same area and  re-
-quires a 4 byte boundary.  The starting address of the area must
-be specified to the linker on a 4 byte  boundary  and  each  as-
-sembled code section must be padded to fill out the area in each
-of the individually assembled files.  The  following  code  will
-provide  the necessary area padding to allow a succesful linking
-of files and maintain the boundary requirements:  
+   As  an  example, suppose there are two sections:  a CODE sec-
+tion and a DATA section.  The program code is  written  so  that
+the  data  associated with this section of the program code fol-
+lows immediately.  
 
-        .$.end = .              ; end of area address
-        .bndry  4               ; set boundary
-        .if ne,. - .$.end       ; is . the same ?
-          . = . - 1             ; no: backup 1 byte
-          .byte 0               ; place padding byte
-        .endif
+                .area   CODE
+                ; Subroutine 1 Code
+                ; Uses data having a boundary of 6
 
+                .area   DATA
+                ; Subroutine 1 Data
+                .bndry  6
+                .word   1, 2, 3
 
-   If  all  files  are  assembled  simultaneously  then only the
-.bndry directive is required at the beginning  of  the  area  in
-each  file and the initial area address must be specified to the
-linker.  
+                ...
+
+                .area   CODE
+                ; Subroutine 2 Code
+                ; Uses data having a boundary of 8
+
+                .area   DATA
+                ; Subroutine 2 Data
+                .bndry  8
+                .word   1, 2, 3, 4,
+
+   Since  the CODE and DATA sections are assembled during a sin-
+gle assembly (also applies to include files) the  the  assembler
+compiles all CODE segments as a single area segment.  The assem-
+bler also compiles all the DATA segments as a single  area  seg-
+ment  which  has  two .bndry directives and will have a boundary
+modulus of 24.  24 is the smallest boundary divisible by 6 and 8
+with  no remainder.  When the assembled file is linked the loca-
+tion of the data in the DATA area will be offset to  an  address
+which has a boundary modulus of 24.  
+
+   When  multiple files containing the same area names (projects
+with multiple independently compiled files or library files) are
+linked  together  each  area segment will be offset to match the
+segments boundary modulus.  
+
+   Boundary  specifications  will also be preserved when an area
+base address is specified with the -b linker option  and/or  the
+area is placed within a bank.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -760,14 +783,6 @@ sections:
         '_DATA'         This  is the default optional data area.
                         This   program   area   is    of    type
                         (REL,CON,DSEG).  
-
-The  ASxxxx  assemblers  also automatically generate two symbols
-for each program area:  
-
-        's_<area>'      This is the starting address of the pro-
-                        gram area.  
-
-        'l_<area>'      This is the length of the program area. 
 
 The .area names and options are never case sensitive.  
 
@@ -1853,7 +1868,7 @@ record formats described in the linker section for details.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: April 2009</B></P></H6>
+<H6><P><B>Last Updated: January 2017</B></P></H6>
 </BODY> 
 </HTML>
 

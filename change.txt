@@ -2,8 +2,42 @@
         CHANGE LOG
 
 
-           Asxxxx/ASlink version 5.10 is considered
-	   a major release version.  
+           Asxxxx/ASlink version 5.20 is considered
+        a major release version.  
+
+        Version 5.20
+        2017_01_01
+        
+           (1)  Completed the functionality for propagating
+                the boundary specifications .odd, .even, and
+                .bndry processed during assembly to the linker.
+        
+           (2)  Restored the correct functionality of the
+                .org directive in areas of REL type.
+        
+           (3)  Added Intel Hex legacy start address record
+                type 1 as an option.
+
+
+
+        Summary  of changes/additions to the ASxxxx Assemblers from Ver-
+        sion 4.11 to Version 5.11.  
+
+
+
+        Version 5.10 Update 1
+        2015_06_27
+        
+           This update for Version 5.10 of the ASxxxx Cross
+        Assemblers includes fixes for the following errors:
+        
+           (1)  The as6500 assembler incorrectly assembled
+                cpx # and cpy # instructions.
+        
+           (2)  An error in asmain.c inhibited the listing of
+                all .if.. assembly directives.
+
+
 
         Version 5.10
         2014_10_31
@@ -19,8 +53,6 @@
            (3)  Add as78k0s assembler (Renesas/NEC 78K/0S) 
 
 
-           Summary  of  changes/additions  to the ASxxxx Assemblers from
-        Version 4.11 to Version 5.06.  
 
         Version 5.00 Update 6
         

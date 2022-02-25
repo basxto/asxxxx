@@ -1,7 +1,7 @@
 /* lklist.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2017  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -421,8 +421,9 @@ struct bank *yp;
 		for (i=0; i<NHASH; i++) {
 			sp = symhash[i];
 			while (sp != NULL) {
-				if (oxp == sp->s_axp)
+				if ((oxp == sp->s_axp) && !sp->s_flag) {
 					++nmsym;
+				}
 				sp = sp->s_sp;
 			}
 		}
@@ -454,7 +455,7 @@ struct bank *yp;
 		for (i=0; i<NHASH; i++) {
 			sp = symhash[i];
 			while (sp != NULL) {
-				if (oxp == sp->s_axp) {
+				if ((oxp == sp->s_axp) && !sp->s_flag) {
 					p[nmsym++] = sp;
 				}
 				sp = sp->s_sp;

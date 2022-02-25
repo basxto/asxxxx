@@ -10,7 +10,7 @@ del *turboc30.zip
 del *vc6.zip
 del *vs05.zip
 del *vs10.zip
-del *vs10.zip
+del *vs13.zip
 del *watcom.zip
 del *symantec.zip
 rem

@@ -152,7 +152,9 @@ char *argv[];
 					break;
 
 				default:
-					usage(ER_FATAL);
+					usage();
+					asexit(ER_FATAL);
+					break;
 				}
 		} else {
 			if (++inpfil > 1) {
@@ -168,8 +170,10 @@ char *argv[];
 			}
 		}
 	}
-	if (inpfil == 0)
-		usage(ER_WARNING);
+	if (inpfil == 0) {
+		usage();
+		asexit(ER_WARNING);
+	}
 
 	/*
 	 * Scan file to find assembler errors
@@ -467,12 +471,10 @@ char *usetxt[] = {
 	NULL
 };
 
-/*)Function	VOID	usage(n)
- *
- *		int	n		exit code
+/*)Function	VOID	usage()
  *
  *	The function usage() outputs to the stderr device the
- *	program name and version and a list of valid assembler options.
+ *	program name and version and a list of valid program options.
  *
  *	local variables:
  *		char **	dp		pointer to an array of
@@ -482,7 +484,6 @@ char *usetxt[] = {
  *		char *	usetxt[]	array of string pointers
  *
  *	functions called:
- *		VOID	asexit()	asmain.c
  *		int	fprintf()	c_library
  *
  *	side effects:
@@ -490,16 +491,15 @@ char *usetxt[] = {
  */
 
 VOID
-usage(n)
-int n;
+usage()
 {
 	char **dp;
 
 	fprintf(stderr, "\nASxxxx Assembler Listing Scanner %s", VERSION);
-	fprintf(stderr, "\nCopyright (C) 2009  Alan R. Baldwin");
+	fprintf(stderr, "\nCopyright (C) %s  Alan R. Baldwin", COPYRIGHT);
 	fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
-	for (dp = usetxt; *dp; dp++)
+	for (dp = usetxt; *dp; dp++) {
 		fprintf(stderr, "%s\n", *dp);
-	asexit(n);
+	}
 }
 

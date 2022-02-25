@@ -1,7 +1,7 @@
 /* asout.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2017  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -1481,6 +1481,7 @@ struct area *ap;
 #endif
 
 	fprintf(ofp, frmt, ap->a_size & a_mask, a_flag);
+
 	bp = ap->b_bp;
 	if (((ap->a_flag & A_BNK) == A_BNK) && (bp != NULL)) {
 		if (xflag == 0) {
@@ -1493,6 +1494,26 @@ struct area *ap;
 			fprintf(ofp, " bank %u", bp->b_ref);
 		}
 	}
+
+	if (ap->a_bndry != 0) {
+#ifdef	LONGINT
+		switch(xflag) {
+		default:
+		case 0:	frmt = " bndry %lX";	break;
+		case 1: frmt = " bndry %lo";	break;
+		case 2: frmt = " bndry %lu";	break;
+		}
+#else
+		switch(xflag) {
+		default:
+		case 0:	frmt = " bndry %X";	break;
+		case 1: frmt = " bndry %o";	break;
+		case 2: frmt = " bndry %u";	break;
+		}
+#endif
+		fprintf(ofp, frmt, ap->a_bndry);
+	}
+
 	fprintf(ofp, "\n");
 }
 

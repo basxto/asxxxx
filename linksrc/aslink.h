@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2017  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@
  * Local Definitions
  */
 
-#define	VERSION "V05.11"
-#define	COPYRIGHT "2015"
+#define	VERSION "V05.20"
+#define	COPYRIGHT "2017"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -639,13 +639,14 @@ struct	areax
 	struct	head	*a_bhp;	/* Base header link */
 	a_uint	a_addr;		/* Beginning address of section */
 	a_uint	a_size;		/* Size of the area in section */
+	a_uint	a_bndry;	/* Boundary for this A directive */
 };
 
 /*
  *	A sym structure is created for every unique symbol
  *	referenced/defined while reading the REL files.  The
  *	struct sym contains the symbol's name, a flag value
- *	(not used in this linker), a symbol type denoting
+ *	set to inhibit map output, a symbol type denoting
  *	referenced/defined, and an address which is loaded
  *	with the relative address within the area in which
  *	the symbol was defined.  The sym structure also
@@ -962,6 +963,9 @@ extern	FILE	*yfp;		/*	SDCDB output file handle
 
 extern	int	oflag;		/*	Output file type flag
 				 */
+extern	int	o1flag;		/*	Output legacy Intel Hex flag
+				 *	Start address record type set to 1 
+				 */
 extern	int	objflg;		/*	Linked file/library object output flag
 				 */
 
@@ -971,6 +975,9 @@ extern	int	jflag;		/*	-j, enable NoICE Debug output
 #endif
 
 extern	int	mflag;		/*	Map output flag
+				 */
+extern	int	m1flag;		/*	Include linker generated
+				 *	symbols in map file
 				 */
 extern	int	xflag;		/*	Map file radix type flag
 				 */
@@ -1105,9 +1112,8 @@ extern	int		main(int argc, char *argv[]);
 extern	VOID		map(void);
 extern	int		parse(void);
 extern	VOID		doparse(void);
-extern	VOID		setarea(void);
 extern	VOID		setgbl(void);
-extern	VOID		usage(int n);
+extern	VOID		usage(void);
 
 /* lklex.c */
 extern	VOID		chopcrlf(char *str);
@@ -1128,6 +1134,7 @@ extern	VOID		lnkarea(void);
 extern	VOID		lnksect(struct area *tap);
 extern	VOID		lnkserr(char *frmt, char *str);
 extern	VOID		newarea(void);
+extern	VOID		setarea(void);
 
 /* lkbank.c */
 extern	VOID		chkbank(FILE *fp);
@@ -1280,9 +1287,6 @@ extern	int		main();
 extern	VOID		map();
 extern	int		parse();
 extern	VOID		doparse();
-extern	VOID		setarea();
-extern	VOID		setbank();
-extern	VOID		chkbank();
 extern	VOID		setgbl();
 extern	VOID		usage();
 
@@ -1305,6 +1309,7 @@ extern	VOID		lnkarea();
 extern	VOID		lnksect();
 extern	VOID		lnkserr();
 extern	VOID		newarea();
+extern	VOID		setarea();
 
 /* lkbank.c */
 extern	VOID		chkbank();

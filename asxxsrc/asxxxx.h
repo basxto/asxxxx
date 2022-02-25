@@ -1,7 +1,7 @@
 /* asxxxx.h */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2017  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -50,8 +50,8 @@
  * Local Definitions
  */
 
-#define	VERSION	"V05.11"
-#define	COPYRIGHT "2015"
+#define	VERSION	"V05.20"
+#define	COPYRIGHT "2017"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -273,6 +273,9 @@ typedef	signed INT32 v_sint;
  *	a variable used to track pass to pass changes in the
  *	area size caused by variable length instruction formats,
  *	and area flags which specify the area's relocation type.
+ *	The structure bndry is a linked list of boundaries specified
+ *	within this area.  This list is used (if defined) to calculate
+ *	the overall boundary required when the area is relocated.
  */
 struct	area
 {
@@ -283,6 +286,14 @@ struct	area
 	a_uint	a_size;		/* Area size */
 	a_uint	a_fuzz;		/* Area fuzz */
 	int	a_flag;		/* Area flags */
+	struct	bndry *a_bn;	/* Boundary link */
+	a_uint	a_bndry;	/* Area Boundary */
+};
+
+struct	bndry
+{
+	struct	bndry *a_bn;	/* Boundary link */
+	a_uint	a_bndry;	/* Boundary value */
 };
 
 /*
@@ -998,7 +1009,7 @@ extern	int	fflag;		/*	-f(f), relocations flagged flag
 				 */
 extern	int	gflag;		/*	-g, make undefined symbols global flag
 				 */
-				/*	-h, usage help listed
+extern	int	hflag;		/*	-h, usage help listed
 				 */
 
 #if NOICE
@@ -1172,6 +1183,7 @@ extern	FILE *		afile(char *fn, char *ft, int wf);
 extern	VOID		afilex(char *fn, char *ft);
 extern	VOID		asexit(int i);
 extern	VOID		asmbl(void);
+extern	VOID		boundary(a_uint n);
 extern	VOID		equate(char *id,struct expr *e1,a_uint equtype);
 extern	int		fndidx(char *str);
 extern	int		intsiz(void);
@@ -1181,7 +1193,7 @@ extern	int		main(int argc, char *argv[]);
 extern	VOID		newdot(struct area *nap);
 extern	VOID		phase(struct area *ap, a_uint a);
 extern	char *		usetxt[];
-extern	VOID		usage(int n);
+extern	VOID		usage(void);
 
 /* asmcro.c */
 extern	char *		fgetm(char *ptr, int len, FILE *fp);
@@ -1329,7 +1341,7 @@ extern	VOID		minit(void);
 extern	VOID		asexit(int i);
 extern	int		main(int argc, char *argv[]);
 extern	char *		usetxt[];
-extern	VOID		usage(int n);
+extern	VOID		usage(void);
 */
 extern	VOID		linout(char *str, unsigned int n);
 
@@ -1339,7 +1351,7 @@ extern	VOID		linout(char *str, unsigned int n);
 extern	VOID		asexit(int i);
 extern	int		main(int argc, char *argv[]);
 extern	char *		usetxt[];
-extern	VOID		usage(int n);
+extern	VOID		usage(void);
 */
 extern	int		dgt(int rdx, char *str, int n);
 
@@ -1353,6 +1365,7 @@ extern	FILE *		afile();
 extern	VOID		afilex();
 extern	VOID		asexit();
 extern	VOID		asmbl();
+extern	VOID		boundary);
 extern	VOID		equate();
 extern	int		fndidx();
 extern	int		intsiz();

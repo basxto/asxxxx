@@ -34,8 +34,8 @@
 
 
 
-                                 Version   5.10
-                                  October 2014
+                                 Version   5.20
+                                  January 2017
 
 
         CHAPTER 1  THE ASSEMBLER                                     1-1 
@@ -158,37 +158,37 @@
         
 
 
-          3.5     ASXXXX VERSION 5.XX (4.XX) LINKING                 3-8 
-          3.5.1     Object Module Format                             3-8 
-          3.5.2     Header Line                                      3-9 
-          3.5.3     Module Line                                      3-9 
-          3.5.4     Merge Mode Line                                  3-9 
-          3.5.5     Bank Line                                       3-10 
-          3.5.6     Area Line                                       3-10 
-          3.5.7     Symbol Line                                     3-10 
-          3.5.8     T Line                                          3-11 
-          3.5.9     R Line                                          3-11 
-          3.5.10    P Line                                          3-12 
-          3.5.11    24-Bit and 32-Bit Addressing                    3-12 
-          3.5.12    ASlink V5.xx (V4.xx) Error Messages             3-13 
-          3.6     ASXXXX VERSION 3.XX LINKING                       3-15 
-          3.6.1     Object Module Format                            3-15 
-          3.6.2     Header Line                                     3-15 
-          3.6.3     Module Line                                     3-16 
-          3.6.4     Area Line                                       3-16 
-          3.6.5     Symbol Line                                     3-16 
-          3.6.6     T Line                                          3-16 
-          3.6.7     R Line                                          3-17 
-          3.6.8     P Line                                          3-17 
-          3.6.9     24-Bit and 32-Bit Addressing                    3-18 
-          3.6.10    ASlink V3.xx Error Messages                     3-18 
-          3.7     HINT FILE FORMAT FOR RELOCATED LISTINGS           3-21 
-          3.8     INTEL IHX OUTPUT FORMAT (16-BIT)                  3-23 
-          3.9     INTEL I86 OUTPUT FORMAT (24 OR 32-BIT)            3-24 
-          3.10    MOTOROLA S1-S9 OUTPUT FORMAT (16-BIT)             3-25 
-          3.11    MOTOROLA S2-S8 OUTPUT FORMAT (24-BIT)             3-26 
-          3.12    MOTOROLA S3-S7 OUTPUT FORMAT (32-BIT)             3-27 
-          3.13    TANDY COLOR COMPUTER DISK BASIC FORMAT            3-28 
+          3.5     ASXXXX VERSION 5.XX (4.XX) LINKING                 3-9 
+          3.5.1     Object Module Format                             3-9 
+          3.5.2     Header Line                                     3-10 
+          3.5.3     Module Line                                     3-10 
+          3.5.4     Merge Mode Line                                 3-10 
+          3.5.5     Bank Line                                       3-11 
+          3.5.6     Area Line                                       3-11 
+          3.5.7     Symbol Line                                     3-12 
+          3.5.8     T Line                                          3-12 
+          3.5.9     R Line                                          3-12 
+          3.5.10    P Line                                          3-13 
+          3.5.11    24-Bit and 32-Bit Addressing                    3-13 
+          3.5.12    ASlink V5.xx (V4.xx) Error Messages             3-14 
+          3.6     ASXXXX VERSION 3.XX LINKING                       3-17 
+          3.6.1     Object Module Format                            3-17 
+          3.6.2     Header Line                                     3-17 
+          3.6.3     Module Line                                     3-18 
+          3.6.4     Area Line                                       3-18 
+          3.6.5     Symbol Line                                     3-18 
+          3.6.6     T Line                                          3-18 
+          3.6.7     R Line                                          3-19 
+          3.6.8     P Line                                          3-19 
+          3.6.9     24-Bit and 32-Bit Addressing                    3-20 
+          3.6.10    ASlink V3.xx Error Messages                     3-20 
+          3.7     HINT FILE FORMAT FOR RELOCATED LISTINGS           3-23 
+          3.8     INTEL IHX OUTPUT FORMAT (16-BIT)                  3-25 
+          3.9     INTEL I86 OUTPUT FORMAT (24 OR 32-BIT)            3-27 
+          3.10    MOTOROLA S1-S9 OUTPUT FORMAT (16-BIT)             3-29 
+          3.11    MOTOROLA S2-S8 OUTPUT FORMAT (24-BIT)             3-30 
+          3.12    MOTOROLA S3-S7 OUTPUT FORMAT (32-BIT)             3-31 
+          3.13    TANDY COLOR COMPUTER DISK BASIC FORMAT            3-32 
 
         CHAPTER 4  BUILDING ASXXXX AND ASLINK                        4-1 
           4.1     BUILDING ASXXXX AND ASLINK WITH LINUX              4-2 
@@ -928,7 +928,7 @@
 
 
 
-           Copyright (C) 1989-2014 Alan R.  Baldwin 
+           Copyright (C) 1989-2017 Alan R.  Baldwin 
 
            This  program  is  free  software:   you  can redistribute it
         and/or modify it under the  terms  of  the  GNU  General  Public
@@ -1125,7 +1125,7 @@
         
 
 
-        ASxxxx Cross Assemblers, Version 5.10, October 2014 
+        ASxxxx Cross Assemblers, Version 5.20, January 2017 
 
         Submitted by Alan R.  Baldwin, 
         Kent State University, Kent, Ohio 
@@ -2603,40 +2603,64 @@
         changes  the current location to be at a multiple of 4, a 4-byte
         boundary.  
 
-           The  relocation  and/or  concatenation  of an area containing
-        .bndry directives to place code at specific boundaries will  NOT
-        maintain  the  specified  boundaries.  When relocating such code
-        areas you must specify the base addresses to the linker manually
-        and/or  you must pad the allocated space of an area to match the
-        boundary conditions.  
+           The boundary specifications are propagated to the linker as a
+        boundary modulus, ie the smallest common boundary for all  .odd,
+        .even, and .bndry directives contained within the area.  A boun-
+        dary value of 1 is equivalent to .odd and a boundary value of  2
+        is equivalent to .even.  Because areas are always assembled with
+        an initial address of 0, an even address, both  .odd  and  .even
+        are modulus 2 boundaries.  
 
-           As  an  example  suppose  you wish to link multiple assembled
-        code sections, each of which has code for the same area and  re-
-        quires a 4 byte boundary.  The starting address of the area must
-        be specified to the linker on a 4 byte  boundary  and  each  as-
-        sembled code section must be padded to fill out the area in each
-        of the individually assembled files.  The  following  code  will
-        provide  the necessary area padding to allow a succesful linking
-        of files and maintain the boundary requirements:  
+           As  an  example, suppose there are two sections:  a CODE sec-
+        tion and a DATA section.  The program code is  written  so  that
+        the  data  associated with this section of the program code fol-
+        lows immediately.  
 
-                .$.end = .              ; end of area address
-                .bndry  4               ; set boundary
-                .if ne,. - .$.end       ; is . the same ?
-                  . = . - 1             ; no: backup 1 byte
-                  .byte 0               ; place padding byte
-                .endif
-
-
-           If  all  files  are  assembled  simultaneously  then only the
-        .bndry directive is required at the beginning  of  the  area  in
-        each  file and the initial area address must be specified to the
-        linker.  
+                        .area   CODE
+                        ; Subroutine 1 Code
+                        ; Uses data having a boundary of 6
+        
+                        .area   DATA
+                        ; Subroutine 1 Data
+                        .bndry  6
+                        .word   1, 2, 3
+        
+                        ...
+        
+                        .area   CODE
+                        ; Subroutine 2 Code
+                        ; Uses data having a boundary of 8
+        
+                        .area   DATA
+                        ; Subroutine 2 Data
+                        .bndry  8
+                        .word   1, 2, 3, 4,
 
 
 
 
         THE ASSEMBLER                                          PAGE 1-27
         GENERAL ASSEMBLER DIRECTIVES
+
+
+           Since  the CODE and DATA sections are assembled during a sin-
+        gle assembly (also applies to include files) the  the  assembler
+        compiles all CODE segments as a single area segment.  The assem-
+        bler also compiles all the DATA segments as a single  area  seg-
+        ment  which  has  two .bndry directives and will have a boundary
+        modulus of 24.  24 is the smallest boundary divisible by 6 and 8
+        with  no remainder.  When the assembled file is linked the loca-
+        tion of the data in the DATA area will be offset to  an  address
+        which has a boundary modulus of 24.  
+
+           When  multiple files containing the same area names (projects
+        with multiple independently compiled files or library files) are
+        linked  together  each  area segment will be offset to match the
+        segments boundary modulus.  
+
+           Boundary  specifications  will also be preserved when an area
+        base address is specified with the -b linker option  and/or  the
+        area is placed within a bank.  
 
 
         1.4.22  .area Directive 
@@ -2670,6 +2694,12 @@
            The .area directive provides a means of defining and separat-
         ing multiple programming and data sections.   The  name  is  the
         area  label used by the assembler and the linker to collect code
+
+
+        THE ASSEMBLER                                          PAGE 1-28
+        GENERAL ASSEMBLER DIRECTIVES
+
+
         from various separately assembled modules into one section.  The
         name may be from 1 to 79 characters in length.  
 
@@ -2691,12 +2721,6 @@
                                         ;other sections of this program
                                         ;area.
         
-
-
-        THE ASSEMBLER                                          PAGE 1-28
-        GENERAL ASSEMBLER DIRECTIVES
-
-
                 .area  PAGE  (PAG)      ;This is a paged section. The
                                         ;section must be on a 256 byte
                                         ;boundary and its length is
@@ -2727,6 +2751,12 @@
         particular  bank  are  combined  at  link  time  into a block of
         code/data.  
 
+
+
+        THE ASSEMBLER                                          PAGE 1-29
+        GENERAL ASSEMBLER DIRECTIVES
+
+
            The  CSEG,  DSEG,  and  BANK options are specified within the
         parenthesis as shown in the following examples:  
 
@@ -2742,12 +2772,6 @@
         blank,  this  defaults  to  the previously specified options for
         this program area.  
 
-
-
-        THE ASSEMBLER                                          PAGE 1-29
-        GENERAL ASSEMBLER DIRECTIVES
-
-
         The   ASxxxx   assemblers   automatically  provide  two  program
         sections:  
 
@@ -2759,14 +2783,6 @@
                 '_DATA'         This  is the default optional data area.
                                 This   program   area   is    of    type
                                 (REL,CON,DSEG).  
-
-        The  ASxxxx  assemblers  also automatically generate two symbols
-        for each program area:  
-
-                's_<area>'      This is the starting address of the pro-
-                                gram area.  
-
-                'l_<area>'      This is the length of the program area. 
 
         The .area names and options are never case sensitive.  
 
@@ -2791,6 +2807,12 @@
                         MAP     NOICE mapping 
 
 
+
+
+        THE ASSEMBLER                                          PAGE 1-30
+        GENERAL ASSEMBLER DIRECTIVES
+
+
            The  .bank  directive allows an arbitrary grouping of program
         and/or data areas to be communicated to the  linker.   The  bank
         parameters are all optional and are described as follows:  
@@ -2800,12 +2822,6 @@
                  ing  the linker -b option for the first area within the
                  bank.  The bank address is always specified  in  'byte'
                  addressing.  A first area which is not 'byte' addressed
-
-
-        THE ASSEMBLER                                          PAGE 1-30
-        GENERAL ASSEMBLER DIRECTIVES
-
-
                  (e.g.  a processor addressed by a 'word' of 2  or  more
                  bytes)  has  the  area  address  scaled to begin at the
                  'byte' address.  
@@ -3916,6 +3932,7 @@
 
         Usage: [-Options] file
         Usage: [-Options] outfile file1 [file2 file3 ...]
+          -h   or NO ARGUMENTS  Show this help list
           -d   Decimal listing
           -q   Octal   listing
           -x   Hex     listing (default)
@@ -3959,13 +3976,15 @@
 
         The ASxxxx options in some more detail:  
 
-                -d      decimal listing
 
 
         THE ASSEMBLER                                          PAGE 1-51
         INVOKING ASXXXX
 
 
+                -h      List the ASxxxx options
+        
+                -d      decimal listing
                 -q      octal   listing
                 -x      hex     listing (default)
         
@@ -4015,15 +4034,15 @@
                 -o      create object output (out)file.rel
                 -s      create symbol output (out)file.sym
         
-                -p      disable listing pagination
-        
-                        This option inhibits the generation
 
 
         THE ASSEMBLER                                          PAGE 1-52
         INVOKING ASXXXX
 
 
+                -p      disable listing pagination
+        
+                        This option inhibits the generation
                         of a form-feed character and its
                         associated page header in the
                         assembler listing.
@@ -4066,8 +4085,6 @@
            The  ASxxxx  assemblers  also  have  several 'hidden' options
         which are not shown in the usage message.  These are:  
 
-                -h      Print the usage message and exit
-        
                 -r      Include assembler line numbers
                         in the .hlr hint file
                 -rr     Also include non listed line
@@ -4075,11 +4092,13 @@
         
                 -t      Show Include File and Macro Expansion
                         levels and memory allocations for
-                        the assembler and macro processor
 
 
         THE ASSEMBLER                                          PAGE 1-53
-        ERRORS
+        INVOKING ASXXXX
+
+
+                        the assembler and macro processor
 
 
         1.6  ERRORS 
@@ -4109,6 +4128,8 @@
 
               (b)   Indicates a direct page boundary error.  
 
+              (c)   Indicates modulus of .bndry directives to large.  
+
               (d)   Indicates a direct page addressing error.  
 
               (e)   Caused by a .error or .assume directive.  
@@ -4129,16 +4150,16 @@
 
               (p)   Phase error:  label location changing between passes
                     2 and 3.  Normally caused by having  more  than  one
-                    level of forward referencing.  
-
-              (q)   Questionable syntax:  missing or improper operators,
-                    terminators, or delimiters.  
-
 
 
         THE ASSEMBLER                                          PAGE 1-54
         ERRORS
 
+
+                    level of forward referencing.  
+
+              (q)   Questionable syntax:  missing or improper operators,
+                    terminators, or delimiters.  
 
               (r)   Relocation  error:   logic  operation attempted on a
                     relocatable term, addition of two relocatable terms,
@@ -4187,14 +4208,14 @@
              6.  Source text 
 
 
-           The error field may contain upto 2 error flags indicating any
-        errors encountered while assembling this line of source code.  
-
 
 
         THE ASSEMBLER                                          PAGE 1-55
         LISTING FILE
 
+
+           The error field may contain upto 2 error flags indicating any
+        errors encountered while assembling this line of source code.  
 
            The  current  location  counter  field  displays  the 16-bit,
         24-bit, or 32-bit program position.  This field will be  in  the
@@ -4245,14 +4266,14 @@
              7.  s   high byte relocation 
 
 
-           Assemblers  which  use 24-bit or 32-bit addressing use an ex-
-        tended flagging mode:  
-
 
 
         THE ASSEMBLER                                          PAGE 1-56
         LISTING FILE
 
+
+           Assemblers  which  use 24-bit or 32-bit addressing use an ex-
+        tended flagging mode:  
 
              1.  *   paged relocation 
 
@@ -4302,17 +4323,17 @@
 
              2.  The symbol or label 
 
-             3.  Directly assigned symbol is denoted with an (=) sign 
-
 
 
         THE ASSEMBLER                                          PAGE 1-57
         SYMBOL TABLE FILE
 
 
+             3.  Directly assigned symbol is denoted with an (=) sign 
+
              4.  The  value of a symbol, location of a label relative to
-                 the  program  area  base  address  (=0),  or   a   ****
-                 indicating the symbol or label is undefined.  
+                 the program area base address (=0), or a ****  indicat-
+                 ing the symbol or label is undefined.  
 
              5.  The       characters:       G - global,      L - local,
                  R - relocatable, and X - external.  
@@ -5718,6 +5739,7 @@
 
         Usage: [-Options] [-Option with arg] file
         Usage: [-Options] [-Option with arg] outfile file [file ...]
+          -h   or NO ARGUMENTS  Show this help list
           -p   Echo commands to stdout (default)
           -n   No echo of commands to stdout
         Alternates to Command Line Input:
@@ -5731,12 +5753,14 @@
           -g   global symbol=expression
         Map format:
           -m   Map output generated as (out)file[.map]
+          -m1    Linker generated symbols included in (out)file[.map]
           -w   Wide listing format for map file
           -x   Hexidecimal (default)
           -d   Decimal
           -q   Octal
         Output:
           -i   Intel Hex as (out)file[.i--]
+          -i1    Legacy: start address record type set to 1
           -s   Motorola S Record as (out)file[.s--]
           -t   Tandy CoCo Disk BASIC binary as (out)file[.bi-]
           -j   NoICE Debug output as (out)file[.noi]
@@ -5759,15 +5783,15 @@
              created output file will have the same filename as the
              .rel file.  
 
-             When  ASlink  is  invoked  with multiple filenames the
-             first filename is the output filename and the  remain-
-             ing  filenames  are  linked  together  into the output
 
 
         THE LINKER                                              PAGE 3-3
         INVOKING ASLINK
 
 
+             When  ASlink  is  invoked  with multiple filenames the
+             first filename is the output filename and the  remain-
+             ing  filenames  are  linked  together  into the output
              filename.  
 
 
@@ -5776,30 +5800,31 @@
         Most  sytems  require  the  options to be entered on the command
         line:  
 
-          aslink [-Options] [-Options with args] file
+        aslink [-Options] [-Options with args] file
         
-          aslink [-Options] [-Options with args] outfile file1 [file2
-        ...]
+        aslink [-Options] [-Options with args] outfile file1 [file2 ...]
 
 
         Some  systems  may  request  the  arguments  after the linker is
         started at a system specific prompt:  
 
-          aslink
-          argv: -[options] -[option arg] file
+        aslink
+        argv: -[options] -[options with args] file
         
-          aslink
-          argv: [-Options] [-Options with args] outfile file1 [file2
-        ...]
+        aslink
+        argv: [-Options] [-Options with args] outfile file1 [file2 ...]
 
 
         The linker commands are explained in some more detail:  
 
-             1.  -c        ASlink >> prompt mode.  
+             1.  -h        or NO ARGUMENTS Show this help list 
+                 Simply prints the help list on stdout.  
+
+             2.  -c        ASlink >> prompt mode.  
                  The  ASlink >>  prompt  mode reads linker commands from
                  stdin.  
 
-             2.  -f file   Command file mode.  
+             3.  -f file   Command file mode.  
                  The  command file mode imports linker commands from the
                  specified file (extension must be  .lnk),  imported  -c
                  and  -f  commands  are ignored.  If the directory path,
@@ -5807,76 +5832,88 @@
                  mand  file  then  the  path  defaults  to the .lnk file
                  directory path.  
 
-             3.  -p/-n     enable/disable echoing commands to stdout.  
+             4.  -p/-n     enable/disable echoing commands to stdout.  
 
-             4.  -i/-s/-t  Intel  Hex (file.i--), Motorola S (file.s--),
+             5.  -i/-s/-t  Intel  Hex (file.i--), Motorola S (file.s--),
                  or Tandy Color Computer  Disk  Basic  (file.bi-)  image
                  output file.  
 
-             5.  -o/-v     Specifies      that     subsequent     linked
-                 files/libraries will generate object  output  (default)
-                 or  suppress  object  output.  (if option -i, -s, or -t
-                 was specified) 
-
-             6.  -z        Disable Case Sensitivity for Symbols 
-
+             6.  -i1       Legacy:  start address record type set to 1 
+                 Use the type 1 record to indicate the program start ad-
+                 dress instead of record type 3.  Record type 1 was used
 
 
         THE LINKER                                              PAGE 3-4
         INVOKING ASLINK
 
 
-             7.  -m        Generate  a  map  file (file.map).  This file
+                 in some older tools.  
+
+             7.  -o/-v     Specifies      that     subsequent     linked
+                 files/libraries will generate object  output  (default)
+                 or  suppress  object  output.  (if option -i, -s, or -t
+                 was specified) 
+
+             8.  -z        Disable Case Sensitivity for Symbols 
+
+             9.  -m        Generate  a  map  file (file.map).  This file
                  contains a list of the symbols (by area) with  absolute
                  addresses, sizes of linked areas, and other linking in-
                  formation.  
 
-             8.  -w        Specifies  that a wide listing format be used
+            10.  -m1       Linker    generated   symbols   included   in
+                 (out)file[.map] 
+                 The linker creates internal symbols for each area (area
+                 segment) input during the linking process but  normally
+                 suppresses  their  inclusion in the map file.  This op-
+                 tion enables their inclusion in the map file.  
+
+            11.  -w        Specifies  that a wide listing format be used
                  for the map file.  
 
-             9.  -xdq      Specifies  the  number radix for the map file
+            12.  -xdq      Specifies  the  number radix for the map file
                  (Hexidecimal, Decimal, or Octal).  
 
-            10.  -u        Generate  an  updated listing file (file.rst)
+            13.  -u        Generate  an  updated listing file (file.rst)
                  derived from the relocated addresses and data from  the
                  linker  and  the hint file (file.hlr) output by the as-
                  sembler.  
 
-            11.  file      File(s)  to  be  linked.  Files may be on the
+            14.  file      File(s)  to  be  linked.  Files may be on the
                  same line as the above options or on a separate line(s)
                  one file per line or multiple files separated by spaces
                  or tabs.  
 
-            12.  -b  area=expression 
+            15.  -b  area=expression 
                  (one definition per line in a linker command file.) 
                  This  specifies  an area base address where the expres-
                  sion may contain constants and/or defined symbols  from
                  the linked files.  
 
-            13.  -g  symbol=expression 
+            16.  -g  symbol=expression 
                  (one definition per line in a linker command file.) 
                  This  specifies  the value for the symbol where the ex-
                  pression may contain constants and/or  defined  symbols
                  from the linked files.  
 
-            14.  -k  library directory path 
+            17.  -k  library directory path 
                  (one definition per line in a linker command file.) 
                  This  specifies one possible path to an object library.
+
+
+        THE LINKER                                              PAGE 3-5
+        INVOKING ASLINK
+
+
                  More than one path is allowed.  
 
-            15.  -l  library file specification 
+            18.  -l  library file specification 
                  (one definition per line in a linker command file.) 
                  This  specifies a possible library file.  More than one
                  file is allowed.  
 
-            16.  -e  or null line, terminates input to the linker.  
+            19.  -e  or null line, terminates input to the linker.  
 
-
-
-
-
-        THE LINKER                                              PAGE 3-5
-        LIBRARY PATH(S) AND FILE(S)
 
 
         3.3  LIBRARY PATH(S) AND FILE(S) 
@@ -5920,6 +5957,12 @@
 
         and the following parameters were specified to the linker:  
 
+
+
+        THE LINKER                                              PAGE 3-6
+        LIBRARY PATH(S) AND FILE(S)
+
+
         -k c:\iosystem\    the first path 
         -k c:\syslib\      the second path 
 
@@ -5931,12 +5974,6 @@
 
         c:\syslib\6809\io_disk.rel     (concatenated path/file) 
         d:\special\io_comm.rel         (absolute path/file) 
-
-
-        THE LINKER                                              PAGE 3-6
-        LIBRARY PATH(S) AND FILE(S)
-
-
 
         all  other path(s)/file(s) don't exist.  (No errors are reported
         for non existant path(s)/file(s).) 
@@ -5962,13 +5999,39 @@
         Relative areas (normally defined as REL|CON) have a base address
         of  0x0000  as read from the object files, the -b command speci-
         fies the beginning address of the area.  All subsequent relative
-        areas  will  be  concatenated  with  proceeding  relative areas.
+        areas  will  be  concatenated  with  preceeding  relative areas.
         Where specific ordering is desired, the first linker input  file
         should  have  the area definitions in the desired order.  At the
         completion of the area linking all area  addresses  and  lengths
         have  been determined.  The areas of type PAG are verified to be
         on a 256 byte boundary and that the length does not  exceed  256
         bytes.  Any errors are noted on stderr and in the map file.  
+
+
+
+        THE LINKER                                              PAGE 3-7
+        ASLINK PROCESSING
+
+
+        The  linker  also  automatically  generates two symbols for each
+        linked program area:  
+
+            'a_<area>'      The starting address of the area.  
+
+            'l_<area>'      The length of the area.  
+
+        and two symbols for each area segment:  
+
+            'm_<area>_n'    The boundary modulus of the area segment.  
+
+            's_<area>_n'    The starting address of the area segment.  
+
+        The  appended  '_n'  signifies  the area segment number within a
+        linked area.  
+
+           These  symbols  are in general only useful diagnostically and
+        are not visible externally.  However if the -m1 linker option is
+        used these symbols will be output to the map file.  
 
            Next  the  global symbol definitions (-g option), if any, are
         processed.  The symbol definitions have been delayed until  this
@@ -5989,11 +6052,6 @@
            After  the  preceeding  processes are complete the linker may
         output a map file (-m option).  This file provides the following
         information:  
-
-
-        THE LINKER                                              PAGE 3-7
-        ASLINK PROCESSING
-
 
              1.  Global symbol values and label absolute addresses 
 
@@ -6006,6 +6064,12 @@
              5.  List of library modules linked 
 
              6.  List of -b and -g definitions 
+
+
+
+        THE LINKER                                              PAGE 3-8
+        ASLINK PROCESSING
+
 
 
 
@@ -6032,7 +6096,7 @@
         libraries for object code inclusion or suppression.  
 
 
-        THE LINKER                                              Page 3-8
+        THE LINKER                                              Page 3-9
         ASXXXX VERSION 5.XX (4.XX) LINKING
 
 
@@ -6079,7 +6143,7 @@
 
 
 
-        THE LINKER                                              PAGE 3-9
+        THE LINKER                                             PAGE 3-10
         ASXXXX VERSION 5.XX (4.XX) LINKING
 
 
@@ -6129,7 +6193,7 @@
 
 
 
-        THE LINKER                                             PAGE 3-10
+        THE LINKER                                             PAGE 3-11
         ASXXXX VERSION 5.XX (4.XX) LINKING
 
 
@@ -6153,17 +6217,34 @@
 
         3.5.6  Area Line 
 
-                A label size ss flags ff 
+                A label size ss flags ff [bank bb] [bndry mm] 
 
            The  area  line  defines the area label, the size (ss) of the
-        area in bytes, and the area flags (ff).  The area flags  specify
-        the ABS, REL, CON, OVR, and PAG parameters:  
+        area in bytes, the area  flags  (ff),  the  optional  [bank  bb]
+        specifies  the  bank  this area is a member of, and the optional
+        [bndry mm] which specifies the boundary modulus  for  this  area
+        segment.  The area flags specify the ABS, REL, CON, OVR, and PAG
+        parameters:  
 
                 OVR/CON  (0x04/0x00 i.e.  bit position 2) 
 
                 ABS/REL  (0x08/0x00 i.e.  bit position 3) 
 
                 PAG      (0x10 i.e.  bit position 4) 
+
+           The  bank label is optional and only specified if the area is
+        to be included within a bank.  
+
+           When  this area (area segment) is linked and their is a boun-
+        dary modulus specified then the code/data beginning address will
+        be  increased to match the boundary modulus.  This will also in-
+        crease the area (area segment) size by the same amount.  
+
+
+
+
+        THE LINKER                                             PAGE 3-12
+        ASXXXX VERSION 5.XX (4.XX) LINKING
 
 
         3.5.7  Symbol Line 
@@ -6180,12 +6261,6 @@
         ternal global symbols will always appear before the  first  area
         definition.  References to external symbols will have a value of
         zero.  
-
-
-
-
-        THE LINKER                                             PAGE 3-11
-        ASXXXX VERSION 5.XX (4.XX) LINKING
 
 
         3.5.8  T Line 
@@ -6222,6 +6297,12 @@
                  1.  bits <3:0>  are a byte index into the corresponding
                      (i.e.  preceeding) T line data (i.e.  a pointer  to
                      the data to be updated by the relocation).  
+
+
+        THE LINKER                                             PAGE 3-13
+        ASXXXX VERSION 5.XX (4.XX) LINKING
+
+
                  2.  bits <7:4> are an index into a selected merge mode.
                      Currently mode 0 simply specifies to  use  standard
                      byte processing modes and merging is ignored.  
@@ -6233,12 +6314,6 @@
 
         The groups of 4 bytes are repeated for each item requiring relo-
         cation in the preceeding T line.  
-
-
-
-
-        THE LINKER                                             PAGE 3-12
-        ASXXXX VERSION 5.XX (4.XX) LINKING
 
 
         3.5.10  P Line 
@@ -6279,14 +6354,14 @@
 
            The  multibyte  formats for byte data replace the 2-byte form
         for 16-bit data with 3-byte or 4-byte data for 24-bit or  32-bit
-        data  respectively.  The 2nd byte format (also named MSB) always
-        uses the second byte of the 2, 3, or 4-byte data.  
-
-
 
 
-        THE LINKER                                             PAGE 3-13
+        THE LINKER                                             PAGE 3-14
         ASXXXX VERSION 5.XX (4.XX) LINKING
+
+
+        data  respectively.  The 2nd byte format (also named MSB) always
+        uses the second byte of the 2, 3, or 4-byte data.  
 
 
         3.5.12  ASlink V5.xx (V4.xx) Error Messages 
@@ -6337,17 +6412,17 @@
         ?ASlink-Warning-PageN relocation error
         ?ASlink-Warning-PageX relocation error
         ?ASlink-Warning-Signed Merge Bit Range error
-        ?ASlink-Warning-Unsigned/Overflow Merge Bit Range error
-
-        These  error  messages  also specify the file, module, area, and
-        offset within the area  of  the  code  referencing  (Refby)  and
 
 
-        THE LINKER                                             PAGE 3-14
+        THE LINKER                                             PAGE 3-15
         ASXXXX VERSION 5.XX (4.XX) LINKING
 
 
-        defining (Defin) the symbol:  
+        ?ASlink-Warning-Unsigned/Overflow Merge Bit Range error
+
+        These  error  messages  also specify the file, module, area, and
+        offset within the area of the code referencing (Refby)  and  de-
+        fining (Defin) the symbol:  
 
         ?ASlink-Warning-Signed value error for symbol  two56
                  file        module      area        offset
@@ -6394,13 +6469,19 @@
                  value exceeded the maximum negative or maximum positive
                  value for the current signed merge variable size.  
 
+
+
+        THE LINKER                                             PAGE 3-16
+        ASXXXX VERSION 5.XX (4.XX) LINKING
+
+
             11.  The  Unsigned/Overflow  Merge Bit Range error indicates
                  an indexing value was  greater  than  maximum  positive
                  value for the current unsigned merge variable size.  
 
 
 
-        THE LINKER                                             Page 3-15
+        THE LINKER                                             Page 3-17
         ASXXXX VERSION 3.XX LINKING
 
 
@@ -6454,7 +6535,7 @@
 
 
 
-        THE LINKER                                             PAGE 3-16
+        THE LINKER                                             PAGE 3-18
         ASXXXX VERSION 3.XX LINKING
 
 
@@ -6510,7 +6591,7 @@
 
 
 
-        THE LINKER                                             PAGE 3-17
+        THE LINKER                                             PAGE 3-19
         ASXXXX VERSION 3.XX LINKING
 
 
@@ -6568,7 +6649,7 @@
 
 
 
-        THE LINKER                                             PAGE 3-18
+        THE LINKER                                             PAGE 3-20
         ASXXXX VERSION 3.XX LINKING
 
 
@@ -6618,7 +6699,7 @@
         code.  Various errors may be reported during this process 
 
 
-        THE LINKER                                             PAGE 3-19
+        THE LINKER                                             PAGE 3-21
         ASXXXX VERSION 3.XX LINKING
 
 
@@ -6676,7 +6757,7 @@
                  DS8xCxxx).  
 
 
-        THE LINKER                                             PAGE 3-20
+        THE LINKER                                             PAGE 3-22
         ASXXXX VERSION 3.XX LINKING
 
 
@@ -6686,7 +6767,7 @@
 
 
 
-        THE LINKER                                             Page 3-21
+        THE LINKER                                             Page 3-23
         HINT FILE FORMAT FOR RELOCATED LISTINGS
 
 
@@ -6743,7 +6824,7 @@
 
 
 
-        THE LINKER                                             PAGE 3-22
+        THE LINKER                                             PAGE 3-24
         HINT FILE FORMAT FOR RELOCATED LISTINGS
 
 
@@ -6776,7 +6857,7 @@
         not be updated.  
 
 
-        THE LINKER                                             Page 3-23
+        THE LINKER                                             Page 3-25
         INTEL IHX OUTPUT FORMAT
 
 
@@ -6811,11 +6892,15 @@
                                 program entry address.  
 
         Record Type Field    -  This  field  identifies the record type,
-                                which is either 0 for data records or  1
-                                for  an End of File record.  It consists
-                                of two ascii characters, with  the  high
-                                digit of the record type first, followed
-                                by the low digit of the record type.  
+                                which is either 0 for data, 1 for an End
+                                of  File,  or  3  for  a  start  address
+                                record.   It  consists  of   two   ascii
+                                characters,  with  the high digit of the
+                                record type first, followed by  the  low
+                                digit  of  the record type.  The default
+                                start address record type is 3,  however
+                                the  -i1 option can override the default
+                                and use the type 1 record.  
 
         Data Field           -  This  field consists of the actual data,
                                 converted to two ascii characters,  high
@@ -6828,10 +6913,16 @@
                                 and the data field.  This  sum  is  then
                                 negated  (2's  complement) and converted
                                 to  two  ascii  characters,  high  digit
+
+
+        THE LINKER                                             PAGE 3-26
+        INTEL IHX OUTPUT FORMAT (16-BIT)
+
+
                                 first.  
 
 
-        THE LINKER                                             Page 3-24
+        THE LINKER                                             Page 3-27
         INTEL I86 OUTPUT FORMAT
 
 
@@ -6866,12 +6957,15 @@
                                 program entry address.  
 
         Record Type Field    -  This  field  identifies the record type,
-                                which is either 0 for  data  records,  1
-                                for  an  End  of File record, or 4 for a
-                                segment  record.   It  consists  of  two
+                                which is either 0 for data, 1 for an End
+                                of File, 3 for a start address, or 4 for
+                                a segment record.  It  consists  of  two
                                 ascii characters, with the high digit of
                                 the record type first, followed  by  the
-                                low digit of the record type.  
+                                low  digit  of  the  record  type.   The
+                                default start address record type is  3,
+                                however  the -i1 option can override the
+                                default and use the type 1 record.  
 
         Data Field           -  This  field consists of the actual data,
                                 converted to two ascii characters,  high
@@ -6884,10 +6978,16 @@
                                 and the data field.  This  sum  is  then
                                 negated  (2's  complement) and converted
                                 to  two  ascii  characters,  high  digit
+
+
+        THE LINKER                                             PAGE 3-28
+        INTEL I86 OUTPUT FORMAT (24 OR 32-BIT)
+
+
                                 first.  
 
 
-        THE LINKER                                             Page 3-25
+        THE LINKER                                             Page 3-29
         MOTOROLA S1-S9 OUTPUT FORMAT
 
 
@@ -6934,7 +7034,7 @@
                                 characters, high digit first.  
 
 
-        THE LINKER                                             Page 3-26
+        THE LINKER                                             Page 3-30
         MOTOROLA S2-S8 OUTPUT FORMAT
 
 
@@ -6983,7 +7083,7 @@
                                 characters, high digit first.  
 
 
-        THE LINKER                                             Page 3-27
+        THE LINKER                                             Page 3-31
         MOTOROLA S3-S7 OUTPUT FORMAT
 
 
@@ -7034,7 +7134,7 @@
                                 characters, high digit first.  
 
 
-        THE LINKER                                             Page 3-28
+        THE LINKER                                             Page 3-32
         TANDY COLOR COMPUTER DISK BASIC BINARY FORMAT
 
 
@@ -8267,11 +8367,43 @@
         
 
 
-           Asxxxx/ASlink version 5.10 is considered a major release ver-
+           Asxxxx/ASlink version 5.20 is considered a major release ver-
         sion.  
 
-        Version 5.10
-        2014_10_31
+
+        January 2017 Version 5.20
+        
+           (1)  Completed the functionality for propagating
+                the boundary specifications .odd, .even, and
+                .bndry processed during assembly to the linker.
+        
+           (2)  Restored the correct functionality of the
+                .org directive in areas of REL type.
+        
+           (3)  Added Intel Hex legacy start address record
+                type 1 as an option.
+
+
+
+        Summary  of changes/additions to the ASxxxx Assemblers from Ver-
+        sion 5.11 to Version 4.11.  
+
+
+
+        2015_06_27 Version 5.10 Update 1
+        
+           This update for Version 5.10 of the ASxxxx Cross
+        Assemblers includes fixes for the following errors:
+        
+           (1)  The as6500 assembler incorrectly assembled
+                cpx # and cpy # instructions.
+        
+           (2)  An error in asmain.c inhibited the listing of
+                all .if.. assembly directives.
+
+
+
+        2014_10_31 Version 5.10
         
            (1)  Rewrite of listing to relocated listing translation
                 code in the assembler and the linker base code.
@@ -8283,11 +8415,16 @@
         
            (3)  Add as78k0s assembler (Renesas/NEC 78K/0S) 
 
-           Summary  of  changes/additions  to the ASxxxx Assemblers from
-        Version 4.11 to Version 5.06.  
 
-        Version 5.00 Update 6
+
+        2013_05_12 Version 5.00 Update 6
         
+
+
+        CHANGE LOG                                              Page D-3
+        
+
+
            This  update  for  Version  5.00  of the  ASxxxx Cross
         Assemblers rolls up updates 1, 2, 3, 4, and 5 with fixes
         for the following:
@@ -8296,8 +8433,9 @@
         
            (2)  Fix aslink error reporting for PC relative modes.
 
-        Version 5.00 Update 5
-        2012_08_01
+
+
+        2012_08_01 Version 5.00 Update 5
         
         Update_05 for the ASxxxx Assembler and Linker Version 5.00
         (use 'pkunzip -d u05500.zip' for extraction with MS-DOS)
@@ -8319,12 +8457,6 @@
                 various build, make, and test files.
         
         
-
-
-        CHANGE LOG                                              Page D-3
-        
-
-
            Update 4 Items
         
            (1)  The AS8048 base opcode value for the JMPP
@@ -8345,6 +8477,12 @@
         
            (2)  Minor syntactical changes for ANSI C compatability,
                 fix type conversion warnings, and update the
+
+
+        CHANGE LOG                                              Page D-4
+        
+
+
                 various build, make, and test files.
         
            (1)  New cross assemblers for STMicroelectronics
@@ -8377,12 +8515,6 @@
         
         
            Update 1 Items
-
-
-        CHANGE LOG                                              Page D-4
-        
-
-
         
            (1)  The newest versions of gcc (and perhaps other
                 compilers) give warnings about missing arguments
@@ -8403,14 +8535,18 @@
         deleted:
         
                 [asxv5pxx\asf2mc8\f8mch.c
+
+
+        CHANGE LOG                                              Page D-5
+        
+
+
                 [asxv5pxx\asf2mc8\f8adr.c
                 [asxv5pxx\asf2mc8\f8pst.c
                 [asxv5pxx\asf2mc8\f8.h
         
                 [asxv5pxx\asxmak\vc6\asf2mc8]
                 [asxv5pxx\asxmak\vs05\asf2mc8]
-        
-        
 
 
 
@@ -8435,12 +8571,6 @@
         
            This  update  for  Version  5.00  of the  ASxxxx Cross
         Assemblers rolls up updates 1 and 2 with the addition of
-
-
-        CHANGE LOG                                              Page D-5
-        
-
-
         three new assemblers and fixes:
         
            (1)  New cross assemblers for STMicroelectronics
@@ -8463,6 +8593,12 @@
         
            (1)  When using the assembler directive .end to specify
                 the code entry address the assembler fails to set
+
+
+        CHANGE LOG                                              Page D-6
+        
+
+
                 the variable .__.END. as a global.  Therefor the
                 value of .__.END. is not passed to the linker and
                 the start address frame is always zero.
@@ -8493,12 +8629,6 @@
         
            This  update  for  Version  5.00  of the  ASxxxx Cross
         Assemblers includes fixes for the following errors:
-
-
-        CHANGE LOG                                              Page D-6
-        
-
-
         
            (1)  When using the assembler directive .end to specify
                 the code entry address the assembler fails to set
@@ -8521,6 +8651,12 @@
                 compilers) give warnings about missing arguments
                 in the fprintf() function.  This update replaces
                 fprintf(arg1, arg2) with fprintf(arg1, "%s", arg2)
+
+
+        CHANGE LOG                                              Page D-7
+        
+
+
                 in each affected line of code.
         
         
@@ -8551,12 +8687,6 @@
         assemblers:  
 
         e.g.    .if    eq,...   if argument == 0
-
-
-        CHANGE LOG                                              Page D-7
-        
-
-
 
 
            The  immediate  conditional statements have been added to the
@@ -8579,6 +8709,12 @@
             err         error codes
             loc         code location
             bin         assembler binary code
+
+
+        CHANGE LOG                                              Page D-8
+        
+
+
             eqt         symbolic equates / if evaluations
             cyc         machine cycles
             lin         assembler source line number
@@ -8609,12 +8745,6 @@
             .nlist  (!,cyc)
 
         or  if  you  wish  to suppress the listing of the .list / .nlist
-
-
-        CHANGE LOG                                              Page D-8
-        
-
-
         directives:  
 
             .nlist              ; disables all listing
@@ -8637,6 +8767,12 @@
         evenly divisible by a specified integer value.  
 
         e.g.    .org    0
+
+
+        CHANGE LOG                                              Page D-9
+        
+
+
                 .bndry  4
                 ; . == 0
         
@@ -8660,7 +8796,7 @@
            Added the SC/MP ASSCMP assembler to ASxxxx.
 
 
-        CHANGE LOG                                              Page D-9
+        CHANGE LOG                                             Page D-10
         
 
 
@@ -8706,7 +8842,7 @@
            wrong object code. Changed from 37 2A  to  37 3A.
 
 
-        CHANGE LOG                                             Page D-10
+        CHANGE LOG                                             Page D-11
         
 
 
@@ -8752,7 +8888,7 @@
                compile the s19os9 program.
 
 
-        CHANGE LOG                                             Page D-11
+        CHANGE LOG                                             Page D-12
         
 
 
@@ -8804,7 +8940,7 @@
                 aspic
 
 
-        CHANGE LOG                                             Page D-12
+        CHANGE LOG                                             Page D-13
         
 
 
@@ -8861,7 +8997,7 @@
 
 
 
-        CHANGE LOG                                             Page D-13
+        CHANGE LOG                                             Page D-14
         
 
 
@@ -8919,7 +9055,7 @@
                  Fix:  
 
 
-        CHANGE LOG                                             Page D-14
+        CHANGE LOG                                             Page D-15
         
 
 
