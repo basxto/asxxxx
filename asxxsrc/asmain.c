@@ -2051,17 +2051,11 @@ loop:
 
 	case S_END:
 		if (more()) {
-			clrexpr(&e1);
-			expr(&e1, 0);
 			sp = lookup(".__.END.");
 			if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
 				err('m');
 			}
-			sp->s_type = S_USER;
-			sp->s_area = e1.e_base.e_ap;
-			sp->s_addr = laddr = e1.e_addr;
-			sp->s_flag |= S_ASG;
-			lmode = ELIST;
+			equate(".__.END.", &e1, O_GBLEQU);
 		}
 		break;
 
