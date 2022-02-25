@@ -15,19 +15,26 @@
 <H4><B><PRE>
 PIC ASSEMBLER NOTES 
 
-The  PIC  series  of  processors  uses  a non unified addressing
-scheme:  the instruction addressing is 1 per  instruction  word,
-each  instruction  uses  a  word of memory varying from 12 to 16
-bits in length.  The processor data is addressed as 1  per  byte
-of  data.   To properly address the program/data spaces you, the
-programmer, must seperate your program and  data  into  seperate
-code  and  data areas.  The data area is addressed as 1 per byte
-and the code area is addressed as 1 per instruction.  
+The PIC 12,14,16, and 17 series of processors uses a non unified
+addressing  scheme:   the   instruction   addressing  is  1  per
+instruction word, each instruction uses a word of memory varying
+from 12 to 16 bits in length.  The processor  data is  addressed
+as 1  per  byte of  data.   To properly address the program/data
+spaces you, the programmer, must seperate your program and  data
+into seperate code  and  data areas.  The data area is addressed
+as  1  per  byte  and  the  code  area  is  addressed  as  1 per
+instruction.  The  assembler/linker  processes  the  instruction
+code so that the linker will output 2 bytes for each instruction
+word.  The instruction word  address will  be the  file  encoded
+address divided by 2.  
 
-     The assembler/linker processes the instruction code so that
-the linker will output 2 bytes for each instruction  word.   The
-instruction  word  address  will  be  the  file  encoded address
-divided by 2.  
+
+The  pic 18  series  of processors  uses  a  unified  addressing
+scheme: the instruction and data addressing is 1 per 8-bit byte.
+The assembler/linker  processes the instruction code so that the
+linker will output 2 bytes for each instruction  word.  The byte
+ordering is  low-byte  then  high-byte  and  the program address
+is the the file encoded address.
 
 
 PROCESSOR SPECIFIC DIRECTIVES 
@@ -110,6 +117,19 @@ Format:
      This directive selects 20-bit addressing and the 16-bit in-
 struction word mnemonics and opcode values to be used during the
 assembly process.  
+
+
+Format:  
+
+        .picgoto	(optional argument) 
+
+     This directive selects the PIC or ASxxxx mode of CALL, GOTO
+and Branching  argument processing.  The  default  ASxxxx  mode,
+specified  by a  zero valued argument, processes the instruction
+arguments  as  regular  labels  (with  relocation  if required).
+A  blank  or  non-zero  argument invokes the  PIC mode.  The PIC
+mode inserts the value of the instruction argument directly into
+the instruction without further processing.
 
 
 The .__.CPU.  Variable 
@@ -553,6 +573,15 @@ mode argument.
 
         tris    []              PIC:12:14:--:--
 
+        addfsr  []              PIC:--:--:--:20
+        addulnk []              PIC:--:--:--:20
+        callw                   PIC:--:--:--:20
+        movsf   []              PIC:--:--:--:20
+        movss   []              PIC:--:--:--:20
+        pushl   []              PIC:--:--:--:20
+        subfsr  []              PIC:--:--:--:20
+        subulnk []              PIC:--:--:--:20
+
 </PRE></B></H4>
 <H5><A HREF="asxdoc.htm#TOP"> Go to the Documentation Index</A></H5>
 
@@ -568,6 +597,6 @@ mode argument.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: June 2006</B></P></H6>
+<H6><P><B>Last Updated: March 2007</B></P></H6>
 </BODY> 
 </HTML>

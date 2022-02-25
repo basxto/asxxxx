@@ -199,6 +199,7 @@ VOID
 newmode()
 {
 	int index, n;
+	a_uint v;
 	struct mode *mp;
 
 	if (headp == NULL) {
@@ -239,10 +240,21 @@ newmode()
 		}
 		mp->m_def[index] = n;
 		if (n & 0x80) {
-			mp->m_mask |= (((a_uint) 1) << (n & 0x1F));
-			mp->m_page |= (((a_uint) 1) << index);
+			mp->m_dbits |= (((a_uint) 1) << (n & 0x1F));
+			mp->m_sbits |= (((a_uint) 1) << index);
 		}
 		index += 1;
+	}
+	/*
+	 * Set Missing Low Order Bits
+	 */
+	for (n=0; n<32; n++) {
+		v = 1 << n;
+		if (mp->m_sbits & v) {
+			break;
+		} else {
+			mp->m_sbits |= v;
+		}
 	}
 }
 

@@ -36,7 +36,7 @@
  * Local Definitions
  */
 
-#define	VERSION	"V04.11 Optional Update 1"
+#define	VERSION	"V04.11"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -607,14 +607,15 @@ struct def
  *
  *     *m_def is a pointer to the bit relocation definition.
  *	m_flag indicates that bit position swapping is required.
- *	m_mask contains the active bit positions for the output.
+ *	m_dbits contains the active bit positions for the output.
+ *	m_sbits contains the active bit positions for the input.
  */
 struct	mode
 {
 	char *	m_def;		/* Bit Relocation Definition */
 	a_uint	m_flag;		/* Bit Swapping Flag */
-	a_uint	m_mask;		/* Bit Mask */
-	a_uint	m_mbro;		/* Bit Range Overflow Mask */
+	a_uint	m_dbits;	/* Destination Bit Mask */
+	a_uint	m_sbits;	/* Source Bit Mask */
 };
 
 /*

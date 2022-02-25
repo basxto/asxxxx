@@ -32,10 +32,9 @@
 
 	;
 	; EPROM Definition
-	; CSEG is 2 Bytes per Word for the PIC.
 	; BANK size is in Bytes.
 	;
-	.bank	EPROM	(BASE=0, SIZE=2*8192)
+	.bank	EPROM	(BASE=0, SIZE=3*8192)
 	.area	CODE	(CSEG, BANK=EPROM)
 
 

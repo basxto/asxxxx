@@ -648,9 +648,9 @@ relr4()
 			adw_xb(argb, v, rtp);
 
 			/*
-			 * Mask Value Selection
+			 * Source Bit Masks
 			 */
-			n = hp->m_list[rxm]->m_page;
+			n = hp->m_list[rxm]->m_sbits;
 			m = ~(n >> 1);
 			n = ~(n >> 0);
 
@@ -692,9 +692,9 @@ relr4()
 					error = 8;
 				break;
 			case R4_PAGX3:	/* Paged from pc + 3 */
-			case R4_PAGX0:	/* Paged from pc + 0 */
-			case R4_PAGX1:	/* Paged from pc + 1 */
 			case R4_PAGX2:	/* Paged from pc + 2 */
+			case R4_PAGX1:	/* Paged from pc + 1 */
+			case R4_PAGX0:	/* Paged from pc + 0 */
 				pcrv = pc + (pcrv / pcb);
 				switch(mode & (R4_PCR | R4_PBITS)) {
 				case R4_PAGX3:	pcrv += 1;	/* Paged from pc + 3 */
@@ -1149,11 +1149,11 @@ char *str;
 	prntval(fptr, sdp.s_area->a_addr + sdp.s_addr);
 }
 
-/*)Function	VOID	lkmerge(val, r, v)
+/*)Function	VOID	lkmerge(val, r, base)
  *
- *		a_uint	val		base value
+ *		a_uint	val		data to merge into base value
  *		int	r		relocation mode
- *		a_uint	v		data to merge into base value
+ *		a_uint	base		base value
  *
  *	The function lkmerge() merges variable v, using the merge
  *	specification coded in r, into the base value val.
@@ -1166,6 +1166,7 @@ char *str;
  *		int	m		bit shuffled value
  *
  *	global variables:
+ *		struct head hp		pointer to a head structure
  *		FILE	*stderr		error console
  *
  *	functions called:
@@ -1175,10 +1176,10 @@ char *str;
  *	side effects:
  *		none
  */
-a_uint lkmerge(val, r, v)
+a_uint lkmerge(val, r, base)
 a_uint val;
 int r;
-a_uint v;
+a_uint base;
 {
 	struct mode *mp;
 	char *vp;
@@ -1199,9 +1200,9 @@ a_uint v;
 			}
 		}
 	} else {
-		m = val;
+		m = val & mp->m_dbits;
 	}
-	return((v & ~mp->m_mask) | (m & mp->m_mask));
+	return((base & ~mp->m_dbits) | m);
 }
 
 /*)Function	a_uint 	adb_byte(p, v, i)

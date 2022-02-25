@@ -13,6 +13,108 @@ ASxxxx Cross Assembler Bugs, Fixes, ...
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 <B><PRE>
 *---*---*---*---*
+Version 4.11 Update 3
+2007_04_01
+<BR><a href="ftp://shop-pdp.kent.edu/u03411.zip">
+Update_03 for the ASxxxx Assembler and Linker Version 4.11 (50K)</a><BR>
+(use 'pkunzip -d U03411.ZIP' for extraction with MS-DOS)<BR>
+(use 'unzip -L -a U03411.ZIP' for extraction with Linux)<BR>
+<BR>
+   This  update  for  Version  4.11  of the  ASxxxx Cross
+Assemblers includes an update to the ASPIC assembler and
+associated fix to ASLINK:
+
+   1)  Change the pic addressing to lo &#47; hi from hi &#47; lo
+       byte ordering.
+
+   2)  The update fixes an error in the pic17 series
+       LCALL instruction.
+
+   3)  A rewrite of the pic18 series assembler to change
+       the PC addressing from 1 per 16-bit word to 1 per
+       8-bit byte and add the extended instruction set.
+
+   4)  Modify the Linker Merge Mode processing to take into
+       account the discarded low order bits for PC Relative
+       Addressing.
+
+   5)  New  tstscn files for testing the assemblers.
+	    
+
+   Merge the update asxv4pxx directory and subdirectories
+with the V4.11 distribution.  The following files will be
+overwritten:
+
+[asxv4pxx\aspic]
+      pic.h
+      picext.c
+      picmch.c
+      picpst.c
+
+[asxv4pxx\aspic\p18cxxx]
+      tpic18cx.asm
+      tpic18cx.bat
+      tpic18cx.def
+      tpic18cx.lnk
+
+[asxv4pxx\asxmak\cygwin\misc]
+      tstscn.bat
+
+[asxv4pxx\asxmak\cygwin\misc\backup]
+      tstscn.bat
+
+[asxv4pxx\asxmak\djgpp\misc]
+      tstscn.bat
+
+[asxv4pxx\asxmak\djgpp\misc\backup]
+      tstscn.bat
+
+[asxv4pxx\asxmak\linux\misc]
+      tstscn.mak
+
+[asxv4pxx\asxmak\linux\misc\backup]
+      tstscn.mak
+
+[asxv4pxx\asxmak\symantec\misc]
+      tstscn.bat
+
+[asxv4pxx\asxmak\symantec\misc\backup]
+      tstscn.bat
+
+[asxv4pxx\asxmak\turboc3\misc]
+      tstscn.bat
+
+[asxv4pxx\asxmak\turboc3\misc\backup]
+      tstscn.bat
+
+[asxv4pxx\asxmak\vc6\misc]
+      tstscn.bat
+
+[asxv4pxx\asxmak\vc6\misc\backup]
+      tstscn.bat
+
+[asxv4pxx\asxxsrc]:
+      asmain.c
+      asout.c
+      asxxxx.h
+
+[asxv4pxx\linksrc]:
+      aslink.h
+      lkhead.c
+      lkrloc4.c
+
+[asxv4pxx\asxxhtml]
+      asxbug.htm
+      asxupd.htm
+
+   You must recompile all the ASxxxx assemblers and linker
+to incorporate the update.
+*---*---*---*---*
+</PRE></B>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<B><PRE>
+*---*---*---*---*
 Version 4.11 Optional Update 2
 2006_11_01
 <BR><a href="ftp://shop-pdp.kent.edu/u02411.zip">
@@ -303,6 +405,6 @@ the patch.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: November 2006</B></P></H6>
+<H6><P><B>Last Updated: March 2007</B></P></H6>
 </BODY>
 </HTML>

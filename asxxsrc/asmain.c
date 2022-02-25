@@ -1031,25 +1031,6 @@ loop:
 			afp = afptmp;
 			strcpy(incfn[incfil],afn);
 			incfp[incfil] = afp;
-/*
-			if (more()) {
-				if (getnb() != ',') {
-					qerr();
-				}
-				n = absexpr() ? 1 : 0;
-			} else {
-				if ((sp = slookup(".__ictrl")) != NULL) {
-					if (!(sp->s_flag & S_ASG) || (sp->s_area != NULL)) {
-						n = 0;
-					} else {
-						n = sp->s_addr ? 1 : 0;
-					}
-				} else {
-					n = 0;
-				}
-				n = 1;
-			}
-*/
 			if (!nlevel) {
 				lop = NLPP;
 			}

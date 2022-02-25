@@ -120,11 +120,11 @@ all:
 	../exe/asavr -glaxff ../../../asxtst/a32bit.asm ../../../asxtst/asmt4blo.asm
 	../exe/asxscn -4 ../../../asxtst/a32bit.lst
 
-	rm -f ../../../asxtst/asmt2bhi.lst
-	../exe/aspic -glaxff ../../../asxtst/asmt2bhi.asm
-	../exe/asxscn ../../../asxtst/asmt2bhi.lst
+	rm -f ../../../asxtst/asmt2blo.lst
+	../exe/aspic -glaxff ../../../asxtst/asmt2blo.asm
+	../exe/asxscn ../../../asxtst/asmt2blo.lst
 	rm -f ../../../asxtst/a32bit.lst
-	../exe/aspic -glaxff ../../../asxtst/a32bit.asm ../../../asxtst/asmt4bhi.asm
+	../exe/aspic -glaxff ../../../asxtst/a32bit.asm ../../../asxtst/asmt4blo.asm
 	../exe/asxscn -4 ../../../asxtst/a32bit.lst
 
 	rm -f ../../../asxtst/asmt2bhi.lst

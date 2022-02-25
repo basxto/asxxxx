@@ -1,7 +1,7 @@
 /* picext.c */
 
 /*
- * (C) Copyright 2001-2006
+ * (C) Copyright 2001-2007
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,5 +13,5 @@
 #include "pic.h"
 
 char	*cpu	= "Microchip Technology Inc.,  [User Defined]";
-int	hilo	= 1;
+int	hilo	= 0;
 char	*dsft	= "asm";

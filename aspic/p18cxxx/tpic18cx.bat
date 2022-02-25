@@ -1,5 +1,5 @@
 aspic -gloaxff tpic18cx
 asxscn -4 tpic18cx.lst
-aslink -nxu -g extaddr=0 tpic18cx
+aslink -nf tpic18cx.lnk
 asxscn -i4 tpic18cx.rst
 

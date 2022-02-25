@@ -108,11 +108,11 @@ rm -f ..\..\..\asxtst\a32bit.lst
 ..\exe\asavr.exe -glaxff ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4blo.asm
 ..\exe\asxscn.exe -4 ..\..\..\asxtst\a32bit.lst
 
-rm -f ..\..\..\asxtst\asmt2bhi.lst
-..\exe\aspic.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+rm -f ..\..\..\asxtst\asmt2blo.lst
+..\exe\aspic.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
 rm -f ..\..\..\asxtst\a32bit.lst
-..\exe\aspic.exe -glaxff ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4bhi.asm
+..\exe\aspic.exe -glaxff ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4blo.asm
 ..\exe\asxscn.exe -4 ..\..\..\asxtst\a32bit.lst
 
 rm -f ..\..\..\asxtst\asmt2bhi.lst

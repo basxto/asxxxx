@@ -501,15 +501,15 @@ struct	head
  *
  *	m_def is the bit relocation definition array.
  *	m_flag indicates that bit position swapping is required.
- *	m_mask contains the active bit positions for the output.
- *	m_page contains the page range.
+ *	m_dbits contains the active bit positions for the output.
+ *	m_sbits contains the active bit positions for the input.
  */
 struct	mode
 {
 	char 	m_def[32];	/* Bit Relocation Definition */
 	int	m_flag;		/* Bit Swapping Flag */
-	a_uint	m_mask;		/* Bit Mask */
-	a_uint	m_page;		/* Page Bits */
+	a_uint	m_dbits;	/* Destination Bit Mask */
+	a_uint	m_sbits;	/* Source Bit Mask */
 };
 
 /*

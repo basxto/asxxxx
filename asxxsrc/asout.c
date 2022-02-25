@@ -749,7 +749,7 @@ a_uint v;
 			 */
 			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_SGND) &&
 			   ((mp = modep[(r >> 8) & 0x0F]) != 0)) {
-			   	m = ~(mp->m_mbro >> 1);
+			   	m = ~(mp->m_sbits >> 1);
 				if (((m & esp->e_addr) != m) && ((m & esp->e_addr) != 0))
 					aerr();
 			}
@@ -758,7 +758,7 @@ a_uint v;
 			 */
 			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_USGN) &&
 			   ((mp = modep[(r >> 8) & 0x0F]) != 0)) {
-				if (~mp->m_mbro & esp->e_addr)
+				if (~mp->m_sbits & esp->e_addr)
 					aerr();
 			}
 			/*
@@ -766,7 +766,7 @@ a_uint v;
 			 */
 			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_PAG0) &&
 			   ((mp = modep[(r >> 8) & 0x0F]) != 0)) {
-				if (~mp->m_mbro & esp->e_addr)
+				if (~mp->m_sbits & esp->e_addr)
 					err('d');
 			}
 			out_lxb(i,esprv,0);
@@ -840,7 +840,7 @@ a_uint v;
  *
  *		a_uint	esp		expr value
  *		int	r		relocation mode
- *		a_uint	v		data to merge into
+ *		a_uint	base		data to merge into
  *
  *	The function outmerge() merges the data in the expr structure esp
  *	and the variable v using the merge specification coded in r.
@@ -863,10 +863,10 @@ a_uint v;
  *	side effects:
  *		none
  */
-a_uint outmerge(esp, r, v)
+a_uint outmerge(esp, r, base)
 a_uint esp;
 int r;
-a_uint v;
+a_uint base;
 {
 	struct mode *mp;
 	char *p;
@@ -889,9 +889,9 @@ a_uint v;
 			}
 		}
 	} else {
-		m = esp & mp->m_mask;
+		m = esp & mp->m_dbits;
 	}
-	return((v & ~mp->m_mask) | m);
+	return((base & ~mp->m_dbits) | m);
 }
 
 /*)Function	VOID	outdp(carea, esp, r)

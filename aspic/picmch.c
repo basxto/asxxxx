@@ -1,12 +1,18 @@
 /* picmch.c */
 
 /*
- * (C) Copyright 2001-2006
+ * (C) Copyright 2001-2007
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ */
+
+/*
+ * PIC18Fxxx Extended Instructions
+ * added by Mengjin Su.
+ * msu at micron dot com
  */
 
 #include "asxxxx.h"
@@ -16,6 +22,7 @@ static char buff[NINPUT];
 static char pic_cpu[80];
 static int  pic_type;
 static int  pic_bytes;
+static int  pic_goto;
 static a_uint pic_fsr;
 static struct badram *br;
 
@@ -195,8 +202,24 @@ struct mne *mp;
 		case X_NOPIC:
 		case X_12BIT:
 		case X_14BIT:
-		case X_16BIT:		exprmasks(2);	break;
-		case X_20BIT:		exprmasks(4);	break;
+		case X_16BIT:
+			exprmasks(2);
+			/* Set "CSEG" Characteristics */
+			/* To 2-bytes per PC Increment */
+			mp = mlookup("CSEG");
+			mp->m_valu = A_CSEG|A_2BYTE;
+			/* Set _CODE Area Characteristics */
+			area[0].a_flag = A_CSEG|A_2BYTE|A_BNK;
+			break;
+		case X_20BIT:
+			exprmasks(4);
+			/* Set "CSEG" Characteristics */
+			/* To 1-byte per PC Increment */
+			mp = mlookup("CSEG");
+			mp->m_valu = A_CSEG|A_1BYTE;
+			/* Set _CODE Area Characteristics */
+			area[0].a_flag = A_CSEG|A_1BYTE|A_BNK;
+			break;
 		}
 		/*
 		 * Load Known Cpu Fixes
@@ -288,6 +311,14 @@ struct mne *mp;
 		lmode = SLIST;
 		break;
 
+	case X_PGOTO:
+		if (more()) {
+			pic_goto = absexpr();
+		} else {
+			pic_goto = 1;
+		}
+		break;
+
 	default:
 		/*
 		 * Process According to CPU Type
@@ -361,7 +392,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -396,7 +427,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -413,7 +444,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -575,7 +606,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -609,7 +640,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -625,7 +656,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -826,7 +857,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -859,7 +890,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -875,7 +906,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -919,7 +950,7 @@ struct mne *mp;
 		if (t1 != S_EXT) {
 			aerr();
 		}
-		outrwm(&e1, R_8BIT, op);
+		outrwm(&e1, R_PAGN | R_8BIT, op);
 		break;
 
 	case S_MOVLB:			/* movlb k */
@@ -942,7 +973,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -978,7 +1009,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -1001,7 +1032,7 @@ struct mne *mp;
 		t2 = addr(&e2);		/* f */
 		if ((t2 != S_DIR) && (t2 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e2)) {
 			aerr();
 		}
@@ -1031,7 +1062,7 @@ struct mne *mp;
 		t3 = addr(&e3);		/* f */
 		if ((t3 != S_DIR) && (t3 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e3)) {
 			aerr();
 		}
@@ -1086,7 +1117,7 @@ static char  p20pg1[256] = {
 /*B0*/   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 /*C0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 /*D0*/   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-/*E0*/   2, 2, 2, 2, 2, 2, 2, 2,UN,UN,UN,UN, 2, 2, 2, 2,
+/*E0*/   2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 2, 2,
 /*F0*/   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 };
 
@@ -1094,7 +1125,7 @@ static char  p20pg2[256] = {
 /*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 /*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
 /*00*/   1,UN,UN, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2,
-/*10*/   2, 2, 2, 2,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/   2, 2, 2, 2, 2,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
 /*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
 /*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
 /*40*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
@@ -1174,7 +1205,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -1258,7 +1289,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -1323,7 +1354,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -1404,9 +1435,6 @@ struct mne *mp;
 
 	case S_CALL:			/* call k */
 		t1 = addr(&e1);		/* k */
-		if (t1 != S_EXT) {
-			aerr();
-		}
 		if (more()) {
 			comma();
 			expr(&e2, 0);	/* s */
@@ -1418,27 +1446,61 @@ struct mne *mp;
 		} else {
 			e2.e_addr = 0;
 		}
-		outr4bm(&e1, R_20BIT, ((op + (e2.e_addr << 8)) << 16) + (a_uint) 0x0000F000);
+		if (pic_goto) {
+			/* Use PIC Mode for Branch */
+			if ((t1 != S_IMMED) && (t1 != S_EXT)) {
+				aerr();
+			}
+			outr4bm(&e1, R_20BIT | R_MBRO, op + (e2.e_addr << 8) + ((a_uint) 0x0000F000 << 16));
+		} else {
+			/* Use ASxxxx Mode for Branch */
+			if (t1 != S_EXT) {
+				aerr();
+			}
+			outr4bm(&e1, R_CALL, op + (e2.e_addr << 8) + ((a_uint) 0x0000F000 << 16));
+		}
 		break;
 
 	case S_GOTO:			/* goto k */
 		t1 = addr(&e1);		/* k */
-		if (t1 != S_EXT) {
-			aerr();
+		if (pic_goto) {
+			/* Use PIC Mode for Branch */
+			if ((t1 != S_IMMED) && (t1 != S_EXT)) {
+				aerr();
+			}
+			outr4bm(&e1, R_20BIT | R_MBRO, op + ((a_uint) 0x0000F000 << 16));
+		} else {
+			/* Use ASxxxx Mode for Branch */
+			if (t1 != S_EXT) {
+				aerr();
+			}
+			outr4bm(&e1, R_CALL, op + ((a_uint) 0x0000F000 << 16));
 		}
-		outr4bm(&e1, R_20BIT, (op << 16) + (a_uint) 0x0000F000);
 		break;
 
 	case S_BRA:			/* bra */
 		/* Relative branch */
 		expr(&e1, 0);
-		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
-			if ((v1 < -1024) || (v1 > 1023))
-				aerr();
-			outaw(op + (v1 & 0x3FF));
+		if (pic_goto) {
+			/* Use PIC Mode for Branch */
+			if (is_abs(&e1)) {
+				v1 = e1.e_addr;
+				if ((v1 < -1024) || (v1 > 1023))
+					aerr();
+				outaw(op + (v1 & 0x7FF));
+			} else {
+				outrwm(&e1, R_SGND | R_11BIT, op);
+			}
 		} else {
-			outrwm(&e1, R_PCR | R_11BIT, op);
+			/* Use ASxxxx Mode for Branch */
+			if (mchpcr(&e1)) {
+				v1 = e1.e_addr - dot.s_addr - 2;
+				if ((v1 < -2048) || (v1 > 2047))
+					aerr();
+				outaw(op + ((v1 >> 1) & 0x7FF));
+			} else {
+				outrwm(&e1, R_PCR | R_BRA, op);
+			}
 		}
 		if (e1.e_mode != S_USER) {
 			rerr();
@@ -1448,13 +1510,26 @@ struct mne *mp;
 	case S_CBRA:			/* Conditional branches */
 		/* Relative branch */
 		expr(&e1, 0);
-		if (mchpcr(&e1)) {
-			v1 = e1.e_addr - dot.s_addr - 1;
-			if ((v1 < -128) || (v1 > 127))
-				aerr();
-			outaw(op + (v1 & 0xFF));
+		if (pic_goto) {
+			/* Use PIC Mode for Branch */
+			if (is_abs(&e1)) {
+				v1 = e1.e_addr;
+				if ((v1 < -128) || (v1 > 127))
+					aerr();
+				outaw(op + (v1 & 0xFF));
+			} else {
+				outrwm(&e1, R_SGND | R_8BIT, op);
+			}
 		} else {
-			outrwm(&e1, R_PCR | R_8BIT, op);
+			/* Use ASxxxx Mode for Branch */
+			if (mchpcr(&e1)) {
+				v1 = e1.e_addr - dot.s_addr - 2;
+				if ((v1 < -256) || (v1 > 255))
+					aerr();
+				outaw(op + ((v1 >> 1) & 0xFF));
+			} else {
+				outrwm(&e1, R_PCR | R_CBRA, op);
+			}
 		}
 		if (e1.e_mode != S_USER) {
 			rerr();
@@ -1473,7 +1548,7 @@ struct mne *mp;
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -1484,18 +1559,22 @@ struct mne *mp;
 		}
 		comma();
 		t2 = addr(&e2);		/* k */
-		if (t2 != S_EXT) {
+		if (t2 != S_IMMED) {
 			aerr();
 		}
-		r_mode = is_abs(&e2) ? R_MBRO | R_LFSR : R_PAG0 | R_LFSR;
-		outr4bm(&e2, r_mode, ((op + (e1.e_addr << 4)) << 16) | (a_uint) 0x0000F000);
+		if (is_abs(&e2)) {
+			r_mode = R_MBRO | R_LFSR;
+		} else {
+			r_mode = R_PAG0 | R_LFSR;
+		}
+		outr4bm(&e2, r_mode, (op + (e1.e_addr << 4)) | ((a_uint) 0x0000F000 << 16));
 		break;
 
 	case S_MOVFF:			/* movff f,f */
 		t1 = addr(&e1);		/* f */
 		if ((t1 != S_DIR) && (t1 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e1)) {
 			aerr();
 		}
@@ -1503,7 +1582,7 @@ struct mne *mp;
 		t2 = addr(&e2);		/* f */
 		if ((t2 != S_DIR) && (t2 != S_EXT)) {
 			aerr();
-		}
+		} else
 		if (mchramchk(&e2)) {
 			aerr();
 		}
@@ -1550,11 +1629,83 @@ struct mne *mp;
 			e1.e_addr = 0;
 		}
 		outaw(op + e1.e_addr);
-		break;;
+		break;
 
 	case S_DAW:			/* daw */
 	case S_INH:			/* inst */
 		outaw(op);
+		break;
+
+	case S_ADDFSR:			/* addfsr, subfsr */
+		expr(&e1, 0);		/* f */
+		abscheck(&e1);
+		if ((e1.e_addr & ~0x03) || (e1.e_addr == 3)) {
+			aerr();
+			e1.e_addr = 0x00;
+		}
+		comma();
+		t2 = addr(&e2);		/* k */
+		if ((t2 != S_IMMED) && (t2 != S_EXT)) {
+			aerr();
+		}
+		outrwm(&e2, R_MBRO | R_6BIT, op + (e1.e_addr << 6));
+		break;
+
+	case S_ADDULNK:			/* addulnk, subulnk */
+		t1 = addr(&e1);		/* k */
+		if ((t1 != S_IMMED) && (t1 != S_EXT)) {
+			aerr();
+		} else
+		if (mchramchk(&e1)) {
+			aerr();
+		}
+		outrwm(&e1, R_MBRO | R_6BIT, op);
+		/* overide cycles table */
+		opcycles = 2;
+		break;
+
+	case S_CALLW:			/* callw */
+		outaw(op);
+		break;
+
+	case S_MOVSS:			/* movss */
+		t1 = addr(&e1);		/* Zs */
+		if ((t1 != S_DIR) && (t1 != S_EXT)) {
+			aerr();
+		} else
+		if (mchramchk(&e1)) {
+			aerr();
+		}
+		comma();
+		t2 = addr(&e2);		/* Zd */
+		if ((t2 != S_DIR) && (t2 != S_EXT)) {
+			aerr();
+		} else
+		if (mchramchk(&e2)) {
+			aerr();
+		}
+		outrwm(&e1, R_MBRO | R_7BIT, op);
+		outrwm(&e2, R_MBRO | R_7BIT, (a_uint) 0x0000F000);
+		break;
+
+	case S_MOVSF:			/* movfs */
+		t1 = addr(&e1);		/* Zs */
+		if ((t1 != S_DIR) && (t1 != S_EXT)) {
+			aerr();
+		} else
+		if (mchramchk(&e1)) {
+			aerr();
+		}
+		comma();
+		t2 = addr(&e2);		/* f */
+		if ((t2 != S_DIR) && (t2 != S_EXT)) {
+			aerr();
+		} else
+		if (mchramchk(&e2)) {
+			aerr();
+		}
+		outrwm(&e1, R_MBRO | R_7BIT, op);
+		outrwm(&e2, R_MBRO | R_12BIT, (a_uint) 0x0000F000);
 		break;
 
 	default:
@@ -1664,5 +1815,6 @@ minit()
 	}
 	pic_type = 0;
 	pic_fsr = ~0;
+	pic_goto = 0;
 }
 

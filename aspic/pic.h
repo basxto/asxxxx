@@ -1,12 +1,18 @@
 /* pic.h */
 
 /*
- * (C) Copyright 2001-2006
+ * (C) Copyright 2001-2007
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ */
+
+/*
+ * PIC18Fxxx Extended Instructions
+ * added by Mengjin Su.
+ * msu at micron dot com
  */
 
 /*)BUILD
@@ -75,19 +81,28 @@
 #define	S_SETF	74		/* SETF Instruction */
 
 /*
+ * PIC18Fxxxx Extended Instructions
+ */
+#define	S_ADDFSR	75	/* ADDFSR and SUBFSR Instructions */
+#define S_ADDULNK	76	/* ADDULNK and SUBULNK Instructions */
+#define	S_CALLW		77	/* CALLW Instruction */
+#define	S_MOVSF		78	/* MOVSF Instruction */
+#define	S_MOVSS		79	/* MOVSS Instruction */
+
+/*
  * Set Direct Memory Map
  */
-#define	S_SDMM	80
+#define	S_SDMM	85
 
 /*
  * Machine Specific
  */
-#define	X_PTYPE		90		/* Processor Type */
-#define	X_PBITS		91		/* Addressing Bits */
-#define	X_PFIX		92		/* Processor Fix */
-#define	X_PMAXR		93		/* .maxram */
-#define	X_PBADR 	94		/* .badram */
-
+#define	X_PTYPE		90	/* Processor Type */
+#define	X_PBITS		91	/* Addressing Bits */
+#define	X_PFIX		92	/* Processor Fix */
+#define	X_PMAXR		93	/* .maxram */
+#define	X_PBADR 	94	/* .badram */
+#define	X_PGOTO		95	/* PIC / ASxxxx Mode CALL, GOTO, Branches */
 
 /*
  *	The badram structure is used to specify
@@ -110,18 +125,21 @@ struct adsym
 /*
  * Extended Addressing Modes
  */
-#define	R_3BIT	0x0100		/* 3-Bit Addressing Mode */
-#define	R_4BTB	0x0200		/* 4-Bit Addressing Mode */
-#define	R_4BTR	0x0300		/* 4-Bit Addressing Mode */
-#define	R_5BIT	0x0400		/* 5-Bit Addressing Mode */
+#define	R_4BTB	0x0100		/* 4-Bit Addressing Mode */
+#define	R_4BTR	0x0200		/* 4-Bit Addressing Mode */
+#define	R_5BIT	0x0300		/* 5-Bit Addressing Mode */
+#define	R_6BIT	0x0400		/* 6-Bit Addressing Mode */
 #define	R_7BIT	0x0500		/* 7-Bit Addressing Mode */
 #define	R_8BIT	0x0600		/* 8-Bit Addressing Mode */
 #define	R_9BIT	0x0700		/* 9-Bit Addressing Mode */
 #define	R_11BIT	0x0800		/* 11-Bit Addressing Mode */
 #define	R_12BIT	0x0900		/* 12-Bit Addressing Mode */
-#define	R_LFSR	0x0A00		/* LFSR   Addressing Mode */
-#define	R_13BIT	0x0B00		/* 13-Bit Addressing Mode */
-#define	R_20BIT	0x0C00		/* 20-Bit Addressing Mode */
+#define	R_13BIT	0x0A00		/* 13-Bit Addressing Mode */
+#define	R_20BIT	0x0B00		/* 20-Bit Addressing Mode */
+#define	R_CBRA	0x0C00		/* CBRA  8-Bit Addressing Mode */
+#define	R_BRA	0x0D00		/* BRA 	11-Bit Addressing Mode */
+#define	R_LFSR	0x0E00		/* LFSR 12-Bit Addressing Mode */
+#define	R_CALL	0x0F00		/* CALL 20-Bit Addressing Mode */
 
 	/* machine dependent functions */
 
