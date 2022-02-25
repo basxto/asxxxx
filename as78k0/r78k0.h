@@ -64,9 +64,10 @@
 #define	S_IHLR	35
 #define	S_IMM	36
 #define	S_SADDR	37
-#define	S_SFR	38
-#define	S_AEXT	39
-#define	S_EXT	40
+#define	S_SADFR	38
+#define	S_SFR	39
+#define	S_AEXT	40
+#define	S_EXT	41
 
 /*
  * 78KO Instruction types
@@ -109,6 +110,11 @@
  * Set Direct Pointer
  */
 #define	S_SDP	90
+
+/*
+ * Mode For Common S_ADDR And S_SFR Addresses
+ */
+#define	S_MODE	91
 
 /*
  * Register Definitions
@@ -169,6 +175,7 @@ extern struct adsym rb[];
 extern	int		addr(struct expr *esp, int *aindx);
 extern	int		addrext(struct expr *esp, int *aindx, int *cidx, int *eidx);
 extern	VOID		addrbit(struct expr *esp1, int *aindx1, int *amode1, struct expr *esp2, int *aindx2, int *amode2, int *eidx);
+extern	int		addrmode(struct expr *esp);
 extern	int		argdot(struct expr *esp, int *aindx, int flag);
 extern	int		dotarg(struct expr *esp, int *aindx, int flag);
 extern	int		admode(struct adsym *sp, int *aindx);
@@ -189,7 +196,8 @@ extern	struct	sdp	sdp;
 	/* r78kadr.c */
 extern	int		addr();
 extern	int		addrext();
-extern	int		addrbit();
+extern	VOID		addrbit();
+extern	int		addrmode();
 extern	int		argdot();
 extern	int		dotarg();
 extern	int		admode();

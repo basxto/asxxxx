@@ -136,6 +136,7 @@ static char *Page[4] = {
 };
 
 int setdp;
+int smode;
 
 /*
  * Process a machine op.
@@ -168,6 +169,11 @@ struct mne *mp;
 	op = (int) mp->m_valu;
 
 	switch (rf = mp->m_type) {
+	case S_MODE:
+		smode = op;
+		lmode = SLIST;
+		break;
+
 	case S_SDP:
 		opcycles = OPCY_SDP;
 		espa = NULL;
@@ -223,6 +229,7 @@ struct mne *mp;
 				}
 			} else
 			if (x1 == REG8_A) {
+				if (t2 == S_SADFR) t2 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 				switch(t2) {
 				case S_IMM:	/* A,#Byte */
 					outab(op + 0x0D);
@@ -271,6 +278,7 @@ struct mne *mp;
 			}
 			break;
 		case S_SADDR:	/* saddr,#Byte */
+		case S_SADFR:	/* saddr/sfr,#Byte */
 			if (t2 == S_IMM) {
 				outab(op + 0x88);
 				outrb(&e1, 0);
@@ -302,6 +310,7 @@ struct mne *mp;
 			comma(1);
 			iptr = ip;
 			addrbit(&e1, &x1, &t1, &e2, &x2, &t2, &eidx);
+			if (t1 == S_SADFR) t1 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 			switch(t1) {
 			case S_REG8:	/* A.bit  or  A,#bit */
 				if (x1 == REG8_A) {
@@ -386,7 +395,7 @@ struct mne *mp;
 			outab(op | x1);
 		} else
 		/* saddr */
-		if (t1 == S_SADDR) {
+		if ((t1 == S_SADDR) || (t1 == S_SADFR)) {
 			switch(rf) {
 			case S_INC:	outab(0x81);	break;
 			case S_DEC:	outab(0x91);	break;
@@ -435,14 +444,15 @@ struct mne *mp;
 				}
 			} else
 			if (x1 == REG8_A) {
+				if (t2 == S_SADFR) t2 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 				switch(t2) {
-				case S_SADDR:	/* A,saddr */
-					outab(0x83);
-					outrb(&e2, 0);
-					break;
 				case S_SFR:	/* A,sfr */
 					outab(0x93);
 					outrb(&e2, is_abs(&e2) ? 0 : R_PAGN);
+					break;
+				case S_SADDR:	/* A,saddr */
+					outab(0x83);
+					outrb(&e2, 0);
 					break;
 				case S_EXT:
 				case S_AEXT:	/* !addr16,A */
@@ -530,6 +540,7 @@ struct mne *mp;
 			outrb(&e2, 0);
 		} else
 		if ((t1 == S_REG8) && (x1 == REG8_A)) {
+			if (t2 == S_SADFR) t2 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 			switch(t2) {
 			case S_SPCL: /* A,PSW */
 				if (x2 == SPCL_PSW) {
@@ -538,13 +549,13 @@ struct mne *mp;
 					xerr('a', "PSW is the only special register allowed.");
 				}
 				break;
-			case S_SADDR:	/* A,saddr */
-				outab(0xF0);
-				outrb(&e2, 0);
-				break;
 			case S_SFR:	/* A,sfr */
 				outab(0xF4);
 				outrb(&e2, is_abs(&e2) ? 0 : R_PAGN);
+				break;
+			case S_SADDR:	/* A,saddr */
+				outab(0xF0);
+				outrb(&e2, 0);
 				break;
 			case S_EXT:	/* A,addr16 */
 			case S_AEXT:	/* A,!addr16 */
@@ -586,6 +597,7 @@ struct mne *mp;
 			}
 		} else
 		if ((t2 == S_REG8) && (x2 == REG8_A)) {
+			if (t1 == S_SADFR) t1 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 			switch(t1) {
 			case S_SPCL:	/* PSW,A */
 				if (x1 == SPCL_PSW) {
@@ -594,13 +606,13 @@ struct mne *mp;
 					xerr('a', "PSW is the only special register allowed.");
 				}
 				break;
-			case S_SADDR:	/* saddr,A */
-				outab(0xF2);
-				outrb(&e1, 0);
-				break;
 			case S_SFR:	/* sfr,A */
 				outab(0xF6);
 				outrb(&e1, is_abs(&e1) ? 0 : R_PAGN);
+				break;
+			case S_SADDR:	/* saddr,A */
+				outab(0xF2);
+				outrb(&e1, 0);
 				break;
 			case S_EXT:	/* addr16,A */
 			case S_AEXT:	/* !addr16,A */
@@ -641,14 +653,25 @@ struct mne *mp;
 				break;
 			}
 		} else
-		if ((t1 == S_SADDR) && (t2 == S_IMM)) {
-			outab(0x11);
-			outrb(&e1, 0);
-			outrb(&e2, 0);
+		if ((t1 == S_SADFR) && (t2 == S_IMM)) {
+			if (smode == S_SFR) { /* sfr,# */
+				outab(0x13);
+				outrb(&e1, is_abs(&e1) ? 0 : R_PAGN);
+				outrb(&e2, 0);
+			} else { /* saddr,# */
+				outab(0x11);
+				outrb(&e1, 0);
+				outrb(&e2, 0);
+			}
 		} else
 		if ((t1 == S_SFR) && (t2 == S_IMM)) {
 			outab(0x13);
 			outrb(&e1, is_abs(&e1) ? 0 : R_PAGN);
+			outrb(&e2, 0);
+		} else
+		if ((t1 == S_SADDR) && (t2 == S_IMM)) {
+			outab(0x11);
+			outrb(&e1, 0);
 			outrb(&e2, 0);
 		} else
 		if ((t1 == S_IHLR) && (x2 == REG8_A)) {
@@ -700,6 +723,7 @@ struct mne *mp;
 			}
 		} else
 		if (t2 == S_IMM) {
+			if (t1 == S_SADFR) t1 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 			switch(t1) {
 			case S_SPCL:	/* SP,#Word */
 				if (x1 == SPCL_SP) {
@@ -713,6 +737,14 @@ struct mne *mp;
 				outab(op + (x1 << 1));
 				outrw(&e2, 0);
 				break;
+			case S_SFR:	/* sfr,#Word */
+				outab(0xFE);
+				outrb(&e1, is_abs(&e1) ? 0 : R_PAGN);
+				outrw(&e2, 0);
+				if (is_abs(&e1) && (e1.e_addr & 0x01)) {
+					xerr('a', "Address must be even.");
+				}
+				break;
 			case S_SADDR:	/* saddr,#Word */
 				outab(0xEE);
 				outrb(&e1, 0);
@@ -721,17 +753,13 @@ struct mne *mp;
 					xerr('a', "Address must be even.");
 				}
 				break;
-			case S_SFR:	/* sfr,#Word */
-				outab(0xFE);
-				outrb(&e1, is_abs(&e1) ? 0 : R_PAGN);
-				outrw(&e2, 0);
-				break;
 			default:
 				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 		} else
 		if ((t1 == S_REG16) && (x1 == REG16_AX)) {
+			if (t2 == S_SADFR) t2 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 			switch(t2) {
 			case S_SPCL:	/* AX,SP */
 				if (x2 == SPCL_SP) {
@@ -740,16 +768,19 @@ struct mne *mp;
 					xerr('a', "SP is the only special register allowed.");
 				}
 				break;
+			case S_SFR:	/* AX,sfr */
+				outab(0xA9);
+				outrb(&e2, is_abs(&e2) ? 0 : R_PAGN);
+				if (is_abs(&e2) && (e2.e_addr & 0x01)) {
+					xerr('a', "Address must be even.");
+				}
+				break;
 			case S_SADDR:	/* AX,saddr */
 				outab(0x89);
 				outrb(&e2, 0);
 				if (is_abs(&e2) && (e2.e_addr & 0x01)) {
 					xerr('a', "Address must be even.");
 				}
-				break;
-			case S_SFR:	/* AX,sfr */
-				outab(0xA9);
-				outrb(&e2, is_abs(&e2) ? 0 : R_PAGN);
 				break;
 			case S_EXT:	/* AX,addr16 */
 			case S_AEXT:	/* AX,!addr16 */
@@ -762,6 +793,7 @@ struct mne *mp;
 			}
 		} else
 		if ((t2 == S_REG16) && (x2 == REG16_AX)) {
+			if (t1 == S_SADFR) t1 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 			switch(t1) {
 			case S_SPCL:	/* SP,AX */
 				if (x1 == SPCL_SP) {
@@ -770,16 +802,19 @@ struct mne *mp;
 					xerr('a', "SP is the only special register allowed.");
 				}
 				break;
+			case S_SFR:	/* sfr,AX */
+				outab(0xB9);
+				outrb(&e1, is_abs(&e1) ? 0 : R_PAGN);
+				if (is_abs(&e1) && (e1.e_addr & 0x01)) {
+					xerr('a', "Address must be even.");
+				}
+				break;
 			case S_SADDR:	/* saddr,AX */
 				outab(0x99);
 				outrb(&e1, 0);
 				if (is_abs(&e1) && (e1.e_addr & 0x01)) {
 					xerr('a', "Address must be even.");
 				}
-				break;
-			case S_SFR:	/* sfr,AX */
-				outab(0xB9);
-				outrb(&e1, is_abs(&e1) ? 0 : R_PAGN);
 				break;
 			case S_EXT:	/* addr16,AX */
 			case S_AEXT:	/* !addr16,AX */
@@ -801,6 +836,7 @@ struct mne *mp;
 				comma(1);
 				iptr = ip;
 				addrbit(&e1, &x1, &t1, &e2, &x2, &t2, &eidx);
+				if (t1 == S_SADFR) t1 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 				switch(t1) {
 				case S_REG8:	/* A.bit  or  A,#bit */
 					if (x1 == REG8_A) {
@@ -857,6 +893,7 @@ struct mne *mp;
 			addrbit(&e1, &x1, &t1, &e2, &x2, &t2, &xidx);
 			if ((t3 == S_SPCL) && (x3 == SPCL_CY)) {
 				if (t2 == S_IMM) {
+					if (t1 == S_SADFR) t1 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 					switch(t1) {
 					case S_REG8:	/* A.bit  or  A,#bit */
 						if (x1 == REG8_A) {
@@ -947,6 +984,7 @@ struct mne *mp;
 		iptr = ip;
 		addrbit(&e1, &x1, &t1, &e2, &x2, &t2, &eidx);
 		if (t2 == S_IMM) {
+			if (t1 == S_SADFR) t1 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 			switch(t1) {
 			case S_REG8:	/* A.bit  or  A,#bit */
 				if (x1 == REG8_A) {
@@ -1010,12 +1048,14 @@ struct mne *mp;
 		ip = iptr;
 		addrbit(&e1, &x1, &t1, &e2, &x2, &t2, &xidx);
 		switch(t3) {
-		case S_SFR:	/* sfr */
 		case S_SADDR:	/* saddr */
+		case S_SADFR:	/* saddr/sfr */
+		case S_SFR:	/* sfr */
 		case S_EXT:	/* addr16 */
 		case S_AEXT:	/* !addr16 */
 		case S_IDX:	/* [HL] */
 			if (t2 == S_IMM) {
+				if (t1 == S_SADFR) t1 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 				switch(t1) {
 				case S_REG8:	/* A.bit,addr  or  A,#bit,addr */
 					if (x1 == REG8_A) {
@@ -1080,12 +1120,14 @@ struct mne *mp;
 		ip = iptr;
 		addrbit(&e1, &x1, &t1, &e2, &x2, &t2, &xidx);
 		switch(t3) {
-		case S_SFR:	/* sfr */
 		case S_SADDR:	/* saddr */
+		case S_SADFR:	/* saddr/sfr */
+		case S_SFR:	/* sfr */
 		case S_EXT:	/* addr16 */
 		case S_AEXT:	/* !addr16 */
 		case S_IDX:	/* [HL] */
 			if (t2 == S_IMM) {
+				if (t1 == S_SADFR) t1 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 				switch(t1) {
 				case S_REG8:	/* A.bit,addr  or  A,#bit,addr */
 					if (x1 == REG8_A) {
@@ -1152,12 +1194,14 @@ struct mne *mp;
 		ip = iptr;
 		addrbit(&e1, &x1, &t1, &e2, &x2, &t2, &xidx);
 		switch(t3) {
-		case S_SFR:	/* sfr */
 		case S_SADDR:	/* saddr */
+		case S_SADFR:	/* saddr/sfr */
+		case S_SFR:	/* sfr */
 		case S_EXT:	/* addr16 */
 		case S_AEXT:	/* !addr16 */
 		case S_IDX:	/* [HL] */
 			if (t2 == S_IMM) {
+				if (t1 == S_SADFR) t1 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 				switch(t1) {
 				case S_REG8:	/* A.bit,addr  or  A,#bit,addr */
 					if (x1 == REG8_A) {
@@ -1214,7 +1258,7 @@ struct mne *mp;
 			ip = iptr + eidx;
 		}
 		break;
-
+ 
 	case S_BR:
 		t1 = addr(&e1, &x1);
 		switch(t1) {
@@ -1222,8 +1266,9 @@ struct mne *mp;
 			outab(0x9B);
 			outrw(&e1, 0);
 			break;
-		case S_SFR:	/* sfr */
 		case S_SADDR:	/* saddr */
+		case S_SADFR:	/* saddr/sfr */
+		case S_SFR:	/* sfr */
 		case S_EXT:	/* addr16 */
 			outab(0xFA);
 			pcrbra(&e1);
@@ -1244,8 +1289,9 @@ struct mne *mp;
 	case S_BRCZ:	/* addr16  or  !addr16 */
 		t1 = addr(&e1, &x1);
 		switch(t1) {
-		case S_SFR:	/* sfr */
 		case S_SADDR:	/* saddr */
+		case S_SADFR:	/* saddr/sfr */
+		case S_SFR:	/* sfr */
 		case S_AEXT:	/* !addr16 */
 		case S_EXT:	/* addr16 */
 			outab(op);
@@ -1262,12 +1308,14 @@ struct mne *mp;
 		comma(1);
 		t2 = addr(&e2, &x2);
 		switch(t2) {
-		case S_SFR:	/* sfr */
 		case S_SADDR:	/* saddr */
+		case S_SADFR:	/* saddr/sfr */
+		case S_SFR:	/* sfr */
 		case S_EXT:	/* addr16 */
 		case S_AEXT:	/* !addr16 */
 			switch(t1) {
 			case S_SADDR:	/* saddr,---- */
+			case S_SADFR:	/* saddr,---- */
 				outab(op);
 				outrb(&e1, 0);
 				pcrbra(&e2);
@@ -1310,8 +1358,9 @@ struct mne *mp;
 	case S_CALLF:	/* addr11  */
 		t1 = addr(&e1, &x1);
 		switch(t1) {
-		case S_SFR:	/* sfr */
 		case S_SADDR:	/* saddr */
+		case S_SADFR:	/* saddr/sfr */
+		case S_SFR:	/* sfr */
 		case S_EXT:	/* addr16 */
 		case S_AEXT:	/* !addr16 */
 			if (is_abs(&e1)) {
@@ -1334,8 +1383,9 @@ struct mne *mp;
 		if (getnb() == '[') {
 			t1 = addr(&e1, &x1);
 			switch(t1) {
-			case S_SFR:	/* sfr */
 			case S_SADDR:	/* saddr */
+			case S_SADFR:	/* saddr/sfr */
+			case S_SFR:	/* sfr */
 			case S_EXT:	/* addr16 */
 			case S_AEXT:	/* !addr16 */
 				if (is_abs(&e1)) {
@@ -1468,5 +1518,10 @@ minit()
 	 * Initialize SFR Page
 	 */
 	setdp = 0;
+
+	/*
+	 * Initialize smode
+	 */
+	smode = S_SADDR;
 }
 

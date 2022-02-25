@@ -16,7 +16,7 @@ del *.o
 del *.rel
 del *.rst
 del *.s19
-del *.s29
-del *.s39
+del *.s28
+del *.s37
 del *.sym
 

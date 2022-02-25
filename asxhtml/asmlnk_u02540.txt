@@ -1,0 +1,1001 @@
+
+
+        APPENDIX A  AS4040 ASSEMBLER                                 A-1 
+          A.1     PROCESSOR SPECIFIC DIRECTIVES                      A-1 
+          A.1.1     .4040 Directive                                  A-1 
+          A.1.2     .4004                                            A-1 
+          A.1.3     The .__.CPU.  Variable                           A-2 
+          A.2     4040/4004 REGISTER SET                             A-2 
+          A.3     4004/4040 INSTRUCTION SET                          A-3 
+          A.3.1     4040/4004 Instructions                           A-4 
+          A.3.2     4040 Specific Instructions                       A-5 
+          A.3.3     Extended Conditional Jump Instructions           A-5 
+
+        APPENDIX B  ASCOP4 ASSEMBLER                                 B-1 
+          B.1     PROCESSOR SPECIFIC DIRECTIVES                      B-1 
+          B.1.1     .cop Directive                                   B-1 
+          B.1.2     .rom_size Directives                             B-2 
+          B.1.3     .xad Directive                                   B-3 
+          B.1.4     .setpg Directive                                 B-3 
+          B.2     COP400 INSTRUCTION SET                             B-5 
+          B.2.1     COP400 Instructions                              B-5 
+          B.3     ASCOP4 MACRO FILE                                  B-7 
+
+        APPENDIX C  ASCOP8 ASSEMBLER                                 C-1 
+          C.1     PROCESSOR SPECIFIC DIRECTIVES                      C-1 
+          C.1.1     .xtnd Directive                                  C-1 
+          C.1.2     .setdp Directive                                 C-2 
+          C.2     COP800 MEMORY MAP FILES                            C-2 
+          C.3     COP800 INSTRUCTION SET                             C-6 
+          C.3.1     COP800 Instructions                              C-6 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   APPENDIX A
+
+                                AS4040 ASSEMBLER
+
+
+
+
+           The  AS4040  assembler  supports  the 4040 microprocessor in-
+        struction set and can be configured to support only  the  subset
+        of instructions used by the 4004 microprocessor.  
+
+
+        A.1  PROCESSOR SPECIFIC DIRECTIVES 
+
+
+
+        A.1.1  .4040 Directive 
+
+
+           Format:  
+
+                .4040 
+
+        The  .4040  directive specifies that the assembler recognize the
+        complete 4040 instruction set.  This is the default  instruction
+        set recognized by the as4040 assembler.  
+
+
+        A.1.2  .4004 
+
+
+           Format:  
+
+                .4004 
+
+        The  .4004 directive specifies that the assembler recognize only
+        the subset of  the  4040  instructions  available  on  the  4004
+        microprocessor.   The  unsupported  instructions will be flagged
+        with an 'o' error during assembly.  
+
+
+
+
+        AS4040 ASSEMBLER                                        PAGE A-2
+        PROCESSOR SPECIFIC DIRECTIVES
+
+
+        A.1.3  The .__.CPU.  Variable 
+
+
+           The  assembler  variable  .__.CPU.   is  set  to indicate the
+        specific processor selected:  
+
+                        .__.CPU.     Processor
+                        --------     ---------
+                           0            4040
+                           1            4004
+
+
+           The  variable  '.__.CPU.'  is by default defined as local and
+        will not be output to the created .rel file.  The assembler com-
+        mand  line  options -g or -a will not cause the local symbols to
+        be output to the created .rel file.  
+
+           The  assembler  .globl  directive  may  be used to change the
+        variable type to global causing its definition to be  output  to
+        the  rel  file.  The inclusion of the definition of the variable
+        '.__.CPU.' might be a useful means of validating that seperately
+        assembled  files have been compiled for the same processor type.
+        The linker will report an error for variables with multiple  non
+        equal definitions.  
+
+
+        A.2  4040/4004 REGISTER SET 
+
+        The  following  is  a  list  of  the 4040/4004 registers used by
+        AS4040:  
+
+                r0,  r1,  r2,  r3,         -  4-bit registers
+                r4,  r5,  r6,  r7,
+                r8,  r9,  r10, r11,
+                r12, r13, r14, r15
+        
+                rp0<r0:r1>,   rp1<r2,r3>   -  8-bit register pairs
+                rp2<r4:r5>,   rp3<r6:r7>
+                rp4<r8:r9>,   rp5<r10:r11>
+                rp6<r12:r13>, rp7<r14:r15>
+
+
+        AS4040 ASSEMBLER                                        PAGE A-3
+        4040/4004 REGISTER SET
+
+
+        A.3  4004/4040 INSTRUCTION SET 
+
+            Instruction Argument Syntax:
+        
+                Rn      registers R0 - R15
+                        or a value in the range 0 to 15
+        
+                RPn     register pairs RP0 - RP7
+                        or a value in the range 0 to 7
+        
+                #data   immediate 4-bit or 8-bit data
+        
+                addr    call, jump address, or label
+        
+                cc      condition code forms
+                    Mnemonic    Binary    Jump Condition
+                    --------    ------    --------------                
+                    nc           0000     no condition
+                    tz, t0       0001     test equals zero
+                    tn, t1       1001     test equals one
+                    cn, c1       0010     carry equals one
+                    cz, c0       1010     carry equals zero
+                    az, a0       0100     accumulator equals zero
+                    an, nza      1100     accumulator not zero
+        
+                        any single mnemonic 
+                or      any ored combination of
+                                tz, cn, az, t0, c1, and a0
+                or      any ored combination of
+                                tn, cz, an, t1, c0, and nza
+                or      any value in the range 0 to 15
+                        are valid condition code arguments.
+        
+                        The mnemonics listed above are predefined
+                        such that a mixed argument like cz|az will
+                        report an 'a' error during assembly.
+
+        The terms data and addr may be expressions.  
+
+           Note  that  not  all addressing modes may be valid with every
+        instruction.  Refer to the 4040/4004 technical  data  for  valid
+        modes.  
+
+           The  following tables list the mnemonics and arguments recog-
+        nized by the AS4040 assembler.  The  extended  instructions  are
+        available only in the 4040 microprocessor.  
+
+
+
+
+        AS4040 ASSEMBLER                                        PAGE A-4
+        4004/4040 INSTRUCTION SET
+
+
+        A.3.1  4040/4004 Instructions 
+
+            Machine Instructions
+                nop             (No Operation)
+                jcn   cc,addr   (Jump On Condition, Current Page)
+                fim   RPn,#data (Fetch Immediate To RPn)
+                src   RPn       (Send Address From RPn)
+                fin   RPn       (Fetch Indirect From ROM Into RPn)
+                jin   RPn       (Jump Indirect RPn)
+                jun   addr      (Jump Unconditional To ROM Address)
+                jms   addr      (Jump To Subroutine ROM Address)
+                inc   Rn        (Increment Rn)
+                isz   Rn, addr  (Increment Rn, Jump If Rn != 0)
+                add   Rn        (Add Rn To A With Carry)
+                sub   Rn        (Subtract Rn From A With Borrow)
+                ld    Rn        (Load A With Rn)
+                xch   Rn        (A <--> Rn)
+                bbl   #data     (Branch Back 1 Level, Load A With data)
+                ldm   #data     (Load A With data)
+        
+            Input/Output And RAM Instructions
+                wrm             (A -> Selected RAM Character)
+                wmp             (A -> Selected RAM Output Port)
+                wrr             (A -> Selected ROM Output Port)
+                wpm             (A -> Selected RAM Half Byte)
+                wr0             (A -> Selected RAM Character 0)
+                wr1             (A -> Selected RAM Character 1)
+                wr2             (A -> Selected RAM Character 2)
+                wr3             (A -> Selected RAM Character 3)
+                sbm             (A <- (A - Slctd RAM Char With Borrow))
+                rdm             (A <- Selected RAM Character)
+                rdr             (A <- Selected ROM Input Port)
+                adm             (A <- (A + Slctd RAM Char With Carry))
+                rd0             (A <- Selected RAM Character 0)
+                rd1             (A <- Selected RAM Character 1)
+                rd2             (A <- Selected RAM Character 2)
+                rd3             (A <- Selected RAM Character 3)
+        
+            Accumulator Group Instructions
+                clb             (A <- 0, C <- 0)
+                clc             (C <- 0)
+                iac             (A <- (A + 1))
+                cmc             (Complement Carry)
+                cma             (Complement Accumulator)
+                ral             (Rotate A,C Left)
+                rar             (Rotate A,C Right)
+                tcc             (Tranfer C To Accumulator, Clear C)
+                dac             (A <- (A - 1))
+                tcs             (Transfer Carry Subtract, Clear C)
+
+
+        AS4040 ASSEMBLER                                        PAGE A-5
+        4004/4040 INSTRUCTION SET
+
+
+                stc             (Set Carry)
+                daa             (Decimal Adjust Accumulator)
+                kbp             (Keyboard Process)
+                dcl             (Designate Command Line)
+
+
+        A.3.2  4040 Specific Instructions 
+
+                hlt             (Halt)
+                bbs             (Branch Back From Interrupt)
+                lcr             (A <- Command Register)
+                or4             (A <- (R4 or A))
+                or5             (A <- (R5 or A))
+                an6             (A <- (R6 and A))
+                an7             (A <- (R7 and A))
+                db0             (Designate ROM Bank 0)
+                db1             (Designate ROM Bank 1)
+                sb0             (Select Index Register Bank 0, 0 - 7)
+                sb1             (Select Index Register Bank 1, 0* - 7*)
+                ein             (Enable Interrupt)
+                din             (Disable Interrupt)
+                rpm             (Read Program Memory)
+
+
+        A.3.3  Extended Conditional Jump Instructions 
+
+                jtz  addr  -  jump if test zero
+                jtn  addr  -  jump if test not zero
+                jto  addr  -  jump if test one
+                jcz  addr  -  jump if carry/link zero
+                jnc  addr  -  jump if no carry
+                jco  addr  -  jump if carry/link one
+                joc  addr  -  jump on carry
+                jaz  addr  -  jump if accumulator equal to zero
+                jnz  addr  -  jump if accumulator non zero
+                jan  addr  -  jump if accumulator non zero
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   APPENDIX B
+
+                                ASCOP4 ASSEMBLER
+
+
+
+
+           The  ASCOP4  assembler  supports  the  COP400 series of 4-bit
+        microprocessors.  The COP400 family provides a  wide  choice  of
+        RAM,  ROM,  and  IO  capability.   The ascop4 assembler specific
+        directives configure the assembler to support a large number  of
+        COP400 family processors.  
+
+
+        B.1  PROCESSOR SPECIFIC DIRECTIVES 
+
+
+
+        B.1.1  .cop Directive 
+
+
+           Format:  
+
+                .cop    'type' 
+
+
+           The  COP400 family of processors have instruction set and ROM
+        memory differences which are configured by specifying  the  .cop
+        directive followed by the processor type.  
+
+           A  .cop  directive without an argument initializes the assem-
+        bler to accept all instructions, sets the ROM size  to  2K,  en-
+        ables  full  functionality  of the xad instruction, and sets the
+        .__.CPU.  variable to zero.  
+
+           The .cop directive currently supports the following processor
+        types where [n] is the value given  to  the  assembler  .__.CPU.
+        variable:  
+
+                402   [1]       404   [2]       404M  [3]
+                410   [4]       410L  [5]       410C  [6]
+
+
+        ASCOP4 ASSEMBLER                                        PAGE B-2
+        PROCESSOR SPECIFIC DIRECTIVES
+
+
+                411   [7]       411L  [8]       411C  [9]
+                413   [10]      413C  [11]      413CH [12]
+                420   [13]      420L  [14]
+                421   [15]      421L  [16]
+                422   [17]      422L  [18]
+                424   [19]      424L  [20]
+                425   [21]      425L  [22]
+                426   [23]      426L  [24]
+                440   [25]      441   [26]      442   [27]
+                2440  [28]      2441  [29]      2442  [30]
+                444   [31]      444L  [32]
+                445   [33]      445L  [34]
+
+
+           The  variable  '.__.CPU.'  is by default defined as local and
+        will not be output to the created .rel file.  The assembler com-
+        mand  line  options -g or -a will not cause the local symbols to
+        be output to the created .rel file.  
+
+           The  assembler  .globl  directive  may  be used to change the
+        variable type to global causing its definition to be  output  to
+        the  rel  file.  The inclusion of the definition of the variable
+        '.__.CPU.' might be a useful means of validating that seperately
+        assembled  files have been compiled for the same processor type.
+        The linker will report an error for variables with multiple  non
+        equal definitions.  
+
+
+        B.1.2  .rom_size Directives 
+
+
+           Format:  
+
+                .rom256      256  Byte ROM Size 
+
+                .rom512      512  Byte ROM Size 
+
+                .rom1k       1024 Byte ROM Size 
+
+                .rom2k       2048 Byte ROM Size 
+
+
+
+
+
+        ASCOP4 ASSEMBLER                                        PAGE B-3
+        PROCESSOR SPECIFIC DIRECTIVES
+
+
+        B.1.3  .xad Directive 
+
+
+           Format:  
+
+                .xad    n 
+
+
+           The .xad directive can override the operating mode of the xad
+        instruction selected by a .cop directive.  A non zero value of n
+        limits the xad instruction to the following form:  
+
+                xad 3,15
+
+           and  a zero or blank argument restores the xad instruction to
+        its full functionality.  
+
+
+        B.1.4  .setpg Directive 
+
+        Format:  
+
+                .setpg [base [,area]] 
+
+
+           The  .setpg  directive is used to inform the assembler of the
+        area containing ROM pages 2 and 3 and the offset address  within
+        the  selected  area.   The  only value allowed for the offset is
+        0x80 (the beginning of page 2).  
+
+           The normal invocation methods are:  
+
+                .area   ROM
+                .setpg
+        
+                or
+        
+                .setpg  0x80,ROM
+
+
+           for  the  COP4 microprocessors.  If a .setpg directive is not
+        issued the assembler defaults the region to the area "_CODE"  at
+        offset 0x80.  
+
+           The  need  for  this  directive will become apparent from the
+        following short description of the jp and jsrp instructions.  
+
+           The  jp  and  jsrp  instructions are unique in the sense that
+        they are dependent upon where in  the  program  space  they  are
+
+
+        ASCOP4 ASSEMBLER                                        PAGE B-4
+        PROCESSOR SPECIFIC DIRECTIVES
+
+
+        located.  This can be seen by comparing the opcode values for jp
+        and jsrp.  
+
+        jp   loc
+          -  0x80 | <A6:A0> Jump within pages 2 and 3
+          -  0xC0 | <A5:A0> Jump within current page, not 2 or 3
+        
+        jsrp sub
+          -  0x80 | <A5:A0> JSR to page 2, not in 2 or 3
+        
+        --------------------------------------------------------
+        
+        jp   0xE0
+          -  0x80 | <A6:A0> -->> 0x80 | 0x60 -->> 0xE0
+          -                 (jp to page 3,  jp in page 2 or 3)
+        jp   0x20
+          -  0xC0 | <A5:A0> -->> 0xC0 | 0x20 -->> 0xE0
+          -                 (jp to current page,  page 0)
+        
+        or
+        
+        jp   0xA0
+          -  0x80 | <A6:A0> -->> 0x80 | 0x20 -->> 0xA0
+          -                 (jp to page 2,  jp in page 2 or 3)
+        jsrp 0xA0
+          -  0x80 | <A5:A0> -->> 0x80 | 0x20 -->> 0xA0
+          -                 (jsrp to page 2)
+
+
+           The  assembler and linker are not capable of changing the op-
+        code based upon the relocated address of the instruction.   Thus
+        a new instruction mnemonic, jp23, is introduced to indicate a jp
+        instruction within pages 2 and 3.  The linker verifies that  any
+        jp23 jump address is in this region (0x80 to 0xFF).  
+
+                jp      Use in pages 0, 1, and >= 4
+                jp23    Use in pages 2 and 3
+
+
+           The  programmer  is  required to manually verify that jp23 is
+        used in pages 2 and 3 and that jp is used in all other pages.  
+
+           The  COP400  documentation resolves the jp - jsrp conflict by
+        not allowing a jsrp instruction to be located within page  2  or
+        3.   The programmer must manually verify that a jsrp instruction
+        is not located in page 2 or 3.  Use the jsr instruction in pages
+        2 and 3.  
+
+
+        ASCOP4 ASSEMBLER                                        PAGE B-5
+        PROCESSOR SPECIFIC DIRECTIVES
+
+
+        B.2  COP400 INSTRUCTION SET 
+
+            Instruction Argument Syntax:
+        
+                A       4-Bit Accumulator
+                B       7-Bit RAM Address Register
+                Br      Upper 3-Bits of B (Register Address)
+                Bd      Lower 4-Bits of B (Digit Address)
+                C       1-Bit Carry Register
+                d       4-Bit Operand Field (RAM Digit Select)
+                r       3-Bit Operand Field (RAM Register Select)
+        
+                n       2-Bit Operand Data (Immediate)
+                y       4-Bit Operand Data (Immediate)
+        
+                addr    jump address or label
+
+        The terms n, y, d, r and addr may be expressions.  
+
+           Note  that  not  all addressing modes may be valid with every
+        instruction.  Refer to  the  COP400  technical  data  for  valid
+        modes.  
+
+           The  following tables list the mnemonics and arguments recog-
+        nized by the ASCOP4 assembler.  
+
+
+        B.2.1  COP400 Instructions 
+
+            Arithmetic Instructions
+                asc             (Add RAM to A with carry, then SKC)
+                add             (Add RAM to A)
+                adt             (Add ten to A)
+                aisc    #y      (Add immediate, Skip on carry)
+                casc            (Add RAM to /A with carry, then SKC)
+                comp            (Ones complement of A to A)
+                nop             (No Operation)
+                or              (OR RAM with A)
+                rc              (Reset Carry)
+                sc              (Set Carry)
+                xor             (Exclusive-OR RAM with A)
+        
+            Transfer Of Control Instructions
+                jid             (Jump Indirect)
+                jmp     addr    (Jump)
+                jp      addr    (Jump within Page)
+                jp23    addr    (Jump to Page 2 or 3)
+                jsrp    addr    (Jump to Subroutine Page 2)
+                jsr     addr    (Jump to Subroutine)
+
+
+        ASCOP4 ASSEMBLER                                        PAGE B-6
+        COP400 INSTRUCTION SET
+
+
+                ret             (Return from Subroutine)
+                retsk           (Return from Subroutine then Skip)
+                halt            (Halt)
+                it              (Idle until Timer overflow)
+        
+            Memory Reference Instructions
+                came            (Copy A,RAM to E)
+                camq            (Copy A,RAM to Q)
+                camt            (Copy A,RAM to T)
+                cema            (Copy E to A,RAM)
+                cqma            (Copy Q to A,RAM)
+                ctma            (Copy T to A,RAM)
+                ld      r       (Load RAM into A, XOR Br with r)
+                ldd     r,d     (Load RAM into A from Direct r,d)
+                lqid            (Load Q Indirect)
+                rmb     n       (Reset RAM Bit)
+                smb     n       (Set RAM Bit)
+                stii    #y      (Store Immediate to RAM, Increment Bd)
+                x       r       (RAM <--> A, Br XOR r)
+                xad     r,d     (RAM(r,d) <--> A)
+                xds     r       (RAM <--> A, Bd - 1 -> Bd, Br XOR r)
+                                (Skip on Decrement of Bd from 0 to 15)
+                xis     r       (RAM <--> A, Bd + 1 -> Bd, Br XOR r)
+                                (Skip on Increment of Bd from 15 to 0)
+        
+            Register Reference Instructions
+                cab             (Copy A to Bd)
+                cba             (Copy Bd to A)
+                lbi     r,d     (Load B from Direct r,d)
+                lei     #y      (Load EN from Immediate data)
+                xabr            (A <--> Br)
+                xan             (A <--> N, N is 2-Bit Stack Pointer)
+        
+            Test Instructions
+                skc             (Skip if C is True)
+                ske             (Skip if A Equals RAM)
+                skgz            (Skip if G is Zero)
+                skgbz   #n      (Skip if G Bit is Zero)
+                skmbz   #n      (Skip if RAM Bit is Zero)
+        
+            Input/Output Instructions
+                camr            (Output A,RAM to R Port)
+                ing             (Input G Port into A)
+                inh             (Input H Port into A)
+                inin            (Input IN Inputs into A)
+                inil            (Input IL Latches into A)
+                inl             (Input L Port into RAM,A)
+                inr             (Input R Port init RAM,A)
+                obd             (Output Bd to D Outputs)
+
+
+        ASCOP4 ASSEMBLER                                        PAGE B-7
+        COP400 INSTRUCTION SET
+
+
+                ogi     #y      (Output Immediate to G Port)
+                omg             (Output RAM to G Ports)
+                omh             (Output RAM to H Port)
+                xas             (Exchange A with SIO)
+
+
+        B.3  ASCOP4 MACRO FILE 
+
+
+           The  'ascop4.mac'  macro file contains an alternate method to
+        configure the ascop4 assembler for a  specific  processor.   The
+        macro  file  contains  macros  which  redefine  the instructions
+        present in the full ascop4 functionality.  This file can be mod-
+        ified to specify processors not natively supported by the ascop4
+        assembler.  See the internals of the macro file for  implementa-
+        tion details.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   APPENDIX C
+
+                                ASCOP8 ASSEMBLER
+
+
+
+
+           The  ASCOP8  assembler  supports  the  COP800 series of 8-bit
+        microprocessors.  The COP800 family provides a  wide  choice  of
+        RAM,  ROM,  and  IO  capability.   The ascop8 assembler specific
+        directives configure the assembler to support a large number  of
+        COP800 family processors.  
+
+
+        C.1  PROCESSOR SPECIFIC DIRECTIVES 
+
+
+
+        C.1.1  .xtnd Directive 
+
+
+           Format:  
+
+                .xtnd   n 
+
+
+           A  non  zero  value  of n enables extended instructions and a
+        zero or blank argument causes an 'a' error to be  reported  when
+        the extended instructions are invoked.  
+
+
+
+
+        ASCOP8 ASSEMBLER                                        PAGE C-2
+        PROCESSOR SPECIFIC DIRECTIVES
+
+
+        C.1.2  .setdp Directive 
+
+        Format:  
+
+                .setdp [base [,area]] 
+
+
+           The  .setdp  directive is used to inform the assembler of the
+        area containing the RAM page and the offset address  within  the
+        selected  area.   The  only value allowed for the offset is 0x00
+        (the beginning of and only RAM page).  
+
+           The normal invocation methods are:  
+
+                .area   RAM
+                .setdp
+        
+                or
+        
+                .setdp  0x00,RAM
+
+
+           for  the  COP8 microprocessors.  If a .setdp directive is not
+        issued the assembler defaults the region to the area "_DATA"  at
+        offset 0x00.  
+
+
+        C.2  COP800 MEMORY MAP FILES 
+
+
+           The  COP800  family  of processors has a wide range of IO op-
+        tions.  These options include timers, counters, analog to  digi-
+        tal  converters,  UARTs,  and Microwire/Plus integrated into the
+        processors.  Each series of processors has a unique selection of
+        devices  and  associated address mapping.  The mapping of the IO
+        devices are specified in definition  files  for  each  processor
+        type.   Definition  files for many processors are located in the
+        'regdef' directory.  Note that each specific processor type  de-
+        finition  file  imports the register mapping definition file for
+        this series of processors.  
+
+           The  variable  '.__.CPU.'  is by default defined as local and
+        will not be output to the created .rel file.  The assembler com-
+        mand  line  options -g or -a will not cause the local symbols to
+        be output to the created .rel file.  
+
+           The  assembler  .globl  directive  may  be used to change the
+        variable type to global causing its definition to be  output  to
+        the  rel  file.  The inclusion of the definition of the variable
+
+
+        ASCOP8 ASSEMBLER                                        PAGE C-3
+        COP800 MEMORY MAP FILES
+
+
+        '.__.CPU.' might be a useful means of validating that seperately
+        assembled  files have been compiled for the same processor type.
+        The linker will report an error for variables with multiple  non
+        equal definitions.  
+
+           To  configure  the  ascop8 assembler for a specific processor
+        include the definition file at the beginning  of  your  assembly
+        language file:  
+
+                .include "_____.def"
+
+
+           The  .__.CPU.   number,  family series and processor specific
+        definition files are shown in the following table:  
+
+            .__.CPU.    1
+            Series:     reg820c
+            Include:    cop620c   cop622c   cop640c   cop642c
+                        cop820c   cop822c   cop840c   cop842c
+                        cop920c   cop922c   cop940c   cop942c
+
+            .__.CPU.    2
+            Series:     reg820cj
+            Include:    cop820cj  cop822cj  cop840cj  cop842cj
+
+            .__.CPU.    3
+            Series:     reg880c
+            Include:    cop680c   cop681c
+                        cop880c   cop881c
+                        cop980c   cop981c
+
+            .__.CPU.    4
+            Series:     reg884bc
+            Include:    cop684bc
+                        cop884bc
+
+            .__.CPU.    5
+            Series:     reg884cf
+            Include:    cop888cf  cop884cf
+                        cop988cf  cop984cf
+
+            .__.CPU.    6
+            Series:     reg888cg
+            Include:    cop888cg  cop884cg
+
+
+
+        ASCOP8 ASSEMBLER                                        PAGE C-4
+        COP800 MEMORY MAP FILES
+
+
+            .__.CPU.    7
+            Series:     reg888cl
+            Include:    cop688cl  cop684cl
+                        cop888cl  cop884cl
+                        cop988cl  cop984cl
+
+            .__.CPU.    8
+            Series:     reg888cs
+            Include:    cop688cs  cop684cs
+                        cop888cs  cop884cs
+                        cop988cs  cop984cs
+
+            .__.CPU.    9
+            Series:     reg888eg
+            Include:    cop688eg  cop684eg
+                        cop888eg  cop884eg
+                        cop988eg  cop984eg
+
+            .__.CPU.    10
+            Series:     reg888ek
+            Include:    cop888ek  cop884ek
+
+            .__.CPU.    11
+            Series:     reg888gw
+            Include:    cop888gw
+
+            .__.CPU.    12
+            Series:     reg912c
+            Include:    cop912c   cop912ch
+
+            .__.CPU.    13
+            Series:     reg8620c
+            Include:    cop8620c  cop8622c  cop8640c  cop8642c
+                        cop86l20c cop86l22c cop86l40c cop86l42c
+
+            .__.CPU.    14
+            Series:     reg8780c
+            Include:    cop8780c  cop8781c  cop8782c
+
+            .__.CPU.    15
+            Series:     reg8788fc
+            Include:    cop8788cf cop8784cf
+
+
+
+        ASCOP8 ASSEMBLER                                        PAGE C-5
+        COP800 MEMORY MAP FILES
+
+
+            .__.CPU.    16
+            Series:     reg8788cl
+            Include:    cop8788cl cop8784cl
+
+            .__.CPU.    17
+            Series:     reg8788eg
+            Include:    cop8788eg cop8784eg
+
+
+           When  a particular definition file, e.g 'cop820c.def', is in-
+        cluded by an assembly source file the  definition  file  imports
+        the family series file, 'reg820c.def', and the 'regdef.mac' file
+        containing the macro '.reg'.  
+
+        .reg  name, addr, str7,str6,str5,str4,str3,str2,str1,str0
+
+
+           Where  'name'  is the name of the register or port, 'addr' is
+        the address of the register or port, and 'str7 - 'str0' are  the
+        names of the bits in the register or port from bit 7 through bit
+        0.  Bits with no designation are left  blank.   As  an  example,
+        taken from 'cop820c.def', here is the definition for the PSW:  
+
+        .reg  PSW, 0xEF, HC, C, T1PND, ENTI, IPND, BUSY, ENI, GIE
+
+
+           Which creates the following constants:  
+
+                PSW       = 0xEF
+                PSW.HC    = 7   PSW.7 = 7
+                PSW.C     = 6   PSW.6 = 6
+                PSW.T1PND = 5   PSW.5 = 5
+                PSW.ENTI  = 4   PSW.4 = 4
+                PSW.IPND  = 3   PSW.3 = 3
+                PSW.BUSY  = 2   PSW.2 = 2
+                PSW.ENI   = 1   PSW.1 = 1
+                PSW.GIE   = 0   PSW.0 = 0
+
+
+           The  processor  definition  files create both upper and lower
+        case constants.  
+
+
+        ASCOP8 ASSEMBLER                                        PAGE C-6
+        COP800 MEMORY MAP FILES
+
+
+        C.3  COP800 INSTRUCTION SET 
+
+            Instruction Argument Syntax:
+        
+                A       8-Bit Accumulator Register
+                B       8-Bit Address Register
+                X       8-Bit Address Register
+                [B]     Memory Indirect Addressed By B
+                [X]     Memory Indirect Addressed By X
+                MD      Direct Addressed Memory
+                Mem     Direct Addressing or [B]
+                Memi    Direct Addressing or [B] or Immediate
+                Imm     8-Bit Immediate Data
+                Reg     Register Memory: R0-R15, B, X, SP, 0xF0-0xFF
+                Addr    Location Address
+                C       Carry Bit
+                HC      Half Carry Bit
+
+        The terms MD, Mem, Memi, Imm, Reg, and Addr may be expressions. 
+
+           Note  that  not  all addressing modes may be valid with every
+        instruction.  Refer to  the  COP800  technical  data  for  valid
+        modes.  
+
+           The  following tables list the mnemonics and arguments recog-
+        nized by the ASCOP8 assembler.  
+
+
+        C.3.1  COP800 Instructions 
+
+            Arithmetic and Logic Instructions
+                add     A,Memi  (A <- A + Memi)
+                adc     A,Memi  (A <- A + Memi + C)
+                                (C <- Carry, HC <- Half Cary)
+                subc    A,Memi  (a <- A - Memi + C)
+                                (C <- Carry, HC <- Half Cary)
+                and     A,Memi  (A <- A and /Memi)
+                or      A,Memi  (A <- A or Memi)
+                xor     A,Memi  (A <- A xor Memi)
+                ifeq    A,Memi  (Do Next if A = Memi)
+                ifgt    A,Memi  (Do next if A > Memi)
+                ifbne   #       (Do Next if <3:0> of B != Imm)
+                drsz    Reg     (Reg <- Reg - 1, Skip If Reg = 0)
+        
+                setb    #,Mem   (1 to Bit, Mem (Bit = 0 to 7)
+                rstb    #,Mem   (0 to Bit, Mem (Bit = 0 to 7)
+                ifbit   #,Mem   (If Bit = 1, Do Next Instruction)
+
+
+
+        ASCOP8 ASSEMBLER                                        PAGE C-7
+        COP800 INSTRUCTION SET
+
+
+            Instructions Using A and C
+                clr     A       (A <- A)
+                inc     A       (A <- A + 1)
+                dec     A       (A <- A - 1)
+                laid            (A <- ROM(PU,A))
+                dccr    A       (A <- BCD Correction of A)
+                rrc     A       (Rotate A Right Through C)
+                swap    A       (<A7:A4> <--> <A3:A0>)
+                sc              (C <- 1, HC <- 1)
+                rc              (C <- 0, HC <- 0)
+                ifc             (If C = 1, Do Next Instruction)
+                ifnc            (If C = 0, Do Next Instruction)
+
+            Transfer of Control Instructions
+                jmpl    Addr    (Jump Absolute Long <14:00>)
+                jmp     Addr    (Jump Absolute Short <11:00>)
+                jp      Addr    (Relative Jump -31 to +32)
+                jsrl    Addr    (Jump Subroutine Long <14:00>)
+                jsr     Addr    (Jump Subroutine Short <11:00>)
+                jid             (Jump Indirect in Current Page)
+                ret             (Return From Subroutine)
+                retsk           (Return From Subroutine, Skip)
+                reti            (Return From Interrupt)
+                intr            (Generate An Interrupt)
+                nop             (No Operation)
+
+            Memory Transfer Instructions
+                x       A,Mem   (A <--> Mem)
+                x       A,[X]   (A <--> [X])
+                x       A,[B+-] (A <--> [B], B <- B +/- 1)
+                x       A,[X+-] (A <--> [X], X <- X +/- 1)
+                ld      A,Memi  (A <- Memi)
+                ld      A,[X]   (A <- [X])
+                ld      A,[B+-] (A <- [B], B <- B +/- 1)
+                ld      A,[X+-] (A <- [X], X <- X +/- 1)
+                ld      B,Imm   (A <- Imm)
+                ld      Mem,Imm (Mem <- Imm)
+                ld      Reg,Imm (Reg <- Imm)
+                ifeq    MD,Imm  (Do Next Instruction If MD = Imm)
+
+
+
+        ASCOP8 ASSEMBLER                                        PAGE C-8
+        COP800 INSTRUCTION SET
+
+
+            Extended Instructions
+                andsz   A,Imm   (Skip Next If (A and Imm) = 0)
+                ifeq    MD,Imm  (Do Next If MD = Imm)
+                ifne    A,Imm   (Do Next If A = Imm)
+                ld      B,Imm   (A <- Imm, Faster Form)
+                pop     A       (POP The Stack Into A)
+                push    A       (PUSH A Onto The Stack)
+                rlc     A       (Rotate A Left Through C)
+                rpnd            (Reset Software Interrupt Pending Flag)
+                vis             (Vector To Software Interrupt Routine)
+
+            Instruction Alternates
+                clra            (A <- 0)
+                inca            (A <- A + 1)
+                deca            (A <- A - 1)
+                dccra           (A <- BCD Correction of A)
+                popa            (POP The Stack Into A)
+                pusha           (PUSH A Onto The Stack)
+                rrca            (Rotate A Right Through C)
+                rlca            (Rotate A Left Through C)
+                swapa           (<A7:A4> <--> <A3:A0>)
+

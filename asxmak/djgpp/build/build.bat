@@ -1,6 +1,7 @@
 rem make clean
 make as1802
 make as2650
+make as4040
 make as430
 make as6100
 make as61860
@@ -26,6 +27,9 @@ make as89lp
 make as8x300
 make as8xcxxx
 make asavr
+make ascheck
+make ascop4
+make ascop8
 make asez80
 make asf2mc8
 make asf8
@@ -41,7 +45,6 @@ make asst8
 make asz8
 make asz80
 make asz280
-make ascheck
 make aslink
 make asxscn
 make asxcnv

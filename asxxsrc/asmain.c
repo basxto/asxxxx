@@ -826,7 +826,8 @@ asmbl()
 	int d, nc, uf;
 	int con_ovr, rel_abs, npg_pag, csg_dsg;
 	a_uint base, size, map, n, v;
-	int skp, cnt, flags;
+	int skp, flags;
+	a_uint cnt;
 	FILE * fp;
 	int m_type;
 
@@ -1618,14 +1619,10 @@ loop:
 			/*
 			 * Insert Count
 			 */
-#ifdef	LONGINT
-			cnt = 0x7FFFFFFFl;
-#else
-			cnt = 0x7FFFFFFF;
-#endif
+			cnt = ~0;
 			comma(0);
 			if (more())
-				cnt = (int) absexpr();
+				cnt = absexpr();
 			/*
 			 * Open File
 			 */

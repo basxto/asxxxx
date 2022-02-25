@@ -3,12 +3,13 @@
 #		Cygwin 'GNU make' Version
 #		=========================
 #
-#   29  November  2018
+#   25  August  2021
 #
 ####################################################################
 
 ASXXXX =	as1802		\
 		as2650		\
+		as4040		\
 		as430		\
 		as6100		\
 		as61860		\
@@ -35,6 +36,8 @@ ASXXXX =	as1802		\
 		as8xcxxx	\
 		asavr		\
 		ascheck		\
+		ascop4		\
+		ascop8		\
 		asez80		\
 		asf2mc8		\
 		asf8		\
@@ -84,6 +87,7 @@ DSTEXE=		../exe/
 
 SRC1802=	$(ASXBAS)as1802/
 SRC2650=	$(ASXBAS)as2650/
+SRC4040=	$(ASXBAS)as4040/
 SRC430=		$(ASXBAS)as430/
 SRC6100=	$(ASXBAS)as6100/
 SRC61860=	$(ASXBAS)as61860/
@@ -110,6 +114,8 @@ SRC8X300=	$(ASXBAS)as8x300/
 SRC8xcxxx=	$(ASXBAS)as8xcxxx/
 SRCAVR=		$(ASXBAS)asavr/
 SRCCHECK=	$(ASXBAS)ascheck/
+SRCCOP4=	$(ASXBAS)ascop4/
+SRCCOP8=	$(ASXBAS)ascop8/
 SRCEZ80=	$(ASXBAS)asez80/
 SRCF2MC8=	$(ASXBAS)asf2mc8/
 SRCF8=		$(ASXBAS)asf8/
@@ -208,6 +214,25 @@ as2650 :	$(ASXX) $(AS2650)
 		$(LD) $(LDFLAGS) -o as2650 $(ASXX) $(AS2650)
 		cp as2650.exe $(DSTEXE)as2650.exe
 		strip $(DSTEXE)as2650.exe
+
+
+####################################################################
+# AS4040
+####################################################################
+
+AS4040 =	i40adr.o i40pst.o i40mch.o
+
+i40adr.o :	$(SRC4040)i40adr.c $(SRC4040)i40.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+i40pst.o :	$(SRC4040)i40pst.c $(SRC4040)i40.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+i40mch.o :	$(SRC4040)i40mch.c $(SRC4040)i40.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+as4040 :	$(ASXX) $(AS4040)
+		$(LD) $(LDFLAGS) -o as4040 $(ASXX) $(AS4040)
+		cp as4040.exe $(DSTEXE)as4040.exe
+		strip $(DSTEXE)as4040.exe
 
 
 ####################################################################
@@ -499,13 +524,13 @@ as78k0 :	$(ASXX) $(AS78K0)
 # AS78K0S
 ####################################################################
 
-AS78K0S =	r78kadr.o r78kpst.o r78kmch.o
+AS78K0S =	r78ksadr.o r78kspst.o r78ksmch.o
 
-r78kadr.o :	$(SRC78K0S)r78kadr.c $(SRC78K0S)r78k0s.h $(SRCASX)asxxxx.h
+r78ksadr.o :	$(SRC78K0S)r78ksadr.c $(SRC78K0S)r78ks.h $(SRCASX)asxxxx.h
 		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
-r78kpst.o :	$(SRC78K0S)r78kpst.c $(SRC78K0S)r78k0s.h $(SRCASX)asxxxx.h
+r78kspst.o :	$(SRC78K0S)r78kspst.c $(SRC78K0S)r78ks.h $(SRCASX)asxxxx.h
 		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
-r78kmch.o :	$(SRC78K0S)r78kmch.c $(SRC78K0S)r78k0s.h $(SRCASX)asxxxx.h
+r78ksmch.o :	$(SRC78K0S)r78ksmch.c $(SRC78K0S)r78ks.h $(SRCASX)asxxxx.h
 		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
 
 as78k0s :	$(ASXX) $(AS78K0S)
@@ -700,6 +725,44 @@ ascheck :	$(ASXX) $(ASCHECK)
 		$(LD) $(LDFLAGS) -o ascheck $(ASXX) $(ASCHECK)
 		cp ascheck.exe $(DSTEXE)ascheck.exe
 		strip $(DSTEXE)ascheck.exe
+
+
+####################################################################
+# ASCOP4
+####################################################################
+
+ASCOP4 =	cop4adr.o cop4pst.o cop4mch.o
+
+cop4adr.o :	$(SRCCOP4)cop4adr.c $(SRCCOP4)cop4.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+cop4pst.o :	$(SRCCOP4)cop4pst.c $(SRCCOP4)cop4.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+cop4mch.o :	$(SRCCOP4)cop4mch.c $(SRCCOP4)cop4.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+ascop4 :	$(ASXX) $(ASCOP4)
+		$(LD) $(LDFLAGS) -o ascop4 $(ASXX) $(ASCOP4)
+		cp ascop4.exe $(DSTEXE)ascop4.exe
+		strip $(DSTEXE)ascop4.exe
+
+
+####################################################################
+# ASCOP8
+####################################################################
+
+ASCOP8 =	cop8adr.o cop8pst.o cop8mch.o
+
+cop8adr.o :	$(SRCCOP8)cop8adr.c $(SRCCOP8)cop8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+cop8pst.o :	$(SRCCOP8)cop8pst.c $(SRCCOP8)cop8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+cop8mch.o :	$(SRCCOP8)cop8mch.c $(SRCCOP8)cop8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+ascop8 :	$(ASXX) $(ASCOP8)
+		$(LD) $(LDFLAGS) -o ascop8 $(ASXX) $(ASCOP8)
+		cp ascop8.exe $(DSTEXE)ascop8.exe
+		strip $(DSTEXE)ascop8.exe
 
 
 ####################################################################

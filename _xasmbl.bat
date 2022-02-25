@@ -14,6 +14,9 @@ cd ..
 cd as2650
 call ..\_xfiles.bat
 cd ..
+cd as4040
+call ..\_xfiles.bat
+cd ..
 cd as430
 call ..\_xfiles.bat
 cd ..
@@ -92,6 +95,12 @@ cd ..
 cd ascheck
 call ..\_xfiles.bat
 call _clean.bat
+cd ..
+cd ascop4
+call ..\_xfiles.bat
+cd ..
+cd ascop8
+call ..\_xfiles.bat
 cd ..
 cd asez80
 call ..\_xfiles.bat

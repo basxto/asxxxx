@@ -348,7 +348,7 @@ struct mne *mp;
 			if (m2 & A_RIV) {
 				code = 0x1F00;
 			} else
-			if ((v2 == 0x07) | (v2 = 0x0F)) {
+			if ((v2 == 0x07) | (v2 == 0x0F)) {
 				code = v2 << 8;
 			   	if (m1 & (A_LIV | A_RIV)) {
 					outrwm(&e1, R_VO8, op|code);

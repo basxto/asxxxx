@@ -255,6 +255,8 @@ struct	mne	mne[] = {
 	/* Special */
 
     {	NULL,	".setdp",	S_SDP,		0,	0	},
+    {	NULL,	".saddr",	S_MODE,		0,	S_SADDR	},
+    {	NULL,	".sfr",		S_MODE,		0,	S_SFR	},
 
 	/* 78K0 */
 

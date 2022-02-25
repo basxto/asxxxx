@@ -32,9 +32,7 @@
 
 #include "aslink.h"
 
-#if 0
-#define	DEBUG	1
-#endif
+#define	DEBUG	0
 
 /*)Module	lkrloc4.c
  *
@@ -144,6 +142,8 @@ int c;
  *			+----+----+----+----+----+
  *		  rtflag|  1 |  1 |  1 |  1 |  1 |
  *			+----+----+----+----+----+
+ *		  rterr |  0 |  0 |  x |  x |  x |
+ *			+----+----+----+----+----+
  *
  * 	The  T  line contains the assembled code output by the assem-
  *	bler with xx xx being the offset address from the  current  area
@@ -155,6 +155,7 @@ int c;
  *
  *	global variables:
  *		int	rtcnt		number of values evaluated
+ *		int	rterr[]		array of evaluation errors
  *		int	rtflg[]		array of evaluation flags
  *		int	rtval[]		array of evaluation values
  *
@@ -245,8 +246,9 @@ relt4()
  *		a_uint	relv		relocation final value
  *		int	rindex		symbol / area index
  *		a_uint	rtbase		base code address
+ *		a_uint	rtbofst		rtbase code offset
  *		a_uint	rtofst		rtval[] index offset
- *		a_uint	rtpofst		rtval[] index offset (initial)
+ *		a_uint	rtpofst		rtp code offset
  *		int	rtp		index into T data
  *		int	rxm	        merge mode index
  *		sym	**s		pointer to array of symbol pointers
@@ -294,7 +296,7 @@ relr4()
 {
 	a_uint reli, relv;
 	int mode;
-	a_uint rtbase, rtofst, rtpofst;
+	a_uint rtbase, rtofst, rtpofst, rtbofst;
 	a_uint paga, pags, pagx, pcrv;
 	a_uint m, n, v;
 	int aindex, argb, argm, rindex, rtp, rxm, error, i;
@@ -368,9 +370,9 @@ relr4()
 	while (more()) {
 		error = 0;
 		relv = 0;
-		rtpofst = rtofst;
 		mode = (int) eval();
 		rtp = (int) eval();
+		rtpofst = 0;
 		rindex = (int) evword();
 
 		/*
@@ -401,7 +403,7 @@ relr4()
 				return;
 			}
 			reli = symval(s[rindex]);
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "relr4-sym:  reli = %X, rindex = %d\n", reli, rindex);
 #endif
 		} else {
@@ -411,7 +413,7 @@ fprintf(stdout, "relr4-sym:  reli = %X, rindex = %d\n", reli, rindex);
 				return;
 			}
 			reli = a[rindex]->a_addr;
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "relr4-area: reli = %X, rindex = %d\n", reli, rindex);
 #endif
 		}
@@ -439,7 +441,7 @@ fprintf(stdout, "relr4-area: reli = %X, rindex = %d\n", reli, rindex);
 			case R4_PCRN:
 				pcrv  = (pcrv + argb) / pcb;
 				reli -= (pc + pcrv);
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "R4_PCRX: reli = %X\n", reli);
 #endif
 				break;
@@ -459,7 +461,7 @@ fprintf(stdout, "R4_PCRX: reli = %X\n", reli);
 			case R4_PCR0N:
 				pcrv /=  pcb;
 				reli -= (pc + pcrv);
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "R4_PCRX: reli = %X\n", reli);
 #endif
 				break;
@@ -468,7 +470,7 @@ fprintf(stdout, "R4_PCRX: reli = %X\n", reli);
 				paga  = sdp.s_area->a_addr;
 				pags  = sdp.s_addr;
 				reli -= paga + pags;
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "R4_PAGN: paga = %X, pags = %X, reli = %X\n", paga, pags, reli);
 #endif
 				break;
@@ -490,6 +492,7 @@ fprintf(stdout, "R4_PAGN: paga = %X, pags = %X, reli = %X\n", paga, pags, reli);
 				 * from a_bytes of data in the T line.
 				 */
 				rtofst += (a_bytes - 1);
+				rtpofst += a_bytes;
 			} else {
 				relv = adw_xb(argb, reli, rtp);
 				/*
@@ -497,8 +500,9 @@ fprintf(stdout, "R4_PAGN: paga = %X, pags = %X, reli = %X\n", paga, pags, reli);
 				 * from a_bytes of data in the T line.
 				 */
 				rtofst += (a_bytes - argb);
+				rtpofst += a_bytes;
 			}
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "R4_RELV: relv = %X\n", relv);
 #endif
 
@@ -539,7 +543,7 @@ fprintf(stdout, "R4_RELV: relv = %X\n", relv);
 			}
 #endif
 
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "relr4: relv = %X\n", relv);
 fprintf(stdout, "     :    m = %X\n", m);
 fprintf(stdout, "     :    n = %X\n", n);
@@ -630,7 +634,7 @@ fprintf(stdout, "     : mode = %X\n", mode);
 			case R4_PCRN:
 				pcrv  = (pcrv + argb) / pcb;
 				reli -= (pc + pcrv);
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "R4_PCRX_MERGE: reli = %X\n", reli);
 #endif
 				break;
@@ -650,7 +654,7 @@ fprintf(stdout, "R4_PCRX_MERGE: reli = %X\n", reli);
 			case R4_PCR0N:
 				pcrv /=  pcb;
 				reli -= (pc + pcrv);
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "R4_PCRX_MERGE: reli = %X\n", reli);
 #endif
 				break;
@@ -659,7 +663,7 @@ fprintf(stdout, "R4_PCRX_MERGE: reli = %X\n", reli);
 				paga  = sdp.s_area->a_addr;
 				pags  = sdp.s_addr;
 				reli -= paga + pags;
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "R4_PAGN_MERGE: paga = %X, pags = %X, reli = %X\n", paga, pags, reli);
 #endif
 				break;
@@ -679,7 +683,7 @@ fprintf(stdout, "R4_PAGN_MERGE: paga = %X, pags = %X, reli = %X\n", paga, pags, 
 			} else {
 				relv = adw_xb(argb, reli, rtp);
 			}
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "relr4-merge: relv = %X\n", relv);
 #endif
 
@@ -701,7 +705,7 @@ fprintf(stdout, "relr4-merge: relv = %X\n", relv);
 			v = lkmerge(relv, rxm, v);
 			ptb_xb(0 , rtp);
 			adw_xb(argb, v, rtp);
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "relr4-merge: v = %X\n", v);
 #endif
 
@@ -711,7 +715,7 @@ fprintf(stdout, "relr4-merge: v = %X\n", v);
 			n = hp->m_list[rxm]->m_sbits;
 			m = ~(n >> 1);
 			n = ~(n >> 0);
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "relr4-merge: relv = %X\n", relv);
 fprintf(stdout, "           :    m = %X\n", m);
 fprintf(stdout, "           :    n = %X\n", n);
@@ -792,19 +796,29 @@ fprintf(stdout, "           : mode = %X\n", mode);
 		 * Error Processing
 		 */
 		if (error) {
+			for (i=a_bytes,rtbofst=0; i<(int)(rtp); i++) {
+				if (rtflg[i]) {
+					rtbofst += 1;
+				}
+			}
+
 			rerr.aindex = aindex;
 			rerr.mode = mode;
-			rerr.rtbase = rtbase + ((rtp - rtpofst) / pcb);
+			rerr.rtbase = rtbase + (rtbofst / pcb);
 			rerr.rindex = rindex;
 			rerr.rval = relv - reli;
 			relerr4(errmsg4[error]);
 
-			for (i=rtp; i<rtp+a_bytes; i++) {
+			for (i=(int)rtp; i<(int)(rtp+rtpofst); i++) {
 				if (rtflg[i]) {
 					rterr[i] = error;
 					break;
 				}
 			}
+
+#if DEBUG
+			fprintf(stdout, "relr4-error(%d): rtp = %d, rtpofst = %d, rtbofst = %d\n", error, rtp, rtpofst, rtbofst);
+#endif
 		}
 		/*
 		 * Bank Has Output
@@ -924,7 +938,7 @@ relp4()
 		lkerr++;
 		return;
 	}
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "relp4-relocation-area: aindex = %4X\n", aindex);
 #endif
 
@@ -966,7 +980,7 @@ fprintf(stdout, "relp4-relocation-area: aindex = %4X\n", aindex);
 		lkerr++;
 		return;
 	}
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "relp4-paged: aindex = %4X\n", aindex);
 #endif
 
@@ -976,7 +990,7 @@ fprintf(stdout, "relp4-paged: aindex = %4X\n", aindex);
 	if (rtcnt > a_bytes*3) {
 		p_mask = adb_xb(0,a_bytes*3);
 	}
-#ifdef	DEBUG
+#if DEBUG
 fprintf(stdout, "relp4-sdp: area = %s, addr = %X, p_mask = %X\n", sdp.s_areax->a_bap->a_id, sdp.s_addr, p_mask);
 #endif
 

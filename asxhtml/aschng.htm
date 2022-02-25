@@ -12,7 +12,60 @@
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 
 <H4><B><PRE>
-                RELEASE NOTES
+Summary  of changes/additions to the ASxxxx Assemblers
+from version 5.40.  
+
+2021_09_01 Version 5.40 Update 2
+
+   This update brings the assembler and linker to version 5.41
+
+   Includes: 2021_05_11 Version 5.40 Update 1
+
+   and the following:
+
+   assemblers:
+     asmain    - 'cnt' variable changed to 'a_uint' type.
+     asxxxx.h  - Version 5.41
+
+   aslink:
+     lklist.c  - linking errors now reported in .rst file
+     lkrloc4.c - corrected problem in reported error location
+     lkrloc3.c - "
+     aslink.h  - Version 5.41
+
+   as8x300:
+     s8xmch.c  - line 351 changed to
+     		 if ((v2 == 0x07) | (v2 == 0x0F)) {
+
+   New Assemblers:
+     as4040    - Intel 4040 and 4004
+     ascop4    - National Semiconductor COP400 Series Of Microprocessors
+     ascop8    - National Semiconductor COP800 Series Of Microprocessors
+
+   Updates to build/make files, assembler test files, and documentation.
+
+
+2021_05_11 Version 5.40 Update 1
+
+   AS78K0 and AS78K0S -
+
+   Instructions CMP, XOR, AND, OR, ADD, SUB, ADDC, SUBC, and XCH
+   with register to register operations of the form Rn,Rn
+   failed to report an error if one of the arguments was not A.
+
+   Instruction MOVW with an addressing mode of SADDRP failed to
+   report an ODD address as an error.
+
+     Note: An externally defined SADDRP address which is ODD
+           will not be reported as an error by the assembler
+           or the linker.
+
+</PRE></B></H4>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+
+<H4><B><PRE>
+                VERSION 5.40 RELEASE NOTES
 
 
         Asxxxx/ASlink version 5.40 is
@@ -733,7 +786,7 @@ Version 4.00 to Version 4.10.
 
     12.  Made many corrections to internal code comments.  
 
- </PRE></B></H4>
+</PRE></B></H4>
 <H5><A HREF="asxdoc.htm#TOP"> Go to the Documentation Index</A></H5>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">

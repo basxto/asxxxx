@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#   30 November 2018			Created for LINUX     / make /
+#   25 August 2021			Created for LINUX     / make /
 #
 ######################################################################
 
@@ -11,6 +11,7 @@
 
 all:	as1802		\
 	as2650		\
+	as4040		\
 	as430		\
 	as6100		\
 	as61860		\
@@ -36,6 +37,9 @@ all:	as1802		\
 	as8x300		\
 	as8xcxxx	\
 	asavr		\
+	ascheck		\
+	ascop4		\
+	ascop8		\
 	asez80		\
 	asf2mc8		\
 	asf8		\
@@ -65,6 +69,7 @@ clean:
 	rm -f $(S19OS9)*.o
 	rm -f $(SRC1802)*.o
 	rm -f $(SRC2650)*.o
+	rm -f $(SRC4040)*.o
 	rm -f $(SRC430)*.o
 	rm -f $(SRC6100)*.o
 	rm -f $(SRC61860)*.o
@@ -91,6 +96,8 @@ clean:
 	rm -f $(SRC8XCXXX)*.o
 	rm -f $(SRCAVR)*.o
 	rm -f $(SRCCHECK)*.o
+	rm -f $(SRCOP4)*.o
+	rm -f $(SRCOP8)*.o
 	rm -f $(SRCEZ80)*.o
 	rm -f $(SRCF2MC8)*.o
 	rm -f $(SRCF8)*.o
@@ -108,6 +115,7 @@ clean:
 	rm -f $(SRCZ280)*.o
 	rm -f as1802
 	rm -f as2650
+	rm -f as4040
 	rm -f as430
 	rm -f as6100
 	rm -f as61860
@@ -133,6 +141,9 @@ clean:
 	rm -f as8x300
 	rm -f as8xcxxx
 	rm -f asavr
+	rm -f ascheck
+	rm -f ascop4
+	rm -f ascop8
 	rm -f asez80
 	rm -f asf2mc8
 	rm -f asf8
@@ -142,7 +153,6 @@ clean:
 	rm -f aspic
 	rm -f asrab
 	rm -f asscmp
-	rm -f ascheck
 	rm -f asst6
 	rm -f asst7
 	rm -f asst8
@@ -162,6 +172,7 @@ prep:
 	rm -f $(SRCS19OS9)*.o
 	rm -f $(SRC1802)*.o
 	rm -f $(SRC2650)*.o
+	rm -f $(SRC4040)*.o
 	rm -f $(SRC430)*.o
 	rm -f $(SRC6100)*.o
 	rm -f $(SRC61860)*.o
@@ -188,6 +199,8 @@ prep:
 	rm -f $(SRC8XCXXX)*.o
 	rm -f $(SRCAVR)*.o
 	rm -f $(SRCCHECK)*.o
+	rm -f $(SRCOP4)*.o
+	rm -f $(SRCOP8)*.o
 	rm -f $(SRCEZ80)*.o
 	rm -f $(SRCF2MC8)*.o
 	rm -f $(SRCF8)*.o
@@ -205,6 +218,7 @@ prep:
 	rm -f $(SRCZ280)*.o
 	rm -f as1802
 	rm -f as2650
+	rm -f as4040
 	rm -f as430
 	rm -f as6100
 	rm -f as61860
@@ -230,6 +244,9 @@ prep:
 	rm -f as8x300
 	rm -f as8xcxxx
 	rm -f asavr
+	rm -f ascheck
+	rm -f ascop4
+	rm -f ascop8
 	rm -f asez80
 	rm -f asf2mc8
 	rm -f asf8
@@ -239,7 +256,6 @@ prep:
 	rm -f aspic
 	rm -f asrab
 	rm -f asscmp
-	rm -f ascheck
 	rm -f asst6
 	rm -f asst7
 	rm -f asst8
@@ -263,7 +279,6 @@ LDFLAGS=	-Wall $(LDOPT)
 #  Set ASXBAS relative to this make file.
 
 ASXBAS:=	../../../
-ASXEXE:=	../
 
 SRCASX:=	$(ASXBAS)asxxsrc/
 SRCLNK:=	$(ASXBAS)linksrc/
@@ -273,6 +288,7 @@ DSTEXE:=	$(ASXBAS)asxmak/linux/exe/
 
 SRC1802=	$(ASXBAS)as1802/
 SRC2650=	$(ASXBAS)as2650/
+SRC4040=	$(ASXBAS)as4040/
 SRC430=		$(ASXBAS)as430/
 SRC6100=	$(ASXBAS)as6100/
 SRC61860=	$(ASXBAS)as61860/
@@ -299,6 +315,8 @@ SRC8X300=	$(ASXBAS)as8x300/
 SRC8XCXXX=	$(ASXBAS)as8xcxxx/
 SRCAVR=		$(ASXBAS)asavr/
 SRCCHECK=	$(ASXBAS)ascheck/
+SRCCOP4=	$(ASXBAS)ascop4/
+SRCCOP8=	$(ASXBAS)ascop8/
 SRCEZ80=	$(ASXBAS)asez80/
 SRCF2MC8=	$(ASXBAS)asf2mc8/
 SRCF8=		$(ASXBAS)asf8/
@@ -363,6 +381,22 @@ as2650:	$(ASXXSRC) $(AS2650SRC)
 	strip $(DSTEXE)as2650
 	chmod 755 $(DSTEXE)as2650
 
+
+####################################################################
+# AS4040
+####################################################################
+
+AS4040 =	i40adr.o i40mch.o i40pst.o
+
+AS4040SRC =	$(addprefix $(SRC4040),$(AS4040))
+
+$(AS4040SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC4040)i40.h
+
+as4040:	$(ASXXSRC) $(AS4040SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS4040SRC) -o as4040
+	cp as4040 $(DSTEXE)as4040
+	strip $(DSTEXE)as4040
+	chmod 755 $(DSTEXE)as4040
 
 ####################################################################
 # AS430
@@ -621,11 +655,11 @@ as78k0:		$(ASXXSRC) $(AS78K0SRC)
 # AS78K0S
 ####################################################################
 
-AS78K0S =	r78kadr.o r78kmch.o r78kpst.o
+AS78K0S =	r78ksadr.o r78ksmch.o r78kspst.o
 
 AS78KSRC =	$(addprefix $(SRC78K0S),$(AS78K0S))
 
-$(AS78KSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC78K0S)r78k0s.h
+$(AS78KSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC78K0S)r78ks.h
 
 as78k0s:	$(ASXXSRC) $(AS78KSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS78KSRC) -o as78k0s
@@ -802,6 +836,40 @@ ascheck:	$(ASXXSRC) $(ASCHECKSRC)
 	cp ascheck $(DSTEXE)ascheck
 	strip $(DSTEXE)ascheck
 	chmod 755 $(DSTEXE)ascheck
+
+
+####################################################################
+# ASCOP4
+####################################################################
+
+ASCOP4 =	cop4adr.o cop4mch.o cop4pst.o
+
+ASCOP4SRC =	$(addprefix $(SRCCOP4),$(ASCOP4))
+
+$(ASCOP4SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCCOP4)cop4.h
+
+ascop4:	$(ASXXSRC) $(ASCOP4SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASCOP4SRC) -o ascop4
+	cp ascop4 $(DSTEXE)ascop4
+	strip $(DSTEXE)ascop4
+	chmod 755 $(DSTEXE)ascop4
+
+
+####################################################################
+# ASCOP8
+####################################################################
+
+ASCOP8 =	cop8adr.o cop8mch.o cop8pst.o
+
+ASCOP8SRC =	$(addprefix $(SRCCOP8),$(ASCOP8))
+
+$(ASCOP8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCCOP8)cop8.h
+
+ascop8:	$(ASXXSRC) $(ASCOP8SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASCOP8SRC) -o ascop8
+	cp ascop8 $(DSTEXE)ascop8
+	strip $(DSTEXE)ascop8
+	chmod 755 $(DSTEXE)ascop8
 
 
 ####################################################################

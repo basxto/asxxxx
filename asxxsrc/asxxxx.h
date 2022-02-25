@@ -50,7 +50,7 @@
  * Local Definitions
  */
 
-#define	VERSION	"V05.40"
+#define	VERSION	"V05.41"
 #define	COPYRIGHT "2021"
 
 /*
