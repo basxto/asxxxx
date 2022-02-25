@@ -13,10 +13,71 @@ ASxxxx Cross Assembler Updates
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 <B><PRE>
 *---*---*---*---*
+Version 4.11 Update 4
+2008_02_03
+<BR><a href="ftp://shop-pdp.kent.edu/u04411.zip">
+Update_04 for the ASxxxx Assembler and Linker Version 4.11 (23K)</a><BR>
+(use 'pkunzip -d U04411.ZIP' for extraction with MS-DOS)<BR>
+(use 'unzip -L -a U04411.ZIP' for extraction with Linux)<BR>
+<BR>
+   This  update  for  Version  4.11  of the  ASxxxx Cross
+Assemblers includes an update to the AS2650 assembler to
+fix the following errors:
+
+   1)  The indexed addressing mode generates invalid
+       code by using the first argument register as
+       the index register: (assume addr = 0x1234)
+
+           loda    r0,[addr,r1]          0C F2 34
+               this should give          0D F2 34
+
+   2)  The index addressing mode did not generate
+       an addressing error when the first argument
+       register was not r0:
+
+           stra    r1,[addr,r2]  should give an 'a'
+               error, the source must be r0
+
+           loda    r2,[addr,r3]  should give an 'a'
+               error, the destination must be r0
+
+   3)  The S2650 auto increment and decrement indexing 
+       modes always perform the register update before
+       the register is used. i.e. +Rn or -Rn.  The
+       assembler now accepts +Rn or Rn+ as meaning
+       pre-increment and -Rn or Rn- as meaning
+       pre-decrement.
+
+The AS2650 assembler tstscn files have been updated for
+testing the assemblers.
+	    
+
+   Merge the update asxv4pxx directory and subdirectories
+with the V4.11 distribution.  The following files will be
+overwritten:
+
+[asxv4pxx/as2650]
+      s26adr.c
+      s26mch.c
+      t2650.asm
+      t2650e.asm
+
+[asxv4pxx\asxxhtml]
+      asxupt.htm
+
+   You must recompile the AS2650 assembler to incorporate
+the update.
+
+*---*---*---*---*
+</PRE></B>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<B><PRE>
+*---*---*---*---*
 Version 4.11 Update 3
 2007_04_01
 <BR><a href="ftp://shop-pdp.kent.edu/u03411.zip">
-Update_03 for the ASxxxx Assembler and Linker Version 4.11 (105K)</a><BR>
+Update_03 for the ASxxxx Assembler and Linker Version 4.11 (122K)</a><BR>
 (use 'pkunzip -d U03411.ZIP' for extraction with MS-DOS)<BR>
 (use 'unzip -L -a U03411.ZIP' for extraction with Linux)<BR>
 <BR>
@@ -50,6 +111,18 @@ overwritten:
       picext.c
       picmch.c
       picpst.c
+
+[asxv4pxx\aspic\p12c5xx]
+      tp12c5xx.asm
+
+[asxv4pxx\aspic\p12c67x]
+      t12c67x.asm
+
+[asxv4pxx\aspic\p16cxxx]
+      tpic16cx.asm
+
+[asxv4pxx\aspic\p17cxxx]
+      tpic17cx.asm
 
 [asxv4pxx\aspic\p18cxxx]
       tpic18cx.asm
@@ -96,6 +169,7 @@ overwritten:
 [asxv4pxx\asxxsrc]:
       asmain.c
       asout.c
+      assubr.c
       asxxxx.h
 
 [asxv4pxx\linksrc]:
@@ -452,6 +526,6 @@ specify case insensitivity.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: March 2007</B></P></H6>
+<H6><P><B>Last Updated: February 2008</B></P></H6>
 </BODY>
 </HTML>

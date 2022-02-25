@@ -119,6 +119,21 @@
 	lodr	[BADD,r0+]
 	lodr	[BADD,-r0]
 
+	lodr	r0,[BADD,r0]
+	lodr	r1,[BADD,r1]
+	lodr	r2,[BADD,r2]
+	lodr	r3,[BADD,r3]
+
+	lodr	r0,[BADD,+r0]
+	lodr	r1,[BADD,+r1]
+	lodr	r2,[BADD,+r2]
+	lodr	r3,[BADD,+r3]
+
+	lodr	r0,[BADD,-r0]
+	lodr	r1,[BADD,-r1]
+	lodr	r2,[BADD,-r2]
+	lodr	r3,[BADD,-r3]
+
 	; Type: S_TYP2
 
 	loda	r0,[ADDR]
@@ -141,6 +156,21 @@
 	loda	[BADD,r0]
 	loda	[BADD,r0+]
 	loda	[BADD,-r0]
+
+	loda	r0,[BADD,r0]
+	loda	r1,[BADD,r1]
+	loda	r2,[BADD,r2]
+	loda	r3,[BADD,r3]
+
+	loda	r0,[BADD,+r0]
+	loda	r1,[BADD,+r1]
+	loda	r2,[BADD,+r2]
+	loda	r3,[BADD,+r3]
+
+	loda	r0,[BADD,-r0]
+	loda	r1,[BADD,-r1]
+	loda	r2,[BADD,-r2]
+	loda	r3,[BADD,-r3]
 
 	; Type: S_TYP3
 
@@ -166,6 +196,21 @@
 	lodi	[BADD,r0]
 	lodi	[BADD,r0+]
 	lodi	[BADD,-r0]
+
+	lodi	r0,[BADD,r0]
+	lodi	r1,[BADD,r1]
+	lodi	r2,[BADD,r2]
+	lodi	r3,[BADD,r3]
+
+	lodi	r0,[BADD,+r0]
+	lodi	r1,[BADD,+r1]
+	lodi	r2,[BADD,+r2]
+	lodi	r3,[BADD,+r3]
+
+	lodi	r0,[BADD,-r0]
+	lodi	r1,[BADD,-r1]
+	lodi	r2,[BADD,-r2]
+	lodi	r3,[BADD,-r3]
 
 	; Type: S_TYP4
 

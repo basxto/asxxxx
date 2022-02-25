@@ -192,7 +192,14 @@ struct mne *mp;
 		comma();
 		t2 = addr(&e2);
 		a2 = aindx;
-		outab(op | (0x03 & a1));
+		if (t2 == S_INDX) {
+			outab(op | (0x03 & a2));
+			if ((0x03 & a1) != 0x00) {
+				aerr();
+			}
+		} else {
+			outab(op | (0x03 & a1));
+		}
 		outrwm(&e2, M_13BIT, (0xE0 & a2) << 8);
 		if (t1 != S_REG) {
 			aerr();

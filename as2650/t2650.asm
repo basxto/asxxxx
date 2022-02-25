@@ -53,20 +53,20 @@
 	loda	r2,[ADDR]		; 0E 92 34
 	loda	r3,[ADDR]		; 0F 92 34
 
-	loda	r0,[ADDR,r0+]		; 0C B2 34
-	loda	r1,[ADDR,r0+]		; 0D B2 34
-	loda	r2,[ADDR,r0+]		; 0E B2 34
-	loda	r3,[ADDR,r0+]		; 0F B2 34
+	loda	r0,[ADDR,+r0]		; 0C B2 34
+	loda	r0,[ADDR,+r1]		; 0D B2 34
+	loda	r0,[ADDR,+r2]		; 0E B2 34
+	loda	r0,[ADDR,+r3]		; 0F B2 34
 
 	loda	r0,[ADDR,-r0]		; 0C D2 34
-	loda	r1,[ADDR,-r0]		; 0D D2 34
-	loda	r2,[ADDR,-r0]		; 0E D2 34
-	loda	r3,[ADDR,-r0]		; 0F D2 34
+	loda	r0,[ADDR,-r1]		; 0D D2 34
+	loda	r0,[ADDR,-r2]		; 0E D2 34
+	loda	r0,[ADDR,-r3]		; 0F D2 34
 
 	loda	r0,[ADDR,r0]		; 0C F2 34
-	loda	r1,[ADDR,r0]		; 0D F2 34
-	loda	r2,[ADDR,r0]		; 0E F2 34
-	loda	r3,[ADDR,r0]		; 0F F2 34
+	loda	r0,[ADDR,r1]		; 0D F2 34
+	loda	r0,[ADDR,r2]		; 0E F2 34
+	loda	r0,[ADDR,r3]		; 0F F2 34
 
 	.sbttl	lod_ 'Alternate Indirect' Instruction Tests
 
@@ -80,20 +80,20 @@
 	loda	r2,@ADDR		; 0E 92 34
 	loda	r3,@ADDR		; 0F 92 34
 
-	loda	r0,@ADDR,r0+		; 0C B2 34
-	loda	r1,@ADDR,r0+		; 0D B2 34
-	loda	r2,@ADDR,r0+		; 0E B2 34
-	loda	r3,@ADDR,r0+		; 0F B2 34
+	loda	r0,@ADDR,+r0		; 0C B2 34
+	loda	r0,@ADDR,+r1		; 0D B2 34
+	loda	r0,@ADDR,+r2		; 0E B2 34
+	loda	r0,@ADDR,+r3		; 0F B2 34
 
 	loda	r0,@ADDR,-r0		; 0C D2 34
-	loda	r1,@ADDR,-r0		; 0D D2 34
-	loda	r2,@ADDR,-r0		; 0E D2 34
-	loda	r3,@ADDR,-r0		; 0F D2 34
+	loda	r0,@ADDR,-r1		; 0D D2 34
+	loda	r0,@ADDR,-r2		; 0E D2 34
+	loda	r0,@ADDR,-r3		; 0F D2 34
 
 	loda	r0,@ADDR,r0		; 0C F2 34
-	loda	r1,@ADDR,r0		; 0D F2 34
-	loda	r2,@ADDR,r0		; 0E F2 34
-	loda	r3,@ADDR,r0		; 0F F2 34
+	loda	r0,@ADDR,r1		; 0D F2 34
+	loda	r0,@ADDR,r2		; 0E F2 34
+	loda	r0,@ADDR,r3		; 0F F2 34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -210,20 +210,20 @@
 	eora	r2,[ADDR]		; 2E 92 34
 	eora	r3,[ADDR]		; 2F 92 34
 
-	eora	r0,[ADDR,r0+]		; 2C B2 34
-	eora	r1,[ADDR,r0+]		; 2D B2 34
-	eora	r2,[ADDR,r0+]		; 2E B2 34
-	eora	r3,[ADDR,r0+]		; 2F B2 34
+	eora	r0,[ADDR,+r0]		; 2C B2 34
+	eora	r0,[ADDR,+r1]		; 2D B2 34
+	eora	r0,[ADDR,+r2]		; 2E B2 34
+	eora	r0,[ADDR,+r3]		; 2F B2 34
 
 	eora	r0,[ADDR,-r0]		; 2C D2 34
-	eora	r1,[ADDR,-r0]		; 2D D2 34
-	eora	r2,[ADDR,-r0]		; 2E D2 34
-	eora	r3,[ADDR,-r0]		; 2F D2 34
+	eora	r0,[ADDR,-r1]		; 2D D2 34
+	eora	r0,[ADDR,-r2]		; 2E D2 34
+	eora	r0,[ADDR,-r3]		; 2F D2 34
 
 	eora	r0,[ADDR,r0]		; 2C F2 34
-	eora	r1,[ADDR,r0]		; 2D F2 34
-	eora	r2,[ADDR,r0]		; 2E F2 34
-	eora	r3,[ADDR,r0]		; 2F F2 34
+	eora	r0,[ADDR,r1]		; 2D F2 34
+	eora	r0,[ADDR,r2]		; 2E F2 34
+	eora	r0,[ADDR,r3]		; 2F F2 34
 
 	.sbttl	eor_ 'Alternate Indirect' Instruction Tests
 
@@ -237,20 +237,20 @@
 	eora	r2,@ADDR		; 2E 92 34
 	eora	r3,@ADDR		; 2F 92 34
 
-	eora	r0,@ADDR,r0+		; 2C B2 34
-	eora	r1,@ADDR,r0+		; 2D B2 34
-	eora	r2,@ADDR,r0+		; 2E B2 34
-	eora	r3,@ADDR,r0+		; 2F B2 34
+	eora	r0,@ADDR,+r0		; 2C B2 34
+	eora	r0,@ADDR,+r1		; 2D B2 34
+	eora	r0,@ADDR,+r2		; 2E B2 34
+	eora	r0,@ADDR,+r3		; 2F B2 34
 
 	eora	r0,@ADDR,-r0		; 2C D2 34
-	eora	r1,@ADDR,-r0		; 2D D2 34
-	eora	r2,@ADDR,-r0		; 2E D2 34
-	eora	r3,@ADDR,-r0		; 2F D2 34
+	eora	r0,@ADDR,-r1		; 2D D2 34
+	eora	r0,@ADDR,-r2		; 2E D2 34
+	eora	r0,@ADDR,-r3		; 2F D2 34
 
 	eora	r0,@ADDR,r0		; 2C F2 34
-	eora	r1,@ADDR,r0		; 2D F2 34
-	eora	r2,@ADDR,r0		; 2E F2 34
-	eora	r3,@ADDR,r0		; 2F F2 34
+	eora	r0,@ADDR,r1		; 2D F2 34
+	eora	r0,@ADDR,r2		; 2E F2 34
+	eora	r0,@ADDR,r3		; 2F F2 34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -369,20 +369,20 @@
 	anda	r2,[ADDR]		; 4E 92 34
 	anda	r3,[ADDR]		; 4F 92 34
 
-	anda	r0,[ADDR,r0+]		; 4C B2 34
-	anda	r1,[ADDR,r0+]		; 4D B2 34
-	anda	r2,[ADDR,r0+]		; 4E B2 34
-	anda	r3,[ADDR,r0+]		; 4F B2 34
+	anda	r0,[ADDR,+r0]		; 4C B2 34
+	anda	r0,[ADDR,+r1]		; 4D B2 34
+	anda	r0,[ADDR,+r2]		; 4E B2 34
+	anda	r0,[ADDR,+r3]		; 4F B2 34
 
 	anda	r0,[ADDR,-r0]		; 4C D2 34
-	anda	r1,[ADDR,-r0]		; 4D D2 34
-	anda	r2,[ADDR,-r0]		; 4E D2 34
-	anda	r3,[ADDR,-r0]		; 4F D2 34
+	anda	r0,[ADDR,-r1]		; 4D D2 34
+	anda	r0,[ADDR,-r2]		; 4E D2 34
+	anda	r0,[ADDR,-r3]		; 4F D2 34
 
 	anda	r0,[ADDR,r0]		; 4C F2 34
-	anda	r1,[ADDR,r0]		; 4D F2 34
-	anda	r2,[ADDR,r0]		; 4E F2 34
-	anda	r3,[ADDR,r0]		; 4F F2 34
+	anda	r0,[ADDR,r1]		; 4D F2 34
+	anda	r0,[ADDR,r2]		; 4E F2 34
+	anda	r0,[ADDR,r3]		; 4F F2 34
 
 	.sbttl	and_ 'Alternate Indirect' Instruction Tests
 
@@ -396,20 +396,20 @@
 	anda	r2,@ADDR		; 4E 92 34
 	anda	r3,@ADDR		; 4F 92 34
 
-	anda	r0,@ADDR,r0+		; 4C B2 34
-	anda	r1,@ADDR,r0+		; 4D B2 34
-	anda	r2,@ADDR,r0+		; 4E B2 34
-	anda	r3,@ADDR,r0+		; 4F B2 34
+	anda	r0,@ADDR,+r0		; 4C B2 34
+	anda	r0,@ADDR,+r1		; 4D B2 34
+	anda	r0,@ADDR,+r2		; 4E B2 34
+	anda	r0,@ADDR,+r3		; 4F B2 34
 
 	anda	r0,@ADDR,-r0		; 4C D2 34
-	anda	r1,@ADDR,-r0		; 4D D2 34
-	anda	r2,@ADDR,-r0		; 4E D2 34
-	anda	r3,@ADDR,-r0		; 4F D2 34
+	anda	r0,@ADDR,-r1		; 4D D2 34
+	anda	r0,@ADDR,-r2		; 4E D2 34
+	anda	r0,@ADDR,-r3		; 4F D2 34
 
 	anda	r0,@ADDR,r0		; 4C F2 34
-	anda	r1,@ADDR,r0		; 4D F2 34
-	anda	r2,@ADDR,r0		; 4E F2 34
-	anda	r3,@ADDR,r0		; 4F F2 34
+	anda	r0,@ADDR,r1		; 4D F2 34
+	anda	r0,@ADDR,r2		; 4E F2 34
+	anda	r0,@ADDR,r3		; 4F F2 34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -490,20 +490,20 @@
 	iora	r2,[ADDR]		; 6E 92 34
 	iora	r3,[ADDR]		; 6F 92 34
 
-	iora	r0,[ADDR,r0+]		; 6C B2 34
-	iora	r1,[ADDR,r0+]		; 6D B2 34
-	iora	r2,[ADDR,r0+]		; 6E B2 34
-	iora	r3,[ADDR,r0+]		; 6F B2 34
+	iora	r0,[ADDR,+r0]		; 6C B2 34
+	iora	r0,[ADDR,+r1]		; 6D B2 34
+	iora	r0,[ADDR,+r2]		; 6E B2 34
+	iora	r0,[ADDR,+r3]		; 6F B2 34
 
 	iora	r0,[ADDR,-r0]		; 6C D2 34
-	iora	r1,[ADDR,-r0]		; 6D D2 34
-	iora	r2,[ADDR,-r0]		; 6E D2 34
-	iora	r3,[ADDR,-r0]		; 6F D2 34
+	iora	r0,[ADDR,-r1]		; 6D D2 34
+	iora	r0,[ADDR,-r2]		; 6E D2 34
+	iora	r0,[ADDR,-r3]		; 6F D2 34
 
 	iora	r0,[ADDR,r0]		; 6C F2 34
-	iora	r1,[ADDR,r0]		; 6D F2 34
-	iora	r2,[ADDR,r0]		; 6E F2 34
-	iora	r3,[ADDR,r0]		; 6F F2 34
+	iora	r0,[ADDR,r1]		; 6D F2 34
+	iora	r0,[ADDR,r2]		; 6E F2 34
+	iora	r0,[ADDR,r3]		; 6F F2 34
 
 	.sbttl	ior_ 'Alternate Indirect' Instruction Tests
 
@@ -517,20 +517,20 @@
 	iora	r2,@ADDR		; 6E 92 34
 	iora	r3,@ADDR		; 6F 92 34
 
-	iora	r0,@ADDR,r0+		; 6C B2 34
-	iora	r1,@ADDR,r0+		; 6D B2 34
-	iora	r2,@ADDR,r0+		; 6E B2 34
-	iora	r3,@ADDR,r0+		; 6F B2 34
+	iora	r0,@ADDR,+r0		; 6C B2 34
+	iora	r0,@ADDR,+r1		; 6D B2 34
+	iora	r0,@ADDR,+r2		; 6E B2 34
+	iora	r0,@ADDR,+r3		; 6F B2 34
 
 	iora	r0,@ADDR,-r0		; 6C D2 34
-	iora	r1,@ADDR,-r0		; 6D D2 34
-	iora	r2,@ADDR,-r0		; 6E D2 34
-	iora	r3,@ADDR,-r0		; 6F D2 34
+	iora	r0,@ADDR,-r1		; 6D D2 34
+	iora	r0,@ADDR,-r2		; 6E D2 34
+	iora	r0,@ADDR,-r3		; 6F D2 34
 
 	iora	r0,@ADDR,r0		; 6C F2 34
-	iora	r1,@ADDR,r0		; 6D F2 34
-	iora	r2,@ADDR,r0		; 6E F2 34
-	iora	r3,@ADDR,r0		; 6F F2 34
+	iora	r0,@ADDR,r1		; 6D F2 34
+	iora	r0,@ADDR,r2		; 6E F2 34
+	iora	r0,@ADDR,r3		; 6F F2 34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -611,20 +611,20 @@
 	adda	r2,[ADDR]		; 8E 92 34
 	adda	r3,[ADDR]		; 8F 92 34
 
-	adda	r0,[ADDR,r0+]		; 8C B2 34
-	adda	r1,[ADDR,r0+]		; 8D B2 34
-	adda	r2,[ADDR,r0+]		; 8E B2 34
-	adda	r3,[ADDR,r0+]		; 8F B2 34
+	adda	r0,[ADDR,+r0]		; 8C B2 34
+	adda	r0,[ADDR,+r1]		; 8D B2 34
+	adda	r0,[ADDR,+r2]		; 8E B2 34
+	adda	r0,[ADDR,+r3]		; 8F B2 34
 
 	adda	r0,[ADDR,-r0]		; 8C D2 34
-	adda	r1,[ADDR,-r0]		; 8D D2 34
-	adda	r2,[ADDR,-r0]		; 8E D2 34
-	adda	r3,[ADDR,-r0]		; 8F D2 34
+	adda	r0,[ADDR,-r1]		; 8D D2 34
+	adda	r0,[ADDR,-r2]		; 8E D2 34
+	adda	r0,[ADDR,-r3]		; 8F D2 34
 
 	adda	r0,[ADDR,r0]		; 8C F2 34
-	adda	r1,[ADDR,r0]		; 8D F2 34
-	adda	r2,[ADDR,r0]		; 8E F2 34
-	adda	r3,[ADDR,r0]		; 8F F2 34
+	adda	r0,[ADDR,r1]		; 8D F2 34
+	adda	r0,[ADDR,r2]		; 8E F2 34
+	adda	r0,[ADDR,r3]		; 8F F2 34
 
 	.sbttl	add_ 'Alternate Indirect' Instruction Tests
 
@@ -638,20 +638,20 @@
 	adda	r2,@ADDR		; 8E 92 34
 	adda	r3,@ADDR		; 8F 92 34
 
-	adda	r0,@ADDR,r0+		; 8C B2 34
-	adda	r1,@ADDR,r0+		; 8D B2 34
-	adda	r2,@ADDR,r0+		; 8E B2 34
-	adda	r3,@ADDR,r0+		; 8F B2 34
+	adda	r0,@ADDR,+r0		; 8C B2 34
+	adda	r0,@ADDR,+r1		; 8D B2 34
+	adda	r0,@ADDR,+r2		; 8E B2 34
+	adda	r0,@ADDR,+r3		; 8F B2 34
 
 	adda	r0,@ADDR,-r0		; 8C D2 34
-	adda	r1,@ADDR,-r0		; 8D D2 34
-	adda	r2,@ADDR,-r0		; 8E D2 34
-	adda	r3,@ADDR,-r0		; 8F D2 34
+	adda	r0,@ADDR,-r1		; 8D D2 34
+	adda	r0,@ADDR,-r2		; 8E D2 34
+	adda	r0,@ADDR,-r3		; 8F D2 34
 
 	adda	r0,@ADDR,r0		; 8C F2 34
-	adda	r1,@ADDR,r0		; 8D F2 34
-	adda	r2,@ADDR,r0		; 8E F2 34
-	adda	r3,@ADDR,r0		; 8F F2 34
+	adda	r0,@ADDR,r1		; 8D F2 34
+	adda	r0,@ADDR,r2		; 8E F2 34
+	adda	r0,@ADDR,r3		; 8F F2 34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -770,20 +770,20 @@
 	suba	r2,[ADDR]		; AE 92 34
 	suba	r3,[ADDR]		; AF 92 34
 
-	suba	r0,[ADDR,r0+]		; AC B2 34
-	suba	r1,[ADDR,r0+]		; AD B2 34
-	suba	r2,[ADDR,r0+]		; AE B2 34
-	suba	r3,[ADDR,r0+]		; AF B2 34
+	suba	r0,[ADDR,+r0]		; AC B2 34
+	suba	r0,[ADDR,+r1]		; AD B2 34
+	suba	r0,[ADDR,+r2]		; AE B2 34
+	suba	r0,[ADDR,+r3]		; AF B2 34
 
 	suba	r0,[ADDR,-r0]		; AC D2 34
-	suba	r1,[ADDR,-r0]		; AD D2 34
-	suba	r2,[ADDR,-r0]		; AE D2 34
-	suba	r3,[ADDR,-r0]		; AF D2 34
+	suba	r0,[ADDR,-r1]		; AD D2 34
+	suba	r0,[ADDR,-r2]		; AE D2 34
+	suba	r0,[ADDR,-r3]		; AF D2 34
 
 	suba	r0,[ADDR,r0]		; AC F2 34
-	suba	r1,[ADDR,r0]		; AD F2 34
-	suba	r2,[ADDR,r0]		; AE F2 34
-	suba	r3,[ADDR,r0]		; AF F2 34
+	suba	r0,[ADDR,r1]		; AD F2 34
+	suba	r0,[ADDR,r2]		; AE F2 34
+	suba	r0,[ADDR,r3]		; AF F2 34
 
 	.sbttl	sub_ 'Alternate Indirect' Instruction Tests
 
@@ -797,20 +797,20 @@
 	suba	r2,@ADDR		; AE 92 34
 	suba	r3,@ADDR		; AF 92 34
 
-	suba	r0,@ADDR,r0+		; AC B2 34
-	suba	r1,@ADDR,r0+		; AD B2 34
-	suba	r2,@ADDR,r0+		; AE B2 34
-	suba	r3,@ADDR,r0+		; AF B2 34
+	suba	r0,@ADDR,+r0		; AC B2 34
+	suba	r0,@ADDR,+r1		; AD B2 34
+	suba	r0,@ADDR,+r2		; AE B2 34
+	suba	r0,@ADDR,+r3		; AF B2 34
 
 	suba	r0,@ADDR,-r0		; AC D2 34
-	suba	r1,@ADDR,-r0		; AD D2 34
-	suba	r2,@ADDR,-r0		; AE D2 34
-	suba	r3,@ADDR,-r0		; AF D2 34
+	suba	r0,@ADDR,-r1		; AD D2 34
+	suba	r0,@ADDR,-r2		; AE D2 34
+	suba	r0,@ADDR,-r3		; AF D2 34
 
 	suba	r0,@ADDR,r0		; AC F2 34
-	suba	r1,@ADDR,r0		; AD F2 34
-	suba	r2,@ADDR,r0		; AE F2 34
-	suba	r3,@ADDR,r0		; AF F2 34
+	suba	r0,@ADDR,r1		; AD F2 34
+	suba	r0,@ADDR,r2		; AE F2 34
+	suba	r0,@ADDR,r3		; AF F2 34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -929,20 +929,20 @@
 	stra	r2,[ADDR]		; CE 92 34
 	stra	r3,[ADDR]		; CF 92 34
 
-	stra	r0,[ADDR,r0+]		; CC B2 34
-	stra	r1,[ADDR,r0+]		; CD B2 34
-	stra	r2,[ADDR,r0+]		; CE B2 34
-	stra	r3,[ADDR,r0+]		; CF B2 34
+	stra	r0,[ADDR,+r0]		; CC B2 34
+	stra	r0,[ADDR,+r1]		; CD B2 34
+	stra	r0,[ADDR,+r2]		; CE B2 34
+	stra	r0,[ADDR,+r3]		; CF B2 34
 
 	stra	r0,[ADDR,-r0]		; CC D2 34
-	stra	r1,[ADDR,-r0]		; CD D2 34
-	stra	r2,[ADDR,-r0]		; CE D2 34
-	stra	r3,[ADDR,-r0]		; CF D2 34
+	stra	r0,[ADDR,-r1]		; CD D2 34
+	stra	r0,[ADDR,-r2]		; CE D2 34
+	stra	r0,[ADDR,-r3]		; CF D2 34
 
 	stra	r0,[ADDR,r0]		; CC F2 34
-	stra	r1,[ADDR,r0]		; CD F2 34
-	stra	r2,[ADDR,r0]		; CE F2 34
-	stra	r3,[ADDR,r0]		; CF F2 34
+	stra	r0,[ADDR,r1]		; CD F2 34
+	stra	r0,[ADDR,r2]		; CE F2 34
+	stra	r0,[ADDR,r3]		; CF F2 34
 
 	.sbttl	str_ 'Alternate Indirect' Instruction Tests
 
@@ -956,20 +956,20 @@
 	stra	r2,@ADDR		; CE 92 34
 	stra	r3,@ADDR		; CF 92 34
 
-	stra	r0,@ADDR,r0+		; CC B2 34
-	stra	r1,@ADDR,r0+		; CD B2 34
-	stra	r2,@ADDR,r0+		; CE B2 34
-	stra	r3,@ADDR,r0+		; CF B2 34
+	stra	r0,@ADDR,+r0		; CC B2 34
+	stra	r0,@ADDR,+r1		; CD B2 34
+	stra	r0,@ADDR,+r2		; CE B2 34
+	stra	r0,@ADDR,+r3		; CF B2 34
 
 	stra	r0,@ADDR,-r0		; CC D2 34
-	stra	r1,@ADDR,-r0		; CD D2 34
-	stra	r2,@ADDR,-r0		; CE D2 34
-	stra	r3,@ADDR,-r0		; CF D2 34
+	stra	r0,@ADDR,-r1		; CD D2 34
+	stra	r0,@ADDR,-r2		; CE D2 34
+	stra	r0,@ADDR,-r3		; CF D2 34
 
 	stra	r0,@ADDR,r0		; CC F2 34
-	stra	r1,@ADDR,r0		; CD F2 34
-	stra	r2,@ADDR,r0		; CE F2 34
-	stra	r3,@ADDR,r0		; CF F2 34
+	stra	r0,@ADDR,r1		; CD F2 34
+	stra	r0,@ADDR,r2		; CE F2 34
+	stra	r0,@ADDR,r3		; CF F2 34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -1050,20 +1050,20 @@
 	coma	r2,[ADDR]		; EE 92 34
 	coma	r3,[ADDR]		; EF 92 34
 
-	coma	r0,[ADDR,r0+]		; EC B2 34
-	coma	r1,[ADDR,r0+]		; ED B2 34
-	coma	r2,[ADDR,r0+]		; EE B2 34
-	coma	r3,[ADDR,r0+]		; EF B2 34
+	coma	r0,[ADDR,+r0]		; EC B2 34
+	coma	r0,[ADDR,+r1]		; ED B2 34
+	coma	r0,[ADDR,+r2]		; EE B2 34
+	coma	r0,[ADDR,+r3]		; EF B2 34
 
 	coma	r0,[ADDR,-r0]		; EC D2 34
-	coma	r1,[ADDR,-r0]		; ED D2 34
-	coma	r2,[ADDR,-r0]		; EE D2 34
-	coma	r3,[ADDR,-r0]		; EF D2 34
+	coma	r0,[ADDR,-r1]		; ED D2 34
+	coma	r0,[ADDR,-r2]		; EE D2 34
+	coma	r0,[ADDR,-r3]		; EF D2 34
 
 	coma	r0,[ADDR,r0]		; EC F2 34
-	coma	r1,[ADDR,r0]		; ED F2 34
-	coma	r2,[ADDR,r0]		; EE F2 34
-	coma	r3,[ADDR,r0]		; EF F2 34
+	coma	r0,[ADDR,r1]		; ED F2 34
+	coma	r0,[ADDR,r2]		; EE F2 34
+	coma	r0,[ADDR,r3]		; EF F2 34
 
 	.sbttl	com_ 'Alternate Indirect' Instruction Tests
 
@@ -1077,20 +1077,20 @@
 	coma	r2,@ADDR		; EE 92 34
 	coma	r3,@ADDR		; EF 92 34
 
-	coma	r0,@ADDR,r0+		; EC B2 34
-	coma	r1,@ADDR,r0+		; ED B2 34
-	coma	r2,@ADDR,r0+		; EE B2 34
-	coma	r3,@ADDR,r0+		; EF B2 34
+	coma	r0,@ADDR,+r0		; EC B2 34
+	coma	r0,@ADDR,+r1		; ED B2 34
+	coma	r0,@ADDR,+r2		; EE B2 34
+	coma	r0,@ADDR,+r3		; EF B2 34
 
 	coma	r0,@ADDR,-r0		; EC D2 34
-	coma	r1,@ADDR,-r0		; ED D2 34
-	coma	r2,@ADDR,-r0		; EE D2 34
-	coma	r3,@ADDR,-r0		; EF D2 34
+	coma	r0,@ADDR,-r1		; ED D2 34
+	coma	r0,@ADDR,-r2		; EE D2 34
+	coma	r0,@ADDR,-r3		; EF D2 34
 
 	coma	r0,@ADDR,r0		; EC F2 34
-	coma	r1,@ADDR,r0		; ED F2 34
-	coma	r2,@ADDR,r0		; EE F2 34
-	coma	r3,@ADDR,r0		; EF F2 34
+	coma	r0,@ADDR,r1		; ED F2 34
+	coma	r0,@ADDR,r2		; EE F2 34
+	coma	r0,@ADDR,r3		; EF F2 34
 
 
 	.sbttl	cmp_ 'Sequential' Instruction Tests
@@ -1124,20 +1124,20 @@
 	cmpa	r2,[ADDR]		; EE 92 34
 	cmpa	r3,[ADDR]		; EF 92 34
 
-	cmpa	r0,[ADDR,r0+]		; EC B2 34
-	cmpa	r1,[ADDR,r0+]		; ED B2 34
-	cmpa	r2,[ADDR,r0+]		; EE B2 34
-	cmpa	r3,[ADDR,r0+]		; EF B2 34
+	cmpa	r0,[ADDR,+r0]		; EC B2 34
+	cmpa	r0,[ADDR,+r1]		; ED B2 34
+	cmpa	r0,[ADDR,+r2]		; EE B2 34
+	cmpa	r0,[ADDR,+r3]		; EF B2 34
 
 	cmpa	r0,[ADDR,-r0]		; EC D2 34
-	cmpa	r1,[ADDR,-r0]		; ED D2 34
-	cmpa	r2,[ADDR,-r0]		; EE D2 34
-	cmpa	r3,[ADDR,-r0]		; EF D2 34
+	cmpa	r0,[ADDR,-r1]		; ED D2 34
+	cmpa	r0,[ADDR,-r2]		; EE D2 34
+	cmpa	r0,[ADDR,-r3]		; EF D2 34
 
 	cmpa	r0,[ADDR,r0]		; EC F2 34
-	cmpa	r1,[ADDR,r0]		; ED F2 34
-	cmpa	r2,[ADDR,r0]		; EE F2 34
-	cmpa	r3,[ADDR,r0]		; EF F2 34
+	cmpa	r0,[ADDR,r1]		; ED F2 34
+	cmpa	r0,[ADDR,r2]		; EE F2 34
+	cmpa	r0,[ADDR,r3]		; EF F2 34
 
 	.sbttl	cmp_ 'Alternate Indirect' Instruction Tests
 
@@ -1151,20 +1151,20 @@
 	cmpa	r2,@ADDR		; EE 92 34
 	cmpa	r3,@ADDR		; EF 92 34
 
-	cmpa	r0,@ADDR,r0+		; EC B2 34
-	cmpa	r1,@ADDR,r0+		; ED B2 34
-	cmpa	r2,@ADDR,r0+		; EE B2 34
-	cmpa	r3,@ADDR,r0+		; EF B2 34
+	cmpa	r0,@ADDR,+r0		; EC B2 34
+	cmpa	r0,@ADDR,+r1		; ED B2 34
+	cmpa	r0,@ADDR,+r2		; EE B2 34
+	cmpa	r0,@ADDR,+r3		; EF B2 34
 
 	cmpa	r0,@ADDR,-r0		; EC D2 34
-	cmpa	r1,@ADDR,-r0		; ED D2 34
-	cmpa	r2,@ADDR,-r0		; EE D2 34
-	cmpa	r3,@ADDR,-r0		; EF D2 34
+	cmpa	r0,@ADDR,-r1		; ED D2 34
+	cmpa	r0,@ADDR,-r2		; EE D2 34
+	cmpa	r0,@ADDR,-r3		; EF D2 34
 
 	cmpa	r0,@ADDR,r0		; EC F2 34
-	cmpa	r1,@ADDR,r0		; ED F2 34
-	cmpa	r2,@ADDR,r0		; EE F2 34
-	cmpa	r3,@ADDR,r0		; EF F2 34
+	cmpa	r0,@ADDR,r1		; ED F2 34
+	cmpa	r0,@ADDR,r2		; EE F2 34
+	cmpa	r0,@ADDR,r3		; EF F2 34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -1270,20 +1270,20 @@
 	loda	r2,[ADDR]		; 0Es92r34
 	loda	r3,[ADDR]		; 0Fs92r34
 
-	loda	r0,[ADDR,r0+]		; 0CsB2r34
-	loda	r1,[ADDR,r0+]		; 0DsB2r34
-	loda	r2,[ADDR,r0+]		; 0EsB2r34
-	loda	r3,[ADDR,r0+]		; 0FsB2r34
+	loda	r0,[ADDR,+r0]		; 0CsB2r34
+	loda	r0,[ADDR,+r1]		; 0DsB2r34
+	loda	r0,[ADDR,+r2]		; 0EsB2r34
+	loda	r0,[ADDR,+r3]		; 0FsB2r34
 
 	loda	r0,[ADDR,-r0]		; 0CsD2r34
-	loda	r1,[ADDR,-r0]		; 0DsD2r34
-	loda	r2,[ADDR,-r0]		; 0EsD2r34
-	loda	r3,[ADDR,-r0]		; 0FsD2r34
+	loda	r0,[ADDR,-r1]		; 0DsD2r34
+	loda	r0,[ADDR,-r2]		; 0EsD2r34
+	loda	r0,[ADDR,-r3]		; 0FsD2r34
 
 	loda	r0,[ADDR,r0]		; 0CsF2r34
-	loda	r1,[ADDR,r0]		; 0DsF2r34
-	loda	r2,[ADDR,r0]		; 0EsF2r34
-	loda	r3,[ADDR,r0]		; 0FsF2r34
+	loda	r0,[ADDR,r1]		; 0DsF2r34
+	loda	r0,[ADDR,r2]		; 0EsF2r34
+	loda	r0,[ADDR,r3]		; 0FsF2r34
 
 	.sbttl	lod_ 'Alternate Indirect' Instruction Tests
 
@@ -1297,20 +1297,20 @@
 	loda	r2,@ADDR		; 0Es92r34
 	loda	r3,@ADDR		; 0Fs92r34
 
-	loda	r0,@ADDR,r0+		; 0CsB2r34
-	loda	r1,@ADDR,r0+		; 0DsB2r34
-	loda	r2,@ADDR,r0+		; 0EsB2r34
-	loda	r3,@ADDR,r0+		; 0FsB2r34
+	loda	r0,@ADDR,+r0		; 0CsB2r34
+	loda	r0,@ADDR,+r1		; 0DsB2r34
+	loda	r0,@ADDR,+r2		; 0EsB2r34
+	loda	r0,@ADDR,+r3		; 0FsB2r34
 
 	loda	r0,@ADDR,-r0		; 0CsD2r34
-	loda	r1,@ADDR,-r0		; 0DsD2r34
-	loda	r2,@ADDR,-r0		; 0EsD2r34
-	loda	r3,@ADDR,-r0		; 0FsD2r34
+	loda	r0,@ADDR,-r1		; 0DsD2r34
+	loda	r0,@ADDR,-r2		; 0EsD2r34
+	loda	r0,@ADDR,-r3		; 0FsD2r34
 
 	loda	r0,@ADDR,r0		; 0CsF2r34
-	loda	r1,@ADDR,r0		; 0DsF2r34
-	loda	r2,@ADDR,r0		; 0EsF2r34
-	loda	r3,@ADDR,r0		; 0FsF2r34
+	loda	r0,@ADDR,r1		; 0DsF2r34
+	loda	r0,@ADDR,r2		; 0EsF2r34
+	loda	r0,@ADDR,r3		; 0FsF2r34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -1427,20 +1427,20 @@
 	eora	r2,[ADDR]		; 2Es92r34
 	eora	r3,[ADDR]		; 2Fs92r34
 
-	eora	r0,[ADDR,r0+]		; 2CsB2r34
-	eora	r1,[ADDR,r0+]		; 2DsB2r34
-	eora	r2,[ADDR,r0+]		; 2EsB2r34
-	eora	r3,[ADDR,r0+]		; 2FsB2r34
+	eora	r0,[ADDR,+r0]		; 2CsB2r34
+	eora	r0,[ADDR,+r1]		; 2DsB2r34
+	eora	r0,[ADDR,+r2]		; 2EsB2r34
+	eora	r0,[ADDR,+r3]		; 2FsB2r34
 
 	eora	r0,[ADDR,-r0]		; 2CsD2r34
-	eora	r1,[ADDR,-r0]		; 2DsD2r34
-	eora	r2,[ADDR,-r0]		; 2EsD2r34
-	eora	r3,[ADDR,-r0]		; 2FsD2r34
+	eora	r0,[ADDR,-r1]		; 2DsD2r34
+	eora	r0,[ADDR,-r2]		; 2EsD2r34
+	eora	r0,[ADDR,-r3]		; 2FsD2r34
 
 	eora	r0,[ADDR,r0]		; 2CsF2r34
-	eora	r1,[ADDR,r0]		; 2DsF2r34
-	eora	r2,[ADDR,r0]		; 2EsF2r34
-	eora	r3,[ADDR,r0]		; 2FsF2r34
+	eora	r0,[ADDR,r1]		; 2DsF2r34
+	eora	r0,[ADDR,r2]		; 2EsF2r34
+	eora	r0,[ADDR,r3]		; 2FsF2r34
 
 	.sbttl	eor_ 'Alternate Indirect' Instruction Tests
 
@@ -1454,20 +1454,20 @@
 	eora	r2,@ADDR		; 2Es92r34
 	eora	r3,@ADDR		; 2Fs92r34
 
-	eora	r0,@ADDR,r0+		; 2CsB2r34
-	eora	r1,@ADDR,r0+		; 2DsB2r34
-	eora	r2,@ADDR,r0+		; 2EsB2r34
-	eora	r3,@ADDR,r0+		; 2FsB2r34
+	eora	r0,@ADDR,+r0		; 2CsB2r34
+	eora	r0,@ADDR,+r1		; 2DsB2r34
+	eora	r0,@ADDR,+r2		; 2EsB2r34
+	eora	r0,@ADDR,+r3		; 2FsB2r34
 
 	eora	r0,@ADDR,-r0		; 2CsD2r34
-	eora	r1,@ADDR,-r0		; 2DsD2r34
-	eora	r2,@ADDR,-r0		; 2EsD2r34
-	eora	r3,@ADDR,-r0		; 2FsD2r34
+	eora	r0,@ADDR,-r1		; 2DsD2r34
+	eora	r0,@ADDR,-r2		; 2EsD2r34
+	eora	r0,@ADDR,-r3		; 2FsD2r34
 
 	eora	r0,@ADDR,r0		; 2CsF2r34
-	eora	r1,@ADDR,r0		; 2DsF2r34
-	eora	r2,@ADDR,r0		; 2EsF2r34
-	eora	r3,@ADDR,r0		; 2FsF2r34
+	eora	r0,@ADDR,r1		; 2DsF2r34
+	eora	r0,@ADDR,r2		; 2EsF2r34
+	eora	r0,@ADDR,r3		; 2FsF2r34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -1586,20 +1586,20 @@
 	anda	r2,[ADDR]		; 4Es92r34
 	anda	r3,[ADDR]		; 4Fs92r34
 
-	anda	r0,[ADDR,r0+]		; 4CsB2r34
-	anda	r1,[ADDR,r0+]		; 4DsB2r34
-	anda	r2,[ADDR,r0+]		; 4EsB2r34
-	anda	r3,[ADDR,r0+]		; 4FsB2r34
+	anda	r0,[ADDR,+r0]		; 4CsB2r34
+	anda	r0,[ADDR,+r1]		; 4DsB2r34
+	anda	r0,[ADDR,+r2]		; 4EsB2r34
+	anda	r0,[ADDR,+r3]		; 4FsB2r34
 
 	anda	r0,[ADDR,-r0]		; 4CsD2r34
-	anda	r1,[ADDR,-r0]		; 4DsD2r34
-	anda	r2,[ADDR,-r0]		; 4EsD2r34
-	anda	r3,[ADDR,-r0]		; 4FsD2r34
+	anda	r0,[ADDR,-r1]		; 4DsD2r34
+	anda	r0,[ADDR,-r2]		; 4EsD2r34
+	anda	r0,[ADDR,-r3]		; 4FsD2r34
 
 	anda	r0,[ADDR,r0]		; 4CsF2r34
-	anda	r1,[ADDR,r0]		; 4DsF2r34
-	anda	r2,[ADDR,r0]		; 4EsF2r34
-	anda	r3,[ADDR,r0]		; 4FsF2r34
+	anda	r0,[ADDR,r1]		; 4DsF2r34
+	anda	r0,[ADDR,r2]		; 4EsF2r34
+	anda	r0,[ADDR,r3]		; 4FsF2r34
 
 	.sbttl	and_ 'Alternate Indirect' Instruction Tests
 
@@ -1613,20 +1613,20 @@
 	anda	r2,@ADDR		; 4Es92r34
 	anda	r3,@ADDR		; 4Fs92r34
 
-	anda	r0,@ADDR,r0+		; 4CsB2r34
-	anda	r1,@ADDR,r0+		; 4DsB2r34
-	anda	r2,@ADDR,r0+		; 4EsB2r34
-	anda	r3,@ADDR,r0+		; 4FsB2r34
+	anda	r0,@ADDR,+r0		; 4CsB2r34
+	anda	r0,@ADDR,+r1		; 4DsB2r34
+	anda	r0,@ADDR,+r2		; 4EsB2r34
+	anda	r0,@ADDR,+r3		; 4FsB2r34
 
 	anda	r0,@ADDR,-r0		; 4CsD2r34
-	anda	r1,@ADDR,-r0		; 4DsD2r34
-	anda	r2,@ADDR,-r0		; 4EsD2r34
-	anda	r3,@ADDR,-r0		; 4FsD2r34
+	anda	r0,@ADDR,-r1		; 4DsD2r34
+	anda	r0,@ADDR,-r2		; 4EsD2r34
+	anda	r0,@ADDR,-r3		; 4FsD2r34
 
 	anda	r0,@ADDR,r0		; 4CsF2r34
-	anda	r1,@ADDR,r0		; 4DsF2r34
-	anda	r2,@ADDR,r0		; 4EsF2r34
-	anda	r3,@ADDR,r0		; 4FsF2r34
+	anda	r0,@ADDR,r1		; 4DsF2r34
+	anda	r0,@ADDR,r2		; 4EsF2r34
+	anda	r0,@ADDR,r3		; 4FsF2r34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -1707,20 +1707,20 @@
 	iora	r2,[ADDR]		; 6Es92r34
 	iora	r3,[ADDR]		; 6Fs92r34
 
-	iora	r0,[ADDR,r0+]		; 6CsB2r34
-	iora	r1,[ADDR,r0+]		; 6DsB2r34
-	iora	r2,[ADDR,r0+]		; 6EsB2r34
-	iora	r3,[ADDR,r0+]		; 6FsB2r34
+	iora	r0,[ADDR,+r0]		; 6CsB2r34
+	iora	r0,[ADDR,+r1]		; 6DsB2r34
+	iora	r0,[ADDR,+r2]		; 6EsB2r34
+	iora	r0,[ADDR,+r3]		; 6FsB2r34
 
 	iora	r0,[ADDR,-r0]		; 6CsD2r34
-	iora	r1,[ADDR,-r0]		; 6DsD2r34
-	iora	r2,[ADDR,-r0]		; 6EsD2r34
-	iora	r3,[ADDR,-r0]		; 6FsD2r34
+	iora	r0,[ADDR,-r1]		; 6DsD2r34
+	iora	r0,[ADDR,-r2]		; 6EsD2r34
+	iora	r0,[ADDR,-r3]		; 6FsD2r34
 
 	iora	r0,[ADDR,r0]		; 6CsF2r34
-	iora	r1,[ADDR,r0]		; 6DsF2r34
-	iora	r2,[ADDR,r0]		; 6EsF2r34
-	iora	r3,[ADDR,r0]		; 6FsF2r34
+	iora	r0,[ADDR,r1]		; 6DsF2r34
+	iora	r0,[ADDR,r2]		; 6EsF2r34
+	iora	r0,[ADDR,r3]		; 6FsF2r34
 
 	.sbttl	ior_ 'Alternate Indirect' Instruction Tests
 
@@ -1734,20 +1734,20 @@
 	iora	r2,@ADDR		; 6Es92r34
 	iora	r3,@ADDR		; 6Fs92r34
 
-	iora	r0,@ADDR,r0+		; 6CsB2r34
-	iora	r1,@ADDR,r0+		; 6DsB2r34
-	iora	r2,@ADDR,r0+		; 6EsB2r34
-	iora	r3,@ADDR,r0+		; 6FsB2r34
+	iora	r0,@ADDR,+r0		; 6CsB2r34
+	iora	r0,@ADDR,+r1		; 6DsB2r34
+	iora	r0,@ADDR,+r2		; 6EsB2r34
+	iora	r0,@ADDR,+r3		; 6FsB2r34
 
 	iora	r0,@ADDR,-r0		; 6CsD2r34
-	iora	r1,@ADDR,-r0		; 6DsD2r34
-	iora	r2,@ADDR,-r0		; 6EsD2r34
-	iora	r3,@ADDR,-r0		; 6FsD2r34
+	iora	r0,@ADDR,-r1		; 6DsD2r34
+	iora	r0,@ADDR,-r2		; 6EsD2r34
+	iora	r0,@ADDR,-r3		; 6FsD2r34
 
 	iora	r0,@ADDR,r0		; 6CsF2r34
-	iora	r1,@ADDR,r0		; 6DsF2r34
-	iora	r2,@ADDR,r0		; 6EsF2r34
-	iora	r3,@ADDR,r0		; 6FsF2r34
+	iora	r0,@ADDR,r1		; 6DsF2r34
+	iora	r0,@ADDR,r2		; 6EsF2r34
+	iora	r0,@ADDR,r3		; 6FsF2r34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -1828,20 +1828,20 @@
 	adda	r2,[ADDR]		; 8Es92r34
 	adda	r3,[ADDR]		; 8Fs92r34
 
-	adda	r0,[ADDR,r0+]		; 8CsB2r34
-	adda	r1,[ADDR,r0+]		; 8DsB2r34
-	adda	r2,[ADDR,r0+]		; 8EsB2r34
-	adda	r3,[ADDR,r0+]		; 8FsB2r34
+	adda	r0,[ADDR,+r0]		; 8CsB2r34
+	adda	r0,[ADDR,+r1]		; 8DsB2r34
+	adda	r0,[ADDR,+r2]		; 8EsB2r34
+	adda	r0,[ADDR,+r3]		; 8FsB2r34
 
 	adda	r0,[ADDR,-r0]		; 8CsD2r34
-	adda	r1,[ADDR,-r0]		; 8DsD2r34
-	adda	r2,[ADDR,-r0]		; 8EsD2r34
-	adda	r3,[ADDR,-r0]		; 8FsD2r34
+	adda	r0,[ADDR,-r1]		; 8DsD2r34
+	adda	r0,[ADDR,-r2]		; 8EsD2r34
+	adda	r0,[ADDR,-r3]		; 8FsD2r34
 
 	adda	r0,[ADDR,r0]		; 8CsF2r34
-	adda	r1,[ADDR,r0]		; 8DsF2r34
-	adda	r2,[ADDR,r0]		; 8EsF2r34
-	adda	r3,[ADDR,r0]		; 8FsF2r34
+	adda	r0,[ADDR,r1]		; 8DsF2r34
+	adda	r0,[ADDR,r2]		; 8EsF2r34
+	adda	r0,[ADDR,r3]		; 8FsF2r34
 
 	.sbttl	add_ 'Alternate Indirect' Instruction Tests
 
@@ -1855,20 +1855,20 @@
 	adda	r2,@ADDR		; 8Es92r34
 	adda	r3,@ADDR		; 8Fs92r34
 
-	adda	r0,@ADDR,r0+		; 8CsB2r34
-	adda	r1,@ADDR,r0+		; 8DsB2r34
-	adda	r2,@ADDR,r0+		; 8EsB2r34
-	adda	r3,@ADDR,r0+		; 8FsB2r34
+	adda	r0,@ADDR,+r0		; 8CsB2r34
+	adda	r0,@ADDR,+r1		; 8DsB2r34
+	adda	r0,@ADDR,+r2		; 8EsB2r34
+	adda	r0,@ADDR,+r3		; 8FsB2r34
 
 	adda	r0,@ADDR,-r0		; 8CsD2r34
-	adda	r1,@ADDR,-r0		; 8DsD2r34
-	adda	r2,@ADDR,-r0		; 8EsD2r34
-	adda	r3,@ADDR,-r0		; 8FsD2r34
+	adda	r0,@ADDR,-r1		; 8DsD2r34
+	adda	r0,@ADDR,-r2		; 8EsD2r34
+	adda	r0,@ADDR,-r3		; 8FsD2r34
 
 	adda	r0,@ADDR,r0		; 8CsF2r34
-	adda	r1,@ADDR,r0		; 8DsF2r34
-	adda	r2,@ADDR,r0		; 8EsF2r34
-	adda	r3,@ADDR,r0		; 8FsF2r34
+	adda	r0,@ADDR,r1		; 8DsF2r34
+	adda	r0,@ADDR,r2		; 8EsF2r34
+	adda	r0,@ADDR,r3		; 8FsF2r34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -1987,20 +1987,20 @@
 	suba	r2,[ADDR]		; AEs92r34
 	suba	r3,[ADDR]		; AFs92r34
 
-	suba	r0,[ADDR,r0+]		; ACsB2r34
-	suba	r1,[ADDR,r0+]		; ADsB2r34
-	suba	r2,[ADDR,r0+]		; AEsB2r34
-	suba	r3,[ADDR,r0+]		; AFsB2r34
+	suba	r0,[ADDR,+r0]		; ACsB2r34
+	suba	r0,[ADDR,+r1]		; ADsB2r34
+	suba	r0,[ADDR,+r2]		; AEsB2r34
+	suba	r0,[ADDR,+r3]		; AFsB2r34
 
 	suba	r0,[ADDR,-r0]		; ACsD2r34
-	suba	r1,[ADDR,-r0]		; ADsD2r34
-	suba	r2,[ADDR,-r0]		; AEsD2r34
-	suba	r3,[ADDR,-r0]		; AFsD2r34
+	suba	r0,[ADDR,-r1]		; ADsD2r34
+	suba	r0,[ADDR,-r2]		; AEsD2r34
+	suba	r0,[ADDR,-r3]		; AFsD2r34
 
 	suba	r0,[ADDR,r0]		; ACsF2r34
-	suba	r1,[ADDR,r0]		; ADsF2r34
-	suba	r2,[ADDR,r0]		; AEsF2r34
-	suba	r3,[ADDR,r0]		; AFsF2r34
+	suba	r0,[ADDR,r1]		; ADsF2r34
+	suba	r0,[ADDR,r2]		; AEsF2r34
+	suba	r0,[ADDR,r3]		; AFsF2r34
 
 	.sbttl	sub_ 'Alternate Indirect' Instruction Tests
 
@@ -2014,20 +2014,20 @@
 	suba	r2,@ADDR		; AEs92r34
 	suba	r3,@ADDR		; AFs92r34
 
-	suba	r0,@ADDR,r0+		; ACsB2r34
-	suba	r1,@ADDR,r0+		; ADsB2r34
-	suba	r2,@ADDR,r0+		; AEsB2r34
-	suba	r3,@ADDR,r0+		; AFsB2r34
+	suba	r0,@ADDR,+r0		; ACsB2r34
+	suba	r0,@ADDR,+r1		; ADsB2r34
+	suba	r0,@ADDR,+r2		; AEsB2r34
+	suba	r0,@ADDR,+r3		; AFsB2r34
 
 	suba	r0,@ADDR,-r0		; ACsD2r34
-	suba	r1,@ADDR,-r0		; ADsD2r34
-	suba	r2,@ADDR,-r0		; AEsD2r34
-	suba	r3,@ADDR,-r0		; AFsD2r34
+	suba	r0,@ADDR,-r1		; ADsD2r34
+	suba	r0,@ADDR,-r2		; AEsD2r34
+	suba	r0,@ADDR,-r3		; AFsD2r34
 
 	suba	r0,@ADDR,r0		; ACsF2r34
-	suba	r1,@ADDR,r0		; ADsF2r34
-	suba	r2,@ADDR,r0		; AEsF2r34
-	suba	r3,@ADDR,r0		; AFsF2r34
+	suba	r0,@ADDR,r1		; ADsF2r34
+	suba	r0,@ADDR,r2		; AEsF2r34
+	suba	r0,@ADDR,r3		; AFsF2r34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -2146,20 +2146,20 @@
 	stra	r2,[ADDR]		; CEs92r34
 	stra	r3,[ADDR]		; CFs92r34
 
-	stra	r0,[ADDR,r0+]		; CCsB2r34
-	stra	r1,[ADDR,r0+]		; CDsB2r34
-	stra	r2,[ADDR,r0+]		; CEsB2r34
-	stra	r3,[ADDR,r0+]		; CFsB2r34
+	stra	r0,[ADDR,+r0]		; CCsB2r34
+	stra	r0,[ADDR,+r1]		; CDsB2r34
+	stra	r0,[ADDR,+r2]		; CEsB2r34
+	stra	r0,[ADDR,+r3]		; CFsB2r34
 
 	stra	r0,[ADDR,-r0]		; CCsD2r34
-	stra	r1,[ADDR,-r0]		; CDsD2r34
-	stra	r2,[ADDR,-r0]		; CEsD2r34
-	stra	r3,[ADDR,-r0]		; CFsD2r34
+	stra	r0,[ADDR,-r1]		; CDsD2r34
+	stra	r0,[ADDR,-r2]		; CEsD2r34
+	stra	r0,[ADDR,-r3]		; CFsD2r34
 
 	stra	r0,[ADDR,r0]		; CCsF2r34
-	stra	r1,[ADDR,r0]		; CDsF2r34
-	stra	r2,[ADDR,r0]		; CEsF2r34
-	stra	r3,[ADDR,r0]		; CFsF2r34
+	stra	r0,[ADDR,r1]		; CDsF2r34
+	stra	r0,[ADDR,r2]		; CEsF2r34
+	stra	r0,[ADDR,r3]		; CFsF2r34
 
 	.sbttl	str_ 'Alternate Indirect' Instruction Tests
 
@@ -2173,20 +2173,20 @@
 	stra	r2,@ADDR		; CEs92r34
 	stra	r3,@ADDR		; CFs92r34
 
-	stra	r0,@ADDR,r0+		; CCsB2r34
-	stra	r1,@ADDR,r0+		; CDsB2r34
-	stra	r2,@ADDR,r0+		; CEsB2r34
-	stra	r3,@ADDR,r0+		; CFsB2r34
+	stra	r0,@ADDR,+r0		; CCsB2r34
+	stra	r0,@ADDR,+r1		; CDsB2r34
+	stra	r0,@ADDR,+r2		; CEsB2r34
+	stra	r0,@ADDR,+r3		; CFsB2r34
 
 	stra	r0,@ADDR,-r0		; CCsD2r34
-	stra	r1,@ADDR,-r0		; CDsD2r34
-	stra	r2,@ADDR,-r0		; CEsD2r34
-	stra	r3,@ADDR,-r0		; CFsD2r34
+	stra	r0,@ADDR,-r1		; CDsD2r34
+	stra	r0,@ADDR,-r2		; CEsD2r34
+	stra	r0,@ADDR,-r3		; CFsD2r34
 
 	stra	r0,@ADDR,r0		; CCsF2r34
-	stra	r1,@ADDR,r0		; CDsF2r34
-	stra	r2,@ADDR,r0		; CEsF2r34
-	stra	r3,@ADDR,r0		; CFsF2r34
+	stra	r0,@ADDR,r1		; CDsF2r34
+	stra	r0,@ADDR,r2		; CEsF2r34
+	stra	r0,@ADDR,r3		; CFsF2r34
 
 
 	.sbttl	'Sequential' Instruction Tests
@@ -2267,20 +2267,20 @@
 	coma	r2,[ADDR]		; EEs92r34
 	coma	r3,[ADDR]		; EFs92r34
 
-	coma	r0,[ADDR,r0+]		; ECsB2r34
-	coma	r1,[ADDR,r0+]		; EDsB2r34
-	coma	r2,[ADDR,r0+]		; EEsB2r34
-	coma	r3,[ADDR,r0+]		; EFsB2r34
+	coma	r0,[ADDR,+r0]		; ECsB2r34
+	coma	r0,[ADDR,+r1]		; EDsB2r34
+	coma	r0,[ADDR,+r2]		; EEsB2r34
+	coma	r0,[ADDR,+r3]		; EFsB2r34
 
 	coma	r0,[ADDR,-r0]		; ECsD2r34
-	coma	r1,[ADDR,-r0]		; EDsD2r34
-	coma	r2,[ADDR,-r0]		; EEsD2r34
-	coma	r3,[ADDR,-r0]		; EFsD2r34
+	coma	r0,[ADDR,-r1]		; EDsD2r34
+	coma	r0,[ADDR,-r2]		; EEsD2r34
+	coma	r0,[ADDR,-r3]		; EFsD2r34
 
 	coma	r0,[ADDR,r0]		; ECsF2r34
-	coma	r1,[ADDR,r0]		; EDsF2r34
-	coma	r2,[ADDR,r0]		; EEsF2r34
-	coma	r3,[ADDR,r0]		; EFsF2r34
+	coma	r0,[ADDR,r1]		; EDsF2r34
+	coma	r0,[ADDR,r2]		; EEsF2r34
+	coma	r0,[ADDR,r3]		; EFsF2r34
 
 	.sbttl	com_ 'Alternate Indirect' Instruction Tests
 
@@ -2294,20 +2294,20 @@
 	coma	r2,@ADDR		; EEs92r34
 	coma	r3,@ADDR		; EFs92r34
 
-	coma	r0,@ADDR,r0+		; ECsB2r34
-	coma	r1,@ADDR,r0+		; EDsB2r34
-	coma	r2,@ADDR,r0+		; EEsB2r34
-	coma	r3,@ADDR,r0+		; EFsB2r34
+	coma	r0,@ADDR,+r0		; ECsB2r34
+	coma	r0,@ADDR,+r1		; EDsB2r34
+	coma	r0,@ADDR,+r2		; EEsB2r34
+	coma	r0,@ADDR,+r3		; EFsB2r34
 
 	coma	r0,@ADDR,-r0		; ECsD2r34
-	coma	r1,@ADDR,-r0		; EDsD2r34
-	coma	r2,@ADDR,-r0		; EEsD2r34
-	coma	r3,@ADDR,-r0		; EFsD2r34
+	coma	r0,@ADDR,-r1		; EDsD2r34
+	coma	r0,@ADDR,-r2		; EEsD2r34
+	coma	r0,@ADDR,-r3		; EFsD2r34
 
 	coma	r0,@ADDR,r0		; ECsF2r34
-	coma	r1,@ADDR,r0		; EDsF2r34
-	coma	r2,@ADDR,r0		; EEsF2r34
-	coma	r3,@ADDR,r0		; EFsF2r34
+	coma	r0,@ADDR,r1		; EDsF2r34
+	coma	r0,@ADDR,r2		; EEsF2r34
+	coma	r0,@ADDR,r3		; EFsF2r34
 
 
 	.sbttl	cmp_ 'Sequential' Instruction Tests
@@ -2341,20 +2341,20 @@
 	cmpa	r2,[ADDR]		; EEs92r34
 	cmpa	r3,[ADDR]		; EFs92r34
 
-	cmpa	r0,[ADDR,r0+]		; ECsB2r34
-	cmpa	r1,[ADDR,r0+]		; EDsB2r34
-	cmpa	r2,[ADDR,r0+]		; EEsB2r34
-	cmpa	r3,[ADDR,r0+]		; EFsB2r34
+	cmpa	r0,[ADDR,+r0]		; ECsB2r34
+	cmpa	r0,[ADDR,+r1]		; EDsB2r34
+	cmpa	r0,[ADDR,+r2]		; EEsB2r34
+	cmpa	r0,[ADDR,+r3]		; EFsB2r34
 
 	cmpa	r0,[ADDR,-r0]		; ECsD2r34
-	cmpa	r1,[ADDR,-r0]		; EDsD2r34
-	cmpa	r2,[ADDR,-r0]		; EEsD2r34
-	cmpa	r3,[ADDR,-r0]		; EFsD2r34
+	cmpa	r0,[ADDR,-r1]		; EDsD2r34
+	cmpa	r0,[ADDR,-r2]		; EEsD2r34
+	cmpa	r0,[ADDR,-r3]		; EFsD2r34
 
 	cmpa	r0,[ADDR,r0]		; ECsF2r34
-	cmpa	r1,[ADDR,r0]		; EDsF2r34
-	cmpa	r2,[ADDR,r0]		; EEsF2r34
-	cmpa	r3,[ADDR,r0]		; EFsF2r34
+	cmpa	r0,[ADDR,r1]		; EDsF2r34
+	cmpa	r0,[ADDR,r2]		; EEsF2r34
+	cmpa	r0,[ADDR,r3]		; EFsF2r34
 
 	.sbttl	cmp_ 'Alternate Indirect' Instruction Tests
 
@@ -2368,20 +2368,20 @@
 	cmpa	r2,@ADDR		; EEs92r34
 	cmpa	r3,@ADDR		; EFs92r34
 
-	cmpa	r0,@ADDR,r0+		; ECsB2r34
-	cmpa	r1,@ADDR,r0+		; EDsB2r34
-	cmpa	r2,@ADDR,r0+		; EEsB2r34
-	cmpa	r3,@ADDR,r0+		; EFsB2r34
+	cmpa	r0,@ADDR,+r0		; ECsB2r34
+	cmpa	r0,@ADDR,+r1		; EDsB2r34
+	cmpa	r0,@ADDR,+r2		; EEsB2r34
+	cmpa	r0,@ADDR,+r3		; EFsB2r34
 
 	cmpa	r0,@ADDR,-r0		; ECsD2r34
-	cmpa	r1,@ADDR,-r0		; EDsD2r34
-	cmpa	r2,@ADDR,-r0		; EEsD2r34
-	cmpa	r3,@ADDR,-r0		; EFsD2r34
+	cmpa	r0,@ADDR,-r1		; EDsD2r34
+	cmpa	r0,@ADDR,-r2		; EEsD2r34
+	cmpa	r0,@ADDR,-r3		; EFsD2r34
 
 	cmpa	r0,@ADDR,r0		; ECsF2r34
-	cmpa	r1,@ADDR,r0		; EDsF2r34
-	cmpa	r2,@ADDR,r0		; EEsF2r34
-	cmpa	r3,@ADDR,r0		; EFsF2r34
+	cmpa	r0,@ADDR,r1		; EDsF2r34
+	cmpa	r0,@ADDR,r2		; EEsF2r34
+	cmpa	r0,@ADDR,r3		; EFsF2r34
 
 
 	.sbttl	'Sequential' Instruction Tests
