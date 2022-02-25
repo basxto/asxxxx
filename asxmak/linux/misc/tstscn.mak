@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#  5 January 2006
+#  15 June 2006
 #
 ####################################################################
 
@@ -14,7 +14,7 @@ all:
 	../exe/as430 -glaxff ../../../asxtst/asmt2blo.asm
 	../exe/asxscn ../../../asxtst/asmt2blo.lst
 
-	rm ../../../asxtst/asmt2blo.lst
+	rm -f ../../../asxtst/asmt2blo.lst
 	../exe/as740 -glaxff ../../../asxtst/asmt2blo.asm
 	../exe/asxscn ../../../asxtst/asmt2blo.lst
 

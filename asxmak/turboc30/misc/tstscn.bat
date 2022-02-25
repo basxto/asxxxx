@@ -78,9 +78,9 @@ del ..\..\..\asxtst\asmt2blo.lst
 ..\exe\asgb.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
 
-del ..\..\..\asxtst\a24bit.lst
-..\exe\asez80.exe -glaxff ..\..\..\asxtst\a24bit.asm  ..\..\..\asxtst\asmt3blo.asm
-..\exe\asxscn.exe -3 ..\..\..\asxtst\a24bit.lst
+del ..\..\..\asxtst\asmt3blo.lst
+..\exe\asez80.exe -glaxff ..\..\..\asxtst\asmt3blo.asm
+..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3blo.lst
 
 del ..\..\..\asxtst\asmt2blo.lst
 ..\exe\asrab.exe -glaxff ..\..\..\asxtst\asmt2blo.asm

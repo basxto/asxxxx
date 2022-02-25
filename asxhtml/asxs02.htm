@@ -697,9 +697,6 @@ they will be considered undefined.  The assembly directive  (-g)
 can  be  be  invoked to make all undefined symbols global at the
 end of pass 1.  
 
-   Naming  a  symbol  not  existing in the current assembly in a
-.globl directive will cause a 'u' error.  
-
    The  .globl directive and == construct can be overridden by a
 following .local directive.  
 
@@ -743,11 +740,6 @@ Registers) for a microprocessor.
 
    The .local directive and =:  construct can be overridden by a
 following .globl directive.  
-
-   A  defined  symbol  that  has  not been given a value is con-
-sidered an external variable and will cause an 'r'  error  in  a
-.local  directive  and  its symbol type will not be changed.  An
-undefined symbol in a .local directive causes a 'u' error.  
 
 
                               NOTE
@@ -1259,7 +1251,7 @@ record formats described in the linker section for details.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2006</B></P></H6>
+<H6><P><B>Last Updated: June 2006</B></P></H6>
 </BODY> 
 </HTML>
 

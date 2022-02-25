@@ -11,7 +11,7 @@
  * With contributions for the
  * object libraries from
  * Ken Hornstein
- * kenh@cmf.nrl.navy.mil
+ * kenhat cmf dot nrl dot navy dot mil
  *
  */
 

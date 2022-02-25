@@ -34,320 +34,8 @@
 
 
 
-                                 Version   4.10
-                                  January 2006
-
-
-                                                                  Page 2
-        
-
-
-         
-                                  P R E F A C E
-
-
-
-
-
-           The  ASxxxx  assemblers  were  written following the style of
-        several cross assemblers found in the Digital Equipment Corpora-
-        tion  Users  Society  (DECUS)  distribution of the C programming
-        language.  The DECUS code was provided with no documentation  as
-        to  the  input  syntax  or the output format.  Study of the code
-        revealed that the unknown author of the code  had  attempted  to
-        formulate  an assembler with attributes similiar to those of the
-        PDP-11 MACRO assembler (without macro's).  The  incomplete  code
-        from  the  DECUS C distribution has been largely rewritten, only
-        the program structure, and C source  file  organization  remains
-        relatively  unchanged.   However, I wish to thank the author for
-        his contribution to this set of assemblers.  
-
-           The  ASLINK  program was written as a companion to the ASxxxx
-        assemblers, its design and implementation was not  derived  from
-        any other work.  
-
-           I  would  greatly  appreciate  receiving  the  details of any
-        changes, additions, or errors pertaining to these  programs  and
-        will  attempt  to  incorporate  any  fixes  or  generally useful
-        changes in a future update to these programs.  
-
-
-
-                Alan R.  Baldwin 
-                Kent State University 
-                Physics Department 
-                Kent, Ohio 44242 
-                U.S.A.  
-
-
-                http://shop-pdp.kent.edu/ashtml/asxxxx.htm 
-
-                baldwin@kent.edu 
-                baldwin@shop-pdp.kent.edu 
-                tel:  (330) 672 2531 
-                fax:  (330) 672 2959 
-
-
-                                                                  Page 3
-        
-
-
-         
-               E N D   U S E R   L I C E N S E   A G R E E M E N T
-
-
-
-
-
-           This software is FREEWARE which means it is NOT public domain
-        but  fully  copyrighted  material  that  is  distributed  freely
-        without  money.   Its  electronic distribution through BBSs, the
-        Internet, or other such means is encouraged provided no money is
-        requested in return.  
-
-           It is forbidden to distribute this software should this file,
-        or any of the remaining files, change in any way or  be  omitted
-        from the archive.  
-
-           If you would like to include this software together with your
-        own work you MUST include it only as the original  complete  un-
-        modified archive in which I distribute it and not as independent
-        files.   If  uncertain,  simply  point  others   or   link   to:
-        http://shop-pdp.kent.edu/asxhtm/asxxxx.htm 
-
-           Please note that although I have done my best to ensure there
-        is no potentially dangerous code  (or  accidental  virus  infec-
-        tions),  the  nature of programming is such that it forces me to
-        provide absolutely no warranty, express or  implied,  with  this
-        version  of the software, and I bear no responsibility for what-
-        ever damages, direct or consequential, you may suffer  from  its
-        use.   I definitely do not warrant this software for suitability
-        for any particular purpose, either.  It is  also  possible  that
-        the instructions, the extra utilities, or the examples that come
-        with the software contain errors,  none  of  which  were  inten-
-        tional.  
-
-
-                                                                  Page 4
-        
-
-
-         
-
-
-
-
-                             C O N T R I B U T O R S
-
-
-
-        Thanks  to Marko Makela for his contribution of the AS6500 cross
-        assembler.  
-
-                Marko Makela
-                Sillitie 10 A
-                01480 Vantaa
-                Finland
-                Internet: Marko dot Makela at Helsinki dot Fi
-                EARN/BitNet: msmakela at finuh
-
-
-
-
-        Thanks  to John Hartman for his contribution of the AS8051 cross
-        assembler and updates to the ASxxxx and ASLINK internals.  
-
-                John L. Hartman
-                jhartman at compuserve dot com
-                noice at noicedebugger dot com
-
-
-
-
-        Thanks  to  G.   Osborn  for  his  contributions  to LKS19.C and
-        LKIHX.C.  
-
-                G. Osborn
-                gary at s-4 dot com
-
-
-
-
-        Thanks to Ken Hornstein for his contribution of object libraries
-        contained in LKLIBR.C.  
-
-                Ken Hornstein
-                kenh at cmf dot nrl dot navy dot mil
-
-
-
-
-
-
-                                                                  Page 5
-        
-
-
-        Thanks  to  Bill  McKinnon for his contributions to the AS8XCXXX
-        cross assembler for the DS8XCXXX series of microprocessors.  
-
-                Bill McKinnon
-                w_mckinnon at conknet dot com
-
-
-
-
-        Thanks  to Roger Ivie for his contribution of the ASGB cross as-
-        sembler for the GameBoy.  
-
-                Roger Ivie
-                ivie at cc dot usu dot edu
-
-
-
-
-        Thanks  to  Uwe  Steller for his contribution of the AS740 cross
-        assembler.  
-
-                Uwe Stellar
-                Uwe dot Steller at t-online dot de
-
-
-
-
-        Thanks  to  Shujen Chen for his contribution of the AS1802 cross
-        assembler.  
-
-                Shugen Chen
-                DeVry University
-                Tinley Park IL
-                schen at tp dot devry dot edu
-
-
-
-
-        Thanks  to  Edgar Puehringer for his contribution of the AS61860
-        cross assembler.  
-
-                Edgar Puehringer
-                edgar_pue at yahoo dot com
-
-
-
-
-
-
-                                                                  Page 6
-        
-
-
-        Thanks to Ulrich Raich and Razaq Ijoduola for their contribution
-        of the ASRAB cross assembler.  
-
-                Ulrich Raich and Razaq Ijoduola
-                PS Division
-                CERN
-                CH-1211 Geneva-23
-                Ulrich dot Raich at cern dot ch
-
-
-
-
-        Thanks  to Patrick Head for his contribution of the ASEZ80 cross
-        assembler.  
-
-                Patrick Head
-                patrick at phead dot net
-
-
-
-
-        Thanks  to  Boisy  G.   Pitre for contributing the .ifeq, .ifne,
-        .ifgt, .iflt, .ifle, and .ifge conditional  directives  and  the
-        Tandy Color Computer Disk Basic binary output for ASLINK.  
-
-                Boisy G. Pitre
-                boisy at boisypitre dot com
-
-
-
-
-        Thanks  to  Mike  McCarty for his contributions to the processor
-        cycle count option of the ASxxxx Assemblers.  
-
-                Mike McCarty
-                mike dot mccarty at sbcglobal dot net
-
-
-                                                                  Page 7
-        
-
-
-        ASxxxx Cross Assemblers, Version 4.10, January 2006 
-
-        Submitted by Alan R.  Baldwin, 
-        Kent State University, Kent, Ohio 
-
-        Operating System:  Linux, Windows, MS-DOS 
-        or other supporting ANSI C.  
-
-        Source Langauge:  C 
-
-        Abstract:  
-
-           The  ASxxxx  assemblers are a series of microprocessor assem-
-        blers written in the C programming  language.   This  collection
-        contains  cross  assemblers  for the 1802, S2650, MPS430, 61860,
-        6500,  6800(6802/6808),  6801(hd6303),  6804,  6805,  68HC(S)08,
-        6809,  68HC11,  68HC(S)12,  68HC16,  740, 8051, 8085(8080), AVR,
-        DS8xCxxx, ez80, F2MC8L/FX,  GameBoy(Z80),  H8/3xx,  PIC,  Rabbit
-        2000/3000,  z8,  and  z80(hd64180) series microprocessors.  Each
-        assembler has a device specific  section  which  includes:   (1)
-        device  description, byte order, and file extension information,
-        (2) a table of assembler general directives, special directives,
-        assembler  mnemonics and associated operation codes, (3) machine
-        specific code for processing the  device  mnemonics,  addressing
-        modes, and special directives.  
-
-           The assemblers have a common device independent section which
-        handles the details of file input/output, symbol  table  genera-
-        tion,  program/data  areas,  expression  analysis, and assembler
-        directive processing.  
-
-           The  assemblers  provide  the following features:  (1) alpha-
-        betized, formatted symbol table listings, (2) relocatable object
-        modules, (3) global symbols for linking object modules, (4) con-
-        ditional assembly directives, (5) reusable  local  symbols,  and
-        (6) include-file processing.  
-
-           The  companion program ASLINK is a relocating linker perform-
-        ing the following functions:  (1) bind multiple  object  modules
-        into  a  single  memory  image,  (2) resolve inter-module symbol
-        references,  (3)  resolve  undefined  symbols   from   specified
-        librarys of object modules, (4) process absolute, relative, con-
-        catenated, and overlay attributes in data and program  sections,
-        (5)  perform  byte and word program-counter relative (pc or pcr)
-        addressing calculations, (6) define absolute  symbol  values  at
-        link  time, (7) define absolute area base address values at link
-        time, (8) produce an Intel Hex  record,  Motorola  S  record  or
-        Tandy  CoCo  Disk  Basic  output  file, (9) produce a map of the
-        linked memory image, and (10) update the ASxxxx assembler  list-
-        ing files with the absolute linked addresses and data.  
-
-           The  assemblers  and  linker  have  been  tested using Linux,
-        DJGPP, Cygwin, Symantec C/C++ V7.2,  Borland  Turbo C++ 3.0  and
-        VC6 with MS-DOS/Windows 3.x/9x/NT/2000/XP.  Complete source code
-        and documentation for the assemblers and linker is included with
-        the  distribution.   Additionally,  test code for each assembler
-        and several microprocessor monitors (  ASSIST05  for  the  6805,
-
-
-                                                                  Page 8
-        
-
-
-        MONDEB  and ASSIST09 for the 6809, and BUFFALO 2.5 for the 6811)
-        are included as working examples of use of these assemblers.  
+                                 Version   4.11
+                                    June 2006
 
 
         CHAPTER 1  THE ASSEMBLER                                     1-1 
@@ -393,29 +81,29 @@
           1.4.21    .bank Directive                                 1-26 
           1.4.22    .org Directive                                  1-27 
           1.4.23    .globl Directive                                1-28 
-          1.4.24    .local Directive                                1-29 
-          1.4.25    .equ, .gblequ, and .lclequ Directives           1-30 
+          1.4.24    .local Directive                                1-28 
+          1.4.25    .equ, .gblequ, and .lclequ Directives           1-29 
           1.4.26    .if, .else, and .endif Directives               1-30 
           1.4.27    .ifxx, .else, and .endif Directives             1-31 
           1.4.28    .ifdef, .else, and .endif Directives            1-32 
           1.4.29    .ifndef, .else, and .endif Directives           1-33 
           1.4.30    .include Directive                              1-34 
-          1.4.31    .define and .undefine Directives                1-35 
+          1.4.31    .define and .undefine Directives                1-34 
           1.4.32    .setdp Directive                                1-35 
           1.4.33    .16bit, .24bit, and .32bit Directives           1-37 
-          1.4.34    .msb Directive                                  1-38 
+          1.4.34    .msb Directive                                  1-37 
           1.4.35    .end Directive                                  1-38 
-          1.5     INVOKING ASXXXX                                   1-40 
+          1.5     INVOKING ASXXXX                                   1-39 
 
 
                                                                  Page ii
         
 
 
-          1.6     ERRORS                                            1-42 
-          1.7     LISTING FILE                                      1-43 
-          1.8     SYMBOL TABLE FILE                                 1-45 
-          1.9     OBJECT FILE                                       1-46 
+          1.6     ERRORS                                            1-41 
+          1.7     LISTING FILE                                      1-42 
+          1.8     SYMBOL TABLE FILE                                 1-44 
+          1.9     OBJECT FILE                                       1-45 
 
         CHAPTER 2  THE LINKER                                        2-1 
           2.1     ASLINK RELOCATING LINKER                           2-1 
@@ -759,6 +447,9 @@
         
 
 
+          AQ.2.8    Unspecified Instructions                        AQ-3 
+          AQ.3    UNSPECIFIED OPCODE ARTICLE                        AQ-4 
+
         APPENDIX AR  AS8XCXXX ASSEMBLER                             AR-1 
           AR.1    ACKNOWLEDGMENTS                                   AR-1 
           AR.2    AS8XCXXX ASSEMBLER DIRECTIVES                     AR-1 
@@ -808,14 +499,15 @@
           AR.10.4   Optional Symbols:  Control Bits                AR-33 
           AR.11   DS83C550/DS87C550 SPECIAL FUNCTION REGISTERS     AR-34 
           AR.11.1   SFR Map                                        AR-34 
-          AR.11.2   Bit Addressable Registers:  Generic            AR-36 
-          AR.11.3   Bit Addressable Registers:  Specific           AR-37 
-          AR.11.4   Optional Symbols:  Control Bits                AR-39 
 
 
                                                                  Page ix
         
 
+
+          AR.11.2   Bit Addressable Registers:  Generic            AR-36 
+          AR.11.3   Bit Addressable Registers:  Specific           AR-37 
+          AR.11.4   Optional Symbols:  Control Bits                AR-39 
 
         APPENDIX AS  ASAVR ASSEMBLER                                AS-1 
           AS.1    AVR ASSEMBLER NOTES                               AS-1 
@@ -865,16 +557,16 @@
 
         APPENDIX AV  ASGB ASSEMBLER                                 AV-1 
           AV.1    ACKNOWLEDGEMENT                                   AV-1 
-          AV.2    INTRODUCTION                                      AV-1 
-          AV.3    GAMEBOY REGISTER SET AND CONDITIONS               AV-1 
-          AV.4    GAMEBOY INSTRUCTION SET                           AV-2 
-          AV.4.1    .tile Directive                                 AV-2 
 
 
                                                                   Page x
         
 
 
+          AV.2    INTRODUCTION                                      AV-1 
+          AV.3    GAMEBOY REGISTER SET AND CONDITIONS               AV-1 
+          AV.4    GAMEBOY INSTRUCTION SET                           AV-2 
+          AV.4.1    .tile Directive                                 AV-2 
           AV.4.2    Potentially Controversial Mnemonic Selection    AV-4 
           AV.4.2.1    Auto-Indexing Loads                           AV-4 
           AV.4.2.2    Input and Output Operations                   AV-4 
@@ -922,17 +614,17 @@
           AX.6    20-BIT ADDRESSING PIC                             AX-9 
           AX.7    PIC OPCODES                                      AX-10 
 
-        APPENDIX AY  ASRAB ASSEMBLER                                AY-1 
-          AY.1    ACKNOWLEDGMENT                                    AY-1 
-          AY.2    PROCESSOR SPECIFIC DIRECTIVES                     AY-1 
-          AY.2.1    .r2k Directive                                  AY-2 
-          AY.2.2    .hd64 Directive                                 AY-2 
 
 
                                                                  Page xi
         
 
 
+        APPENDIX AY  ASRAB ASSEMBLER                                AY-1 
+          AY.1    ACKNOWLEDGMENT                                    AY-1 
+          AY.2    PROCESSOR SPECIFIC DIRECTIVES                     AY-1 
+          AY.2.1    .r2k Directive                                  AY-2 
+          AY.2.2    .hd64 Directive                                 AY-2 
           AY.2.3    .z80 Directive                                  AY-2 
           AY.2.4    The .__.CPU.  Variable                          AY-3 
           AY.3    RABBIT 2000/3000 ADDRESSING AND INSTRUCTIONS      AY-4 
@@ -978,6 +670,318 @@
           BA.5.8    Input and Output Instructions                   BA-6 
           BA.5.9    Register Pair Instructions                      BA-6 
           BA.5.10   HD64180/Z180 Specific Instructions              BA-7 
+
+
+                                                                  Page 2
+        
+
+
+         
+                                  P R E F A C E
+
+
+
+
+
+           The  ASxxxx  assemblers  were  written following the style of
+        several cross assemblers found in the Digital Equipment Corpora-
+        tion  Users  Society  (DECUS)  distribution of the C programming
+        language.  The DECUS code was provided with no documentation  as
+        to  the  input  syntax  or the output format.  Study of the code
+        revealed that the unknown author of the code  had  attempted  to
+        formulate  an assembler with attributes similiar to those of the
+        PDP-11 MACRO assembler (without macro's).  The  incomplete  code
+        from  the  DECUS C distribution has been largely rewritten, only
+        the program structure, and C source  file  organization  remains
+        relatively  unchanged.   However, I wish to thank the author for
+        his contribution to this set of assemblers.  
+
+           The  ASLINK  program was written as a companion to the ASxxxx
+        assemblers, its design and implementation was not  derived  from
+        any other work.  
+
+           I  would  greatly  appreciate  receiving  the  details of any
+        changes, additions, or errors pertaining to these  programs  and
+        will  attempt  to  incorporate  any  fixes  or  generally useful
+        changes in a future update to these programs.  
+
+
+
+                Alan R.  Baldwin 
+                Kent State University 
+                Physics Department 
+                Kent, Ohio 44242 
+                U.S.A.  
+
+
+                http://shop-pdp.kent.edu/ashtml/asxxxx.htm 
+
+                baldwin@kent.edu 
+                baldwin@shop-pdp.kent.edu 
+                tel:  (330) 672 2531 
+                fax:  (330) 672 2959 
+
+
+                                                                  Page 3
+        
+
+
+         
+               E N D   U S E R   L I C E N S E   A G R E E M E N T
+
+
+
+
+
+           This software is FREEWARE which means it is NOT public domain
+        but  fully  copyrighted  material  that  is  distributed  freely
+        without  money.   Its  electronic distribution through BBSs, the
+        Internet, or other such means is encouraged provided no money is
+        requested in return.  
+
+           It is forbidden to distribute this software should this file,
+        or any of the remaining files, change in any way or  be  omitted
+        from the archive.  
+
+           If you would like to include this software together with your
+        own work you MUST include it only as the original  complete  un-
+        modified archive in which I distribute it and not as independent
+        files.   If  uncertain,  simply  point  others   or   link   to:
+        http://shop-pdp.kent.edu/asxhtm/asxxxx.htm 
+
+           Please note that although I have done my best to ensure there
+        is no potentially dangerous code  (or  accidental  virus  infec-
+        tions),  the  nature of programming is such that it forces me to
+        provide absolutely no warranty, express or  implied,  with  this
+        version  of the software, and I bear no responsibility for what-
+        ever damages, direct or consequential, you may suffer  from  its
+        use.   I definitely do not warrant this software for suitability
+        for any particular purpose, either.  It is  also  possible  that
+        the instructions, the extra utilities, or the examples that come
+        with the software contain errors,  none  of  which  were  inten-
+        tional.  
+
+
+                                                                  Page 4
+        
+
+
+         
+
+
+
+
+                             C O N T R I B U T O R S
+
+
+
+        Thanks  to Marko Makela for his contribution of the AS6500 cross
+        assembler.  
+
+                Marko Makela
+                Sillitie 10 A
+                01480 Vantaa
+                Finland
+                Internet: Marko dot Makela at Helsinki dot Fi
+                EARN/BitNet: msmakela at finuh
+
+
+
+
+        Thanks  to John Hartman for his contribution of the AS8051 cross
+        assembler and updates to the ASxxxx and ASLINK internals.  
+
+                John L. Hartman
+                jhartman at compuserve dot com
+                noice at noicedebugger dot com
+
+
+
+
+        Thanks  to  G.   Osborn  for  his  contributions  to LKS19.C and
+        LKIHX.C.  
+
+                G. Osborn
+                gary at s-4 dot com
+
+
+
+
+        Thanks to Ken Hornstein for his contribution of object libraries
+        contained in LKLIBR.C.  
+
+                Ken Hornstein
+                kenh at cmf dot nrl dot navy dot mil
+
+
+
+
+
+
+                                                                  Page 5
+        
+
+
+        Thanks  to  Bill  McKinnon for his contributions to the AS8XCXXX
+        cross assembler for the DS8XCXXX series of microprocessors.  
+
+                Bill McKinnon
+                w_mckinnon at conknet dot com
+
+
+
+
+        Thanks  to Roger Ivie for his contribution of the ASGB cross as-
+        sembler for the GameBoy.  
+
+                Roger Ivie
+                ivie at cc dot usu dot edu
+
+
+
+
+        Thanks  to  Uwe  Steller for his contribution of the AS740 cross
+        assembler.  
+
+                Uwe Stellar
+                Uwe dot Steller at t-online dot de
+
+
+
+
+        Thanks  to  Shujen Chen for his contribution of the AS1802 cross
+        assembler.  
+
+                Shugen Chen
+                DeVry University
+                Tinley Park IL
+                schen at tp dot devry dot edu
+
+
+
+
+        Thanks  to  Edgar Puehringer for his contribution of the AS61860
+        cross assembler.  
+
+                Edgar Puehringer
+                edgar_pue at yahoo dot com
+
+
+
+
+
+
+                                                                  Page 6
+        
+
+
+        Thanks to Ulrich Raich and Razaq Ijoduola for their contribution
+        of the ASRAB cross assembler.  
+
+                Ulrich Raich and Razaq Ijoduola
+                PS Division
+                CERN
+                CH-1211 Geneva-23
+                Ulrich dot Raich at cern dot ch
+
+
+
+
+        Thanks  to Patrick Head for his contribution of the ASEZ80 cross
+        assembler.  
+
+                Patrick Head
+                patrick at phead dot net
+
+
+
+
+        Thanks  to  Boisy  G.   Pitre for contributing the .ifeq, .ifne,
+        .ifgt, .iflt, .ifle, and .ifge conditional  directives  and  the
+        Tandy Color Computer Disk Basic binary output for ASLINK.  
+
+                Boisy G. Pitre
+                boisy at boisypitre dot com
+
+
+
+
+        Thanks  to  Mike  McCarty for his contributions to the processor
+        cycle count option of the ASxxxx Assemblers.  
+
+                Mike McCarty
+                mike dot mccarty at sbcglobal dot net
+
+
+                                                                  Page 7
+        
+
+
+        ASxxxx Cross Assemblers, Version 4.11, June 2006 
+
+        Submitted by Alan R.  Baldwin, 
+        Kent State University, Kent, Ohio 
+
+        Operating System:  Linux, Windows, MS-DOS 
+        or other supporting ANSI C.  
+
+        Source Langauge:  C 
+
+        Abstract:  
+
+           The  ASxxxx  assemblers are a series of microprocessor assem-
+        blers written in the C programming  language.   This  collection
+        contains  cross  assemblers  for the 1802, S2650, MPS430, 61860,
+        6500,  6800(6802/6808),  6801(hd6303),  6804,  6805,  68HC(S)08,
+        6809,  68HC11,  68HC(S)12,  68HC16,  740, 8051, 8085(8080), AVR,
+        DS8xCxxx, ez80, F2MC8L/FX,  GameBoy(Z80),  H8/3xx,  PIC,  Rabbit
+        2000/3000,  z8,  and  z80(hd64180) series microprocessors.  Each
+        assembler has a device specific  section  which  includes:   (1)
+        device  description, byte order, and file extension information,
+        (2) a table of assembler general directives, special directives,
+        assembler  mnemonics and associated operation codes, (3) machine
+        specific code for processing the  device  mnemonics,  addressing
+        modes, and special directives.  
+
+           The assemblers have a common device independent section which
+        handles the details of file input/output, symbol  table  genera-
+        tion,  program/data  areas,  expression  analysis, and assembler
+        directive processing.  
+
+           The  assemblers  provide  the following features:  (1) alpha-
+        betized, formatted symbol table listings, (2) relocatable object
+        modules, (3) global symbols for linking object modules, (4) con-
+        ditional assembly directives, (5) reusable  local  symbols,  and
+        (6) include-file processing.  
+
+           The  companion program ASLINK is a relocating linker perform-
+        ing the following functions:  (1) bind multiple  object  modules
+        into  a  single  memory  image,  (2) resolve inter-module symbol
+        references,  (3)  resolve  undefined  symbols   from   specified
+        librarys of object modules, (4) process absolute, relative, con-
+        catenated, and overlay attributes in data and program  sections,
+        (5)  perform  byte and word program-counter relative (pc or pcr)
+        addressing calculations, (6) define absolute  symbol  values  at
+        link  time, (7) define absolute area base address values at link
+        time, (8) produce an Intel Hex  record,  Motorola  S  record  or
+        Tandy  CoCo  Disk  Basic  output  file, (9) produce a map of the
+        linked memory image, and (10) update the ASxxxx assembler  list-
+        ing files with the absolute linked addresses and data.  
+
+           The  assemblers  and  linker  have  been  tested using Linux,
+        DJGPP, Cygwin, Symantec C/C++ V7.2,  Borland  Turbo C++ 3.0  and
+        VC6 with MS-DOS/Windows 3.x/9x/NT/2000/XP.  Complete source code
+        and documentation for the assemblers and linker is included with
+        the  distribution.   Additionally,  test code for each assembler
+        and several microprocessor monitors (  ASSIST05  for  the  6805,
+
+
+                                                                  Page 8
+        
+
+
+        MONDEB  and ASSIST09 for the 6809, and BUFFALO 2.5 for the 6811)
+        are included as working examples of use of these assemblers.  
 
 
 
@@ -2479,9 +2483,6 @@
         can  be  be  invoked to make all undefined symbols global at the
         end of pass 1.  
 
-           Naming  a  symbol  not  existing in the current assembly in a
-        .globl directive will cause a 'u' error.  
-
            The  .globl directive and == construct can be overridden by a
         following .local directive.  
 
@@ -2493,12 +2494,6 @@
              in the symbol table and output to the .rel file.  
 
 
-
-
-
-
-        THE ASSEMBLER                                          PAGE 1-29
-        GENERAL ASSEMBLER DIRECTIVES
 
 
         1.4.24  .local Directive 
@@ -2513,6 +2508,11 @@
 
            A  .local directive may also have a label field and/or a com-
         ment field.  
+
+
+        THE ASSEMBLER                                          PAGE 1-29
+        GENERAL ASSEMBLER DIRECTIVES
+
 
            The  .local  directive is provided to define symbols that are
         local to the current assembly process.  Local  symbols  are  not
@@ -2531,11 +2531,6 @@
            The .local directive and =:  construct can be overridden by a
         following .globl directive.  
 
-           A  defined  symbol  that  has  not been given a value is con-
-        sidered an external variable and will cause an 'r'  error  in  a
-        .local  directive  and  its symbol type will not be changed.  An
-        undefined symbol in a .local directive causes a 'u' error.  
-
 
                                       NOTE
 
@@ -2544,12 +2539,6 @@
              in the symbol table and output to the .rel file.  
 
 
-
-
-
-
-        THE ASSEMBLER                                          PAGE 1-30
-        GENERAL ASSEMBLER DIRECTIVES
 
 
         1.4.25  .equ, .gblequ, and .lclequ Directives 
@@ -2568,6 +2557,12 @@
 
            These  alternate  forms  of equivalence are provided for user
         convenience.  
+
+
+
+
+        THE ASSEMBLER                                          PAGE 1-30
+        GENERAL ASSEMBLER DIRECTIVES
 
 
         1.4.26  .if, .else, and .endif Directives 
@@ -2604,12 +2599,6 @@
                 .byte   3,4             ;insert bytes if K+3
                 .endif                  ;is zero
         
-
-
-        THE ASSEMBLER                                          PAGE 1-31
-        GENERAL ASSEMBLER DIRECTIVES
-
-
                 .if     J&3             ;evaluate J masked by 3
                 .byte   12              ;insert this byte if J&3
                 .else                   ;is not zero
@@ -2628,6 +2617,12 @@
         
                 .page
                 This text will be bypassed during assembly
+
+
+        THE ASSEMBLER                                          PAGE 1-31
+        GENERAL ASSEMBLER DIRECTIVES
+
+
                 but appear in the listing file.
                 .
                 .
@@ -2661,12 +2656,6 @@
                 .                       ;}
                 .endif
 
-
-
-        THE ASSEMBLER                                          PAGE 1-32
-        GENERAL ASSEMBLER DIRECTIVES
-
-
            The  conditional  assembly directives allow you to include or
         exclude blocks of source code during the assembly process, based
         on the evaluation of the test condition.  
@@ -2686,6 +2675,12 @@
                 .byte   3,4             ;insert bytes if K+3
                 .endif                  ;is zero
         
+
+
+        THE ASSEMBLER                                          PAGE 1-32
+        GENERAL ASSEMBLER DIRECTIVES
+
+
                 .ifne   J&3             ;evaluate J masked by 3
                 .byte   12              ;insert this byte if J&3
                 .else                   ;is not zero
@@ -2718,12 +2713,6 @@
         'sym' has been defined with a .define directive or  'sym'  is  a
         variable  with  an  assigned  value else the false range will be
         processed.  The range of true condition is optional  as  is  the
-
-
-        THE ASSEMBLER                                          PAGE 1-33
-        GENERAL ASSEMBLER DIRECTIVES
-
-
         .else directive and the range of false condition.  The following
         are all valid .ifdef/.else/.endif constructions:  
 
@@ -2743,6 +2732,12 @@
                 .else                   ;is defined/valued
                 .byte   13              ;insert this byte if sym$3
                 .endif                  ;is not defined/valued
+
+
+        THE ASSEMBLER                                          PAGE 1-33
+        GENERAL ASSEMBLER DIRECTIVES
+
+
 
 
         The .ifdef/.else/.endif directives may be nested upto 10 levels. 
@@ -2776,12 +2771,6 @@
                 .ifndef sym$1           ;lookup symbol sym$1
                 .byte   1,2             ;insert bytes if sym$1 is
                 .endif                  ;not defined and
-
-
-        THE ASSEMBLER                                          PAGE 1-34
-        GENERAL ASSEMBLER DIRECTIVES
-
-
                                         ;not assigned a value
         
                 .ifndef sym$2           ;lookup symbol sym$2
@@ -2799,6 +2788,12 @@
 
         The  .ifndef/.else/.endif  directives may be nested upto 10 lev-
         els.  
+
+
+
+
+        THE ASSEMBLER                                          PAGE 1-34
+        GENERAL ASSEMBLER DIRECTIVES
 
 
         1.4.30  .include Directive 
@@ -2834,10 +2829,6 @@
         example:   if  the  current  source file, D:\proj\file1.asm, in-
         cludes  a  file  specified   as   "include1"   then   the   file
         D:\proj\include1.asm is opened.  
-
-
-        THE ASSEMBLER                                          PAGE 1-35
-        GENERAL ASSEMBLER DIRECTIVES
 
 
         1.4.31  .define and .undefine Directives 
@@ -2857,6 +2848,12 @@
                         characters including white space.  
 
                 /  /    represent   the  delimiting  characters.   These
+
+
+        THE ASSEMBLER                                          PAGE 1-35
+        GENERAL ASSEMBLER DIRECTIVES
+
+
                         delimiters   may   be   any   paired    printing
                         characters,  as  long  as the characters are not
                         contained within  the  string  itself.   If  the
@@ -2887,11 +2884,6 @@
         to  inform  the  assembler of the current direct page region and
         the offset address within the selected area.  The normal invoca-
         tion methods are:  
-
-
-        THE ASSEMBLER                                          PAGE 1-36
-        GENERAL ASSEMBLER DIRECTIVES
-
 
                 .area   DIRECT  (PAG)
                 .setdp
@@ -2913,6 +2905,12 @@
         direct variable reference is located in this area.  Local  vari-
         able  and  constant value direct access addresses are checked to
         be within the address range from 0 to 255.  
+
+
+
+        THE ASSEMBLER                                          PAGE 1-36
+        GENERAL ASSEMBLER DIRECTIVES
+
 
            External direct references are assumed by the assembler to be
         in the correct area and have valid  offsets.   The  linker  will
@@ -2944,12 +2942,6 @@
         and variable names are independent).   The  linker  will  verify
         that  the  relocated  direct page accesses are within the direct
         page.  
-
-
-        THE ASSEMBLER                                          PAGE 1-37
-        GENERAL ASSEMBLER DIRECTIVES
-
-
         The  preceeding  sequence  could  be repeated for multiple paged
         areas, however an alternate method is to define a non-paged area
         and use the .setdp directive to specify the offset value:  
@@ -2971,8 +2963,14 @@
 
         The  linker  will  verify that subsequent direct page references
         are in the specified area and offset address range.  It  is  the
-        programmers responsibility to load the dp register with the cor-
-        rect page segment  corresponding  to  the  .setdp  base  address
+        programmers  responsibility  to  load  the  dp register with the
+
+
+        THE ASSEMBLER                                          PAGE 1-37
+        GENERAL ASSEMBLER DIRECTIVES
+
+
+        correct page segment corresponding to the  .setdp  base  address
         specified.  
 
            For  those  cases  where a single piece of code must access a
@@ -2997,12 +2995,6 @@
            The  .16bit, .24bit, and .32bit directives are special direc-
         tives for assembler configuration when default  values  are  not
         used.  
-
-
-
-
-        THE ASSEMBLER                                          PAGE 1-38
-        GENERAL ASSEMBLER DIRECTIVES
 
 
         1.4.34  .msb Directive 
@@ -3030,6 +3022,12 @@
                 .msb 1          ;select byte 1 of address
                                 ;<M(3):N(2):m(1):n(0)>
                 LD A,>MNmn      ;byte m <15:8> ==>> A
+
+
+        THE ASSEMBLER                                          PAGE 1-38
+        GENERAL ASSEMBLER DIRECTIVES
+
+
                 ...
         
                 .msb 2          ;select byte 2 of address
@@ -3055,12 +3053,6 @@
                         symbols, or labels.  
 
 
-
-
-        THE ASSEMBLER                                          PAGE 1-39
-        GENERAL ASSEMBLER DIRECTIVES
-
-
            The  .end  directive is used to specify a code entry point to
         be included in the linker output file.  Review  the  I86  and  S
         record formats described in the linker section for details.  
@@ -3068,7 +3060,7 @@
            The .end directive without an expression is ignored.  
 
 
-        THE ASSEMBLER                                          PAGE 1-40
+        THE ASSEMBLER                                          PAGE 1-39
         GENERAL ASSEMBLER DIRECTIVES
 
 
@@ -3126,7 +3118,7 @@
         
 
 
-        THE ASSEMBLER                                          PAGE 1-41
+        THE ASSEMBLER                                          PAGE 1-40
         INVOKING ASXXXX
 
 
@@ -3184,7 +3176,7 @@
 
 
 
-        THE ASSEMBLER                                          PAGE 1-42
+        THE ASSEMBLER                                          PAGE 1-41
         INVOKING ASXXXX
 
 
@@ -3242,7 +3234,7 @@
                     directive in a relocatable area.  
 
 
-        THE ASSEMBLER                                          PAGE 1-43
+        THE ASSEMBLER                                          PAGE 1-42
         ERRORS
 
 
@@ -3300,7 +3292,7 @@
 
 
 
-        THE ASSEMBLER                                          PAGE 1-44
+        THE ASSEMBLER                                          PAGE 1-43
         LISTING FILE
 
 
@@ -3358,7 +3350,7 @@
 
 
 
-        THE ASSEMBLER                                          PAGE 1-45
+        THE ASSEMBLER                                          PAGE 1-44
         LISTING FILE
 
 
@@ -3416,7 +3408,7 @@
 
 
 
-        THE ASSEMBLER                                          PAGE 1-46
+        THE ASSEMBLER                                          PAGE 1-45
         SYMBOL TABLE FILE
 
 
@@ -5429,6 +5421,68 @@
 
 
            Summary  of  changes/additions  to the ASxxxx Assemblers from
+        Version 4.10 to Version 4.11.  
+
+             1.  Incorporated  the patches contained in p01410.zip which
+                 corrected a coding error that affected BANKS containing
+                 multiple ABS areas or mixed AREA types.  
+
+             2.  Incorporated  the patches contained in p02410.zip which
+                 corrected improper use of  R_USGN  in  most  addressing
+                 modes  in AS6500.  This caused unexpected 'a' errors in
+                 V4.xx because of the ASxxxx core change to  32-bit  in-
+                 tegers and arithmetic.  
+
+             3.  Incorporated  the patches contained in p03410.zip which
+                 corrected errors in the  .local  and  .globl  assembler
+                 directive  processing  routine that introduced unwanted
+                 side effects for variable and symbol definition  files.
+                 These  effects included improper definitions and incor-
+                 rect error warnings.  
+
+             4.  The  following  new subdirectories and their files have
+                 been added to the asxtst directory:  
+
+                  *  areabank     Area and Bank Processing Test 
+                     This  directory  contains  several  test  programs:
+                     ts.asm (single file - multiple areas), tm1.asm  and
+                     tm2.asm  (multiple  file  -  multiple  areas),  and
+                     tbm.asm, tbm1.asm, and tbm2.asm ( multiple  file  -
+                     multiple  areas  within  a  bank) and several other
+                     files which verify the  correct  operation  of  the
+                     linker  when used with a single linked file, multi-
+                     ple linked files having no  banking,  and  multiple
+                     linked  files  with banking.  These reference files
+                     show in detail how the .area and  .bank  directives
+                     work together.  
+
+
+
+        CHANGE LOG                                              Page D-2
+        
+
+
+                  *  equtst       Equate Processing Test 
+                     This  directory  contains a test file for verifying
+                     the operation of the .globl, .local, .equ, .gblequ,
+                     and  .lclequ  directives  and  the  =,  ==,  and =:
+                     equalities.  
+
+                  *  inctst       Nested Include File Test 
+
+                  *  itst         Include File Error Reporting Test 
+
+
+             5.  Incorporated  the updates contained in u01410.zip which
+                 added 10 undocumented 8085 instructions to  the  AS8085
+                 assembler.  
+
+
+
+
+
+
+           Summary  of  changes/additions  to the ASxxxx Assemblers from
         Version 4.00 to Version 4.10.  
 
              1.  Added new assemblers for the Zilog EZ80, Zilog Z8, Sig-
@@ -5460,16 +5514,17 @@
                  tion  caused  by  address rollover to 0.) Aslink inter-
                  preted this as a 0 size.  
 
+
+
+        CHANGE LOG                                              Page D-3
+        
+
+
                  Fix:  
                  A  new area 'Output Code Flag' bit was defined to indi-
                  cate when data is  defined  in  an  area.   ASxxxx  and
                  Aslink  have  been updated to set and process this area
                  flag bit.  
-
-
-        CHANGE LOG                                              Page D-2
-        
-
 
              8.  Problem:  
                  The  use  of  the .end assembler directive in an Asxxxx
@@ -9968,6 +10023,452 @@
                 shld    addr            sta     addr
         
                 lxi     r,#data
+
+
+        AQ.2.8  Unspecified Instructions 
+
+                arhl
+                dsub
+        
+                jnx5    addr
+                jx5     addr
+        
+                ldhi    #data
+                ldsi    #data
+        
+                lhlx
+                rdel
+                rstv
+                shlx
+
+
+        AS8085 ASSEMBLER                                       PAGE AQ-4
+        8085 INSTRUCTION SET
+
+
+        AQ.3  UNSPECIFIED OPCODE ARTICLE 
+
+        Engineer's Notebook,
+        "Electronics" magazine, 1980
+        
+        ----------------------------
+        
+        Unspecified 8085 Op Codes Enhance Programming
+        
+        by Wolfgang Dehnhardt and Villy M. Sorenson
+        GSI, Dermstat, and Sorenson Software,
+        Seeheim, West Germany
+        
+        ----------------------------
+        
+
+
+           Ten  operating  codes and two flag bits previously unknown to
+        most users of the 8085 microprocessor will enable programmers to
+        write  more efficient routines.  The new members of the instruc-
+        tion set, which were stumbled upon  during  the  testing  of  an
+        assembler-disassembler  module,  include  seven opcodes that in-
+        volve the processing of register pairs, two  that  involve  jump
+        operations  with  one  new  flag, and one that performs a condi-
+        tional restart on the overflow indication of the other flag bit. 
+
+
+           The   seven  register  pair  instructions  (all  with  16-bit
+        operands) consist of a double subtraction, a  rotate,  a  shift,
+        indirect  loading  and  storing of a word, and two offset opera-
+        tions.  Either BC, DE, HL, or SP  are  the  designated  register
+        pairs used in these opcodes.  
+
+
+           The  mnemonic names of the instructions have been selected to
+        be compatible with the 8085's existing mnemonics.  In the double
+        subtraction  (DSUB),  register  pair  BC  is subtracted from HL.
+        This instruction thus performs the opposite task  of  DAD  B,  a
+        well-known  instruction.   The instruction RDEL rotates register
+        pair DE left 1 bit through the carry.   ARHL  is  an  arithmetic
+        shift  to  the right of HL.  It serves to divide HL by 2, except
+        in cases where HL is -1.  
+
+
+           All  16  bits of register pair HL can be stored indirectly at
+        the address contained in the DE pair by  specifying  instruction
+        SHLX.  To load HL, LHLX must be employed.  
+
+
+           As  an example of how this instruction can be used to cut in-
+        struction steps, consider the common sequence used for a routine
+        table  jump  shown  in part (a) of the figure.  By assigning the
+
+
+        AS8085 ASSEMBLER                                       PAGE AQ-5
+        UNSPECIFIED OPCODE ARTICLE
+
+
+        register DE for HL and using the LHLX instruction, this sequence
+        can  be  replaced  by  the much simpler arrangement shown at the
+        bottom of part (a).  
+
+
+           As  for  adding  the contents of register pairs with an addi-
+        tional byte (offset), DE can be loaded with HL plus the byte  by
+        selecting  the instruction LDHI, which simplifies array address-
+        ing.  Usually, the architecture of the 8080-type systems dictate
+        addressing  of  arrays  in  what  are called pages of 256 bytes.
+        This restriction means that the starting  address  of  an  array
+        must  be placed near the beginning of a page.  A typical call is
+        shown in part (b) of the figure.  
+
+
+           The  page  limitation  is by passed using th LDHI instruction
+        code and constant indexes.  The starting address  of  the  array
+        can  now  be  placed anywhere, and addressing occurs as shown at
+        the bottom of part (b).  
+
+
+           An  additional  byte can be combined with register pair SP in
+        DE if  instruction  LDSI  is  specified.   This  instruction  is
+        designed  for  operating system routines that transfer arguments
+        on the stack.  An example sequence, shown in (c), stores HL into
+        a  16-bit  word  located as the second item below the top of the
+        stack.  
+
+
+           The  jump  and  restart instructions work in conjunction with
+        the two discoverd flag bits, X5 and V.  Op codes  JX5  and  JNX5
+        jump depending on the state of th X5 flag.  Op code RSTV makes a
+        restart call to hexidecimal address 40 if the  V  flag  is  set;
+        otherwise it functions as a no-operation instruction.  
+
+
+           Flag  bit V indicates a 2's complement overflow condition for
+        8- and 16-bit arithmetic operations.  Flag bit X5 has been named
+        for  its  position  in  the  condition code byte and not for its
+        function.  It does not resemble any normal flag bit.   The  only
+        use  for this bit found thus far are as an unsigned overflow in-
+        dicator resulting from a data change of FFFF to 0000 on  execut-
+        ing DCX.  
+
+
+           The new 8085 instructions are outlined in the table.  
+
+
+        AS8085 ASSEMBLER                                       PAGE AQ-6
+        UNSPECIFIED OPCODE ARTICLE
+
+
+        Figure:
+        
+            ------------------------------------------------------|
+            |  part (a)                                           |
+            | |-------------------------------------------------| |
+            | | Sourec Statement |           Comment            | |
+            | |-------------------------------------------------| |
+            | |    MOV   E,M     |  ;Routine ADR Low Byte       | |
+            | |    INX   H       |  ;HL = Table ADR             | |
+            | |    MOV   D,M     |  ;Routine ADR High Byte      | |
+            | |    XCHG          |  ;DE = Routine ADR           | |
+            | |    PCHL          |  ;Go to Routine ADR          | |
+            | |----                                         ----| |
+            |                       ||                            |
+            |                       \/                            |
+            | |----                                         ----| |
+            | |    LHLX          |  ;DE = Table ADR             | |
+            | |    PCHL          |  ;HL = Routine ADR           | |
+            | |-------------------------------------------------| |
+            |                                                     |
+            |  part (b)                                           |
+            | |-------------------------------------------------| |
+            | | Sourec Statement |           Comment            | |
+            | |-------------------------------------------------| |
+            | |    LXI   H,ARRAY |  ;ARRAY Base ADR             | |
+            | |    MVI   L,INDEX |  ;8-Bit INDEX, HL=ARRAY ADR  | |
+            | |----                                         ----| |
+            |                       ||                            |
+            |                       \/                            |
+            | |----                                         ----| |
+            | |    LXI   H,ARRAY |  ;ARRAY Base ADR             | |
+            | |    LDHI  L,INDEX |  ;8-Bit INDEX, HL=ARRAY ADR  | |
+            | |-------------------------------------------------| |
+            |                                                     |
+            |  part (c)                                           |
+            | |-------------------------------------------------| |
+            | | Sourec Statement |           Comment            | |
+            | |-------------------------------------------------| |
+            | |    LDSI  2       |  ;DE = SP + 2                | |
+            | |    SHLX          |  ;Replace 2, Item on Stack   | |
+            | |-------------------------------------------------| |
+            |                                                     |
+            | Options.   Newly discovered operating codes for     |
+            | 8085 shown in table enables the writing of more     |
+            | efficient programs. Program for table jump (a, top) |
+            | can be reduced significantly when new instructions  |
+            | (a, bottom) are implemented. Array routine (b, top) |
+            | can be rewritten (b, Bottom) so that arrays can be  |
+            | addressed across page boundaries.  Data words can   |
+            | be entered at any point in a stack register (c).    |
+            ------------------------------------------------------|
+
+
+        AS8085 ASSEMBLER                                       PAGE AQ-7
+        UNSPECIFIED OPCODE ARTICLE
+
+
+        Table:
+        
+            -----------------------------------
+            |    Condition  Code  Format      |
+            -----------------------------------
+            |  S   Z  X5  AC   O   P   V  CY  |
+            -----------------------------------
+        
+            New Condition Codes:
+        
+            V  = Bit 1     2's complement overflow
+            X5 = bit 5     Underflow (DCX) or Overflow (INX)
+                           X5 = O1*O2 + O1*R + O2*R, where
+                           * == AND, + == OR
+                           O1 = sign of operand 1
+                           O2 = sign of operand 2
+                           R  = sign of result.
+                           For subtraction and comparisons
+                           replace O2 with ~O2.
+        
+        
+        
+          DSUB   (double subtraction)
+        
+            (H)(L)=(H)(L)-(B)(C)
+            The contents of register pair B and C are subtracted
+            from the contents of register pair H and L. The
+            result is placed in register pair H and L. All
+            condition flags are affected.
+        
+              ---------------------
+              [  0 0 0 0 1 0 0 0  ]                (08)
+              ---------------------
+        
+              cycles:          3
+              states:         10
+              addressing:     register
+              flags:          Z,S,P,CY,AC,X5,V
+
+
+        AS8085 ASSEMBLER                                       PAGE AQ-8
+        UNSPECIFIED OPCODE ARTICLE
+
+
+        
+          ARHL    (arithmetic shift of H and L to the right)
+        
+            (H7=H7);(Hn-1)=(Hn)
+            (L7=H0);(Ln-1)=(Ln);(CY)=(L0)
+            The contents of register pair H and L are shifted
+            right one bit. The uppermost bit is duplicated and
+            the lowest bit is shifted into the carry bit.
+            The result is placed in register pair H and L.
+            Note: only the CY flag is affected.
+        
+              ---------------------
+              [  0 0 0 1 0 0 0 0  ]                (10)
+              ---------------------
+        
+              cycles:         3
+              states:         7
+              addressing:     register
+              flags:          CY
+        
+        
+        
+          RDEL    (rotate D and E left through carry)
+        
+            (Dn+1)=(Dn);(D0)=(E7)
+            (CY)=(D7);(En+1)=(En);(E0)=(CY)
+            The contents of register pair D and E are rotated
+            left one position through the carry flag. The low
+            order bit is set equal to the CY flag and the CY
+            flag is set to the value shifted out of the
+            high-order bit. Only the CY and V flags are
+            affected.
+        
+               ---------------------
+               [  0 0 0 1 1 0 0 0  ]                (18)
+               ---------------------
+        
+              cycles:           3
+              states:          10
+              addressing:      register
+              flags:           CY, V
+
+
+        AS8085 ASSEMBLER                                       PAGE AQ-9
+        UNSPECIFIED OPCODE ARTICLE
+
+
+        
+          LDHI    (load D and E with H and L plus immediate byte)
+        
+            (D)(E)=((H)(L)+(byte 2)
+            The contents of register pair H and L are added to
+            the immediate byte. The result is placed in
+            register pair D and E.
+            Note: no condition flags are affected.
+        
+               ---------------------
+               [  0 0 1 0 1 0 0 0  ]                (28)
+               ---------------------
+               [       data        ]
+               ---------------------
+        
+              cycles:           3
+              states:          10
+              addressing:      immediate register
+              flags:           none
+        
+        
+        
+          LDSI    (load D and E with SP plus immediate bytey)
+        
+            (D)(E);(D0)=(E7)
+            (CY)=(D7);(SPH)(SPL)+(byte 2)
+            The contents of register pair H and L are added to
+            the immediate byte. The result is placed in
+            register pair D and E.
+            Note: no condition flags are affected.
+        
+               ---------------------
+               [  0 0 1 1 1 0 0 0  ]                (38)
+               ---------------------
+               [       data        ]
+               ---------------------
+        
+              cycles:           3
+              states:          10
+              addressing:      immediate register
+              flags:           none
+
+
+        AS8085 ASSEMBLER                                      PAGE AQ-10
+        UNSPECIFIED OPCODE ARTICLE
+
+
+        
+          RSTV    (restart on overflow)
+        
+            if (V):
+               ((SP)-1))=(PCH)
+               ((SP)-2))=(PCL)
+               (SP)=(SP)-2
+               (PC)=40 hex
+            If the overflow flag V is set, the actions
+            specified above are performed; otherwise
+            control continues sequentially.
+        
+               ---------------------
+               [  1 1 0 0 1 0 1 1  ]                (CB)
+               ---------------------
+        
+              cycles:          1 or 3
+              states:          6 or 12
+              addressing:      register indirect
+              flags:           none
+        
+        
+        
+          SHLX    (store H and L indirect through D and E)
+        
+            ((D)(E))=(L)
+            ((D)(E)+1)=(H)
+            The contents of register L are moved to the
+            memory-location whose address is in register pair
+            D and E. The contents of register H are moved to
+            the succeeding memory location.
+        
+               ---------------------
+               [  1 1 0 1 1 0 0 1  ]                (D9)
+               ---------------------
+        
+              cycles:           3
+              states:          10
+              addressing:      register indirect
+              flags:           none
+
+
+        AS8085 ASSEMBLER                                      PAGE AQ-11
+        UNSPECIFIED OPCODE ARTICLE
+
+
+        
+          JNX5    (jump on not X5)
+        
+            if (not X5)
+               (PC)=(byte 3)(byte 2)
+        
+            If the X5 flag is reset, control is transferred to
+            the instruction whose address is specified in byte
+            3 and byte 2 of the current instruction; otherwise
+            control continues sequentially.
+        
+               ---------------------
+               [  1 1 0 1 1 1 0 1  ]                (DD)
+               ---------------------
+               [  lo-order address ]
+               ---------------------
+               [  hi-order address ]
+               ---------------------
+        
+              cycles:          2 or 3
+              states:          7 or 10
+              addressing:      immediate
+              flags:           none
+        
+        
+        
+          LHLX    (load H and L indirect through D and E))
+        
+            (L)=((D)(E))
+            (H)=((D)(E)+1)
+            The content of the memory location whose address
+            is in D and E, are moved to register L. The
+            contents of the succeeding memory location are
+            moved to register H.
+        
+               ---------------------
+               [  1 1 1 0 1 1 0 1  ]                (ED)
+               ---------------------
+        
+              cycles:           3
+              states:          10
+              addressing:      register indirect
+              flags:           none
+
+
+        AS8085 ASSEMBLER                                      PAGE AQ-12
+        UNSPECIFIED OPCODE ARTICLE
+
+
+        
+          JX5     (jump on X5)
+        
+            if (X5)
+               (PC)=(byte 3)(byte 2)
+        
+            If the X5 flag is set, control is transferred to
+            the instruction whose address is specified in byte
+            3 and byte 2 of the current instruction; otherwise
+            control continues sequentially.
+        
+               ---------------------
+               [  1 1 1 1 1 1 0 1  ]                (FD)
+               ---------------------
+               [  lo-order address ]
+               ---------------------
+               [  hi-order address ]
+               ---------------------
+        
+              cycles:          2 or 3
+              states:          7 or 10
+              addressing:      immediate
+              flags:           none
 
 
 

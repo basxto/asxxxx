@@ -1,331 +1,0 @@
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 1.
-Hexidecimal [16-Bits]
-
-
-
-   0000 00                    1 	.byte	0x00				; inctst.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 2.
-Hexidecimal [16-Bits]
-
-
-
-                              2 	.include	"inc0a"			; inc0a.asm
-   0001 0A                    1 	.byte	0x0A		; inc0a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 3.
-Hexidecimal [16-Bits]
-
-
-
-                              3 	.include	".\inc1\inc1a"		; inc1a.asm
-   0002 1A                    1 	.byte	0x1A		; inc1a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 4.
-Hexidecimal [16-Bits]
-
-
-
-                              4 	.include	".\inc2\inc2a"		; inc2a.asm
-   0003 2A                    1 	.byte	0x2A		; inc2a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 5.
-Hexidecimal [16-Bits]
-
-
-
-                              5 	.include	".\inc3\inc3a"		; inc3a.asm
-   0004 3A                    1 	.byte	0x3A		; inc3a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 6.
-Hexidecimal [16-Bits]
-
-
-
-                              6 	.include	".\inc1\inc1"		; inc1.asm,
-   0005 10                    1 	.byte	0x10				; inc1.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 7.
-Hexidecimal [16-Bits]
-
-
-
-                              2 	.include	".\inc0a"		; inc0a.asm
-   0006 0A                    1 	.byte	0x0A		; inc0a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 8.
-Hexidecimal [16-Bits]
-
-
-
-                              3 	.include	"inc1a"		        ; inc1a.asm
-   0007 1A                    1 	.byte	0x1A		; inc1a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 9.
-Hexidecimal [16-Bits]
-
-
-
-                              4 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 10.
-Hexidecimal [16-Bits]
-
-
-
-                              7 						; inc1a.asm, inc0.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 11.
-Hexidecimal [16-Bits]
-
-
-
-                              8 	.include	".\inc2\inc2"		; inc2.asm,
-   0008 20                    1 	.byte	0x20				; inc2.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 12.
-Hexidecimal [16-Bits]
-
-
-
-                              2 	.include	".\inc0a"		; inc0a.asm
-   0009 0A                    1 	.byte	0x0A		; inc0a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 13.
-Hexidecimal [16-Bits]
-
-
-
-                              3 	.include	".\inc1\inc1a"		; incla.asm
-   000A 1A                    1 	.byte	0x1A		; inc1a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 14.
-Hexidecimal [16-Bits]
-
-
-
-                              4 	.include	"inc2a"			; inc2a.asm
-   000B 2A                    1 	.byte	0x2A		; inc2a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 15.
-Hexidecimal [16-Bits]
-
-
-
-                              5 	.include	".\inc1\inc1"		; inc1.asm,
-   000C 10                    1 	.byte	0x10				; inc1.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 16.
-Hexidecimal [16-Bits]
-
-
-
-                              2 	.include	".\inc0a"		; inc0a.asm
-   000D 0A                    1 	.byte	0x0A		; inc0a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 17.
-Hexidecimal [16-Bits]
-
-
-
-                              3 	.include	"inc1a"		        ; inc1a.asm
-   000E 1A                    1 	.byte	0x1A		; inc1a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 18.
-Hexidecimal [16-Bits]
-
-
-
-                              4 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 19.
-Hexidecimal [16-Bits]
-
-
-
-                              6 						; inc1a.asm, inc0.asm
-                              7 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 20.
-Hexidecimal [16-Bits]
-
-
-
-                              9 						; inc0a.asm, inc1a.asm,
-                             10 						; inc2a.asm
-                             11 						; inc1.asm,
-                             12 						; inc0a.asm, inc1a.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 21.
-Hexidecimal [16-Bits]
-
-
-
-                             13 	.include	".\inc3\inc3"	        ; inc3.asm,
-   000F 30                    1 	.byte	0x30				; inc3.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 22.
-Hexidecimal [16-Bits]
-
-
-
-                              2 	.include	".\inc0a"		; inc0a.asm
-   0010 0A                    1 	.byte	0x0A		; inc0a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 23.
-Hexidecimal [16-Bits]
-
-
-
-                              3 	.include	".\inc1\inc1a"		; incla.asm
-   0011 1A                    1 	.byte	0x1A		; inc1a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 24.
-Hexidecimal [16-Bits]
-
-
-
-                              4 	.include	".\inc2\inc2a"		; inc2a.asm
-   0012 2A                    1 	.byte	0x2A		; inc2a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 25.
-Hexidecimal [16-Bits]
-
-
-
-                              5 	.include	"inc3a"			; inc3a.asm
-   0013 3A                    1 	.byte	0x3A		; inc3a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 26.
-Hexidecimal [16-Bits]
-
-
-
-                              6 	.include	".\inc1\inc1"		; inc1.asm,
-   0014 10                    1 	.byte	0x10				; inc1.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 27.
-Hexidecimal [16-Bits]
-
-
-
-                              2 	.include	".\inc0a"		; inc0a.asm
-   0015 0A                    1 	.byte	0x0A		; inc0a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 28.
-Hexidecimal [16-Bits]
-
-
-
-                              3 	.include	"inc1a"		        ; inc1a.asm
-   0016 1A                    1 	.byte	0x1A		; inc1a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 29.
-Hexidecimal [16-Bits]
-
-
-
-                              4 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 30.
-Hexidecimal [16-Bits]
-
-
-
-                              7 						; inc0a.asm, inc1a.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 31.
-Hexidecimal [16-Bits]
-
-
-
-                              8 	.include	".\inc2\inc2"		; inc2.asm,
-   0017 20                    1 	.byte	0x20				; inc2.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 32.
-Hexidecimal [16-Bits]
-
-
-
-                              2 	.include	".\inc0a"		; inc0a.asm
-   0018 0A                    1 	.byte	0x0A		; inc0a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 33.
-Hexidecimal [16-Bits]
-
-
-
-                              3 	.include	".\inc1\inc1a"		; incla.asm
-   0019 1A                    1 	.byte	0x1A		; inc1a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 34.
-Hexidecimal [16-Bits]
-
-
-
-                              4 	.include	"inc2a"			; inc2a.asm
-   001A 2A                    1 	.byte	0x2A		; inc2a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 35.
-Hexidecimal [16-Bits]
-
-
-
-                              5 	.include	".\inc1\inc1"		; inc1.asm,
-   001B 10                    1 	.byte	0x10				; inc1.asm
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 36.
-Hexidecimal [16-Bits]
-
-
-
-                              2 	.include	".\inc0a"		; inc0a.asm
-   001C 0A                    1 	.byte	0x0A		; inc0a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 37.
-Hexidecimal [16-Bits]
-
-
-
-                              3 	.include	"inc1a"		        ; inc1a.asm
-   001D 1A                    1 	.byte	0x1A		; inc1a.asm
-                              2 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 38.
-Hexidecimal [16-Bits]
-
-
-
-                              4 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 39.
-Hexidecimal [16-Bits]
-
-
-
-                              6 						; inc1a.asm, inc0.asm
-                              7 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 40.
-Hexidecimal [16-Bits]
-
-
-
-                              9 						; inc0a.asm, inc1a.asm,
-                             10 						; inc2a.asm
-                             11 						; inc1.asm,
-                             12 						; inc0a.asm, inc1a.asm
-                             13 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 41.
-Hexidecimal [16-Bits]
-
-
-
-                             14 						; inc0a.asm, inc1a.asm,
-                             15 						; inc3a.asm
-                             16 						; inc1.asm,
-                             17 						; inc0a.asm, inc1a.asm
-                             18 						; inc2.asm,
-                             19 						; inc0a.asm, inc1a.asm,
-                             20 						; inc2a.asm
-                             21 						; inc1.asm,
-                             22 						; inc0a.asm, inc1a.asm
-                             23 
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 42.
-Hexidecimal [16-Bits]
-
-Symbol Table
-
-    .__.ABS.       =   0000 G   |     .__.CPU.       =   0000 L
-
-ASxxxx Assembler V04.10  (ASxxxx Test Assembler), page 43.
-Hexidecimal [16-Bits]
-
-Area Table
-
-[_CSEG]
-   0 _CODE            size   1E   flags C180
-[_DSEG]
-   1 _DATA            size    0   flags C0C0

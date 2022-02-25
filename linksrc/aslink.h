@@ -25,7 +25,7 @@
  * Local Definitions
  */
 
-#define	VERSION	"V04.10"
+#define	VERSION	"V04.11"
 
 /*
  * To include NoICE Debugging set non-zero

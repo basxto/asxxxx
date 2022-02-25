@@ -771,8 +771,8 @@ minit()
 				sp = lookup(pid);
 				if (sp->s_type == S_NEW) {
 					sp->s_addr = pd->value;
-					sp->s_type = S_ULCL;
-					sp->s_flag = S_ASG;
+					sp->s_type = S_USER;
+					sp->s_flag = S_LCL | S_ASG;
 				}
 			}
 			pd++;

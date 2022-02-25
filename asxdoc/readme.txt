@@ -1,4 +1,4 @@
-ASxxxx and ASlink V4.10 January 2006
+ASxxxx and ASlink V4.11 June 2006
 
    The  ASxxxx  assemblers are a series of microprocessor assem-
 blers written in the C programming  language.   This  collection
@@ -19,48 +19,48 @@ code  for  each  assembler  and  several microprocessor monitors
 and  BUFFALO 2.5 for the 6811) are included as  working examples
 of use of these assemblers.  
 
-asxv4p00.zip	ASxxxx and ASlink V4.00 Zipped
+asxv4p11.zip	ASxxxx and ASlink V4.11 Zipped
 
 	MS-DOS:
-	DJGPP:		pkunzip -d asxv4p00.zip
+	DJGPP:		pkunzip -d asxv4p11.zip
 			unzips and restores directory structure
 
-	Linux:		unzip -L -a asxv4p00.zip
+	Linux:		unzip -L -a asxv4p11.zip
 			unzips to lower-case names and converts ascii
 			files to \n from \r\n form.
 
 
 Exectutables are in directories:
 
-	Linux:		/asxxxx/asxmak/linux/exe/
+	Linux:		/asxv4pxx/asxmak/linux/exe/
 
-	Cygwin:		\asxxxx\asxmak\cygwin\exe\
+	Cygwin:		\asxv4pxx\asxmak\cygwin\exe\
 
-	VC6:		\asxxxx\asxmak\vc6\exe\
+	VC6:		\asxv4pxx\asxmak\vc6\exe\
 
-	DJGPP:		\asxxxx\asxmak\djgpp\exe\
+	DJGPP:		\asxv4pxx\asxmak\djgpp\exe\
 
-	MS-DOS:		\asxxxx\asxmak\symantec\exe\
+	MS-DOS:		\asxv4pxx\asxmak\symantec\exe\
 
 
 Makefiles or Build command files are in directories:
 
-	Linux:		/asxxxx/asxmak/linux/build/
+	Linux:		/asxv4pxx/asxmak/linux/build/
 
-	Cygwin:		\asxxxx\asxmak\cygwin\build\
+	Cygwin:		\asxv4pxx\asxmak\cygwin\build\
 
-	VC6:		\asxxxx\asxmak\vc6\build\
+	VC6:		\asxv4pxx\asxmak\vc6\build\
 
-	DJGPP:		\asxxxx\asxmak\djgpp\build\
+	DJGPP:		\asxv4pxx\asxmak\djgpp\build\
 
-	MS-DOS:		\asxxxx\asxmak\symantec\build\
+	MS-DOS:		\asxv4pxx\asxmak\symantec\build\
 
 
  Documentation in plain text form is
- 	\asxxxx\asxdoc\asmlnk.txt
+ 	\asxv4pxx\asxdoc\asmlnk.txt
 
  Documentation in HTML form may be found starting with
- 	\asxxxx\asxhtml\asxxxx.htm
+ 	\asxv4pxx\asxhtml\asxxxx.htm
 
 
 

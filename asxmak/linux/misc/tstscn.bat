@@ -2,7 +2,7 @@ rm -f ../../../asxtst/asmt2blo.lst
 ../exe/as430 -glaxff ../../../asxtst/asmt2blo.asm
 ../exe/asxscn ../../../asxtst/asmt2blo.lst
 
-rm ../../../asxtst/asmt2blo.lst
+rm -f ../../../asxtst/asmt2blo.lst
 ../exe/as740 -glaxff ../../../asxtst/asmt2blo.asm
 ../exe/asxscn ../../../asxtst/asmt2blo.lst
 
@@ -79,8 +79,8 @@ rm -f ../../../asxtst/asmt2blo.lst
 ../exe/asxscn ../../../asxtst/asmt2blo.lst
 
 rm -f ../../../asxtst/asmt3blo.lst
-../exe/asez80 -glaxff ../../../asxtst/asmt3blo.asm
-../exe/asxscn -3 ../../../asxtst/asmt3blo.lst
+../exe/asez80.exe -glaxff ../../../asxtst/asmt3blo.asm
+../exe/asxscn.exe -3 ../../../asxtst/asmt3blo.lst
 
 rm -f ../../../asxtst/asmt2blo.lst
 ../exe/asrab -glaxff ../../../asxtst/asmt2blo.asm

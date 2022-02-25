@@ -12,6 +12,54 @@
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 
 <H4><B><PRE>
+   Summary  of  changes/additions to the ASxxxx Assemblers from
+Version 4.10 to Version 4.11.  
+
+     1.  Corrected coding errors that affected  BANKS
+         containing multiple ABS areas or mixed AREA types. 
+
+     2.  Corrected improper use of R_USGN in most  addressing
+         modes  in AS6500.  This caused unexpected 'a'
+         errors in V4.xx  because  of  the  ASxxxx  core
+         change to 32-bit integers and arithmetic.  
+
+     3.  Corrected errors in the .local and .globl assembler
+         directive  processing  routine that introduced
+         unwanted side effects for variable and symbol
+         definition  files.  These effects included improper
+         definitions and incorrect error warnings.  
+
+     4.  The  following  new  subdirectories and their files
+         have been added to the asxtst directory:  
+
+          *  areabank     Area and Bank Processing Test 
+             This  directory contains several test programs:
+             ts.asm (single file - multiple areas),  tm1.asm
+             and  tm2.asm  (multiple file - multiple areas),
+             and tbm.asm, tbm1.asm, and tbm2.asm (  multiple
+             file  -  multiple  areas  within  a  bank)  and
+             several other files which  verify  the  correct
+             operation of the linker when used with a single
+             linked file, multiple linked  files  having  no
+             banking,  and  multiple linked files with bank-
+             ing.  These reference files show in detail  how
+             the .area and .bank directives work together.  
+
+          *  equtst       Equate Processing Test 
+             This directory contains a test file for verify-
+             ing the operation of the .globl, .local,  .equ,
+             .gblequ,  and .lclequ directives and the =, ==,
+             and =:  equalities.  
+
+          *  inctst       Nested Include File Test 
+
+          *  itst         Include File Error Reporting Test 
+
+
+     5.  Added 10 undocumented  8085  instructions  to  the
+         AS8085 assembler.  
+
+
    Summary  of  changes/additions  to the ASxxxx Assemblers from
 Version 4.00 to Version 4.10.  
 
@@ -98,6 +146,6 @@ Version 4.00 to Version 4.10.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2006</B></P></H6>
+<H6><P><B>Last Updated: June 2006</B></P></H6>
 </BODY> 
 </HTML>

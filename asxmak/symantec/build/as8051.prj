@@ -4,7 +4,7 @@ as8051.OPN
 novcs
 as8051.DEF
 6
-1092876674
+1138702200
 0 0 0 0 0 "..\..\..\ASXXSRC\asdata.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asdbg.c"
 0 0 0 0 0 "..\..\..\ASXXSRC\asexpr.c"

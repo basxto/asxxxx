@@ -1,6 +1,69 @@
 .appendix Change Log
 
   Summary of changes/additions to the ASxxxx Assemblers
+from Version 4.10 to Version 4.11.
+
+.list
+.list element
+Incorporated the patches contained in p01410.zip which
+corrected a coding error that affected BANKS containing multiple
+ABS areas or mixed AREA types.
+
+.list element
+Incorporated the patches contained in p02410.zip which
+corrected improper use of R__USGN in most addressing modes in
+AS6500. This caused unexpected 'a' errors in V4.xx because of
+the ASxxxx core change to 32-bit integers and arithmetic.
+
+.list element
+Incorporated the patches contained in p03410.zip which
+corrected errors in the .local and .globl assembler directive
+processing routine that introduced unwanted side effects
+for variable and symbol definition files.  These
+effects included improper definitions and incorrect
+error warnings.
+
+.list element
+The following new subdirectories and their files have
+been added to the asxtst directory:
+
+.list "*"
+.list element
+areabank#####Area and Bank Processing Test
+.br
+This directory contains
+several test programs: ts.asm (single file - multiple
+areas), tm1.asm and tm2.asm (multiple file - multiple
+areas), and tbm.asm, tbm1.asm, and tbm2.asm ( multiple
+file - multiple areas within a bank) and several other
+files which verify the correct operation of the linker
+when used with a single linked file,  multiple linked
+files having no banking, and multiple linked files with
+banking.  These reference files show in detail how
+the .area and .bank directives work together.
+
+.list element
+equtst#######Equate Processing Test
+.br
+This directory contains a test file for verifying the operation
+of the .globl, .local, .equ, .gblequ, and .lclequ directives
+and the =, ==, and =: equalities.
+
+.list element
+inctst#######Nested Include File Test
+.list element
+itst#########Include File Error Reporting Test
+.end list
+
+.list element
+Incorporated the updates contained in u01410.zip which
+added 10 undocumented 8085 instructions to the
+AS8085 assembler.
+
+.end list
+
+.sk 4
+  Summary of changes/additions to the ASxxxx Assemblers
 from Version 4.00 to Version 4.10.
 
 .list

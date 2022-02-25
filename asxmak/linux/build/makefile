@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#   29 July 2005			Created for LINUX     / make /
+#   15 June 2005			Created for LINUX     / make /
 #
 ######################################################################
 
@@ -112,7 +112,7 @@ SRCCHECK=	$(ASXBAS)ascheck/
 	strip $<
 	cp $< $@
 	cp $< $(DSTEXE)$@
-	chmod 557 $(DSTEXE)$@
+	chmod 777 $(DSTEXE)$@
 
 
 ASXX =	asdata.o asexpr.o aslex.o aslist.o	\
