@@ -1013,6 +1013,10 @@ FILE *fp;
 			putc('G', fp);
 			++j;
 		}
+		if (sp->s_flag & S_LCL) {
+			putc('L', fp);
+			++j;
+		}
 		if (sp->s_area != NULL) {
 			putc('R', fp);
 			++j;

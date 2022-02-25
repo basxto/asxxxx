@@ -425,14 +425,14 @@ struct	sym
 
 #define	S_EOL		040	/* End mark for ___pst files */
 
-#define	S_LCL		000	/* Local Variable */
-#define	S_GBL		001	/* Global Variable */
-#define	S_ASG		002	/* Assigned Value */
-#define	S_MDF		004	/* Multiple Definition */
+#define	S_LCL		001	/* Local Variable */
+#define	S_GBL		002	/* Global Variable */
+#define	S_ASG		004	/* Assigned Value */
+#define	S_MDF		010	/* Multiple Definition */
 
 #define	S_NEW		0	/* New  Name (External) */
 #define	S_USER		1	/* User Name (Assigned) */
-#define	S_ULCL		2	/* User Name (Internal) */
+#define	S_SPARE		2	/* Spare Definition */
 #define	S_PAGE		3	/* .page */
 #define	S_HEADER	4	/* .title, .sbttl */
 #define	  O_TITLE    0		/* .title */

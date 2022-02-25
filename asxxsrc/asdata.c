@@ -237,7 +237,7 @@ struct	mne	*mnehash[NHASH];
 struct	sym	sym[] = {
     {	NULL,	NULL,	".",	    S_USER, 0,			NULL,0,0    },
     {	NULL,	NULL,	".__.ABS.", S_USER, S_ASG|S_GBL,	NULL,0,0    },
-    {	NULL,	NULL,	".__.CPU.", S_ULCL, S_ASG|S_EOL,	NULL,0,0    }
+    {	NULL,	NULL,	".__.CPU.", S_USER, S_ASG|S_LCL|S_EOL,	NULL,0,0    }
 };
 
 struct	sym	*symp;		/*	pointer to a symbol structure

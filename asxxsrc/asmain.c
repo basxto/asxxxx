@@ -634,45 +634,30 @@ loop:
 		}
 		if (c != '$' || get() != ':')
 			qerr();
+
 		tp = symp->s_tsym;
-		if (pass == 0) {
-			while (tp) {
-				if (n == tp->t_num) {
+		while (tp) {
+			if (n == tp->t_num) {
+				if (pass == 0) {
 					tp->t_flg |= S_MDF;
-					break;
 				}
-				tp = tp->t_lnk;
+				break;
 			}
-			if (tp == NULL) {
-				tp=(struct tsym *) new (sizeof(struct tsym));
-				tp->t_lnk = symp->s_tsym;
-				tp->t_num = n;
-				tp->t_flg = 0;
-				tp->t_area = dot.s_area;
-				tp->t_addr = dot.s_addr;
-				symp->s_tsym = tp;
-			}
-		} else {
-			while (tp) {
-				if (n == tp->t_num) {
-					break;
-				}
-				tp = tp->t_lnk;
-			}
-			if (tp) {
-				if (pass == 1) {
-					fuzz = tp->t_addr - dot.s_addr;
-					tp->t_area = dot.s_area;
-					tp->t_addr = dot.s_addr;
-				} else {
-					phase(tp->t_area, tp->t_addr);
-					if (tp->t_flg & S_MDF)
-						err('m');
-				}
-			} else {
-				err('u');
-			}
+			tp = tp->t_lnk;
 		}
+		if (tp == NULL) {
+			tp=(struct tsym *) new (sizeof(struct tsym));
+			tp->t_lnk = symp->s_tsym;
+			tp->t_num = n;
+			tp->t_flg = 0;
+			symp->s_tsym = tp;
+		}
+		if (tp->t_flg & S_MDF)
+			err('m');
+		phase(tp->t_area, tp->t_addr);
+		fuzz = tp->t_addr - dot.s_addr;
+		tp->t_area = dot.s_area;
+		tp->t_addr = dot.s_addr;
 		lmode = ALIST;
 		goto loop;
 	}
@@ -712,21 +697,18 @@ loop:
 		}
 		symp = lookup(id);
 		if (symp == &dot)
-			err('.');
-		if (pass == 0)
-			if ((symp->s_type != S_NEW) &&
-			   ((symp->s_flag & S_ASG) == 0))
+			qerr();
+		if (pass == 0) {
+			if ((symp->s_type != S_NEW) && ((symp->s_flag & S_ASG) == 0))
 				symp->s_flag |= S_MDF;
-		if (pass != 2) {
-			fuzz = symp->s_addr - dot.s_addr;
-			symp->s_type = S_USER;
-			symp->s_area = dot.s_area;
-			symp->s_addr = dot.s_addr;
-		} else {
-			if (symp->s_flag & S_MDF)
-				err('m');
-			phase(symp->s_area, symp->s_addr);
 		}
+		if (symp->s_flag & S_MDF)
+			err('m');
+		symp->s_type = S_USER;
+		phase(symp->s_area, symp->s_addr);
+		fuzz = symp->s_addr - dot.s_addr;
+		symp->s_area = dot.s_area;
+		symp->s_addr = dot.s_addr;
 		if (c) {
 			symp->s_flag |= S_GBL;
 		}
@@ -750,8 +732,6 @@ loop:
 		    case ':':   equtype = O_LCLEQU;     		break;
 		    default:    equtype = O_EQU;	unget(c);	break;
 		}
-		clrexpr(&e1);
-		expr(&e1, 0);
 		equate(id, &e1, equtype);
 		goto loop;
 	}
@@ -775,8 +755,6 @@ loop:
                 if ((mp = mlookup(equ)) == NULL || mp->m_type != S_EQU) {
                 	ip = equ_ip;
                 } else {
-			clrexpr(&e1);
-			expr(&e1, 0);
                 	equate(id, &e1, mp->m_valu);
                 	goto loop;
 		}
@@ -859,7 +837,7 @@ loop:
 					n = 1;
 				} else
 				if ((sp = slookup(id)) != NULL) {
-					n = (sp->s_flag & S_ASG) ? 1 : 0;
+					n = (sp->s_type == S_USER) ? 1 : 0;
 				} else {
 					n = 0;
 				}
@@ -1298,16 +1276,9 @@ loop:
 	case S_GLOBL:
 		do {
 			getid(id, -1);
-			sp = slookup(id);
-			if (sp != NULL) {
-				if (sp->s_type == S_ULCL) {
-					sp->s_type = S_USER;
-				}
-				sp->s_flag &= ~S_LCL;
-				sp->s_flag |=  S_GBL;
-			} else {
-				err('u');
-			}
+			sp = lookup(id);
+			sp->s_flag &= ~S_LCL;
+			sp->s_flag |=  S_GBL;
 		} while ((c = getnb()) == ',');
 		unget(c);
 		lmode = SLIST;
@@ -1316,18 +1287,9 @@ loop:
 	case S_LOCAL:
 		do {
 			getid(id, -1);
-			sp = slookup(id);
-			if (sp != NULL) {
-				if (sp->s_type == S_NEW) {
-					rerr();
-				} else {
-					sp->s_type = S_ULCL;
-					sp->s_flag &= ~S_GBL;
-					sp->s_flag |=  S_LCL;
-				}
-			} else {
-				err('u');
-			}
+			sp = lookup(id);
+			sp->s_flag &= ~S_GBL;
+			sp->s_flag |=  S_LCL;
 		} while ((c = getnb()) == ',');
 		unget(c);
 		lmode = SLIST;
@@ -1344,8 +1306,6 @@ loop:
 		if ((c = getnb()) != ',') {
 			qerr();
 		}
-		clrexpr(&e1);
-		expr(&e1, 0);
 		equate(id, &e1, mp->m_valu);
 		break;
 
@@ -1778,7 +1738,8 @@ loop:
  *		VOID	rerr()		assubr.c
  *
  *	side effects:
- *		none
+ *		A new symbol may be created.
+ *		Symbol parameters are updated.
  */
 
 VOID
@@ -1789,33 +1750,42 @@ a_uint equtype;
 {
 	struct sym *sp;
 
-	if (equtype == O_LCLEQU)
-		abscheck(e1);
+	clrexpr(e1);
+	expr(e1, 0);
+
 	sp = lookup(id);
+
 	if (sp == &dot) {
 		outall();
 		if (e1->e_flag || e1->e_base.e_ap != dot.s_area)
 			err('.');
-	} else
-	if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
-		err('m');
-	}
-	if (equtype == O_LCLEQU) {
-		sp->s_type = S_ULCL;
-		sp->s_area = e1->e_base.e_ap;
 	} else {
-		sp->s_type = S_USER;
+		switch(equtype) {
+		case O_EQU:
+		default:
+			break;
+
+		case O_GBLEQU:
+			sp->s_flag &= ~S_LCL;
+			sp->s_flag |=  S_GBL;
+			break;
+
+		case O_LCLEQU:
+			sp->s_flag &= ~S_GBL;
+			sp->s_flag |=  S_LCL;
+			break;
+		}
+
 		if (e1->e_flag && (e1->e_base.e_sp->s_type == S_NEW)) {
 			rerr();
 		} else {
 			sp->s_area = e1->e_base.e_ap;
 		}
+		sp->s_flag |= S_ASG;
+		sp->s_type = S_USER;
 	}
+
 	sp->s_addr = laddr = e1->e_addr;
-	sp->s_flag = S_LCL | S_ASG;
-	if (equtype == O_GBLEQU) {
-		sp->s_flag |= S_GBL;
-	}
 	lmode = ELIST;
 }
 

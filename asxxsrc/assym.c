@@ -374,8 +374,9 @@ char *id;
 /*)Function	VOID	symglob()
  *
  *	The function symglob() will mark all symbols of
- *	type S_NEW as global.  Called at the beginning of pass 1
- *	if the assembly option -g was specified.
+ *	type S_NEW and not local as global.  Called at
+ *	the beginning of pass 1 if the assembly
+ *	option -g was specified.
  *
  *	local variables:
  *		sym *	sp		pointer to a sym structure
@@ -401,7 +402,7 @@ symglob()
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
 		while (sp != NULL) {
-			if (sp->s_type == S_NEW)
+			if (sp->s_type == S_NEW && !(sp->s_flag & S_LCL))
 				sp->s_flag |= S_GBL;
 			sp = sp->s_sp;
 		}
@@ -411,8 +412,9 @@ symglob()
 /*)Function	VOID	allglob()
  *
  *	The function allglob() will mark all symbols of
- *	type S_USER as global.  Called at the beginning of pass 1
- *	if the assembly option -a was specified.
+ *	type S_USER and not local as global.  Called at
+ *	the beginning of pass 1 if the assembly
+ *	option -a was specified.
  *
  *	local variables:
  *		sym *	sp		pointer to a sym structure
@@ -438,7 +440,7 @@ allglob()
 	for (i=0; i<NHASH; ++i) {
 		sp = symhash[i];
 		while (sp != NULL) {
-			if (sp != &dot && sp->s_type == S_USER)
+			if (sp != &dot && sp->s_type == S_USER && !(sp->s_flag & S_LCL))
 				sp->s_flag |= S_GBL;
 			sp = sp->s_sp;
 		}
