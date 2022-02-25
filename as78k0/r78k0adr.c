@@ -1,7 +1,7 @@
 /* R78K0ADR.C */
 
 /*
- *  Copyright (C) 2019-2021  Alan R. Baldwin
+ *  Copyright (C) 2019-2022  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ int *aindx;
 		expr(esp, 0);
 		amode = addrmode(esp);
 		if (is_abs(esp)) {
-			if((amode |= S_SADDR) && (amode |= S_SADFR)) {
+			if((amode != S_SADDR) && (amode != S_SADFR)) {
 				xerr('a', "Address is outside of SADDR Range");
 			}
 		}
@@ -97,7 +97,7 @@ int *aindx;
 		expr(esp, 0);
 		amode = addrmode(esp);
 		if (is_abs(esp)) {
-			if((amode |= S_SFR) && (amode |= S_SADFR)) {
+			if((amode != S_SFR) && (amode != S_SADFR)) {
 				xerr('a', "Address is outside of SFR Range");
 			}
 		}

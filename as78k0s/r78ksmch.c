@@ -1,7 +1,7 @@
 /* R78KSMCH.C */
 
 /*
- *  Copyright (C) 2014  Alan R. Baldwin
+ *  Copyright (C) 2014-2022  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -165,27 +165,13 @@ struct mne *mp;
 		t2 = addr(&e2, &x2);
 		switch(t1) {
 		case S_REG8:
-			if (t2 == S_REG8) {
-				if ((x1 == REG8_A) && (x2 == REG8_A)) {
-					xerr('a', "A,A is invalid.");
-				} else
-				/* A,R8n */
-				if (x1 == REG8_A) {
-					outab(RK0SPG1);
-					outab(op + (x2 << 1));
-				} else
-				/* R8n,A */
-				if (x2 == REG8_A) {
-					outab(RK0SPG1);
-					outab(op + (x1 << 1));
-				} else {
-				/* R8n,R8n */
-					xerr('a', "One of the arguments must be A.");
-				}
-			} else
 			if (x1 == REG8_A) {
 				if (t2 == S_SADFR) t2 = S_SADDR;
 				switch(t2) {
+				case S_REG8:	/* A,R8n */
+					outab(RK0SPG1);
+					outab(op + (x2 << 1));
+					break;
 				case S_IMM:	/* A,#Byte */
 					outab(op + 0x02);
 					outrb(&e2, 0);
@@ -424,6 +410,10 @@ struct mne *mp;
 			outab(0xF1 | (x1 << 1));
 			outrb(&e2, 0);
 		} else
+		if ((t1 == S_SPCL) && (x1 == SPCL_PSW) && (t2 == S_IMM)) {
+			outaw(0x1EF5);
+			outrb(&e2, 0);
+		} else
 		if ((t1 == S_REG8) && (x1 == REG8_A)) {
 			if (t2 == S_SADFR) t2 = (smode == S_SADDR) ? S_SADDR : S_SFR;
 			switch(t2) {
@@ -458,6 +448,14 @@ struct mne *mp;
 					outab(0x4B);
 				} else {
 					xerr('a', "DE and HL are the only 16-Bit registers allowed.");
+				}
+				break;
+			case S_SPCL:
+				/* A,PSW */
+				if (x2 == SPCL_PSW) {
+					outaw(0x1E25);
+				} else {
+					xerr('a', "PSW is the only special register allowed.");
 				}
 				break;
 			default:
@@ -499,6 +497,14 @@ struct mne *mp;
 					outab(0xEB);
 				} else {
 					xerr('a', "DE and HL are the only 16-Bit registers allowed.");
+				}
+				break;
+			case S_SPCL:
+				/* PSW,A */
+				if (x1 == SPCL_PSW) {
+					outaw(0x1EE5);
+				} else {
+					xerr('a', "PSW is the only special register allowed.");
 				}
 				break;
 			default:

@@ -102,6 +102,7 @@
 	callf	addr11+0x0000			; 0C 65
 	add	a,#byt45			; 0D 45
 	add	a,saddrFE20			; 0E 20
+	add	a,@saddrFE20			; 0E 20
 	add	a,[hl]				; 0F
 
 	movw	ax,#0x1234			; 10 34 12
