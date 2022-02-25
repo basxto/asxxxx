@@ -16,23 +16,25 @@
 
 	ani	#3			; E6 03
 
-	call	next1			; CDr27s00
+	arhl				; 10
 
-	cc	next1			; DCr27s00
+	call	next1			; CDr28s00
 
-	cm	next1			; FCr27s00
+	cc	next1			; DCr28s00
 
-	cnc	next1			; D4r27s00
+	cm	next1			; FCr28s00
 
-	cnz	next1			; C4r27s00
+	cnc	next1			; D4r28s00
 
-	cp	next1			; F4r27s00
+	cnz	next1			; C4r28s00
 
-	cpe	next1			; ECr27s00
+	cp	next1			; F4r28s00
 
-	cpo	next1			; E4r27s00
+	cpe	next1			; ECr28s00
 
-	cz	next1			; CCr27s00
+	cpo	next1			; E4r28s00
+
+	cz	next1			; CCr28s00
 
 next1:
 
@@ -56,6 +58,8 @@ next1:
 
 	di				; F3
 
+	dsub				; 08
+
 	ei				; FB
 
 	hlt				; 76
@@ -67,31 +71,41 @@ next1:
 
 	inx	h			; 23
 
-	jc	jmpadr			; DAr55s00
+	jc	jmpadr			; DAr5Ds00
 
-	jm	jmpadr			; FAr55s00
+	jm	jmpadr			; FAr5Ds00
 
-	jmp	jmpadr			; C3r55s00
+	jmp	jmpadr			; C3r5Ds00
 
-	jnc	jmpadr			; D2r55s00
+	jnc	jmpadr			; D2r5Ds00
 
-	jnz	jmpadr			; C2r55s00
+	jnz	jmpadr			; C2r5Ds00
 
-	jp	jmpadr			; F2r55s00
+	jp	jmpadr			; F2r5Ds00
 
-	jpe	jmpadr			; EAr55s00
+	jpe	jmpadr			; EAr5Ds00
 
-	jpo	jmpadr			; E2r55s00
+	jpo	jmpadr			; E2r5Ds00
 
-	jz	jmpadr			; CAr55s00
+	jz	jmpadr			; CAr5Ds00
 
-jmpadr:	.word	jmpadr			;r55s00
+	jnx5	jmpadr			; DDr5Ds00
 
-	lda	jmpadr			; 3Ar55s00
+	jx5	jmpadr			; FDr5Ds00
+
+jmpadr:	.word	jmpadr			;r5Ds00
+
+	lda	jmpadr			; 3Ar5Ds00
 
 	ldax	b			; 0A
 
-	lhld	jmpadr			; 2Ar55s00
+	ldhi	#4			; 28 04
+
+	ldsi	#5			; 38 05
+
+	lhld	jmpadr			; 2Ar5Ds00
+
+	lhlx				; ED
 
 	lxi	sp,#0xeeee		; 31 EE EE
 
@@ -121,6 +135,8 @@ jmpadr:	.word	jmpadr			;r55s00
 
 	rar				; 1F
 
+	rdel				; 18
+
 	ret				; C9
 
 	rim				; 20
@@ -139,18 +155,22 @@ jmpadr:	.word	jmpadr			;r55s00
 
 	rst	#3			; DF
 
+	rstv				; CB
+
 	sbb	c			; 99
 	sbb	m			; 9E
 
 	sbi	#5			; DE 05
 
-	shld	jmpadr			; 22r55s00
+	shld	jmpadr			; 22r5Ds00
+
+	shlx				; D9
 
 	sim				; 30
 
 	sphl				; F9
 
-	sta	jmpadr+1		; 32r56s00
+	sta	jmpadr+1		; 32r5Es00
 
 	stax	b			; 02
 

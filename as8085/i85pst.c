@@ -7,6 +7,10 @@
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ *
+ *	Undocumented Instructions
+ *	implemented by:
+ *		John R. Hogerhuis
  */
 
 #include "asxxxx.h"
@@ -274,5 +278,20 @@ struct	mne	mne[] = {
 
     {	NULL,	"mov",		S_MOV,		0,	0100	},
 
-    {	NULL,	"mvi",		S_MVI,		S_EOL,	0006	}
+    {	NULL,	"mvi",		S_MVI,		0,	0006	},
+
+	/* Undocumented 8085 Opcodes */
+
+    {	NULL,	"dsub",		S_INH,		0,	0010    },
+    {	NULL,	"arhl",		S_INH,		0,	0020    },
+    {	NULL,	"rdel",		S_INH,		0,	0030    },
+    {	NULL,	"rstv",		S_INH,		0,	0313    },
+    {	NULL,	"shlx",		S_INH,		0,	0331    },
+    {	NULL,	"lhlx",		S_INH,		0,	0355    },
+
+    {	NULL,	"ldhi",		S_ADI,		0,	0050	},
+    {	NULL,	"ldsi",		S_ADI,		0,	0070	},
+
+    {	NULL,	"jnx5",		S_JMP,		0,	0335	},
+    {	NULL,	"jx5",		S_JMP,		S_EOL,	0375	}
 };
