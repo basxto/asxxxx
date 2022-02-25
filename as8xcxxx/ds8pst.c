@@ -1,7 +1,7 @@
 /* ds8pst.c */
 
 /*
- *  Copyright (C) 1998-2014  Alan R. Baldwin
+ *  Copyright (C) 1998-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -133,21 +133,6 @@ struct	mne	mne[] = {
     {	NULL,	"CSEG",		S_ATYP,		0,	A_CSEG|A_1BYTE	},
     {	NULL,	"DSEG",		S_ATYP,		0,	A_DSEG|A_1BYTE	},
 
-    {	NULL,	".amode",	S_AMODE,	0,	0	},
-
-    {	NULL,	".cpu",		S_CPU,		0,	DS______	},
-    {	NULL,	".DS8XCXXX",	S_CPU,		0,	DS8XCXXX	},
-    {	NULL,	".DS80C310",	S_CPU,		0,	DS80C310	},
-    {	NULL,	".DS80C320",	S_CPU,		0,	DS80C320	},
-    {	NULL,	".DS80C323",	S_CPU,		0,	DS80C323	},
-    {	NULL,	".DS80C390",	S_CPU,		0,	DS80C390	},
-    {	NULL,	".DS83C520",	S_CPU,		0,	DS83C520	},
-    {	NULL,	".DS83C530",	S_CPU,		0,	DS83C530	},
-    {	NULL,	".DS83C550",	S_CPU,		0,	DS83C550	},
-    {	NULL,	".DS87C520",	S_CPU,		0,	DS87C520	},
-    {	NULL,	".DS87C530",	S_CPU,		0,	DS87C530	},
-    {	NULL,	".DS87C550",	S_CPU,		0,	DS87C550	},
-
 	/* system */
 
     {	NULL,	"BANK",		S_ATYP,		0,	A_BNK	},
@@ -167,7 +152,8 @@ struct	mne	mne[] = {
     {	NULL,	".title",	S_HEADER,	0,	O_TITLE	},
     {	NULL,	".sbttl",	S_HEADER,	0,	O_SBTTL	},
     {	NULL,	".module",	S_MODUL,	0,	0	},
-    {	NULL,	".include",	S_INCL,		0,	0	},
+    {	NULL,	".include",	S_INCL,		0,	I_CODE	},
+    {	NULL,	".incbin",	S_INCL,		0,	I_BNRY	},
     {	NULL,	".area",	S_AREA,		0,	0	},
     {	NULL,	".bank",	S_BANK,		0,	0	},
     {	NULL,	".org",		S_ORG,		0,	0	},
@@ -273,6 +259,21 @@ struct	mne	mne[] = {
     {	NULL,	".mdelete",	S_MACRO,	0,	O_MDEL	},
 
     	/* machine */
+
+    {	NULL,	".amode",	S_AMODE,	0,	0	},
+
+    {	NULL,	".cpu",		S_CPU,		0,	DS______	},
+    {	NULL,	".DS8XCXXX",	S_CPU,		0,	DS8XCXXX	},
+    {	NULL,	".DS80C310",	S_CPU,		0,	DS80C310	},
+    {	NULL,	".DS80C320",	S_CPU,		0,	DS80C320	},
+    {	NULL,	".DS80C323",	S_CPU,		0,	DS80C323	},
+    {	NULL,	".DS80C390",	S_CPU,		0,	DS80C390	},
+    {	NULL,	".DS83C520",	S_CPU,		0,	DS83C520	},
+    {	NULL,	".DS83C530",	S_CPU,		0,	DS83C530	},
+    {	NULL,	".DS83C550",	S_CPU,		0,	DS83C550	},
+    {	NULL,	".DS87C520",	S_CPU,		0,	DS87C520	},
+    {	NULL,	".DS87C530",	S_CPU,		0,	DS87C530	},
+    {	NULL,	".DS87C550",	S_CPU,		0,	DS87C550	},
 
     {	NULL,	"a",		S_A,		0,	A	},
     {	NULL,	"ab",		S_AB,		0,	0	},

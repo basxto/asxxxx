@@ -32,6 +32,7 @@ zip -d asxs5pxx.zip asxv5pxx\asxmak\vs05\exe\*.exe
 zip -d asxs5pxx.zip asxv5pxx\asxmak\vs10\exe\*.exe
 zip -d asxs5pxx.zip asxv5pxx\asxmak\vs13\exe\*.exe
 zip -d asxs5pxx.zip asxv5pxx\asxmak\vs15\exe\*.exe
+zip -d asxs5pxx.zip asxv5pxx\asxmak\vs19\exe\*.exe
 zip -d asxs5pxx.zip asxv5pxx\asxmak\watcom\exe\*.exe
 zip -d asxs5pxx.zip asxv5pxx\asxmak\symantec\exe\*.EXE
 zip -T asxs5pxx.zip

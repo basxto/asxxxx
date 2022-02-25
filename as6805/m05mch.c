@@ -1,7 +1,7 @@
 /* m05mch.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ char mcmcyc[256] = {
 };
 
 int mchtyp;
-
+struct area *zpg;
 
 /*
  * Process a machine op.
@@ -105,10 +105,8 @@ struct mne *mp;
 {
 	int op, t1, t2, type;
 	struct expr e1, e2, e3;
-	a_uint espv;
-	struct area *espa;
 	char id[NCPS];
-	int c, v1;
+	int c, v1, v3;
 
 	clrexpr(&e1);
 	clrexpr(&e2);
@@ -119,29 +117,25 @@ struct mne *mp;
 
 	case S_SDP:
 		opcycles = OPCY_SDP;
-		espa = NULL;
+		zpg = dot.s_area;
 		if (more()) {
 			expr(&e1, 0);
 			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
 				if (e1.e_addr) {
-					err('b');
+					xerr('b', "Only Page 0 Allowed.");
 				}
 			}
 			if ((c = getnb()) == ',') {
 				getid(id, -1);
-				espa = alookup(id);
-				if (espa == NULL) {
-					err('u');
+				zpg = alookup(id);
+				if (zpg == NULL) {
+					xerr('u', "Undefined Area.");
 				}
 			} else {
 				unget(c);
 			}
 		}
-		if (espa) {
-			outdp(espa, &e1, 0);
-		} else {
-			outdp(dot.s_area, &e1, 0);
-		}
+		outdp(zpg, &e1, 0);
 		lmode = SLIST;
 		break;
 
@@ -162,7 +156,7 @@ struct mne *mp;
 		if (e1.e_base.e_ap == dot.s_area) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
 		} else {
 			outrb(&e1, R_PCR);
@@ -195,13 +189,11 @@ struct mne *mp;
 			outrb(&e1, R_USGN);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_TYP2:
 		t1 = addr(&e1);
-		espv = e1.e_addr;
-		espa = e1.e_base.e_ap;
 		if (t1 == S_IMMED) {
 			if ((op == 0xA7) ||
 			    (op == 0xAC) ||
@@ -235,40 +227,52 @@ struct mne *mp;
 			outrw(&e1, 0);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_TYP3:
 		t1 = addr(&e1);
-		espv = e1.e_addr;
-		if (t1 != S_IMMED || espv & ~0x07)
-			aerr();
+		if (t1 != S_IMMED)
+			xerr('a', "Require Immediate(#) For First Argument.");
 		comma(1);
 		t2 = addr(&e2);
 		if (t2 != S_DIR)
-			aerr();
-		outab(op + 2*(espv&0x07));
+			xerr('a', "Require Direct Mode For Second Argument.");
+		if (is_abs(&e1)) {
+			v1 = (int) e1.e_addr;
+			if (v1 & ~0x07)
+				xerr('a', "Valid Bit Values Are 0 -> 7.");
+			outab(op | ((v1 & 0x07) << 1));
+		} else {
+			outrbm(&e1, R_MBRO | R_3BIT, op);
+		}
 		outrb(&e2, R_PAG0);
 		break;
 
 	case S_TYP4:
 		t1 = addr(&e1);
-		espv = e1.e_addr;
-		if (t1 != S_IMMED || espv & ~0x07)
-			aerr();
+		if (t1 != S_IMMED)
+			xerr('a', "Require Immediate(#) For First Argument.");
 		comma(1);
 		t2 = addr(&e2);
 		if (t2 != S_DIR)
-			aerr();
+			xerr('a', "Require Direct Mode For Second Argument.");
 		comma(1);
 		expr(&e3, 0);
-		outab(op + 2*(espv&0x07));
+		if (is_abs(&e1)) {
+			v1 = (int) e1.e_addr;
+			if (v1 & ~0x07)
+				xerr('a', "Valid Bit Values Are 0 -> 7.");
+			outab(op | ((v1 & 0x07) << 1));
+		} else {
+			outrbm(&e1, R_MBRO | R_3BIT, op);
+		}
 		outrb(&e2, R_PAG0);
 		if (mchpcr(&e3)) {
-			v1 = (int) (e3.e_addr - dot.s_addr - 1);
-			if ((v1 < -128) || (v1 > 127))
-				aerr();
-			outab(v1);
+			v3 = (int) (e3.e_addr - dot.s_addr - 1);
+			if ((v3 < -128) || (v3 > 127))
+				xerr('a', "Branching Range Exceeded.");
+			outab(v3);
 		} else {
 			outrb(&e3, R_PCR);
 		}
@@ -278,7 +282,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 
@@ -327,8 +331,11 @@ minit()
 	 */
 	hilo = 1;
 
-	if (pass == 0) {
-		mchtyp = X_6805;
-		sym[2].s_addr = X_6805;
-	}
+	/*
+	 * Zero Page
+	 */
+	zpg = NULL;
+
+	mchtyp = X_6805;
+	sym[2].s_addr = X_6805;
 }

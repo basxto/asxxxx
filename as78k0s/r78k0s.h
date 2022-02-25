@@ -1,7 +1,7 @@
 /* r78k.h */
 
 /*
- *  Copyright (C) 2014  Alan R. Baldwin
+ *  Copyright (C) 2014-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -94,11 +94,6 @@
 #define	S_INHP	73
 
 /*
- * Set Direct Pointer
- */
-#define	S_SDP	80
-
-/*
  * Register Definitions
  */
 #define	REG8_X		0
@@ -153,7 +148,6 @@ extern	VOID		addrbit(struct expr *esp1, int *aindx1, int *amode1, struct expr *e
 extern	int		argdot(struct expr *esp, int *aindx, int flag);
 extern	int		dotarg(struct expr *esp, int *aindx, int flag);
 extern	int		admode(struct adsym *sp, int *aindx);
-extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 
 	/* r78kmch.c */
@@ -174,7 +168,6 @@ extern	int		addrbit();
 extern	int		argdot();
 extern	int		dotarg();
 extern	int		admode();
-extern	int		any();
 extern	int		srch();
 
 	/* r78kmch.c */

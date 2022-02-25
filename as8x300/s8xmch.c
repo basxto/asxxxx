@@ -1,7 +1,7 @@
 /* s8xmch.c */
 
 /*
- *  Copyright (C) 2018-2019  Alan R. Baldwin
+ *  Copyright (C) 2018-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,8 +37,6 @@ char	*dsft	= "asm";
 
 /*	OPCY_NONE	((char) (0x80))	*/
 /*	OPCY_MASK	((char) (0x7F))	*/
-
-a_uint xerr;
 
 struct	xdef	xfield[16];
 int d_xtnd;
@@ -90,14 +88,6 @@ struct mne *mp;
 	op = (int) mp->m_valu;
 	switch (mp->m_type) {
 
-	case S_XERR:
-		xerr = 0;
-		if (more()) {
-			xerr = absexpr();
-		}
-		lmode = SLIST;
-		break;
-
 	case S_CPU:
 		sym[2].s_addr = op;
 		opcycles = OPCY_CPU;
@@ -134,20 +124,20 @@ struct mne *mp;
 			 * Argument Errors
 			 */
 			if (regchk(v1,v3)) {
-				mcherr("Invalid source or destination register");
+				xerr('a', "Invalid source or destination register");
 			}
 			if (v2 > 0x08) {
-				mcherr("Invalid len value");
+				xerr('a', "Invalid len value");
 			}
 
 			/*
 			 * Other Errors
 			 */
 			if (n1.e_mode || n2.e_mode || n3.e_mode) {
-				mcherr("Form symbol(n) not allowed");
+				xerr('a', "Form symbol(n) not allowed");
 			}
 			if (x1.e_mode || x2.e_mode) {
-				mcherr("Extended data not allowed");
+				xerr('o', "Extended data not allowed");
 			}
 		} else
 		/* Rs,Rd or Rs(n),Rd */
@@ -179,47 +169,47 @@ struct mne *mp;
 					case A_REG:
 					case A_EXT:
 						if ((n1.e_addr & 0x07) != 0) {
-							mcherr("I/O transfers between different banks requires len = 8");
+							xerr('a', "I/O transfers between different banks requires len = 8");
 						}
 						break;
 					case A_LIV:
 					case A_RIV:
 						if (((n1.e_addr >> 6) & 0x07) != 0) {
-							mcherr("I/O transfers between different banks requires len = 8");
+							xerr('a', "I/O transfers between different banks requires len = 8");
 						}
 						break;
 					default:
 						if (((e1.e_addr & 0x07) != 0) || ((e2.e_addr & 0x07) != 0)) {
-							mcherr("I/O transfers between different banks requires len = 8");
+							xerr('a', "I/O transfers between different banks requires len = 8");
 						}
 						break;
 					}
 				}
 				if (v1 == v2) {
 					if ((e1.e_addr & 0x07) != (e2.e_addr & 0x07)) {
-						mcherr("I/O Transfers with the same address requires identical lengths");
+						xerr('a', "I/O Transfers with the same address requires identical lengths");
 					}
 				}
 			}
 			if (regchk(v1,v2)) {
-				mcherr("Invalid source or destination register");
+				xerr('a', "Invalid source or destination register");
 			}
 			if ((n1.e_mode & (A_REG | A_EXT)) && (n1.e_addr > 0x08)) {
-				mcherr("Invalid (n) value");
+				xerr('a', "Invalid (n) value");
 			}
 
 			/*
 			 * Other Errors
 			 */
 			if (x1.e_mode || (n1.e_mode & A_REG)) {
-				mcherr("Rs(Rn) or Rs[...] or Rs(n)[...] not allowed");
+				xerr('a', "Rs(Rn) or Rs[...] or Rs(n)[...] not allowed");
 			}
 			if (n2.e_mode) {
-				mcherr("Form Rs,Rd(n) not allowed");
+				xerr('a', "Form Rs,Rd(n) not allowed");
 			}
 		} else {
 			outaw(op | code);
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		if (argcnt == 2) { xtndout(&x2); } else { xtndout(&x3); }
 		break;
@@ -240,18 +230,18 @@ struct mne *mp;
 			code = (int) (n1.e_addr & 0x1F) << 8;
 			if (m2) {
 				if (((e1.e_addr + e2.e_addr - 1) & ~0xFF) != (dot.s_addr & ~0xFF)) {
-					mcherr("Not enough space in page");
+					xerr('a', "Not enough space in page");
 				}
 			}
 			if (m1 & (A_LIV | A_RIV)) {
 				outrwm(&e1, R_VO8, op|code);
 				if ((e1.e_addr & ~0x00FF) >> 6) {
-					mcherr("8 Bit Address paging error");
+					xerr('a', "8 Bit Address paging error");
 				}
 			} else {
 				outrwm(&e1, R_LO8, op|code);
 				if ((e1.e_addr & ~0x00FF) != (dot.s_addr & ~0x00FF)) {
-					mcherr("8 Bit Address paging error");
+					xerr('a', "8 Bit Address paging error");
 				}
 			}
 		} else
@@ -267,23 +257,23 @@ struct mne *mp;
 			}
 			if (m2) {
 				if (((e1.e_addr + e2.e_addr - 1) & ~0x1F) != (dot.s_addr & ~0x1F)) {
-					mcherr("Not enough space in page");
+					xerr('a', "Not enough space in page");
 				}
 			}
 			if (m1 & (A_LIV | A_RIV)) {
 				outrwm(&e1, R_VO5, op|code);
 				if ((e1.e_addr >> 6) & ~0x001F) {
-					mcherr("5 Bit Address paging error");
+					xerr('a', "5 Bit Address paging error");
 				}
 			} else {
 				outrwm(&e1, R_LO5, op|code);
 				if ((e1.e_addr & ~0x001F) != (dot.s_addr & ~0x001F)) {
-					mcherr("5 Bit Address paging error");
+					xerr('a', "5 Bit Address paging error");
 				}
 			}
 		} else {
 			outaw(op);
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		if (argcnt == 1) { xtndout(&x1); } else { xtndout(&x2); }
 		break;
@@ -310,12 +300,12 @@ struct mne *mp;
 				outrwm(&e1, R_VO8, op|code);
 			} else {
 				if ((v1 > 0xFF) || (v1 < -0x80)) {
-					mcherr("Out Of Range Integer Value");
+					xerr('a', "Out Of Range Integer Value");
 				}
 				outrwm(&e1, R_LO8, op|code);
 			}
 			if (regchk(0,v2)) {
-				mcherr("Invalid register");
+				xerr('a', "Invalid register");
 			}
 		} else
 		/* exp5,df,len */
@@ -338,7 +328,7 @@ struct mne *mp;
 				outrwm(&e1, R_VO5, op|code);
 			} else {
 				if ((v1 > 0x1F) || (v1 < -0x10)) {
-					mcherr("Out Of Range Integer Value");
+					xerr('a', "Out Of Range Integer Value");
 				}
 				outrwm(&e1, R_LO5, op|code);
 			}
@@ -364,7 +354,7 @@ struct mne *mp;
 					outrwm(&e1, R_VO8, op|code);
 				} else {
 					if ((v1 > 0xFF) || (v1 < -0x80)) {
-						mcherr("Out Of Range Integer Value");
+						xerr('a', "Out Of Range Integer Value");
 					}
 					outrwm(&e1, R_LO8, op|code);
 				}
@@ -375,13 +365,13 @@ struct mne *mp;
 				outrwm(&e1, R_VO5, op|code);
 			} else {
 				if ((v1 > 0x1F) || (v1 < -0x10)) {
-					mcherr("Out Of Range Integer Value");
+					xerr('a', "Out Of Range Integer Value");
 				}
 				outrwm(&e1, R_LO5, op|code);
 			}
 		} else {
 			outaw(op);
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		if (argcnt == 2) { xtndout(&x2); } else { xtndout(&x3); }
 		break;
@@ -407,12 +397,12 @@ struct mne *mp;
 		   	if (m2 & (A_LIV | A_RIV)) {
 				outrwm(&e2, R_VO8, op|code);
 				if ((e2.e_addr >> 6) & ~0x00FF) {
-					mcherr("8 Bit Address paging error");
+					xerr('a', "8 Bit Address paging error");
 				}
 			} else {
 				outrwm(&e2, R_LO8, op|code);
 				if ((e2.e_addr & ~0x00FF) != (dot.s_addr & ~0x00FF)) {
-					mcherr("8 Bit Address paging error");
+					xerr('a', "8 Bit Address paging error");
 				}
 			}
 		} else
@@ -434,7 +424,7 @@ struct mne *mp;
 			switch(m2) {
 			case A_EXT:	code |= ((v2 & 0x07) << 5);
 					if (v2 > 8) {
-						mcherr("Bits more than 8");
+						xerr('a', "Bits more than 8");
 					}
 					break;
 			case A_LIV:
@@ -445,12 +435,12 @@ struct mne *mp;
 		   	if (m3 & (A_LIV | A_RIV)) {
 				outrwm(&e3, R_VO5, op|code);
 				if ((e3.e_addr >> 6) & ~0x001F) {
-					mcherr("5 Bit Address paging error");
+					xerr('a', "5 Bit Address paging error");
 				}
 			} else {
 				outrwm(&e3, R_LO5, op|code);
 				if ((e3.e_addr & ~0x001F) != (dot.s_addr & ~0x001F)) {
-					mcherr("5 Bit Address paging error");
+					xerr('a', "5 Bit Address paging error");
 				}
 			}
 		} else
@@ -471,17 +461,17 @@ struct mne *mp;
 		   	if (m2 & (A_LIV | A_RIV)) {
 				outrwm(&e2, R_VO5, op|code);
 				if ((e2.e_addr >> 6) & ~0x001F) {
-					mcherr("5 Bit Address paging error");
+					xerr('a', "5 Bit Address paging error");
 				}
 			} else {
 				outrwm(&e2, R_LO5, op|code);
 				if ((e2.e_addr & ~0x001F) != (dot.s_addr & ~0x001F)) {
-					mcherr("5 Bit Address paging error");
+					xerr('a', "5 Bit Address paging error");
 				}
 			}
 		} else {
 			outaw(op);
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		if (argcnt == 2) { xtndout(&x2); } else { xtndout(&x3); }
 		break;
@@ -492,18 +482,18 @@ struct mne *mp;
 			outrwm(&e1, R_JMP, op);
 			if (is_abs(&e1)) {
 				if (e1.e_addr & ~0x1FFF) {
-					mcherr("Jump Address out of range");
+					xerr('a', "Jump Address out of range");
 				}
 			}
 			/*
 			 * Other Errors
 			 */
 			if (n1.e_mode) {
-				mcherr("Form symbol(n) not allowed");
+				xerr('a', "Form symbol(n) not allowed");
 			}
 		} else {
 			outaw(op);
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		xtndout(&x1);
 		break;
@@ -517,11 +507,10 @@ struct mne *mp;
 			if (m1 == A_RIV) {
 				code =  0x0F << 8;
 			} else {
-				sprintf(id, "Symbol not of LIV/RIV type");
-				mcherr(id);
+				xerr('a', "Symbol not of LIV/RIV type");
 			}
 		} else {
-			mcherr("Symbol not of LIV/RIV type");
+			xerr('a', "Symbol not of LIV/RIV type");
 		}
 	   	if (m1 & (A_LIV | A_RIV)) {
 			outrwm(&e1, R_VO8, op|code);
@@ -553,11 +542,11 @@ struct mne *mp;
 		if (sym[2].s_addr == X_305) {
 			outrwm(&e1, R_LO8, op);
 			if (m1 != A_EXT) {
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 		} else {
 			outaw(op);
-			err('o');
+			xerr('o', "Not an 8x300 instruction.");
 		}
 		xtndout(&x1);
 		break;
@@ -568,7 +557,7 @@ struct mne *mp;
 			getid(id,-1);
 			xtndap = alookup(id);
 			if (xtndap == NULL) {
-				err('u');
+				xerr('u', "Undefined Area.");
 			}
 		}
 		lmode = SLIST;
@@ -606,7 +595,7 @@ struct mne *mp;
 						vp->s_addr = v2;
 						v2 = 0;
 						if ((vp->s_flag & (F_LIV | F_RIV)) != (sp->s_flag & (F_LIV | F_RIV))) {
-							mcherr("Mixed IVL/IVR symbols");
+							xerr('a', "Mixed IVL/IVR symbols");
 						}
 					} else {
 						ip = ips;
@@ -645,10 +634,12 @@ struct mne *mp;
 		/*
 		 * Errors
 		 */
-		if (argcnt == 0) { qerr(); }
-		if (v1 > 0xFF) { mcherr("Byte value greater than 255"); }
-		if (v2 > 0x07) { mcherr("Bit value greater than 7"); }
-		if (v3 > 0x08) { mcherr("Len value greater then 8"); }
+		if (argcnt == 0) {
+			xerr('q', "Arguments required.");
+		}
+		if (v1 > 0xFF) { xerr('a', "Byte value greater than 255"); }
+		if (v2 > 0x07) { xerr('a', "Bit value greater than 7"); }
+		if (v3 > 0x08) { xerr('a', "Len value greater then 8"); }
 
 		lmode = ELIST;
 		eqt_area = NULL;
@@ -674,7 +665,7 @@ struct mne *mp;
 				v1 = (int) e1.e_addr;
 				if ((m1 != A_EXT) || (n1.e_mode && (n1.e_mode != A_EXT))) {
 					sprintf(id, "Invalid argument in field %d", argcnt+1);
-					mcherr(id);
+					xerr('a', id);
 				}
 				abscheck(&e1);
 				abscheck(&n1);
@@ -689,7 +680,7 @@ struct mne *mp;
 				}
 				if (((e1.e_addr & s_mask) == 0) && (n1.e_addr & (~v2 + 1))) {
 					sprintf(id, "Default value %d exceeds maximum bit range of %d", n1.e_addr, v2-1);
-					mcherr(id);
+					xerr('a', id);
 				}
 				v2 -= 1;
 				v3 += xfield[argcnt].d_bits;
@@ -697,7 +688,7 @@ struct mne *mp;
 				d_xdef += 1;
 			}
 			if (v3 > 16) {
-				mcherr("More than 16 bits defined");
+				xerr('a', "More than 16 bits defined");
 			}
 		}
 		opcycles = OPCY_DEF;
@@ -708,7 +699,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 	if (opcycles == OPCY_NONE) {
@@ -773,34 +764,6 @@ struct expr *esp;
 }
 
 /*
- * Expanded Error Reporting
- */
-VOID
-mcherr(str)
-char *str;
-{
-	if (xerr == 0) {
-		aerr();
-	} else {
-		err('x');
-		if (pass == 2) {
-			if (xerr > 1) {
-				fprintf(stdout, "?ASxxxx-Error-<x> in line %d of %s\n", getlnm(), afn);
-				fprintf(stdout, "              <x> %s\n", str);
-			}
-			if ((xerr > 2) && (lfp != NULL)) {
-				fprintf(lfp, "?ASxxxx-Error-<x> in line %d of %s\n", getlnm(), afn);
-				fprintf(lfp, "              <x> %s\n", str);
-				if (hfp != NULL) {
-					listhlr(HLR_NLST, SLIST, 0);
-					listhlr(HLR_NLST, SLIST, 0);
-				}
-			}
-		}
-	}
-}
-
-/*
  * Register Symbols
  */
 
@@ -856,16 +819,11 @@ minit()
 {
 	int i;
 	struct sym *sp;
-	char id[NCPS];
 
 	/*
 	 * Byte Order
 	 */
 	hilo = 1;
-	/*
-	 * Extended Error Flag
-	 */
-	xerr = 0;
 	/*
 	 * CPU type
 	 */
@@ -877,8 +835,7 @@ minit()
 		sp = lookup(regsym[i].a_str);
 		if (pass == 2) {
 			if (sp->s_addr != (a_uint) regsym[i].a_val) {
-				sprintf(id, "Register symbol %s value changed to %d  [line number is unknown]", regsym[i].a_str, sp->s_addr);
-				mcherr(id);
+				printf("?AS8X300-Error: Register symbol %s value changed to %u [line number is unknown]\n", regsym[i].a_str, sp->s_addr);
 			}
 		}
 		sp->s_addr = regsym[i].a_val;

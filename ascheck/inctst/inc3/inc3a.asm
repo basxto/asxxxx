@@ -1,2 +1,3 @@
-	.byte	0x3A		; inc3a.asm
+.list
+	.byte	0x3A				; inc3a.asm
 

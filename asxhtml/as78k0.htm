@@ -53,44 +53,6 @@ the correct area and have valid offsets.  The linker will  check
 all SFR page relocations to verify that they are within the cor-
 rect area.  
 
-
-.xerr Directive 
-
-Format:  
-
-        .xerr [n] 
-
-
-   The expanded error directive outputs alternate error messages
-for the &lta&gt error at the commmand line and in the listing  files
-created by the assembler.  The modes are:  
-
-       .xerr [0]
-
-           Restores the default &lta&gt error reporting.
-
-       .xerr 1
-
-           Replaces the &lta&gt error with the &ltx&gt error which
-           lists the source line containing the error on
-           the stdout device.
-
-       .xerr 2
-
-           Replaces the &lta&gt error with the &ltx&gt error which
-           lists the source line containing the error on
-           the stdout device and also outputs an additional
-           &ltx&gt error describing the detected error.
-
-       .xerr 3
-
-           Replaces the &lta&gt error with the &ltx&gt error which
-           lists the source line containing the error on
-           the stdout device and also outputs an additional
-           &ltx&gt error describing the detected error.  The
-           additional &ltx&gt error describing the detected
-           error is inserted into the optional listing file.
-
 </PRE></B></H4>
 
 <H4><B><PRE>
@@ -143,20 +105,20 @@ for each addressing mode supported by AS78K0:
                         via a 5-bit address
 
         @saddr          short direct addressing
-                        0xFE20 &lt= saddr &lt= 0xFF1F
+                        0xFE20 &lt;= saddr &lt;= 0xFF1F
 
         @saddr.bit      short direct addressing
         @saddr,bit      with bit addressing (0-7)
-                        0xFE20 &lt= saddr &lt= 0xFF1F
+                        0xFE20 &lt;= saddr &lt;= 0xFF1F
 
         *sfr            special function registers
-                        0xFF00 &lt= sfr &lt= 0xFFCF  or
-                        0xFFE0 &lt= sfr &lt= 0xFFFF
+                        0xFF00 &lt;= sfr &lt;= 0xFFCF  or
+                        0xFFE0 &lt;= sfr &lt;= 0xFFFF
 
         *sfr.bit        special function registers
         *sfr,bit        wiht bit addressing (0-7)
-                        0xFF00 &lt= sfr &lt= 0xFFCF  or
-                        0xFFE0 &lt= sfr &lt= 0xFFFF
+                        0xFF00 &lt;= sfr &lt;= 0xFFCF  or
+                        0xFFE0 &lt;= sfr &lt;= 0xFFFF
 
         label           branch label
                         (pc relative addressing)
@@ -316,6 +278,6 @@ Double Operand Instructions
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2019</B></P></H6>
+<H6><P><B>Last Updated: March 2021</B></P></H6>
 </BODY> 
 </HTML>

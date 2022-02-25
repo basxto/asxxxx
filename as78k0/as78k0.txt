@@ -137,7 +137,7 @@
                                 0xFFE0 <= sfr <= 0xFFFF
         
                 *sfr.bit        special function registers
-                *sfr,bit        wiht bit addressing (0-7)
+                *sfr,bit        with bit addressing (0-7)
                                 0xFF00 <= sfr <= 0xFFCF  or
                                 0xFFE0 <= sfr <= 0xFFFF
         

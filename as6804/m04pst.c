@@ -1,7 +1,7 @@
 /* m04pst.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -56,9 +56,35 @@ char	mode0[32] = {	/* R_NORM */
 
 /*
  * Additional Relocation Mode Definitions
+ *
+ *	#define		R_3BIT	0100
  */
+char	mode1[32] = {	/* R_3BIT */
+	'\200',	'\201',	'\202',	'\003',	'\004',	'\005',	'\006',	'\007',
+	'\010',	'\011',	'\012',	'\013',	'\014',	'\015',	'\016',	'\017',
+	'\020',	'\021',	'\022',	'\023',	'\024',	'\025',	'\026',	'\027',
+	'\030',	'\031',	'\032',	'\033',	'\034',	'\035',	'\036',	'\037'
+};
 
-/* None Required */
+/*
+ *	#define		R_5BIT	0200
+ */
+char	mode2[32] = {	/* R_5BIT */
+	'\200',	'\201',	'\202',	'\203',	'\204',	'\005',	'\006',	'\007',
+	'\010',	'\011',	'\012',	'\013',	'\014',	'\015',	'\016',	'\017',
+	'\020',	'\021',	'\022',	'\023',	'\024',	'\025',	'\026',	'\027',
+	'\030',	'\031',	'\032',	'\033',	'\034',	'\035',	'\036',	'\037'
+};
+
+/*
+ *	#define		R_12BIT	0300
+ */
+char	mode3[32] = {	/* R_12BIT */
+	'\200',	'\201',	'\202',	'\203',	'\204',	'\205',	'\206',	'\207',
+	'\210',	'\211',	'\212',	'\213',	'\014',	'\015',	'\016',	'\017',
+	'\020',	'\021',	'\022',	'\023',	'\024',	'\025',	'\026',	'\027',
+	'\030',	'\031',	'\032',	'\033',	'\034',	'\035',	'\036',	'\037'
+};
 
 /*
  *     *m_def is a pointer to the bit relocation definition.
@@ -74,15 +100,18 @@ char	mode0[32] = {	/* R_NORM */
  *		a_uint	m_sbits;	Source Bit Mask
  *	};
  */
-struct	mode	mode[1] = {
-    {	&mode0[0],	0,	0x0000FFFF,	0x0000FFFF	}
+struct	mode	mode[4] = {
+    {	&mode0[0],	0,	0x0000FFFF,	0x0000FFFF	},
+    {	&mode1[0],	0,	0x00000007,	0x00000007	},
+    {	&mode2[0],	0,	0x0000001F,	0x0000001F	},
+    {	&mode3[0],	0,	0x00000FFF,	0x00000FFF	}
 };
 
 /*
  * Array of Pointers to mode Structures
  */
 struct	mode	*modep[16] = {
-	&mode[0],	NULL,		NULL,		NULL,
+	&mode[0],	&mode[1],	&mode[2],	&mode[3],
 	NULL,		NULL,		NULL,		NULL,
 	NULL,		NULL,		NULL,		NULL,
 	NULL,		NULL,		NULL,		NULL
@@ -97,8 +126,6 @@ struct	mne	mne[] = {
 
     {	NULL,	"CSEG",		S_ATYP,		0,	A_CSEG|A_1BYTE	},
     {	NULL,	"DSEG",		S_ATYP,		0,	A_DSEG|A_1BYTE	},
-
-    {	NULL,	".setdp",	S_SDP,		0,	0	},
 
 	/* system */
 
@@ -119,7 +146,8 @@ struct	mne	mne[] = {
     {	NULL,	".title",	S_HEADER,	0,	O_TITLE	},
     {	NULL,	".sbttl",	S_HEADER,	0,	O_SBTTL	},
     {	NULL,	".module",	S_MODUL,	0,	0	},
-    {	NULL,	".include",	S_INCL,		0,	0	},
+    {	NULL,	".include",	S_INCL,		0,	I_CODE	},
+    {	NULL,	".incbin",	S_INCL,		0,	I_BNRY	},
     {	NULL,	".area",	S_AREA,		0,	0	},
     {	NULL,	".bank",	S_BANK,		0,	0	},
     {	NULL,	".org",		S_ORG,		0,	0	},
@@ -224,6 +252,10 @@ struct	mne	mne[] = {
 
     {	NULL,	".mdelete",	S_MACRO,	0,	O_MDEL	},
 
+	/* Special */
+
+    {	NULL,	".setdp",	S_SDP,		0,	0	},
+
 	/* 6804 */
 
     {	NULL,	"jmp",		S_TYP1,		0,	0x9000	},
@@ -258,8 +290,8 @@ struct	mne	mne[] = {
     {	NULL,	"inca",		S_APOST,	0,	0xFE	},
     {	NULL,	"deca",		S_APOST,	0,	0xFF	},
 
-    {	NULL,	"bap",		S_BPM,		0,	0xC7	},
-    {	NULL,	"bam",		S_BPM,		0,	0xCF	},
+    {	NULL,	"bapl",		S_BPM,		0,	0xC7	},
+    {	NULL,	"bami",		S_BPM,		0,	0xCF	},
     {	NULL,	"bxpl",		S_BXPM,		0,	0xC7	},
     {	NULL,	"bxmi",		S_BXPM,		0,	0xCF	},
     {	NULL,	"bypl",		S_BYPM,		0,	0xC7	},

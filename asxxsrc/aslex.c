@@ -1,7 +1,7 @@
 /* aslex.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -488,8 +488,8 @@ int d;
  *
  *	called functions:
  *		int	getnb()		aslex.c
- *		VOID	qerr()		assubr.c
  *		VOID	unget()		aslex.c
+ *		VOID	xerr()		assubr.c
  *
  *	side effects:
  *		assembler-source text line pointer updated
@@ -503,7 +503,7 @@ int flag;
 
 	if ((c = getnb()) != ',') {
 		if (flag) {
-			qerr();
+			xerr('q', "Expected a ','.");
 		} else {
 			unget(c);
 		}

@@ -160,30 +160,86 @@ equal definitions.
 Z280 ADDRESSING AND INSTRUCTIONS
 
 
-   The following is a complete list of register designations and
-condition mnemonics:  
+Registers 
 
-        byte registers  -       a,b,c,d,e,h,l,i,r
-        register pairs  -       af,af',bc,de,hl
-        word registers  -       pc,sp,ix,iy
-
-        C -     carry bit set
-        M -     sign bit set
-        NC -    carry bit clear
-        NZ -    zero bit clear
-        P -     sign bit clear
-        PE -    parity even
-        PO -    parity odd
-        Z -     zero bit set
+ Recognized Registers
+ -----------------------------------------------------
+  8-bit  data registers:        A,B,C,D,E,H,L,I,R
+  16-Bit data registers:        BC,DE,HL,IX,IY
+  Accumulator/Flag registers:   AF,AF'
+  Program Counter:              PC
+  Stack Pointer:                SP
+ -----------------------------------------------------
 
 
-     The  instruction  format  arguments  are  described in this
+Condition Codes 
+
+ Condition Codes for Jump, Call, and Return Instructions
+ -----------------------------------------------------
+        NZ -    Not Zero        zero bit clear
+        Z  -    Zero            zero bit set
+        NC -    No Carry        carry bit clear
+        C  -    Carry           carry bit set
+        NV -    No Overflow     overflow bit clear
+        V  -    Overflow        overflow bit set
+        PE -    Parity Even     (overflow bit set)
+        PO -    Parity Odd      (overflow bit clear)
+        NS -    No Sign         sign bit clear
+        P  -    Plus            sign bit clear
+        S -     Sign            sign bit set
+        M  -    Minus           sign bit set
+ -----------------------------------------------------
+
+     Condition Codes for Jump Relative Instruction
+ -----------------------------------------------------
+        NZ -    Not Zero        zero bit clear
+        Z  -    Zero            zero bit set
+        NC -    No Carry        carry bit clear
+        C  -    Carry           carry bit set
+ -----------------------------------------------------
+
+
+Instruction Modes
+
+ Addressing Mode Notes
+ -----------------------------------------------------
+  R     8-bit registers:        A,B,C,D,E,H,L,I,R,AF,AF'
+
+  RX    16-Bit registers:       BC,DE,HL,IX,IY,SP
+
+  IM    Immediate               #byte, #word
+
+  IR    Indirect Register       (HL)
+
+  DA    Direct Address          (address)
+
+  X     Indexed                 (HL+ofst),ofst(HL)
+                                (IX+ofst),ofst(IX)
+                                (IY+Ofst),ofst(IY)
+
+  SX    Short Index             (HL+ofst),ofst(HL)
+                                (IX+ofst),ofst(IX)
+                                (IY+ofst),ofst(IY)
+                                -128 &lt;= ofst &lt;= 127
+
+  RA    PC Relative Address     [address]
+                8-bit offset:   -128 &lt;= ofst &lt;= 127
+                16-bit offset:  -32768 &lt;= ofst &lt;= 32767
+
+  SR    Stack Pointer Relative  (SP+ofst)
+
+  BX    Base Index              (HL+IX),(HL+IY),(IX+IY)
+ -----------------------------------------------------
+
+
+  The  instruction  format  arguments  are  described in this
 table.  Note that not all addressing  arguments  are  valid  for
 every mode, refer to the z280 technical data for valid operands.
 
  Argument Formats
  -----------------------------------------------------
  A,B,C,D,E,H,L,AF,AF'   Explicit 8-Bit Register
+ AF,AF'
 
  BC,DE,HL,IX,IY,SP,PC   Explicit 16-Bit Register
 
@@ -651,6 +707,6 @@ Z80 Undocumented Instructions
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2019</B></P></H6>
+<H6><P><B>Last Updated: March 2021</B></P></H6>
 </BODY> 
 </HTML>

@@ -1,7 +1,7 @@
 /* m12pst.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -107,8 +107,6 @@ struct	mne	mne[] = {
     {	NULL,	"CSEG",		S_ATYP,		0,	A_CSEG|A_1BYTE	},
     {	NULL,	"DSEG",		S_ATYP,		0,	A_DSEG|A_1BYTE	},
 
-    {	NULL,	".setdp",	S_SDP,		0,	0	},
-
 	/* system */
 
     {	NULL,	"BANK",		S_ATYP,		0,	A_BNK	},
@@ -128,7 +126,8 @@ struct	mne	mne[] = {
     {	NULL,	".title",	S_HEADER,	0,	O_TITLE	},
     {	NULL,	".sbttl",	S_HEADER,	0,	O_SBTTL	},
     {	NULL,	".module",	S_MODUL,	0,	0	},
-    {	NULL,	".include",	S_INCL,		0,	0	},
+    {	NULL,	".include",	S_INCL,		0,	I_CODE	},
+    {	NULL,	".incbin",	S_INCL,		0,	I_BNRY	},
     {	NULL,	".area",	S_AREA,		0,	0	},
     {	NULL,	".bank",	S_BANK,		0,	0	},
     {	NULL,	".org",		S_ORG,		0,	0	},
@@ -232,6 +231,10 @@ struct	mne	mne[] = {
     {	NULL,	".nval",	S_MACRO,	0,	O_NVAL	},
 
     {	NULL,	".mdelete",	S_MACRO,	0,	O_MDEL	},
+
+	/* Special */
+
+    {	NULL,	".setdp",	S_SDP,		0,	0	},
 
 	/* Machines */
 

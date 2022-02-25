@@ -32,6 +32,7 @@ all:	as1802		\
 	as8048		\
 	as8051		\
 	as8085		\
+	as89lp		\
 	as8x300		\
 	as8xcxxx	\
 	asavr		\
@@ -60,6 +61,7 @@ clean:
 	rm -f $(SRCASX)*.o
 	rm -f $(SRCLNK)*.o
 	rm -f $(SRCMISC)*.o
+	rm -f $(SRCS19OS9)*.o
 	rm -f $(S19OS9)*.o
 	rm -f $(SRC1802)*.o
 	rm -f $(SRC2650)*.o
@@ -84,6 +86,7 @@ clean:
 	rm -f $(SRC8048)*.o
 	rm -f $(SRC8051)*.o
 	rm -f $(SRC8085)*.o
+	rm -f $(SRC89LP)*.o
 	rm -f $(SRC8X300)*.o
 	rm -f $(SRC8XCXXX)*.o
 	rm -f $(SRCAVR)*.o
@@ -126,6 +129,7 @@ clean:
 	rm -f as8048
 	rm -f as8051
 	rm -f as8085
+	rm -f as89lp
 	rm -f as8x300
 	rm -f as8xcxxx
 	rm -f asavr
@@ -155,7 +159,7 @@ prep:
 	rm -f $(SRCASX)*.o
 	rm -f $(SRCLNK)*.o
 	rm -f $(SRCMISC)*.o
-	rm -f $(S19OS9)*.o
+	rm -f $(SRCS19OS9)*.o
 	rm -f $(SRC1802)*.o
 	rm -f $(SRC2650)*.o
 	rm -f $(SRC430)*.o
@@ -179,6 +183,7 @@ prep:
 	rm -f $(SRC8048)*.o
 	rm -f $(SRC8051)*.o
 	rm -f $(SRC8085)*.o
+	rm -f $(SRC89LP)*.o
 	rm -f $(SRC8X300)*.o
 	rm -f $(SRC8XCXXX)*.o
 	rm -f $(SRCAVR)*.o
@@ -221,6 +226,7 @@ prep:
 	rm -f as8048
 	rm -f as8051
 	rm -f as8085
+	rm -f as89lp
 	rm -f as8x300
 	rm -f as8xcxxx
 	rm -f asavr
@@ -251,7 +257,8 @@ CCOPT=		-O3
 CCFLAGS=	-Wall -funsigned-char $(CCOPT)
 
 LD=		gcc
-LDFLAGS=	-Wall
+LDOPT=
+LDFLAGS=	-Wall $(LDOPT)
 
 #  Set ASXBAS relative to this make file.
 
@@ -287,6 +294,7 @@ SRC8008S=	$(ASXBAS)as8008s/
 SRC8048=	$(ASXBAS)as8048/
 SRC8051=	$(ASXBAS)as8051/
 SRC8085=	$(ASXBAS)as8085/
+SRC89LP=	$(ASXBAS)as89lp/
 SRC8X300=	$(ASXBAS)as8x300/
 SRC8XCXXX=	$(ASXBAS)as8xcxxx/
 SRCAVR=		$(ASXBAS)asavr/
@@ -709,6 +717,23 @@ as8085:	$(ASXXSRC) $(AS8085SRC)
 	cp as8085 $(DSTEXE)as8085
 	strip $(DSTEXE)as8085
 	chmod 755 $(DSTEXE)as8085
+
+
+####################################################################
+# AS89LP
+####################################################################
+
+AS89LP =	at89adr.o at89mch.o at89pst.o
+
+AS89LPSRC =	$(addprefix $(SRC89LP),$(AS89LP))
+
+$(AS89LPSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC89LP)at89.h
+
+as89lp:	$(ASXXSRC) $(AS89LPSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS89LPSRC) -o as89lp
+	cp as89lp $(DSTEXE)as89lp
+	strip $(DSTEXE)as89lp
+	chmod 755 $(DSTEXE)as89lp
 
 
 ####################################################################

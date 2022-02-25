@@ -64,7 +64,7 @@ static char  chkpg1[256] = {
 };
 
 int	mchtyp;
-
+struct	area *zpg;
 /*
  * Process a machine op.
  */
@@ -75,7 +75,6 @@ struct mne *mp;
 	int c;
 	a_uint op;
 	struct expr e1;
-	struct area *espa;
 	char id[NCPS];
 
 	clrexpr(&e1);
@@ -90,29 +89,26 @@ struct mne *mp;
 		break;
 
 	case S_SDP:
-		espa = NULL;
+		opcycles = OPCY_SDP;
+		zpg = dot.s_area;
 		if (more()) {
 			expr(&e1, 0);
 			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
 				if (e1.e_addr & 0xFF) {
-					err('b');
+					xerr('a', "A 256 Byte Boundary Required.");
 				}
 			}
 			if ((c = getnb()) == ',') {
 				getid(id, -1);
-				espa = alookup(id);
-				if (espa == NULL) {
-					err('u');
+				zpg = alookup(id);
+				if (zpg == NULL) {
+					xerr('u', "Undefined Area.");
 				}
 			} else {
 				unget(c);
 			}
 		}
-		if (espa) {
-			outdp(espa, &e1, 0);
-		} else {
-			outdp(dot.s_area, &e1, 0);
-		}
+		outdp(zpg, &e1, 0);
 		lmode = SLIST;
 		break;
 
@@ -129,7 +125,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 
@@ -179,4 +175,9 @@ minit()
 		mchtyp = X_NOCPU;
 		sym[2].s_addr = X_NOCPU;
 	}
+
+	/*
+	 * Zero Page
+	 */
+	zpg = NULL;
 }

@@ -1,7 +1,7 @@
 /* asdata.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -240,6 +240,8 @@ int	iflag;		/*	-i, insert command line string flag
 			 */
 int	jflag;		/*	-j, enable NoICE Debug Symbols
 			 */
+int	kflag;		/*	-k, disable error output to .lst file
+			 */
 int	lflag;		/*	-l, generate listing flag
 			 */
 int	oflag;		/*	-o, generate relocatable output flag
@@ -297,6 +299,8 @@ char	*ep;		/*	pointer into error list
 			 */
 char	eb[NERR];	/*	array of generated error codes
 			 */
+char	*ex[NERR];	/*	array of error string pointers
+			 */
 char	*ip;		/*	pointer into the assembler-source
 			 *	text line in ib[]
 			 */
@@ -323,8 +327,6 @@ int	opcycles;	/*	opcode execution cycles
 char	tb[NTITL];	/*	Title string buffer
 			 */
 char	stb[NSBTL];	/*	Subtitle string buffer
-			 */
-char	erb[NINPUT+4];	/*	Error string buffer
 			 */
 
 char	symtbl[] = { "Symbol Table" };
@@ -499,6 +501,27 @@ char	*txtp = &txt[0];/*	Pointer to T Line Values
 			 */
 char	*relp = &rel[0];/*	Pointer to R Line Values
 			 */
+/*
+ * ASCII Table
+ */
+/*----	\000	\001	\002	\003	\004	\005	\006	\007	*/
+/*----------------------------------------------------------------------*/
+/*\000	NUL	SOH	STX	ETX	EOT	ENQ	ACK	BELL	*/
+/*\010	BS	TAB	LF	VT	FF	CR	SO	SI	*/
+/*\020	DLE	DC1	DC2	DC3	DC4	NAK	SYN	ETB	*/
+/*\030	CAN	EM	SUB	ESC	FS	GS	RS	US	*/
+/*\040	SPACE	!	"	#	$	%	&	`	*/
+/*\050	(	)	*	+	`	-	.	/	*/
+/*\060	0	1	2	3	4	5	5	7	*/
+/*\070	8	9	:	;	<	=	>	?	*/
+/*\100	@	A	B	C	D	E	F	G	*/
+/*\110	H	I	J	K	L	M	N	O	*/
+/*\120	P	Q	R	S	T	U	V	W	*/
+/*\130	X	Y	Z	[	\	]	^	_	*/
+/*\140	'	a	b	c	d	e	f	g	*/
+/*\150	h	i	j	k	l	m	n	o	*/
+/*\160	p	q	r	s	t	u	v	w	*/
+/*\170	x	y	z	{	|	}	~	DEL	*/
 
 /*
  *	an array of character types,

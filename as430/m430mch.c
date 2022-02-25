@@ -61,7 +61,7 @@ struct mne *mp;
 	 */
 	if (dot.s_addr & 0x0001) {
 		outall();
-		err('b');
+		xerr('b', "Odd instruction address incremented by 1.");
 		dot.s_addr += 1;
 	}
 
@@ -107,7 +107,9 @@ struct mne *mp;
 		case S_RIN:	op += 0x0020 + v1;	break;	/*	@Rn	As=2		*/
 		case S_RIN2:	op += 0x0030 + v1;	break;	/*	@Rn+	As=3		*/
 		case S_IMM:	op += 0x0030;		break;	/*	#N	As=3, Sreg=PC	*/
-		default:	aerr();			break;
+		default:
+			xerr('a', "Invalid SRC Addressing Mode");
+			break;
 		}
 
 		/* DOPDST */
@@ -119,7 +121,9 @@ struct mne *mp;
 		case S_ABS:	op += 0x0082;		break;	/*	&Addr	Ad=1, Sreg=SR	*/
 		case S_RIN:	op += 0x0080 + v2;	break;	/*	@Rn	Ad=1		*/
 		case S_RIN2:	op += 0x0080 + v2;	break;	/*	@Rn+	Ad=1		*/
-		default:	aerr();			break;
+		default:
+			xerr('a', "Invalid DST Addressing Mode");
+			break;
 		}
 
 		outaw(op);
@@ -140,7 +144,7 @@ struct mne *mp;
 		case S_RIN:				break;	/*	@Rn	As=2		*/
 		case S_RIN2:				break;	/*	@Rn+	As=3		*/
 		case S_IMM:	outrw(&e1, 0);		break;	/*	#N	As=3, Sreg=PC	*/
-		default:	aerr();			break;
+		default:	/* DOPSRC Flagged */	break;
 		}
 		/*
 		 * Destination Processing
@@ -174,7 +178,7 @@ struct mne *mp;
 					}
 				}
 							break;
-		default:	aerr();			break;
+		default:	/* DOPDST Flagged */	break;
 		}
 		break;
 
@@ -194,7 +198,9 @@ struct mne *mp;
 		case S_ABS:	op += 0x0210;		break;	/*	&Addr	As=1, Sreg=SR	*/
 		case S_RIN:	op += 0x0020 + v1;	break;	/*	@Rn	As=2		*/
 		case S_RIN2:	op += 0x0030 + v1;	break;	/*	@Rn+	As=3		*/
-		default:	aerr();			break;
+		default:
+			xerr('a', "Invalid SRC/DST Addressing Mode");
+			break;
 		}
 
 		outaw(op);
@@ -215,7 +221,7 @@ struct mne *mp;
 		case S_ABS:	outrw(&e1, 0);		break;	/*	&Addr	As=1, Sreg=SR	*/
 		case S_RIN:				break;	/*	@Rn	As=2		*/
 		case S_RIN2:				break;	/*	@Rn+	As=3		*/
-		default:	aerr();			break;
+		default:	/* SRCDST Flagged */	break;
 		}
 		break;
 
@@ -250,7 +256,9 @@ struct mne *mp;
 		case S_RIN:	op += 0x0020 + v1;	break;	/*	@Rn	As=2		*/
 		case S_RIN2:	op += 0x0030 + v1;	break;	/*	@Rn+	As=3		*/
 		case S_IMM:	op += 0x0030;		break;	/*	#N	As=3, Sreg=PC	*/
-		default:	aerr();			break;
+		default:
+			xerr('a', "Invalid SRC Addressing Mode");
+			break;
 		}
 
 		outaw(op);
@@ -271,7 +279,7 @@ struct mne *mp;
 		case S_RIN:				break;	/*	@Rn	As=2		*/
 		case S_RIN2:				break;	/*	@Rn+	As=3		*/
 		case S_IMM:	outrw(&e1, 0);		break;	/*	#N	As=3, Sreg=PC	*/
-		default:	aerr();			break;
+		default:	/* SRC Flagged */	break;
 		}
 		break;
 
@@ -291,7 +299,9 @@ struct mne *mp;
 		case S_ABS:	op += 0x0082;		break;	/*	&Addr	Ad=1, Sreg=SR	*/
 		case S_RIN:	op += 0x0080 + v1;	break;	/*	@Rn	Ad=1		*/
 		case S_RIN2:	op += 0x0080 + v1;	break;	/*	@Rn+	Ad=1		*/
-		default:	aerr();			break;
+		default:
+			xerr('a', "Invalid DST Addressing Mode");
+			break;
 		}
 
 		outaw(op);
@@ -318,7 +328,7 @@ struct mne *mp;
 					outaw(0x5320 + v1);	;	/*	add	#2,Rn		*/
 				}
 							break;
-		default:	aerr();			break;
+		default:	/* DSTDST Flagged */	break;
 		}
 		break;
 
@@ -350,7 +360,9 @@ struct mne *mp;
 		case S_ABS:	op += 0x0210;		break;	/*	&Addr	As=1, Sreg=SR	*/
 		case S_RIN:	op += 0x0020 + v1;	break;	/*	@Rn	As=2		*/
 		case S_RIN2:	op += 0x0030 + v1;	break;	/*	@Rn+	As=3		*/
-		default:	aerr();			break;
+		default:
+			xerr('a', "Invalid SRC Addressing Mode");
+			break;
 		}
 
 		/* DOPDST */
@@ -362,7 +374,9 @@ struct mne *mp;
 		case S_ABS:	op += 0x0082;		break;	/*	&Addr	Ad=1, Sreg=SR	*/
 		case S_RIN:	op += 0x0080 + v2;	break;	/*	@Rn	Ad=1		*/
 		case S_RIN2:	op += 0x0080 + v2;	break;	/*	@Rn+	Ad=1		*/
-		default:	aerr();			break;
+		default:
+			xerr('a', "Invalid DST Addressing Mode");
+			break;
 		}
 
 		outaw(op);
@@ -383,7 +397,7 @@ struct mne *mp;
 		case S_ABS:	outrw(&e1, 0);		break;	/*	&Addr	As=1, Sreg=SR	*/
 		case S_RIN:				break;	/*	@Rn	As=2		*/
 		case S_RIN2:				break;	/*	@Rn+	As=3		*/
-		default:	aerr();			break;
+		default:	/* DOPSRC Flagged */	break;
 		}
 		/*
 		 * Destination Processing
@@ -417,7 +431,7 @@ struct mne *mp;
 					}
 				}
 							break;
-		default:	aerr();			break;
+		default:	/* DOPDST Flagged */	break;
 		}
 		break;
 
@@ -431,7 +445,7 @@ struct mne *mp;
 			v1 = (int) (e1.e_addr - dot.s_addr - 2);
 			v1 >>= 1;
 			if ((v1 < -512) || (v1 > 511))
-				aerr();
+				xerr('a', "Branching Range Exceeded");
 			outaw(op + (v1 & 0x03FF));
 		} else {
 			outrwm(&e1, R_PCR | R_JXX, op);
@@ -443,6 +457,7 @@ struct mne *mp;
 	default:
 		opcycles = OPCY_ERR;
 		err('o');
+		xerr('o', "Internal Opcode Error");
 		break;
 	}
 

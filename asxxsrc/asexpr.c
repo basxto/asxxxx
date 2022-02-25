@@ -1,7 +1,7 @@
 /* asexpr.c */
 
 /*
- *  Copyright (C) 1989-2019  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -88,12 +88,12 @@
  *	functions called:
  *		VOID	abscheck()	asexpr.c
  *		VOID	clrexpr()	asexpr.c
+ *		VOID	err()		assubr.c
  *		VOID	expr()		asexpr.c
  *		int	get()		aslex.c
  *		int	getnb()		aslex.c
  *		int	oprio()		asexpr.c
- *		VOID	qerr()		assubr.c
- *		VOID	rerr()		assubr.c
+ *		VOID	xerr()		assubr.c
  *		VOID	term()		asexpr.c
  *		VOID	unget()		aslex.c
  *
@@ -123,7 +123,7 @@ int n;
 		if ((p = oprio(c)) <= n)
 			break;
 		if ((c == '>' || c == '<') && c != get())
-			qerr();
+			xerr('q', "Binary operator >> or << expected.");
 		clrexpr(&re);
 		expr(&re, p);
 		esp->e_rlcf |= re.e_rlcf;
@@ -149,10 +149,10 @@ int n;
 				/*
 				 * re should be absolute (constant)
 				 */
-				rerr();
+				xerr('r', "Arg1 + Arg2, Arg2 must be a constant.");
 			}
 			if (esp->e_flag && re.e_flag)
-				rerr();
+				xerr('r', "Arg1 + Arg2, Both arguments cannot be external.");
 			if (re.e_flag)
 				esp->e_flag = 1;
 			ae += ar;
@@ -165,11 +165,11 @@ int n;
 				if (esp->e_base.e_ap == ap) {
 					esp->e_base.e_ap = NULL;
 				} else {
-					rerr();
+					xerr('r', "Arg1 - Arg2, Arg2 must be in same area.");
 				}
 			}
 			if (re.e_flag)
-				rerr();
+				xerr('r', "Arg1 - Arg2, Arg2 cannot be external.");
 			ae -= ar;
 		} else {
 			/*

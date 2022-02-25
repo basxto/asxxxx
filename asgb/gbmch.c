@@ -1,7 +1,7 @@
 /* gbmch.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ struct mne *mp;
 			if ((v1 = admode(CND)) != 0) {
 				outab(op | (v1<<3));
 			} else {
-				qerr();
+				xerr('q', "Condition codes are NZ, Z, NC, and C.");
 			}
 		} else {
 			outab(0xC9);
@@ -138,13 +138,13 @@ struct mne *mp;
 			outab(op | (v1<<4));
 			break;
 		}
-		aerr();
+		xerr('a', "Register SP is invalid.");
 		break;
 
 	case S_RST:
 		v1 = (int) absexpr();
 		if (v1 & ~0x38) {
-			aerr();
+			xerr('a', "Valid values are N * 0x08, N = 0 -> 7.");
 			v1 = 0;
 		}
 		outab(op|v1);
@@ -154,7 +154,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		abscheck(&e1);
 		if (e1.e_addr > 2) {
-			aerr();
+			xerr('a', "Valid values are 0 -> 2.");
 			e1.e_addr = 0;
 		}
 		outab(op);
@@ -174,7 +174,7 @@ struct mne *mp;
 		addr(&e2);
 		abscheck(&e1);
 		if (genop(0xCB, op, &e2, 0) || t1)
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_RL:
@@ -187,7 +187,7 @@ struct mne *mp;
 			t2 = addr(&e2);
 		}
 		if (genop(0xCB, op, &e2, 0) || t1)
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_SWAP:
@@ -197,7 +197,7 @@ struct mne *mp;
 		 	t1++;
 		}
 		if (genop(0xCB, op, &e2, 0) || t1)
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_AND:
@@ -211,7 +211,7 @@ struct mne *mp;
 			t2 = addr(&e2);
 		}
 		if (genop(0, op, &e2, 1) || t1)
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_ADC:
@@ -224,15 +224,15 @@ struct mne *mp;
 		}
 		if (t2 == 0) {
 			if (genop(0, op, &e1, 1))
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		if ((t1 == S_R8) && (e1.e_addr == A)) {
 			if (genop(0, op, &e2, 1))
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_ADD:
@@ -244,12 +244,12 @@ struct mne *mp;
 		}
 		if (t2 == 0) {
 			if (genop(0, op, &e1, 1))
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		if ((t1 == S_R8) && (e1.e_addr == A)) {
 			if (genop(0, op, &e2, 1))
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		if ((t1 == S_R16) && (t2 == S_R16)) {
@@ -265,7 +265,7 @@ struct mne *mp;
 		}
 		if ((t1 == S_R16) && (t2 == S_IMMED)) {
 		  if (rf != S_ADD ) {
-		    aerr();
+		    xerr('a', "ADC, SUB, and SBC are invalid.");
 		    break;
 		  }
 		  if( e1.e_addr == SP ) {
@@ -274,7 +274,7 @@ struct mne *mp;
 		    break;
 		  }
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 
@@ -308,7 +308,7 @@ struct mne *mp;
 
 		  if( e1.e_addr != A )
 		  {
-		    aerr();
+		    xerr('a', "First argument must be A.");
 		    break;
 		  }
 
@@ -322,7 +322,7 @@ struct mne *mp;
 
 		  if( e2.e_addr != A )
 		  {
-		    aerr();
+		    xerr('a', "Second argument must be A.");
 		    break;
 		  }
 
@@ -332,7 +332,7 @@ struct mne *mp;
 
 		/* It's some bogus addressing mode. */
 
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_LD:
@@ -431,7 +431,7 @@ struct mne *mp;
 		    outab( 0x22 );
 		    break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 
@@ -457,7 +457,7 @@ struct mne *mp;
 				break;
 			}
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_JR:
@@ -465,7 +465,7 @@ struct mne *mp;
 			if ((v1 &= 0xFF) <= 0x03) {
 				op += (v1+1)<<3;
 			} else {
-				aerr();
+				xerr('q', "Condition codes are NZ, Z, NC, and C.");
 			}
 			comma(1);
 		}
@@ -474,7 +474,7 @@ struct mne *mp;
 		if (mchpcr(&e2)) {
 			v2 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v2 < -128) || (v2 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v2);
 		} else {
 			outrb(&e2, R_PCR);
@@ -514,7 +514,7 @@ struct mne *mp;
 			outab(0xE9);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_LDH:
@@ -562,7 +562,7 @@ struct mne *mp;
 		    outab( 0xE2 );
 		    break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 
@@ -599,7 +599,7 @@ struct mne *mp;
 		    break;
 		  }
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_OUT:
@@ -635,7 +635,7 @@ struct mne *mp;
 		    break;
 		  }
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_TILE:
@@ -652,7 +652,7 @@ struct mne *mp;
 		  d = get();
 		}
 		if(d == '\0' ) {
-		  qerr();
+		  xerr('q', "TILE is a chunk of 8 characters."); 
 		}
 
 		/* .tile deals with chunks of 8 characters. We need to
@@ -726,7 +726,7 @@ struct mne *mp;
 		 */
 
 		if( i != 0 ) {
-		  aerr();
+		  xerr('a', "Invalid character or terminated without 8 characters.");
 		  break;
 		}
 
@@ -739,7 +739,7 @@ struct mne *mp;
 		 */
 
 		if( c != d ) {
-		  aerr();
+		  xerr('q', "Missing TILE terminator.");
 		  break;
 		}
 
@@ -748,7 +748,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 

@@ -90,7 +90,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		outrbm(&e1, M_3BIT | R_MBRU, op);
 		if ((t1 != S_IMMED) && (t1 != S_EXT)) {
-			aerr();
+			xerr('a', "Lowest 3-Bits of a #__ or value are required.");
 		}
 		break;
 
@@ -101,7 +101,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		outrbm(&e1, M_4BIT | R_MBRU, op);
 		if ((t1 != S_IMMED) && (t1 != S_EXT)) {
-			aerr();
+			xerr('a', "Lowest 4-Bits of a #__ or value are required.");
 		}
 		break;
 
@@ -118,7 +118,7 @@ struct mne *mp;
 		outab(op);
 		outrb(&e1, R_NORM);
 		if ((t1 != S_IMMED) && (t1 != S_EXT)) {
-			aerr();
+			xerr('a', "#__ or value required.");
 		}
 		break;
 
@@ -131,7 +131,7 @@ struct mne *mp;
 		outab(op);
 		outrw(&e1, R_NORM);
 		if ((t1 != S_IMMED) && (t1 != S_EXT)) {
-			aerr();
+			xerr('a', "#__ or value required.");
 		}
 		break;
 
@@ -151,14 +151,14 @@ struct mne *mp;
 				outab(op + 2);
 			} else {
 				outab(op);
-				aerr();
+				xerr('a', "Valid values are 1 and 4.");
 			}
 			if (!is_abs(&e1)) {
-				aerr();
+				xerr('a', "Assembler requires local value definitions.");
 			}
 		} else {
 			outab(op);
-			aerr();
+			xerr('a', "#__ or value required.");
 		}
 		break;
 
@@ -238,7 +238,7 @@ struct mne *mp;
 			outab(0x0D);
 		} else {
 			outab(op);
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -256,7 +256,7 @@ struct mne *mp;
 			outab (op | a1);
 		} else {
 			outab(op);
-			aerr();
+			xerr('a', "Valid registers are R0-R11, J, HU, HL, S, I, and D.");
 		}
 		break;
 
@@ -267,7 +267,7 @@ struct mne *mp;
 		 */
 		t1 = addr(&e1);
 		if ((t1 != S_IMMED) && (t1 != S_EXT)) {
-			aerr();
+			xerr('a', "#__ or value required.");
 		}
 		outab(op);
 		outrb(&e1, R_NORM);
@@ -280,7 +280,7 @@ struct mne *mp;
 		 */
 		t1 = addr(&e1);
 		if ((t1 != S_IMMED) && (t1 != S_EXT)) {
-			aerr();
+			xerr('a', "#__ or value required.");
 		}
 		outrbm(&e1, M_4BIT | R_MBRU, op);
 		break;
@@ -301,7 +301,7 @@ struct mne *mp;
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127)) {
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			}
 			outab(v1);
 		} else {
@@ -318,7 +318,7 @@ struct mne *mp;
 		 */
 		t1 = addr(&e1);
 		if ((t1 != S_IMMED) && (t1 != S_EXT)) {
-			aerr();
+			xerr('a', "#__ or value required.");
 		}
 		comma(1);
 		expr(&e2, 0);
@@ -329,7 +329,7 @@ struct mne *mp;
 		if (mchpcr(&e2)) {
 			v2 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v2 < -128) || (v2 > 127)) {
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			}
 			outab(v2);
 		} else {
@@ -343,7 +343,7 @@ struct mne *mp;
 		 */
 		t1 = addr(&e1);
 		if ((t1 != S_IMMED) && (t1 != S_EXT)) {
-			aerr();
+			xerr('a', "#__ or value required.");
 		}
 		comma(1);
 		expr(&e2, 0);
@@ -354,7 +354,7 @@ struct mne *mp;
 		if (mchpcr(&e2)) {
 			v2 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v2 < -128) || (v2 > 127)) {
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			}
 			outab(v2);
 		} else {
@@ -393,7 +393,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 

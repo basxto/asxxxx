@@ -1,7 +1,7 @@
 /* lklist.c */
 
 /*
- *  Copyright (C) 1989-2019  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -90,23 +90,22 @@ FILE *fp;
 	char *frmt;
 	char np[80];
 	char tp[80];
+	int n;
+
 	/*
 	 *12345678901234567890123456789012345678901234567890123456789012345678901234567890
 	 *ASxxxx Linker Vxx.xx                                                    Page 1
 	 */
+	sprintf(tp, "ASxxxx Linker %-64s", VERSION);
+	sprintf(np, "Page %u", ++page);
  	/*
-	 * Total newpag() string length is 78 characters.
+	 * Total string length is 78 characters.
 	 */
-	sprintf(np, "ASxxxx Linker %-64s", VERSION);
-	/*
-	 * Right justify page number in string.
-	 */
-	sprintf(tp, "Page %u", ++page);
-	strncpy(&np[strlen(np) - strlen(tp)], tp, strlen(tp));
+	n = 78 - strlen(np) - strlen(tp);
 	/*
 	 * Output string.
 	 */
-	fprintf(fp, "\f%s\n", np);
+	fprintf(fp, "\f%s%*s%s\n", tp, n, " " ,np);
 	/*
 	 *12345678901234567890123456789012345678901234567890123456789012345678901234567890
 	 *Hexadecimal [16-Bits]                                 Sun Sep 15 17:22:25 2013
@@ -121,15 +120,15 @@ FILE *fp;
 	case 2:	frmt = "Decimal [%d-Bits]"; break;
 	}
 	sprintf(tp, frmt, 8 * a_bytes);
-	sprintf(np, "%-78s", tp);
+	sprintf(np, "%.24s", ctime(&curtim));
 	/*
-	 * Right justify current time in string.
+	 * Total string length is 78 characters.
 	 */
-	strncpy(&np[strlen(np) - 24], ctime(&curtim), 24);
+	n = 78 - strlen(np) - strlen(tp);
 	/*
 	 * Output string.
 	 */
-	fprintf(fp, "%s\n", np);
+	fprintf(fp, "%s%*s%s\n", tp, n, " ", np);
 	lop = 3;
 }
 
@@ -1028,7 +1027,9 @@ loop:	if (getlst(1) == 0) {
 		}
 	}
 	sprintf(str, frmt, cpc);
-	strncpy(&rb[n], str, m);
+	/* With GCC [-Wstringop-truncation] ? */
+	/* strncpy(&rb[n], str, m); */
+	memcpy(&rb[n], str, m);
 
 	/*
 	 * Copy updated LST text line to RST
@@ -1205,7 +1206,9 @@ loop:	if (gline) {
 	 * Output new data value, overwrite relocation codes
 	 */
 	sprintf(str, frmt, v);
-	strncpy(rp-1, str, s);
+	/* With GCC 10.2.0 [-Wstringop-truncation] ? */
+	/*strncpy(rp-1, str, s); */
+	memcpy(rp-1, str, s);
 
 	/*
 	 * Output relocated code address
@@ -1213,7 +1216,9 @@ loop:	if (gline) {
 	if (gcntr == 0) {
 		if (dgt(r, &rb[n], m)) {
 			sprintf(str, afrmt, cpc);
-			strncpy(&rb[n], str, m);
+			/* With GCC 10.2.0 [-Wstringop-truncation] ? */
+			/* strncpy(&rb[n], str, m); */
+			memcpy(&rb[n], str, m);
 		}
 	}
 
@@ -1425,6 +1430,7 @@ lpLST:	if (gline) {
 	case BLIST:	fprintf(stdout, "hlrlist: BLIST\n");	break;
 	case CLIST:	fprintf(stdout, "hlrlist: CLIST\n");	break;
 	case ELIST:	fprintf(stdout, "hlrlist: ELIST\n");	break;
+	case ILIST:	fprintf(stdout, "hlrlist: ILIST\n");	break;
 	}
 #endif
 
@@ -1740,7 +1746,9 @@ a_uint cpc;
 	}
 	if (listing & LIST_LOC) {
 		sprintf(str, frmt, cpc);
-		strncpy(&rb[n], str, m);
+		/* With GCC 10.2.0 [-Wstringop-truncation] ? */
+		/* strncpy(&rb[n], str, m); */
+		memcpy(&rb[n], str, m);
 	}
 }
 
@@ -1837,6 +1845,7 @@ int v;
 		if (!dgt(r, &rb[n], m)) {
 #if HLR_DEBUG
 			fprintf(stdout, "hlrclist: Bad LIST_LOC\n");
+			fprintf(stdout, "%s\n", rb);
 #endif
 			return;
 		}
@@ -1868,7 +1877,9 @@ int v;
 	if (listing & LIST_LOC) {
 		if (gcntr == 0) {
 			sprintf(str, afrmt, cpc);
-			strncpy(&rb[n], str, m);
+			/* With GCC 10.2.0 [-Wstringop-truncation] ? */
+			/* strncpy(&rb[n], str, m); */
+			memcpy(&rb[n], str, m);
 		}
 	}
 
@@ -1877,7 +1888,9 @@ int v;
 	 */
 	if (listing & LIST_BIN) {
 		sprintf(str, dfrmt, v);
-		strncpy(&rb[a + (s * gcntr) - 1], str, s);
+		/* With GCC 10.2.0 [-Wstringop-truncation] ? */
+		/* strncpy(&rb[a + (s * gcntr) - 1], str, s); */
+		memcpy(&rb[a + (s * gcntr) - 1], str, s);
 	}
 	gcntr++;
 }
@@ -2035,7 +2048,9 @@ hlrelist()
 			if (symeq(eqt_id, hp->a_list[i]->a_bap->a_id, 1)) {
 				eqtv += hp->a_list[i]->a_addr;
 				sprintf(str, afrmt, eqtv & a_mask);
-				strncpy(&rb[a], str, m);
+				/* With GCC 10.2.0 [-Wstringop-truncation] ? */
+				/* strncpy(&rb[a], str, m); */
+				memcpy(&rb[a], str, m);
 				break;
 			}
 		}

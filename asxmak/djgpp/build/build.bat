@@ -22,6 +22,7 @@ make as8008s
 make as8048
 make as8051
 make as8085
+make as89lp
 make as8x300
 make as8xcxxx
 make asavr

@@ -1,7 +1,7 @@
 /* picpst.c */
 
 /*
- *  Copyright (C) 2001-2014  Alan R. Baldwin
+ *  Copyright (C) 2001-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -266,26 +266,6 @@ struct	mode	mode[16] = {
 };
 #endif
 
-#if 0
-struct	mode	mode[16] = {
-    {	&mode0[0],	0,	((a_uint) 0x0000FFFF),	((a_uint) 0x0000FFFF)	},	/* R_NORM  */
-    {	&mode1[0],	0,	((a_uint) 0x0000000F),	((a_uint) 0x0000000F)	},	/* R_4BTB  */
-    {	&mode2[0],	1,	((a_uint) 0x000000F0),	((a_uint) 0x0000000F)	},	/* R_4BTR  */
-    {	&mode3[0],	0,	((a_uint) 0x0000001F),	((a_uint) 0x0000001F)	},	/* R_5BIT  */
-    {	&mode4[0],	0,	((a_uint) 0x0000003F),	((a_uint) 0x0000003F)	},	/* R_6BIT  */
-    {	&mode5[0],	0,	((a_uint) 0x0000007F),	((a_uint) 0x0000007F)	},	/* R_7BIT  */
-    {	&mode6[0],	0,	((a_uint) 0x000000FF),	((a_uint) 0x000000FF)	},	/* R_8BIT  */
-    {	&mode7[0],	0,	((a_uint) 0x000001FF),	((a_uint) 0x000001FF)	},	/* R_9BIT  */
-    {	&mode8[0],	0,	((a_uint) 0x000007FF),	((a_uint) 0x000007FF)	},	/* R_11BIT */
-    {	&mode9[0],	0,	((a_uint) 0x00000FFF),	((a_uint) 0x00000FFF)	},	/* R_12BIT */
-    {	&mode10[0],	0,	((a_uint) 0x00001FFF),	((a_uint) 0x00001FFF)	},	/* R_13BIT */
-    {	&mode11[0],	1,	((a_uint) 0x0FFF00FF),	((a_uint) 0x000FFFFF)	},	/* R_20BIT */
-    {	&mode12[0],	1,	((a_uint) 0x000000FF),	((a_uint) 0x000001FF)	},	/* R_CBRA  */
-    {	&mode13[0],	1,	((a_uint) 0x000007FF),	((a_uint) 0x00000FFF)	},	/* R_BRA   */
-    {	&mode14[0],	1,	((a_uint) 0x00FF000F),	((a_uint) 0x00000FFF)	},	/* R_LFSR  */
-    {	&mode15[0],	1,	((a_uint) 0x0FFF00FF),	((a_uint) 0x001FFFFF)	}	/* R_CALL  */
-};
-#endif
 /*
  * Array of Pointers to mode Structures
  */
@@ -306,22 +286,6 @@ struct	mne	mne[] = {
     {	NULL,	"CSEG",		S_ATYP,		0,	A_CSEG|A_2BYTE	},
     {	NULL,	"DSEG",		S_ATYP,		0,	A_DSEG|A_1BYTE	},
 
-    {	NULL,	".setdmm",	S_SDMM,		0,	0	},
-
-    {	NULL,	".pic",		X_PTYPE,	0,	0	},
-    {	NULL,	".picfix",	X_PFIX,		0,	0	},
-
-    {	NULL,	".picgoto",	X_PGOTO,	0,	0	},
-
-    {	NULL,	".picnopic",	X_PBITS,	0,	X_NOPIC	},
-    {	NULL,	".pic12bit",	X_PBITS,	0,	X_12BIT	},
-    {	NULL,	".pic14bit",	X_PBITS,	0,	X_14BIT	},
-    {	NULL,	".pic16bit",	X_PBITS,	0,	X_16BIT	},
-    {	NULL,	".pic20bit",	X_PBITS,	0,	X_20BIT	},
-
-    {	NULL,	".maxram",	X_PMAXR,	0,	0	},
-    {	NULL,	".badram",	X_PBADR,	0,	0	},
-
 	/* system */
 
     {	NULL,	"BANK",		S_ATYP,		0,	A_BNK	},
@@ -341,7 +305,8 @@ struct	mne	mne[] = {
     {	NULL,	".title",	S_HEADER,	0,	O_TITLE	},
     {	NULL,	".sbttl",	S_HEADER,	0,	O_SBTTL	},
     {	NULL,	".module",	S_MODUL,	0,	0	},
-    {	NULL,	".include",	S_INCL,		0,	0	},
+    {	NULL,	".include",	S_INCL,		0,	I_CODE	},
+    {	NULL,	".incbin",	S_INCL,		0,	I_BNRY	},
     {	NULL,	".area",	S_AREA,		0,	0	},
     {	NULL,	".bank",	S_BANK,		0,	0	},
     {	NULL,	".org",		S_ORG,		0,	0	},
@@ -447,6 +412,22 @@ struct	mne	mne[] = {
     {	NULL,	".mdelete",	S_MACRO,	0,	O_MDEL	},
 
     	/* machine */
+
+    {	NULL,	".setdmm",	S_SDMM,		0,	0	},
+
+    {	NULL,	".pic",		X_PTYPE,	0,	0	},
+    {	NULL,	".picfix",	X_PFIX,		0,	0	},
+
+    {	NULL,	".picgoto",	X_PGOTO,	0,	0	},
+
+    {	NULL,	".picnopic",	X_PBITS,	0,	X_NOPIC	},
+    {	NULL,	".pic12bit",	X_PBITS,	0,	X_12BIT	},
+    {	NULL,	".pic14bit",	X_PBITS,	0,	X_14BIT	},
+    {	NULL,	".pic16bit",	X_PBITS,	0,	X_16BIT	},
+    {	NULL,	".pic20bit",	X_PBITS,	0,	X_20BIT	},
+
+    {	NULL,	".maxram",	X_PMAXR,	0,	0	},
+    {	NULL,	".badram",	X_PBADR,	0,	0	},
 
     {	NULL,	"addwf",	S_FW,		0,	~0	},	/* PIC:12:14:16:20 */
     {	NULL,	"addwfc",	S_FW,		0,	~0	},	/* PIC:--:--:16:20 */

@@ -1,5 +1,7 @@
-	.title	Test of 8085/8080 Assembler
-	.sbttl	All 8085/8080 instructions
+	.title	Test of 8085 Assembler
+	.sbttl	All 8085 instructions
+
+	.8085
 
 	aci	#1			; CE 01
 

@@ -1,7 +1,7 @@
 /* i85pst.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -123,7 +123,8 @@ struct	mne	mne[] = {
     {	NULL,	".title",	S_HEADER,	0,	O_TITLE	},
     {	NULL,	".sbttl",	S_HEADER,	0,	O_SBTTL	},
     {	NULL,	".module",	S_MODUL,	0,	0	},
-    {	NULL,	".include",	S_INCL,		0,	0	},
+    {	NULL,	".include",	S_INCL,		0,	I_CODE	},
+    {	NULL,	".incbin",	S_INCL,		0,	I_BNRY	},
     {	NULL,	".area",	S_AREA,		0,	0	},
     {	NULL,	".bank",	S_BANK,		0,	0	},
     {	NULL,	".org",		S_ORG,		0,	0	},
@@ -227,6 +228,12 @@ struct	mne	mne[] = {
     {	NULL,	".nval",	S_MACRO,	0,	O_NVAL	},
 
     {	NULL,	".mdelete",	S_MACRO,	0,	O_MDEL	},
+
+	/* Machines */
+
+    {	NULL,	".8085",	S_CPU,		0,	X_8085	},
+    {	NULL,	".8085x",	S_CPU,		0,	X_8085X	},
+    {	NULL,	".8080",	S_CPU,		0,	X_8080	},
 
 	/* 8080/8085 */
 
@@ -337,7 +344,27 @@ struct	mne	mne[] = {
 
     {	NULL,	"mvi",		S_MVI,		0,	0006	},
 
-	/* Undocumented 8085 Opcodes */
+	/*
+	 * Undocumented 8085 Instructions
+	 *
+	 *	Overflow Flag:	Bit 1 Of Flag Register
+	 *
+	 *	X5 Flag:	Bit 5 of Flag Register Indicating
+	 *			Overflow / Underflow From INX/DCX 
+	 *
+	 * DSUB		HL - BC -> HL
+	 * ARHL		Rotate HL Right
+	 * RDEL		Rotate DE Left
+	 * RSTV		Restart On Overflow @0x0020
+	 * SHLX		HL -> [DE]
+	 * LHLX		[DE] -> HL
+	 *
+	 * LDHI		HL + #Byte -> DE
+	 * LDSI		SP + #Byte -> DE
+	 *
+	 * JNK / JNX5	Jump If NOT X5
+	 * JK / JX5	Jump If X5
+	 */
 
     {	NULL,	"dsub",		S_INH,		0,	0010    },
     {	NULL,	"arhl",		S_INH,		0,	0020    },
@@ -349,6 +376,8 @@ struct	mne	mne[] = {
     {	NULL,	"ldhi",		S_ADI,		0,	0050	},
     {	NULL,	"ldsi",		S_ADI,		0,	0070	},
 
+    {	NULL,	"jnk",		S_JMP,		0,	0335	},
     {	NULL,	"jnx5",		S_JMP,		0,	0335	},
+    {	NULL,	"jk",		S_JMP,		0,	0375	},
     {	NULL,	"jx5",		S_JMP,		S_EOL,	0375	}
 };

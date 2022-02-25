@@ -1,7 +1,7 @@
 /* M09MCH.C */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -157,6 +157,8 @@ static char m00cyc[24] = {
 	 3, 8, 6, 8, 6, 6, 6,20
 };
 
+struct area *zpg;
+a_uint zpgadr;
 
 /*
  * Process a machine op.
@@ -168,7 +170,6 @@ struct mne *mp;
 	int op, rf, cpg, c;
 	struct expr e1;
 	int t1, v1, v2;
-	struct area *espa;
 	char id[NCPS];
 
 	cpg = 0;
@@ -178,29 +179,26 @@ struct mne *mp;
 
 	case S_SDP:
 		opcycles = OPCY_SDP;
-		espa = NULL;
+		zpg = dot.s_area;
 		if (more()) {
 			expr(&e1, 0);
 			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
 				if (e1.e_addr & 0xFF) {
-					err('b');
+					xerr('a', "A 256 Byte Boundary Required.");
 				}
 			}
 			if ((c = getnb()) == ',') {
 				getid(id, -1);
-				espa = alookup(id);
-				if (espa == NULL) {
-					err('u');
+				zpg = alookup(id);
+				if (zpg == NULL) {
+					xerr('u', "Undefined Area.");
 				}
 			} else {
 				unget(c);
 			}
 		}
-		if (espa) {
-			outdp(espa, &e1, 0);
-		} else {
-			outdp(dot.s_area, &e1, 0);
-		}
+		zpgadr = e1.e_addr;
+		outdp(zpg, &e1, 0);
 		lmode = SLIST;
 		break;
 
@@ -222,7 +220,7 @@ struct mne *mp;
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
 		} else {
 			outrb(&e1, R_PCR);
@@ -253,7 +251,7 @@ struct mne *mp;
 		v1 = 0;
 		do {
 			if ((t1 = admode(stks)) == 0 || v1 & t1)
-				aerr();
+				xerr('a', "Missing Or Duplicate Argument.");
 			v1 |= t1;
 		} while (more() && comma(1));
 		outab(op);
@@ -264,7 +262,7 @@ struct mne *mp;
 		v1 = 0;
 		do {
 			if ((t1 = admode(stku)) == 0 || v1 & t1)
-				aerr();
+				xerr('a', "Missing Or Duplicate Argument.");
 			v1 |= t1;
 		} while (more() && comma(1));
 		outab(op);
@@ -276,7 +274,7 @@ struct mne *mp;
 		comma(1);
 		v2 = admode(regs);
 		if ((v1 & 0x08) != (v2 & 0x08))
-			aerr();
+			xerr('a', "Mixed 8-Bit and 16-Bit Arguments.");
 		outab(op);
 		outab((v1<<4)|v2);
 		break;
@@ -318,7 +316,7 @@ struct mne *mp;
 			genout(cpg, op, rf, &e1);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_CC:
@@ -328,7 +326,7 @@ struct mne *mp;
 			genout(cpg, op, rf, &e1);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_6800:
@@ -338,7 +336,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 
@@ -430,7 +428,7 @@ struct expr *esp;
 
 	case S_PC:
 		if (espa) {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		if (cpg)
@@ -538,7 +536,7 @@ struct expr *esp;
 
 	case S_IMER:
 	default:
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 	}
 }
 
@@ -598,6 +596,12 @@ minit()
 	 * Byte Order
 	 */
 	hilo = 1;
+
+	/*
+	 * Zero Page
+	 */
+	zpg = NULL;
+	zpgadr = 0;
 
 	bp = bb;
 	bm = 1;

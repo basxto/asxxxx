@@ -29,6 +29,11 @@ the linker will output 2 bytes for each instruction  word.   The
 instruction  word  address  will  be  the  file  encoded address
 divided by 2.  
 
+   The  default  address  space  is assumed to be 64K (16-bits).
+The larger address space (ATmega...) processors must specify the
+32-Bit  addressing assembler directive '.32bit' in order to pro-
+cess the JMP instruction.  
+
 
 PROCESSOR SPECIFIC DIRECTIVES 
 
@@ -329,6 +334,6 @@ AVR Data Transfer Instructions
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2019</B></P></H6>
+<H6><P><B>Last Updated: March 2021</B></P></H6>
 </BODY> 
 </HTML>

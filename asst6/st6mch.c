@@ -1,7 +1,7 @@
 /* st6mch.c */
 
 /*
- *  Copyright (C) 2010-2014  Alan R. Baldwin
+ *  Copyright (C) 2010-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -110,20 +110,23 @@ struct mne *mp;
 				switch(v1) {
 				case X:		outab(op);		break;
 				case Y:		outab(op | 0x08);	break;
-				default:	opcy_aerr();		break;
+				default:
+					xerr('a', "Addressing mode supports only X and Y.");
+					break;
 				}
 				break;
 			case S_IMM:
 				outab(op | 0x10);
 				outrb(&e1, R_NORM);
-				valu_aerr(&e1, 1);
+				if (valu_err(&e1, 1))
+					xerr('a', "First argument: Value < 128 or > 255.");
 				break;
 			default:
-				opcy_aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 		} else {
-			opcy_aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -143,14 +146,15 @@ struct mne *mp;
 			case S_VAL:
 				outab(op | 0x10);
 				outrb(&e1, R_NORM);
-				valu_aerr(&e1, 1);
+				if (valu_err(&e1, 1))
+					xerr('a', "First argument: Value < 128 or > 255.");
 				break;
 			default:
-				opcy_aerr();
+				xerr('a', "First argument not a #__ or value.");
 				break;
 			}
 		} else {
-			opcy_aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -185,7 +189,7 @@ struct mne *mp;
 				default:			break;
 				}
 			} else {
-				opcy_aerr();
+				xerr('a', "Internal Opcode Error.");
 			}
 			break;
 		case S_VAL:
@@ -196,11 +200,13 @@ struct mne *mp;
 			switch(v1) {
 			case X:		outab(op);		break;
 			case Y:		outab(op | 0x08);	break;
-			default:	opcy_aerr();		break;
+			default:
+				xerr('a', "Addressing mode supports only X and Y.");
+				break;
 			}
 			break;
 		default:
-			opcy_aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		break;
@@ -241,14 +247,20 @@ struct mne *mp;
 				switch(v2) {
 				case X:		outab(op);		break;
 				case Y:		outab(op | 0x08);	break;
-				default:	opcy_aerr();		break;
+				default:
+					xerr('a', "Addressing mode supports only X and Y.");
+					break;
 				}
 				break;
 			case S_IMM:
 				outab	(op | 0x10);
-				outrb(&e2, R_NORM);	valu_aerr(&e2, 1);
+				outrb(&e2, R_NORM);
+				if (valu_err(&e2, 1))
+					xerr('a', "Second argument: Value < 128 or > 255.");
 				break;
-			default:	opcy_aerr();	break;
+			default:
+				xerr('a', "Invalid Addressing Mode.");
+				break;
 			}
 		} else
 		/*
@@ -276,13 +288,17 @@ struct mne *mp;
 				switch(v1) {
 				case X:		outab(op);		break;
 				case Y:		outab(op | 0x08);	break;
-				default:	opcy_aerr();		break;
+				default:
+					xerr('a', "Addressing mode supports only X and Y.");
+					break;
 				}
 				break;
-			default:	opcy_aerr();	break;
+			default:
+				xerr('a', "Invalid Addressing Mode.");
+				break;
 			}
 		} else {
-			opcy_aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -308,20 +324,24 @@ struct mne *mp;
 					outab(0x0D);
 					outab(v1);
 				}
-				outrb(&e2, R_NORM);	valu_aerr(&e2, 1);
+				outrb(&e2, R_NORM);
+				if (valu_err(&e2, 1))
+					xerr('a', "Second argument: Value < 128 or > 255.");
 				break;
 			case S_VAL:
 				outab(0x0D);
 				outrb(&e1, R_USGN);
-				outrb(&e2, R_NORM);	valu_aerr(&e2, 1);
+				outrb(&e2, R_NORM);
+				if (valu_err(&e2, 1))
+					xerr('a', "Second argument: Value < 128 or > 255.");
 				break;
 			default:
-				opcy_aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 			break;
 		default:
-			opcy_aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		break;
@@ -345,7 +365,7 @@ struct mne *mp;
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr-1);
 			if ((v1 < -16) || (v1 > 15))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(op | ((v1 & 0x1F) << 3));
 		} else {
 			outrbm(&e1, R_5BIT | R_PCR, op);
@@ -370,7 +390,7 @@ struct mne *mp;
 		if (mchpcr(&e3)) {
 			v3 = (int) (e3.e_addr - dot.s_addr - 1);
 			if ((v3 < -128) || (v3 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v3);
 		} else {
 			outrb(&e3, R_PCR);
@@ -410,13 +430,13 @@ struct mne *mp;
 		if (v1 == A) {
 			outab(op);
 		} else {
-			opcy_aerr();
+			xerr('a', "Argument must be A.");
 		}
 		break;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 
@@ -426,21 +446,12 @@ struct mne *mp;
 }
 
 /*
- * Disable Opcode Cycles with aerr()
+ * Return 1 if the absolute value is not
+ * a valid unsigned or signed value.
+ * Else return 0.
  */
-VOID
-opcy_aerr()
-{
-	opcycles = OPCY_SKP;
-	aerr();
-}
-
-/*
- * Generate an 'a' error if the absolute
- * value is not a valid unsigned or signed value.
- */
-VOID
-valu_aerr(e, n)
+int
+valu_err(e, n)
 struct expr *e;
 int n;
 {
@@ -451,18 +462,19 @@ int n;
 		switch(n) {
 		default:
 #ifdef	LONGINT
-		case 1:	if ((v & ~0x000000FFl) && ((v & ~0x000000FFl) != ~0x000000FFl)) aerr();	break;
-		case 2:	if ((v & ~0x0000FFFFl) && ((v & ~0x0000FFFFl) != ~0x0000FFFFl)) aerr();	break;
-		case 3:	if ((v & ~0x00FFFFFFl) && ((v & ~0x00FFFFFFl) != ~0x00FFFFFFl)) aerr();	break;
-		case 4:	if ((v & ~0xFFFFFFFFl) && ((v & ~0xFFFFFFFFl) != ~0xFFFFFFFFl)) aerr();	break;
+		case 1:	if ((v & ~0x000000FFl) && ((v & ~0x000000FFl) != ~0x000000FFl)) return(1);
+		case 2:	if ((v & ~0x0000FFFFl) && ((v & ~0x0000FFFFl) != ~0x0000FFFFl)) return(1);
+		case 3:	if ((v & ~0x00FFFFFFl) && ((v & ~0x00FFFFFFl) != ~0x00FFFFFFl)) return(1);
+		case 4:	if ((v & ~0xFFFFFFFFl) && ((v & ~0xFFFFFFFFl) != ~0xFFFFFFFFl)) return(1);
 #else
-		case 1:	if ((v & ~0x000000FF) && ((v & ~0x000000FF) != ~0x000000FF)) aerr();	break;
-		case 2:	if ((v & ~0x0000FFFF) && ((v & ~0x0000FFFF) != ~0x0000FFFF)) aerr();	break;
-		case 3:	if ((v & ~0x00FFFFFF) && ((v & ~0x00FFFFFF) != ~0x00FFFFFF)) aerr();	break;
-		case 4:	if ((v & ~0xFFFFFFFF) && ((v & ~0xFFFFFFFF) != ~0xFFFFFFFF)) aerr();	break;
+		case 1:	if ((v & ~0x000000FF) && ((v & ~0x000000FF) != ~0x000000FF)) return(1);
+		case 2:	if ((v & ~0x0000FFFF) && ((v & ~0x0000FFFF) != ~0x0000FFFF)) return(1);
+		case 3:	if ((v & ~0x00FFFFFF) && ((v & ~0x00FFFFFF) != ~0x00FFFFFF)) return(1);
+		case 4:	if ((v & ~0xFFFFFFFF) && ((v & ~0xFFFFFFFF) != ~0xFFFFFFFF)) return(1);
 #endif
 		}
 	}
+	return(0);
 }
 
 /*

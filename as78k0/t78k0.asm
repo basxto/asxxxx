@@ -62,6 +62,26 @@
 	bt	psw.1,.				; 9C 1E FD
 	bf	psw.7,.				; 31 73 1E FC
 
+	.page
+	.sbttl	Alternate Register Designations
+
+	mov	r1,r0				; 60
+	; ------				; 61 - PG61 Extension
+	mov	r1,r2				; 62
+	mov	r1,r3				; 63
+	mov	r1,r4				; 64
+	mov	r1,r5				; 65
+	mov	r1,r6				; 66
+	mov	r1,r7				; 67
+
+	mov	r0,r1				; 70
+	; ------				; 71 - PG71 Extension
+	mov	r2,r1				; 72
+	mov	r3,r1				; 73
+	mov	r4,r1				; 74
+	mov	r5,r1				; 75
+	mov	r6,r1				; 76
+	mov	r7,r1				; 77
 
 	.page
 	.sbttl	Base Page Sequential
@@ -85,6 +105,7 @@
 
 	movw	ax,#0x1234			; 10 34 12
 	mov	saddrFE20,#byt01		; 11 20 01
+	mov	psw,#byt01			; 11 1E 01
 	movw	bc,#0x6789			; 12 89 67
 	mov	sfrFF21,#byt23			; 13 21 23
 	movw	de,#0x2345			; 14 45 23
@@ -102,8 +123,8 @@
 
 	set1	cy				; 20
 	clr1	cy				; 21
-	pop	psw				; 22
-	push	psw				; 23
+	push	psw				; 22
+	pop	psw				; 23
 	ror	a,1				; 24
 	rorc	a,1				; 25
 	rol	a,1				; 26
@@ -125,8 +146,8 @@
 	xch	a,b				; 33
 	xch	a,e				; 34
 	xch	a,d				; 35
-	xch	a,h				; 36
-	xch	a,l				; 37
+	xch	a,l				; 36
+	xch	a,h				; 37
 	subc	a,addr16			; 38 16 E0
 	subc	a,[hl+byt67]			; 39 67
 	set1	saddrFF17.bit3			; 3A 17
@@ -142,8 +163,8 @@
 	inc	b				; 43
 	inc	e				; 44
 	inc	d				; 45
-	inc	h				; 46
-	inc	l				; 47
+	inc	l				; 46
+	inc	h				; 47
 	cmp	a,addr16			; 48 16 E0
 	cmp	a,[hl+byt23]			; 49 23
 	set1	saddrFF17.bit4			; 4A 17
@@ -159,8 +180,8 @@
 	dec	b				; 53
 	dec	e				; 54
 	dec	d				; 55
-	dec	h				; 56
-	dec	l				; 57
+	dec	l				; 56
+	dec	h				; 57
 	and	a,addr16			; 58 16 E0
 	and	a,[hl+byt67]			; 59 67
 	set1	saddrFF17.bit5			; 5A 17
@@ -178,8 +199,8 @@
 	mov	a,b				; 63
 	mov	a,e				; 64
 	mov	a,d				; 65
-	mov	a,h				; 66
-	mov	a,l				; 67
+	mov	a,l				; 66
+	mov	a,h				; 67
 	or	a,addr16			; 68 16 E0
 	or	a,[hl+byt67]			; 69 67
 	set1	saddrFF17.bit6			; 6A 17
@@ -195,8 +216,8 @@
 	mov	b,a				; 73
 	mov	e,a				; 74
 	mov	d,a				; 75
-	mov	h,a				; 76
-	mov	l,a				; 77
+	mov	l,a				; 76
+	mov	h,a				; 77
 	xor	a,addr16			; 78 16 E0
 	xor	a,[hl+byt23]			; 79 23
 	set1	saddrFF17.bit7			; 7A 17
@@ -216,6 +237,7 @@
 	mov	a,[hl]				; 87
 	add	saddrFF17,#byt23		; 88 17 23
 	movw	ax,saddrFF17			; 89 17
+	movw	ax,sp				; 89 1C
 	dbnz	c,.				; 8A FE
 	dbnz	b,.				; 8B FE
 	bt	saddrFE20.bit0,.		; 8C 20 FD
@@ -235,6 +257,7 @@
 	mov	[hl],a				; 97
 	sub	saddrFF17,#byt23		; 98 17 23
 	movw	saddrFF17,ax			; 99 17
+	movw	sp,ax				; 99 1C
 	call	addr16				; 9A 16 E0
 	br	!addr16				; 9B 16 E0
 	bt	saddrFE20.bit1,.		; 9C 20 FD
@@ -248,8 +271,8 @@
 	mov	b,#0x89				; A3 89
 	mov	e,#0x89				; A4 89
 	mov	d,#0x89				; A5 89
-	mov	h,#0x89				; A6 89
-	mov	l,#0x89				; A7 89
+	mov	l,#0x89				; A6 89
+	mov	h,#0x89				; A7 89
 	addc	saddrFF17,#byt23		; A8 17 23
 	movw	ax,sfrFF21			; A9 21
 	mov	a,[hl+c]			; AA
@@ -329,11 +352,14 @@
 	bt	saddrFE20.bit6,.		; EC 20 FD
 	callt	[ind60+12]			; ED
 	movw	saddrFF17,#0x7856		; EE 17 56 78
+	movw	sp,#0x7856			; EE 1C 56 78
 	callt	[ind60+14]			; EF
 
 	mov	a,saddrFF17			; F0 17
+	mov	a,psw				; F0 1E
 	callt	[ind70]				; F1
 	mov	saddrFE20,a			; F2 20
+	mov	psw,a				; F2 1E
 	callt	[ind70+2]			; F3
 	mov	a,sfrFF21			; F4 21
 	callt	[ind70+4]			; F5
@@ -644,16 +670,16 @@
 	add	b,a				; 61 03
 	add	e,a				; 61 04
 	add	d,a				; 61 05
-	add	h,a				; 61 06
-	add	l,a				; 61 07
+	add	l,a				; 61 06
+	add	h,a				; 61 07
 	add	a,x				; 61 08
 	; ------				; 61 09
 	add	a,c				; 61 0A
 	add	a,b				; 61 0B
 	add	a,e				; 61 0C
 	add	a,d				; 61 0D
-	add	a,h				; 61 0E
-	add	a,l				; 61 0F
+	add	a,l				; 61 0E
+	add	a,h				; 61 0F
 
 	sub	x,a				; 61 10
 	sub	a,a				; 61 11
@@ -661,16 +687,16 @@
 	sub	b,a				; 61 13
 	sub	e,a				; 61 14
 	sub	d,a				; 61 15
-	sub	h,a				; 61 16
-	sub	l,a				; 61 17
+	sub	l,a				; 61 16
+	sub	h,a				; 61 17
 	sub	a,x				; 61 18
 	; ------				; 61 19
 	sub	a,c				; 61 1A
 	sub	a,b				; 61 1B
 	sub	a,e				; 61 1C
 	sub	a,d				; 61 1D
-	sub	a,h				; 61 1E
-	sub	a,l				; 61 1F
+	sub	a,l				; 61 1E
+	sub	a,h				; 61 1F
 
 	addc	x,a				; 61 20
 	addc	a,a				; 61 21
@@ -678,16 +704,16 @@
 	addc	b,a				; 61 23
 	addc	e,a				; 61 24
 	addc	d,a				; 61 25
-	addc	h,a				; 61 26
-	addc	l,a				; 61 27
+	addc	l,a				; 61 26
+	addc	h,a				; 61 27
 	addc	a,x				; 61 28
 	; ------				; 61 29
 	addc	a,c				; 61 2A
 	addc	a,b				; 61 2B
 	addc	a,e				; 61 2C
 	addc	a,d				; 61 2D
-	addc	a,h				; 61 2E
-	addc	a,l				; 61 2F
+	addc	a,l				; 61 2E
+	addc	a,h				; 61 2F
 
 	.page
 
@@ -697,16 +723,16 @@
 	subc	b,a				; 61 33
 	subc	e,a				; 61 34
 	subc	d,a				; 61 35
-	subc	h,a				; 61 36
-	subc	l,a				; 61 37
+	subc	l,a				; 61 36
+	subc	h,a				; 61 37
 	subc	a,x				; 61 38
 	; ------				; 61 39
 	subc	a,c				; 61 3A
 	subc	a,b				; 61 3B
 	subc	a,e				; 61 3C
 	subc	a,d				; 61 3D
-	subc	a,h				; 61 3E
-	subc	a,l				; 61 3F
+	subc	a,l				; 61 3E
+	subc	a,h				; 61 3F
 
 	cmp	x,a				; 61 40
 	cmp	a,a				; 61 41
@@ -714,16 +740,16 @@
 	cmp	b,a				; 61 43
 	cmp	e,a				; 61 44
 	cmp	d,a				; 61 45
-	cmp	h,a				; 61 46
-	cmp	l,a				; 61 47
+	cmp	l,a				; 61 46
+	cmp	h,a				; 61 47
 	cmp	a,x				; 61 48
 	; ------				; 61 49
 	cmp	a,c				; 61 4A
 	cmp	a,b				; 61 4B
 	cmp	a,e				; 61 4C
 	cmp	a,d				; 61 4D
-	cmp	a,h				; 61 4E
-	cmp	a,l				; 61 4F
+	cmp	a,l				; 61 4E
+	cmp	a,h				; 61 4F
 
 	and	x,a				; 61 50
 	and	a,a				; 61 51
@@ -731,16 +757,16 @@
 	and	b,a				; 61 53
 	and	e,a				; 61 54
 	and	d,a				; 61 55
-	and	h,a				; 61 56
-	and	l,a				; 61 57
+	and	l,a				; 61 56
+	and	h,a				; 61 57
 	and	a,x				; 61 58
 	; ------				; 61 59
 	and	a,c				; 61 5A
 	and	a,b				; 61 5B
 	and	a,e				; 61 5C
 	and	a,d				; 61 5D
-	and	a,h				; 61 5E
-	and	a,l				; 61 5F
+	and	a,l				; 61 5E
+	and	a,h				; 61 5F
 
 	.page
 
@@ -750,16 +776,16 @@
 	or	b,a				; 61 63
 	or	e,a				; 61 64
 	or	d,a				; 61 65
-	or	h,a				; 61 66
-	or	l,a				; 61 67
+	or	l,a				; 61 66
+	or	h,a				; 61 67
 	or	a,x				; 61 68
 	; ------				; 61 69
 	or	a,c				; 61 6A
 	or	a,b				; 61 6B
 	or	a,e				; 61 6C
 	or	a,d				; 61 6D
-	or	a,h				; 61 6E
-	or	a,l				; 61 6F
+	or	a,l				; 61 6E
+	or	a,h				; 61 6F
 
 	xor	x,a				; 61 70
 	xor	a,a				; 61 71
@@ -767,16 +793,16 @@
 	xor	b,a				; 61 73
 	xor	e,a				; 61 74
 	xor	d,a				; 61 75
-	xor	h,a				; 61 76
-	xor	l,a				; 61 77
+	xor	l,a				; 61 76
+	xor	h,a				; 61 77
 	xor	a,x				; 61 78
 	; ------				; 61 79
 	xor	a,c				; 61 7A
 	xor	a,b				; 61 7B
 	xor	a,e				; 61 7C
 	xor	a,d				; 61 7D
-	xor	a,h				; 61 7E
-	xor	a,l				; 61 7F
+	xor	a,l				; 61 7E
+	xor	a,h				; 61 7F
 
 	adjba					; 61 80
 	; ------				; 61 81
@@ -1276,6 +1302,7 @@
 
 	movw	ax,#0x1234			; 10 34 12
 	mov	@xsaddrFE+0x20,#xbt+0x01	; 11r20r01
+	mov	psw,#xbt+0x01			; 11 1Er01
 	movw	bc,#0x6789			; 12 89 67
 	mov	*xsfrFF+0x21,#xbt+0x23		; 13*21r23
 	movw	de,#0x2345			; 14 45 23
@@ -1293,8 +1320,8 @@
 
 	set1	cy				; 20
 	clr1	cy				; 21
-	pop	psw				; 22
-	push	psw				; 23
+	push	psw				; 22
+	pop	psw				; 23
 	ror	a,1				; 24
 	rorc	a,1				; 25
 	rol	a,1				; 26
@@ -1315,8 +1342,8 @@
 	xch	a,b				; 33
 	xch	a,e				; 34
 	xch	a,d				; 35
-	xch	a,h				; 36
-	xch	a,l				; 37
+	xch	a,l				; 36
+	xch	a,h				; 37
 	subc	a,xaddr16+0xE016		; 38r16sE0
 	subc	a,[hl+xbt+0x67]			; 39r67
 	set1	@xsaddrFF+0x17.xbt3+0x03	;r3Ar17
@@ -1332,8 +1359,8 @@
 	inc	b				; 43
 	inc	e				; 44
 	inc	d				; 45
-	inc	h				; 46
-	inc	l				; 47
+	inc	l				; 46
+	inc	h				; 47
 	cmp	a,xaddr16+0xE016		; 48r16sE0
 	cmp	a,[hl+xbt+0x23]			; 49r23
 	set1	@xsaddrFF+0x17.xbt4+0x04	;r4Ar17
@@ -1349,8 +1376,8 @@
 	dec	b				; 53
 	dec	e				; 54
 	dec	d				; 55
-	dec	h				; 56
-	dec	l				; 57
+	dec	l				; 56
+	dec	h				; 57
 	and	a,xaddr16+0xE016		; 58r16sE0
 	and	a,[hl+xbt+0x67]			; 59r67
 	set1	@xsaddrFF+0x17.xbt5+0x05	;r5Ar17
@@ -1367,8 +1394,8 @@
 	mov	a,b				; 63
 	mov	a,e				; 64
 	mov	a,d				; 65
-	mov	a,h				; 66
-	mov	a,l				; 67
+	mov	a,l				; 66
+	mov	a,h				; 67
 	or	a,xaddr16+0xE016		; 68r16sE0
 	or	a,[hl+xbt+0x67]			; 69r67
 	set1	@xsaddrFF+0x17.xbt6+0x06	;r6Ar17
@@ -1384,8 +1411,8 @@
 	mov	b,a				; 73
 	mov	e,a				; 74
 	mov	d,a				; 75
-	mov	h,a				; 76
-	mov	l,a				; 77
+	mov	l,a				; 76
+	mov	h,a				; 77
 	xor	a,xaddr16+0xE016		; 78r16sE0
 	xor	a,[hl+xbt+0x23]			; 79r23
 	set1	@xsaddrFF+0x17.xbt7+0x07	;r7Ar17
@@ -1405,6 +1432,7 @@
 	mov	a,[hl]				; 87
 	add	@xsaddrFF+0x17,#xbt+0x23	; 88r17r23
 	movw	ax,@xsaddrFF+0x17		; 89r17
+	movw	ax,sp				; 89 1C
 	dbnz	c,.				; 8A FE
 	dbnz	b,.				; 8B FE
 	bt	@xsaddrFE+0x20.xbt0+0x00,.	;r8Cr20 FD
@@ -1423,6 +1451,7 @@
 	mov	[hl],a				; 97
 	sub	@xsaddrFF+0x17,#xbt+0x23	; 98r17r23
 	movw	@xsaddrFF+0x17,ax		; 99r17
+	movw	sp,ax				; 99 1C
 	call	xaddr16+0xE016			; 9Ar16sE0
 	br	!xaddr16+0xE016			; 9Br16sE0
 	bt	@xsaddrFE+0x20.xbt1+0x01,.	;r9Cr20 FD
@@ -1436,8 +1465,8 @@
 	mov	b,#0x89				; A3 89
 	mov	e,#0x89				; A4 89
 	mov	d,#0x89				; A5 89
-	mov	h,#0x89				; A6 89
-	mov	l,#0x89				; A7 89
+	mov	l,#0x89				; A6 89
+	mov	h,#0x89				; A7 89
 	addc	@xsaddrFF+0x17,#xbt+0x23	; A8r17r23
 	movw	ax,*xsfrFF+0x21			; A9*21
 	mov	a,[hl+c]			; AA
@@ -1515,11 +1544,14 @@
 	bt	@xsaddrFE+0x20.xbt6+0x06,.	;rECr20 FD
 	callt	[xnd+0x60+12]			;rED
 	movw	@xsaddrFF+0x17,#0x7856		; EEr17 56 78
+	movw	sp,#0x7856			; EE 1C 56 78
 	callt	[xnd+0x60+14]			;rEF
 
 	mov	a,@xsaddrFF+0x17		; F0r17
+	mov	a,psw				; F0 1E
 	callt	[xnd+0x70]			;rF1
 	mov	@xsaddrFE+0x20,a		; F2r20
+	mov	psw,a				; F2 1E
 	callt	[xnd+0x70+2]			;rF3
 	mov	a,*xsfrFF+0x21			; F4*21
 	callt	[xnd+0x70+4]			;rF5
@@ -1823,16 +1855,16 @@
 	add	b,a				; 61 03
 	add	e,a				; 61 04
 	add	d,a				; 61 05
-	add	h,a				; 61 06
-	add	l,a				; 61 07
+	add	l,a				; 61 06
+	add	h,a				; 61 07
 	add	a,x				; 61 08
 	; ------				; 61 09
 	add	a,c				; 61 0A
 	add	a,b				; 61 0B
 	add	a,e				; 61 0C
 	add	a,d				; 61 0D
-	add	a,h				; 61 0E
-	add	a,l				; 61 0F
+	add	a,l				; 61 0E
+	add	a,h				; 61 0F
 
 	sub	x,a				; 61 10
 	sub	a,a				; 61 11
@@ -1840,16 +1872,16 @@
 	sub	b,a				; 61 13
 	sub	e,a				; 61 14
 	sub	d,a				; 61 15
-	sub	h,a				; 61 16
-	sub	l,a				; 61 17
+	sub	l,a				; 61 16
+	sub	h,a				; 61 17
 	sub	a,x				; 61 18
 	; ------				; 61 19
 	sub	a,c				; 61 1A
 	sub	a,b				; 61 1B
 	sub	a,e				; 61 1C
 	sub	a,d				; 61 1D
-	sub	a,h				; 61 1E
-	sub	a,l				; 61 1F
+	sub	a,l				; 61 1E
+	sub	a,h				; 61 1F
 
 	addc	x,a				; 61 20
 	addc	a,a				; 61 21
@@ -1857,17 +1889,18 @@
 	addc	b,a				; 61 23
 	addc	e,a				; 61 24
 	addc	d,a				; 61 25
-	addc	h,a				; 61 26
-	addc	l,a				; 61 27
+	addc	l,a				; 61 26
+	addc	h,a				; 61 27
 	addc	a,x				; 61 28
 	; ------				; 61 29
 	addc	a,c				; 61 2A
 	addc	a,b				; 61 2B
 	addc	a,e				; 61 2C
 	addc	a,d				; 61 2D
-	addc	a,h				; 61 2E
-	addc	a,l				; 61 2F
+	addc	a,l				; 61 2E
+	addc	a,h				; 61 2F
 
+	.page
 
 	subc	x,a				; 61 30
 	subc	a,a				; 61 31
@@ -1875,16 +1908,16 @@
 	subc	b,a				; 61 33
 	subc	e,a				; 61 34
 	subc	d,a				; 61 35
-	subc	h,a				; 61 36
-	subc	l,a				; 61 37
+	subc	l,a				; 61 36
+	subc	h,a				; 61 37
 	subc	a,x				; 61 38
 	; ------				; 61 39
 	subc	a,c				; 61 3A
 	subc	a,b				; 61 3B
 	subc	a,e				; 61 3C
 	subc	a,d				; 61 3D
-	subc	a,h				; 61 3E
-	subc	a,l				; 61 3F
+	subc	a,l				; 61 3E
+	subc	a,h				; 61 3F
 
 	cmp	x,a				; 61 40
 	cmp	a,a				; 61 41
@@ -1892,16 +1925,16 @@
 	cmp	b,a				; 61 43
 	cmp	e,a				; 61 44
 	cmp	d,a				; 61 45
-	cmp	h,a				; 61 46
-	cmp	l,a				; 61 47
+	cmp	l,a				; 61 46
+	cmp	h,a				; 61 47
 	cmp	a,x				; 61 48
 	; ------				; 61 49
 	cmp	a,c				; 61 4A
 	cmp	a,b				; 61 4B
 	cmp	a,e				; 61 4C
 	cmp	a,d				; 61 4D
-	cmp	a,h				; 61 4E
-	cmp	a,l				; 61 4F
+	cmp	a,l				; 61 4E
+	cmp	a,h				; 61 4F
 
 	and	x,a				; 61 50
 	and	a,a				; 61 51
@@ -1909,17 +1942,18 @@
 	and	b,a				; 61 53
 	and	e,a				; 61 54
 	and	d,a				; 61 55
-	and	h,a				; 61 56
-	and	l,a				; 61 57
+	and	l,a				; 61 56
+	and	h,a				; 61 57
 	and	a,x				; 61 58
 	; ------				; 61 59
 	and	a,c				; 61 5A
 	and	a,b				; 61 5B
 	and	a,e				; 61 5C
 	and	a,d				; 61 5D
-	and	a,h				; 61 5E
-	and	a,l				; 61 5F
+	and	a,l				; 61 5E
+	and	a,h				; 61 5F
 
+	.page
 
 	or	x,a				; 61 60
 	or	a,a				; 61 61
@@ -1927,16 +1961,16 @@
 	or	b,a				; 61 63
 	or	e,a				; 61 64
 	or	d,a				; 61 65
-	or	h,a				; 61 66
-	or	l,a				; 61 67
+	or	l,a				; 61 66
+	or	h,a				; 61 67
 	or	a,x				; 61 68
 	; ------				; 61 69
 	or	a,c				; 61 6A
 	or	a,b				; 61 6B
 	or	a,e				; 61 6C
 	or	a,d				; 61 6D
-	or	a,h				; 61 6E
-	or	a,l				; 61 6F
+	or	a,l				; 61 6E
+	or	a,h				; 61 6F
 
 	xor	x,a				; 61 70
 	xor	a,a				; 61 71
@@ -1944,16 +1978,16 @@
 	xor	b,a				; 61 73
 	xor	e,a				; 61 74
 	xor	d,a				; 61 75
-	xor	h,a				; 61 76
-	xor	l,a				; 61 77
+	xor	l,a				; 61 76
+	xor	h,a				; 61 77
 	xor	a,x				; 61 78
 	; ------				; 61 79
 	xor	a,c				; 61 7A
 	xor	a,b				; 61 7B
 	xor	a,e				; 61 7C
 	xor	a,d				; 61 7D
-	xor	a,h				; 61 7E
-	xor	a,l				; 61 7F
+	xor	a,l				; 61 7E
+	xor	a,h				; 61 7F
 
 	adjba					; 61 80
 	; ------				; 61 81

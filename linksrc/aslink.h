@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- *  Copyright (C) 1989-2017  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@
  * Local Definitions
  */
 
-#define	VERSION "V05.20"
-#define	COPYRIGHT "2017"
+#define	VERSION "V05.40"
+#define	COPYRIGHT "2021"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -155,7 +155,7 @@
 #define ALIST	2		/* Address only */
 #define	BLIST	3		/* Address only with allocation */
 #define CLIST	4		/* Code */
-#define	ELIST	5		/* Equate only */
+#define	ELIST	5		/* Equate or IF conditional evaluation */
 
 #define	LIST_ERR	0x0001	/* Error Code(s) */
 #define	LIST_LOC	0x0002	/* Location */

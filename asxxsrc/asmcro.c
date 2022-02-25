@@ -1,7 +1,7 @@
 /* asmcro.c */
 
 /*
- *  Copyright (C) 2010-2014  Alan R. Baldwin
+ *  Copyright (C) 2010-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@
  *		int	code		function code
  *
  *	The function of mcrprc() is to evaluate the
- *	folowing assembler directives:
+ *	following assembler directives:
  *
  *		.macro			define a general macro
  *		.irp			define an inline indefinite repeat macro by arguments
@@ -63,7 +63,7 @@
  *		.nval			assign value of argument to an absolute symbol
  *		.mdelete		delete a macro definition
  *
- *	And to control the building and exitting of a macro
+ *	And to control the building and exiting of a macro
  *	by the use of the internal assembler directives:
  *
  *		O_BUILD			building a macro processing
@@ -74,7 +74,7 @@
  *		expr	e1		expression structure
  *		char 	id[]		id string
  *		mne    *mp		pointer to an assembler mnemonic structure
- *		macrofp *nfp		macro psuedo FILE Handle
+ *		macrofp *nfp		macro pseudo FILE Handle
  *		mcrdef *nq		pointer to a macro definition structure
  *		mcrdef *np		pointer to a macro definition structure
  *		int	rptcnt		repeat count evaluation
@@ -93,6 +93,7 @@
  *		a_uint	absexpr()	asexpr.c
  *		VOID	clrexpr()	asexpr.c
  *		int	comma()		aslex.c
+ *		VOID	err()		assubr.c
  *		VOID	getdarg()	asmcro.c
  *		int	getid()		aslex.c
  *		int	getdlm()	aslex.c
@@ -108,6 +109,7 @@
  *		mcrdef *newdef()	asmcro.c
  *		VOID	qerr()		assubr.c
  *		VOID	unget()		aslex.c
+ *		VOID	xerr()		assubr.c
  *
  *	side effects:
  *		Macro directives processed and
@@ -148,7 +150,7 @@ int code;
 		if (more()) {
 			getid(id, getnb());
 		} else {
-			qerr();
+			xerr('q', ".macro requires at least one argument.");
 		}
 		np = newdef(code, id);
 		/*
@@ -249,7 +251,7 @@ int code;
 				rptcnt = 0;
 			}
 		} else {
-			err('o');
+			xerr('o', ".rept requires a repeat count.");
 			rptcnt = 0;
 		}
 		np->rptcnt = rptcnt;
@@ -257,7 +259,7 @@ int code;
 
 	case O_ENDM:
 		if (asmc->objtyp != T_MACRO) {
-			err('n');
+			xerr('n', ".endm found without matching .macro.");
 		} else {
 			lmode = NLIST;
 		}
@@ -269,7 +271,7 @@ int code;
 			nfp->npexit = 1;
 			nfp->lstptr = nfp->np->endlst;
 		} else {
-			err('n');
+			xerr('n', ".mexit found outside of a macro.");
 		}
 		break;
 
@@ -296,7 +298,7 @@ int code;
 		nfp = (struct macrofp *) asmc->fp;
 		np = nfp->np;
 		if (asmc->objtyp != T_MACRO) {
-			err('n');
+			xerr('n', ".narg found outside of a macro.");
 			break;
 		} else
 		if (np->type != O_MACRO) {
@@ -364,7 +366,7 @@ int code;
 				}
 			}
 			if (more() && comma(0) && !more()) {
-				qerr();
+				xerr('q', "Expecting argument after ','.");
 			}
 		}
 		break;
@@ -694,7 +696,7 @@ char *id;
  *	np for insertion into the code stream.
  *
  *	local variables:
- *		macrofp *nfp		psuedo FILE Handle
+ *		macrofp *nfp		pseudo FILE Handle
  *		strlst *str		missing argument expansion string
  *		strlst *arg		macro definition argument string
  *		strlst *xrg		macro expansion  argument string
@@ -741,23 +743,6 @@ struct mcrdef * np;
 		maxmcr = mcrfil;
 	}
 	/*
-	 * Create an asmf structure for nxtline()
-	 */
-	asmq = (struct asmf *) mstruct (sizeof (struct asmf));
-	asmq->next = asmc;
-	asmq->objtyp = T_MACRO;
-	asmq->line = srcline;
-	if (ftflevel != 0) {
-		asmq->flevel = ftflevel - 1;
-		ftflevel = 0;
-	} else {
-		asmq->flevel = flevel;
-	}
-	asmq->tlevel = tlevel;
-	asmq->lnlist = lnlist;
-	asmq->afp = 0;
-	strcpy(asmq->afn,np->name);
-	/*
 	 * Create a macrofp structure for fgetm()
 	 */
 	nfp = (struct macrofp *) mstruct (sizeof (struct macrofp));
@@ -765,9 +750,6 @@ struct mcrdef * np;
 	nfp->lstptr = np->bgnlst;
 	nfp->rptcnt = np->rptcnt;
 	nfp->rptidx = 0;
-	nfp->flevel = asmq->flevel;
-	nfp->tlevel = asmq->tlevel;
-	nfp->lnlist = asmq->lnlist;
 	nfp->npexit = nfp->rptcnt ? 0 : 1;
 	/*
 	 * Check if arguments are required
@@ -777,10 +759,15 @@ struct mcrdef * np;
 		np->bgnxrg = NULL;
 		np->endxrg = NULL;
 		while (more()) {
+			if (np->xarg == np->narg) {
+				/*
+				 * Too many arguments
+				 * Abort macro with syntax error
+				 */
+				--mcrfil;
+				qerr();
+			}
 			getxarg(np);
-		}
-		if (np->xarg > np->narg) {
-			qerr();
 		}
 		/*
 		 * Fill in missing arguments and
@@ -813,6 +800,29 @@ struct mcrdef * np;
 			xrg = xrg->next;
 		}
 	}
+	/*
+	 * Create an asmf structure for nxtline()
+	 */
+	asmq = (struct asmf *) mstruct (sizeof (struct asmf));
+	asmq->next = asmc;
+	asmq->objtyp = T_MACRO;
+	asmq->line = srcline;
+	if (ftflevel != 0) {
+		asmq->flevel = ftflevel - 1;
+		ftflevel = 0;
+	} else {
+		asmq->flevel = flevel;
+	}
+	asmq->tlevel = tlevel;
+	asmq->lnlist = lnlist;
+	asmq->afp = 0;
+	strcpy(asmq->afn,np->name);
+	/*
+	 * Fill in nfp elements
+	 */
+	nfp->flevel = asmq->flevel;
+	nfp->tlevel = asmq->tlevel;
+	nfp->lnlist = asmq->lnlist;
 	/*
 	 * Cast nfp as a FILE HANDLE
 	 */
@@ -930,7 +940,7 @@ char *id;
  *
  *		char *	ptr	pointer string address
  *		int	len	maximum number of characters to return
- *		FILE *	fp	psuedo FILE Handle
+ *		FILE *	fp	pseudo FILE Handle
  *
  *	The function fgetm() reads characters from the pseudo
  *	stream fp into the string pointed to by ptr. The integer

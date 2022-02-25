@@ -1,7 +1,7 @@
 /* rabmch.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -563,11 +563,11 @@ struct mne *mp;
 			case 0xdb:	preByte.ioe  = op;	break;
 			case 0xd3:	preByte.ioi  = op;	break;
 			default:
-				err('o');
+				xerr('o', "Invalid Instruction PreFix.");
 				break;
 			}
 		} else {
-			err('o');
+			xerr('o', "A Rabbit 2000/3000 Instruction.");
 		}
 		return;
 
@@ -578,12 +578,12 @@ struct mne *mp;
 		 * Rabbit Only
 		 */
 		if ((rf == S_INH1R) && (mchtyp != X_R2K))
-			err('o');
+			xerr('o', "A Rabbit 2000/3000 Instruction.");
 		/*
 		 * Rabbit Excluded
 		 */
 		if ((rf == S_INH1X) && (mchtyp == X_R2K))
-			err('o');
+			xerr('o', "Not A Rabbit 2000/3000 Instruction.");
 	        outab(op);
 		break;
 
@@ -594,12 +594,12 @@ struct mne *mp;
 		 * Rabbit Only
 		 */
 		if ((rf == S_INH2R) && (mchtyp != X_R2K))
-			err('o');
+			xerr('o', "A Rabbit 2000/3000 Instruction.");
 		/*
 		 * Rabbit Excluded
 		 */
 		if ((rf == S_INH2X) && (mchtyp == X_R2K))
-			err('o');
+			xerr('o', "Not A Rabbit 2000/3000 Instruction.");
 		outab(0xED);
 		outab(op);
 		break;
@@ -609,7 +609,7 @@ struct mne *mp;
 			if ((v1 = admode(CND)) != 0) {
 				outab(op | (v1<<3));
 			} else {
-				qerr();
+				xerr('a', "Condition code required.");
 			}
 		} else {
 			outab(0xC9);
@@ -622,7 +622,7 @@ struct mne *mp;
 		 */
 	        if ((admode(R2KIP) & 0xFF) == IP) {
 			if (mchtyp != X_R2K)
-				aerr();
+				xerr('o', "A Rabbit 2000/3000 Instruction.");
 			outab(0xed);
 			if (op == 0xc5) {	/* push ip */
 				outab(0x76);
@@ -630,10 +630,10 @@ struct mne *mp;
 			if (op == 0xc1) {	/* pop  ip */
 				outab(0x7e);
 			} else {
-				err('o');
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			if (preByte.altd)
-				err('o');
+				xerr('a', "PUSH/POP IP Does Not Support ALTD.");
 			break;
 		} else
 		/*
@@ -649,20 +649,20 @@ struct mne *mp;
 		if ((v1 = admode(R16)) != 0 && (v1 &= 0xFF) != SP) {
 			if (v1 != gixiy(v1)) {
 				if (preByte.altd)
-					err('o');
+					xerr('a', "Addressing Mode Does Not Support ALTD.");
 				outab(op+0x20);
 				break;
 			}
 			outab(op | (v1<<4));
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_RST:
 		v1 = (int) absexpr();
 		if (v1 & ~0x38) {
-			aerr();
+			xerr('a', "Allowed values: N * 0x08, N = 0 -> 7."); 
 			v1 = 0;
 		}
 		/*
@@ -677,7 +677,7 @@ struct mne *mp;
 			case 0x38:
 				break;
 			default: 
-				aerr();
+			xerr('a', "Rabbit 2000/3000: 0x00, 0x08, and 0x30 are not allowed"); 
 				break;
 			}
 		}
@@ -689,11 +689,11 @@ struct mne *mp;
 		 * Rabbit Excluded
 		 */
 		if (mchtyp == X_R2K)
-			err('o');
+			xerr('o', "Not A Rabbit 2000/3000 Instruction.");
 		expr(&e1, 0);
 		abscheck(&e1);
 		if (e1.e_addr > 2) {
-			aerr();
+			xerr('a', "Values of 0, 1, and 2 are valid.");
 			e1.e_addr = 0;
 		}
 		outab(op);
@@ -719,7 +719,7 @@ struct mne *mp;
 		 * bit  b,r
 		 */
 		if (genop(0xCB, op, &e2, 0) || t1)
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_RL:
@@ -727,13 +727,13 @@ struct mne *mp;
 		if ((mchtyp == X_R2K) && (t1 == S_R16)) {
 			v1 = (int) e1.e_addr;
 			if (preByte.ioi || preByte.ioe) {
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support IOE Or IOI.");
 			}
 			if (op == 0x10) {		/* rl */
 				if (v1 == DE) {		/* rl de */
 					outab(0xF3);
 				} else {
-					aerr();
+					xerr('a', "Not register DE.");
 				}
 			} else
 			if (op == 0x18) {		/* rr */
@@ -749,16 +749,16 @@ struct mne *mp;
 				if (v1 == IY) {		/* rr iy */
 					outab(0xFD);	outab(0xFC);
 				} else {
-					aerr();
+					xerr('a', "Argument must be DE, HL, IX, or IY.");
 				}
 			} else {
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 		} else { 
 			chkIOPreByte(t1);
 			if (genop(0xCB, op, &e1, 0))
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -785,7 +785,7 @@ struct mne *mp;
 			 * op  n	[#n]
 			 */
 			if (genop(0, op, &e1, 1))
-				aerr();
+				xerr('a', "First argument: Invalid.");
 			break;
 		}
 		if ((t1 == S_R8) && (e1.e_addr == A)) {
@@ -798,11 +798,11 @@ struct mne *mp;
 			 * op  a,n	[a,#n]
 			 */
 			if (genop(0, op, &e2, 1))
-				aerr();
+				xerr('a', "Second argument: Invalid.");
 			break;
 		}
 		if (preByte.ioi || preByte.ioe) {
-			err('o');
+			xerr('a', "Addressing Mode Does Not Support IOE Or IOI.");
 		}
 		if ((mchtyp == X_R2K) && (t1 == S_R16) && (t2 == S_R16)) {
 			if (rf == S_AND) {	/* and */
@@ -811,12 +811,12 @@ struct mne *mp;
 			if (rf == S_OR) {	/* or  */
 				op = 0xEC;
 			} else {
-				aerr();		/* sub / xor */
+				xerr('a', "Not valid for SUB or XOR.");
 				break;
 			}
 			v2 = (int) e2.e_addr;
 			if (v2 != DE) {
-				aerr();
+				xerr('a', "Second argument: must be DE.");
 				break;
 			}
 			v1 = (int) e1.e_addr;
@@ -829,11 +829,11 @@ struct mne *mp;
 			if (v1 == IY) {		/* op  iy,de */
 				outab(0xFD);	outab(op);
 			} else {
-				aerr();
+				xerr('a', "First argument: must be HL, IX, or IY.");
 			}
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_ADD:
@@ -859,7 +859,7 @@ struct mne *mp;
 			 * op  n	[#n]
 			 */
 			if (genop(0, op, &e1, 1))
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		if ((t1 == S_R8) && (e1.e_addr == A)) {
@@ -872,11 +872,11 @@ struct mne *mp;
 			 * op  a,n	[a,#n]
 			 */
 			if (genop(0, op, &e2, 1))
-				aerr();
+				xerr('a', "Second argument: Invalid Addressing Mode.");
 			break;
 		}
 		if (preByte.ioi || preByte.ioe) {
-			err('o');
+			xerr('a', "Addressing Mode Does Not Support IOE Or IOI.");
 		}
 		/*
 		 * op  xx,yy
@@ -906,7 +906,7 @@ struct mne *mp;
 				break;
 			}
 			if (rf != S_ADD) {
-				aerr();
+				xerr('a', "Only valid with ADD.");
 				break;
 			}
 			/*
@@ -935,7 +935,7 @@ struct mne *mp;
 				outab(op | (v2<<4));
 				break;
 			}
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
                 /*
@@ -948,7 +948,7 @@ struct mne *mp;
 			outrb(&e2, R_USGN);
 			break;
                 }
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_LD:
@@ -976,7 +976,7 @@ struct mne *mp;
 		if ((t2 == S_R8) && (v2 == A)) {
 			if ((t1 == S_IDBC) || (t1 == S_IDDE)) {
 				if (preByte.altd)
-					err('o');
+					xerr('a', "Addressing Mode Does Not Support ALTD.");
 				outab(0x02 | ((t1-S_INDR)<<4));
 				break;
 			}
@@ -994,7 +994,7 @@ struct mne *mp;
 		 */
 		if ((t1 == S_INDM) && (t2 == S_R8) && (v2 == A)) {
 			if (preByte.altd)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD.");
 			outab(0x32);
 			outrw(&e1, 0);
 			break;
@@ -1009,9 +1009,9 @@ struct mne *mp;
 		 */
 		if ((t1 == S_R8X) && (t2 == S_R8) && (v2 == A)) {
 			if ((mchtyp != X_R2K) && (v1 == XPC))
-				aerr();
+				xerr('a', "XPC not allowed for first argument.");
 			if (preByte.altd || preByte.ioe || preByte.ioi)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD, IOE, Or IOI.");
 			outab(0xED);
 			outab(v1);
 			break;
@@ -1026,9 +1026,9 @@ struct mne *mp;
 		 */
 		if ((t1 == S_R8) && (v1 == A) && (t2 == S_R8X)) {
 			if ((mchtyp != X_R2K) && (v2 == XPC))
-				aerr();
+				xerr('a', "XPC not allowed for second argument.");
 			if (preByte.ioe || preByte.ioi)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support IOE Or IOI.");
 			outab(0xED);
 			outab(v2|0x10);
 			break;
@@ -1065,9 +1065,9 @@ struct mne *mp;
 		 */
 		if ((t1 == S_R16) && (t2 == S_IMMED)) {
 			if (preByte.ioi || preByte.ioe)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support IOE Or IOI.");
 			if (preByte.altd && ((v1 == SP) || (v1 == IX) || (v1 == IY)))
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD With SP, IX, Or IY.");
 			v1 = gixiy(v1);
 			outab(0x01|(v1<<4));
 			outrw(&e2, 0);
@@ -1083,7 +1083,7 @@ struct mne *mp;
 		 */
 		if ((t1 == S_R16) && (t2 == S_INDM)) {
 			if (preByte.altd && ((v1 == SP) || (v1 == IX) || (v1 == IY)))
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD with SP, IX, Or IY.");
 			if (gixiy(v1) == HL) {
 				outab(0x2A);
 			} else {
@@ -1101,7 +1101,7 @@ struct mne *mp;
 		if ((t1 == S_R16) && (v1 == HL) &&
 		   ((t2 == S_IDIX) || (t2 == S_IDHL) || (t2 == S_IDIY))) {
 			if (mchtyp != X_R2K)
-				aerr();
+				xerr('o', "A Rabbit 2000/3000 Instruction.");
 			if (t2 == S_IDHL)	outab(0xDD);
 			if (t2 == S_IDIY)	outab(0xFD); 
 			outab(0xE4);
@@ -1115,11 +1115,11 @@ struct mne *mp;
 		 */
 		if ((t1 == S_R16) && (t2 == S_IDSP)) {
  	        	if (mchtyp != X_R2K)
-				aerr();
+				xerr('o', "A Rabbit 2000/3000 Instruction.");
 			if (preByte.altd && ((v1 == IX) || (v1 == IY)))
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD With IX Or IY.");
 			if (preByte.ioi || preByte.ioe)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support IOE Or IOI.");
 			if (gixiy(v1) == HL) {
 				outab(0xc4);
 				outrb(&e2, R_USGN);
@@ -1134,9 +1134,9 @@ struct mne *mp;
 	        if ((t2 == S_R16) && (v2 == HL) &&
 		   ((t1 == S_IDIX) || (t1 == S_IDHL) || (t1 == S_IDIY))) {
 			if (mchtyp != X_R2K)
-				aerr();
+				xerr('o', "A Rabbit 2000/3000 Instruction.");
 			if (preByte.altd)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD.");
 			if (t1 == S_IDHL)	outab(0xDD);                         
 			if (t1 == S_IDIY)	outab(0xFD);                           
 			outab(0xF4);
@@ -1150,9 +1150,9 @@ struct mne *mp;
 		 */
 		if ((t2 == S_R16) && (t1 == S_IDSP)) {
 			if (mchtyp != X_R2K)
-				aerr();
+				xerr('o', "A Rabbit 2000/3000 Instruction.");
 			if (preByte.altd || preByte.ioe || preByte.ioi)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD, IOE Or IOI.");
 			if (gixiy(v2) == HL) {
 				outab(0xd4);
 				outrb(&e1, R_USGN);
@@ -1169,7 +1169,7 @@ struct mne *mp;
 		 */
 		if ((t1 == S_INDM) && (t2 == S_R16)) {
 			if (preByte.altd)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD.");
 			if (gixiy(v2) == HL) {
 				outab(0x22);
 			} else {
@@ -1186,9 +1186,9 @@ struct mne *mp;
 		 */
 		if ((t2 == S_R8) && (gixiy(t1) == S_IDHL)) {
 			if ((t1 == S_IDHL) && ((e1.e_base.e_ap != NULL) || (e1.e_addr != 0)))
-				aerr();
+				xerr('a', "First argument: (HL+D) is invalid.");
 			if (preByte.altd)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD.");
 			outab(0x70|v2);
 			if (t1 != S_IDHL)
 				outrb(&e1, R_SGND);
@@ -1201,9 +1201,9 @@ struct mne *mp;
 		 */
 		if ((t2 == S_IMMED) && (gixiy(t1) == S_IDHL)) {
 			if ((t1 == S_IDHL) && ((e1.e_base.e_ap != NULL) || (e1.e_addr != 0)))
-				aerr();
+				xerr('a', "First argument: (HL+D) is invalid.");
 			if (preByte.altd)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD.");
 			outab(0x36);
 			if (t1 != S_IDHL)
 				outrb(&e1, R_SGND);
@@ -1218,7 +1218,7 @@ struct mne *mp;
 		if ((t1 == S_R16) && (v1 == SP)) {
 			if ((t2 == S_R16) && (gixiy(v2) == HL)) {
 				if (preByte.altd || preByte.ioe || preByte.ioi)
-					err('o');
+					xerr('a', "Addressing Mode Does Not Support ALTD, IOE Or IOI.");
 				outab(0xF9);
 				break;
 			}
@@ -1230,9 +1230,9 @@ struct mne *mp;
                 if ((t1 == S_R16) && (v1 == HL) &&
 		    (t2 == S_R16) && ((v2 == IX) || (v2 == IY))) {
 			if (mchtyp != X_R2K)
-				aerr();
+				xerr('o', "A Rabbit 2000/3000 Instruction.");
 			if (preByte.ioe || preByte.ioi)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support IOE Or IOI.");
 			if (v2 == IX)
 				outab(0xDD);
 			if (v2 == IY)
@@ -1247,9 +1247,9 @@ struct mne *mp;
                 if ((t2 == S_R16) && (v2 == HL) &&
 		    (t1 == S_R16) && ((v1 == IX) || (v1 == IY))) {
 			if (mchtyp != X_R2K)
-				aerr();
+				xerr('o', "A Rabbit 2000/3000 Instruction.");
 			if (preByte.altd || preByte.ioe || preByte.ioi)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD, IOE, Or IOI.");
 			if (v1 == IX)
 				outab(0xDD);
 			if (v1 == IY)
@@ -1268,9 +1268,9 @@ struct mne *mp;
 		 */
   	        if ((t1 == S_R16ALT) && (t2 == S_R16)) {
 			if (mchtyp != X_R2K)
-				aerr();
+				xerr('o', "A Rabbit 2000/3000 Instruction.");
 			if (preByte.altd || preByte.ioe || preByte.ioi)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD, IOE, Or IOI.");
 			if (v2 == BC) {
 				if ((v1 == BC) || (v1 == DE) || (v1 == HL)) {
 					outab(0xED);
@@ -1286,7 +1286,7 @@ struct mne *mp;
 				}
 			}
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_EX:
@@ -1305,7 +1305,7 @@ struct mne *mp;
 				if (mchtyp == X_R2K) {
 					if (preByte.altd) {
 						if ((v2 == IX) || (v2 == IY))
-							err('o');
+							xerr('a', "Addressing Mode Does Not Support ALTD With IX or IY.");
 					}
 					if (v2 == HL) {
 						outab(0xED);
@@ -1334,7 +1334,7 @@ struct mne *mp;
 				if (mchtyp == X_R2K) {
 					if (preByte.altd) {
 						if ((v1 == IX) || (v1 == IY))
-							err('o');
+							xerr('a', "Addressing Mode Does Not Support ALTD With IX or IY.");
 					}
 					if (v1 == HL) {
 						outab(0xED);
@@ -1358,7 +1358,7 @@ struct mne *mp;
 		 */
 		if ((t1 == S_R16AF) && (v1 == AF) && (t2 == S_R16ALT) && (v2 == AF)) {
 			if (preByte.altd)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD.");
 			outab(0x08);
 			break;
 		}
@@ -1367,7 +1367,7 @@ struct mne *mp;
 		 */
 		if ((t2 == S_R16AF) && (v2 == AF) && (t1 == S_R16ALT) && (v1 == AF)) {
 			if (preByte.altd)
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support ALTD.");
 			outab(0x08);
 			break;
 		}
@@ -1382,7 +1382,7 @@ struct mne *mp;
 			}
 			if ((mchtyp == X_R2K) && (t2 == S_R16ALT) && (v2 == HL)) {
 				if (preByte.altd)
-					err('o');
+					xerr('a', "Addressing Mode Does Not Support ALTD.");
 				outab(preByte.altd = 0x76);
 				outab(0xEB);
 				break;
@@ -1399,19 +1399,19 @@ struct mne *mp;
 			}
 			if ((t2 == S_R16ALT) && (v2 == HL)) {
 				if (preByte.altd)
-					err('o');
+					xerr('a', "Addressing Mode Does Not Support ALTD.");
 				outab(preByte.altd = 0x76);
 				outab(0xE3);
 				break;
 			}
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_IN:
 	case S_OUT:
 		if (mchtyp == X_R2K) {
-			err('o');
+			xerr('o', "Not A Rabbit 2000/3000 Instruction.");
 		}
 		if (rf == S_IN) {	/* in  */
 			t1 = addr(&e1);
@@ -1444,7 +1444,7 @@ struct mne *mp;
 				break;
 			}
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_DEC:
@@ -1453,7 +1453,7 @@ struct mne *mp;
 		v1 = (int) e1.e_addr;
 		if (preByte.ioi || preByte.ioe) {
 			if ((t1 != S_IDHL) && (t1 != S_IDIX) && (t1 != S_IDIY))
-				err('o');
+				xerr('a', "Addressing Mode Does Not Support IOE Or IOI Without (HL), (IX), Or (IY).");
 		}
 		/*
 		 * op  r
@@ -1473,7 +1473,7 @@ struct mne *mp;
 		if (t1 == S_R16) {
 		        if (preByte.altd || preByte.ioi || preByte.ioe) {
 				if ((v1 == IX) || (v1 == IY))
-					err('o');
+					xerr('a', "Addressing Mode Does Not Support ADL, IOE, Or IOI Without IX Or IY.");
 			}
 			v1 = gixiy(v1);
 			if (rf == S_INC) {
@@ -1490,7 +1490,7 @@ struct mne *mp;
 		 */
 		if (t1 == S_IDHL) {
 			if ((e1.e_base.e_ap != NULL) || (e1.e_addr != 0))
-				aerr();
+				xerr('a', "First argument: (HL+D) is invalid.");
 			outab(op|0x30);
 			break;
 		}
@@ -1503,7 +1503,7 @@ struct mne *mp;
 			outrb(&e1, R_SGND);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_DJNZ:
@@ -1515,7 +1515,7 @@ struct mne *mp;
 			if ((v1 &= 0xFF) <= 0x03) {
 				op += (v1+1)<<3;
 			} else {
-				aerr();
+				xerr('a', "Condition code required.");
 			}
 			comma(1);
 		}
@@ -1527,7 +1527,7 @@ struct mne *mp;
 		if (mchpcr(&e2)) {
 			v2 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v2 < -128) || (v2 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v2);
 		} else {
 			outrb(&e2, R_PCR);
@@ -1586,16 +1586,16 @@ struct mne *mp;
 		 */
 		if (gixiy(t1) == S_IDHL) {
 			if ((e1.e_base.e_ap != NULL) || (e1.e_addr != 0))
-				aerr();
+				xerr('a', "First argument: (HL+D) is invalid.");
 			outab(0xE9);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case HD_INH2:
 		if (mchtyp != X_HD64)
-			err('o');
+			xerr('a', "A Z180 Instruction.");
 		outab(0xED);
 		outab(op);
 		break;
@@ -1603,7 +1603,7 @@ struct mne *mp;
 	case HD_IN:
 	case HD_OUT:
 		if (mchtyp != X_HD64)
-			err('o');
+			xerr('a', "A Z180 Instruction.");
 		if (rf == HD_IN) {
 			t1 = addr(&e1);
 			comma(1);
@@ -1623,12 +1623,12 @@ struct mne *mp;
 			outrb(&e2, 0);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case HD_MLT:
 		if (mchtyp != X_HD64)
-			err('o');
+			xerr('a', "A Z180 Instruction.");
 		t1 = addr(&e1);
 		/*
 		 * mlt  bc/de/hl/sp
@@ -1638,12 +1638,12 @@ struct mne *mp;
 			outab(op | (v1<<4));
 			break;
 		}
-		aerr();
+		xerr('a', "Only BC, DE, HL and SP are allowed.");
 		break;
 
 	case HD_TST:
 		if (mchtyp != X_HD64)
-			err('o');
+			xerr('a', "A Z180 Instruction.");
 		t1 = addr(&e1);
 		if (t1 == S_USER)
 			t1 = e1.e_mode = S_IMMED;
@@ -1672,12 +1672,12 @@ struct mne *mp;
 			outrb(&e1, 0);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case HD_TSTIO:
 		if (mchtyp != X_HD64)
-			err('o');
+			xerr('a', "A Z180 Instruction.");
 		t1 = addr(&e1);
 		if (t1 == S_USER)
 			t1 = e1.e_mode = S_IMMED;
@@ -1690,15 +1690,15 @@ struct mne *mp;
 			outrb(&e1, 0);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case RB_IPSET:
 		if (mchtyp != X_R2K)
-			err('o');
+			xerr('o', "A Rabbit 2000/3000 Instruction.");
 	        v1 = (int) absexpr();
 		if (v1 > 3) {
-			aerr();
+			xerr('a', "Only values of 0, 1, 2, and 3 are valid.");
 			v1 &= 0x03;
 		}
 		if(v1 > 1) {
@@ -1706,7 +1706,7 @@ struct mne *mp;
 			v1 = v1 - 2;
 		}
 		/*
-		 * ipset  1/2/3/4
+		 * ipset  0/1/2/3
 		 */
 		outab(0xED);
 		outab(op | (v1 << 4));
@@ -1714,7 +1714,7 @@ struct mne *mp;
 
 	case RB_LCALL:
 		if (mchtyp != X_R2K)
-			err('o');
+			xerr('o', "A Rabbit 2000/3000 Instruction.");
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
 		comma(1);
@@ -1729,13 +1729,13 @@ struct mne *mp;
 			outrw(&e2, 0);
 			outrb(&e1, 0);
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
 	case RB_LDP:
 		if (mchtyp != X_R2K)
-			err('o');
+			xerr('o', "A Rabbit 2000/3000 Instruction.");
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
 		comma(1);
@@ -1748,7 +1748,7 @@ struct mne *mp;
 		 */
 		if ((t1 == S_INDM) && (t2 == S_R16)) {  
 			if ((v2 != HL) && (v2 != IX) && (v2 != IY)) {
-				aerr();
+				xerr('a', "Second argument: must be HL, IX, or IY.");
 				break;
 			}
 			if (v2 == HL) {		
@@ -1767,7 +1767,7 @@ struct mne *mp;
 		 */
 		if ((t1 == S_R16) && (t2 == S_INDM)) {
 			if ((v1 != HL) && (v1 != IX) && (v1 != IY)) {
-				aerr();
+				xerr('a', "First argument: must be HL, IX, or IY.");
 				break;
 			}
 			if (v1 == HL) {
@@ -1786,11 +1786,11 @@ struct mne *mp;
 		 */
 		if ((t2 == S_R16) && (v2 == HL)) {
 			if ((t1 != S_IDHL) && (t1 != S_IDIX) && (t1 != S_IDIY)) {
-				aerr();
+				xerr('a', "First argument: must be (HL), (IX), or (IY).");
 				break;
 			}
 			if ((e1.e_base.e_ap != NULL) || (v1 != 0)) {
-				aerr();
+				xerr('a', "First argument: (HL+D, (IX+D), and (IY+D) are invalid.");
 				break;
 			}
 			if (t1 == S_IDHL) {
@@ -1808,11 +1808,11 @@ struct mne *mp;
 		 */
 		if ((t1 == S_R16) && (v1 == HL)) {
 			if ((t2 != S_IDHL) && (t2 != S_IDIX) && (t2 != S_IDIY)) {
-				aerr();
+				xerr('a', "Second argument: must be (HL), (IX), or (IY).");
 				break;
 			}
 			if ((e2.e_base.e_ap != NULL) || (v2 != 0)) {
-				aerr();
+				xerr('a', "Second argument: (HL+D, (IX+D), and (IY+D) are invalid.");
 				break;
 			}
 			if (t2 == S_IDHL) {
@@ -1823,12 +1823,12 @@ struct mne *mp;
 			outab(op|0x08);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case RB_BOOL:
 		if (mchtyp != X_R2K)
-			err('o');
+			xerr('o', "A Rabbit 2000/3000 Instruction.");
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
 		/*
@@ -1841,16 +1841,16 @@ struct mne *mp;
 				gixiy(v1);
 				outab(op);
 			} else {
-				aerr();
+				xerr('a', "First argument: must be HL, IX, or IY.");
 			}
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 
@@ -1956,7 +1956,7 @@ int f;
 	 */
 	if (t1 == S_IDHL) {
 		if ((esp->e_base.e_ap != NULL) || (esp->e_addr != 0))
-			aerr();
+			xerr('a', "(HL+D) is invalid.");
 		if (pop)
 			outab(pop);
 		outab(op|0x06);
@@ -2028,7 +2028,7 @@ int addrMode;
 {
 	if (preByte.ioi || preByte.ioe) {
 		if ((addrMode != S_IDHL) && (addrMode != S_IDIX) && (addrMode != S_IDIY))
-			err('o');
+			xerr('a', "IOE and IOI require (HL), (IX), or (IY) Indexing.");
 	}
 }
 
@@ -2039,17 +2039,17 @@ struct mne *mp;
 	if (preByte.altd) {
 		outab(preByte.altd);
 		if (!(mp->m_flag & P_ALTD))
-			err('o');
+			xerr('a', "This Instruction Does Not Support ALTD.");
 	} else
 	if (preByte.ioe) {
 		outab(preByte.ioe);
 		if (!(mp->m_flag & P_IO))
-			err('o');
+			xerr('a', "This Instruction Does Not Support IOE.");
 	} else
 	if (preByte.ioi) {
 		outab(preByte.ioi);
 		if (!(mp->m_flag & P_IO))
-			err('o');
+			xerr('a', "This Instruction Does Not Support IOI.");
 	}
 }
 

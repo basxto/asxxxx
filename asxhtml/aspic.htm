@@ -48,7 +48,20 @@ define the register file address page.
 
 Format:  
 
-        .pic    "string" 
+        .pic     /string/               or 
+
+        .pic    ^/string/ 
+
+
+where:  string  represents a text string.  The string is the pic
+                processor type.  
+
+        /  /    represent   the  delimiting  characters.   These
+                delimiters   may   be   any   paired    printing
+                characters,  as  long  as the characters are not
+                contained within  the  string  itself.   If  the
+                delimiting  characters  do  not  match, the .pic
+                directive will give the <q> error.  
 
      The assembler uses the delimited string to define a proces-
 sor  specific  symbol.   e.g:   "p12c508"  produces  the  symbol
@@ -597,6 +610,6 @@ mode argument.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2019</B></P></H6>
+<H6><P><B>Last Updated: March 2021</B></P></H6>
 </BODY> 
 </HTML>

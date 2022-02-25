@@ -1,7 +1,7 @@
 /* m6801.h */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -109,10 +109,10 @@ struct adsym
 extern	struct	adsym	abdx[];
 extern	int		addr(struct expr *esp);
 extern	int		admode(struct adsym *sp);
-extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 
 	/* m01mch.c */
+extern	struct  area	*zpg;
 extern	VOID		machine(struct mne *mp);
 extern	int		mchpcr(struct expr *esp);
 extern	VOID		minit(void);
@@ -123,10 +123,10 @@ extern	VOID		minit(void);
 extern	struct	adsym	abdx[];
 extern	int		addr();
 extern	int		admode();
-extern	int		any();
 extern	int		srch();
 
 	/* m01mch.c */
+extern	struct  area	*zpg;
 extern	VOID		machine();
 extern	int		mchpcr();
 extern	VOID		minit();

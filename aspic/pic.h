@@ -1,7 +1,7 @@
 /* pic.h */
 
 /*
- *  Copyright (C) 2001-2014  Alan R. Baldwin
+ *  Copyright (C) 2001-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -206,7 +206,6 @@ extern	VOID		pic20bit(struct mne *mp);
 extern	struct	adsym	regfw[];
 extern	int		addr(struct expr *esp);
 extern	int		admode(struct adsym *sp);
-extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 
 #else
@@ -229,7 +228,6 @@ extern	VOID		pic20bit();
 extern	struct	adsym	regfw[];
 extern	int		addr();
 extern	int		admode();
-extern	int		any();
 extern	int		srch();
 
 #endif

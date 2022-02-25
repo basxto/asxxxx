@@ -1,7 +1,7 @@
 /* m00mch.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -65,6 +65,8 @@ char m00cyc[256] = {
 /*F0*/   4, 4, 4,UN, 4, 4, 4, 5, 4, 4, 4, 4,UN,UN, 5, 6
 };
 
+struct area *zpg;
+
 /*
  * Process a machine op.
  */
@@ -74,7 +76,6 @@ struct mne *mp;
 {
 	int op, t1;
 	struct expr e1;
-	struct area *espa;
 	char id[NCPS];
 	int c, v1, reg;
 
@@ -85,29 +86,25 @@ struct mne *mp;
 
 	case S_SDP:
 		opcycles = OPCY_SDP;
-		espa = NULL;
+		zpg = dot.s_area;
 		if (more()) {
 			expr(&e1, 0);
 			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
 				if (e1.e_addr) {
-					err('b');
+					xerr('b', "Only Page 0 Allowed.");
 				}
 			}
 			if ((c = getnb()) == ',') {
 				getid(id, -1);
-				espa = alookup(id);
-				if (espa == NULL) {
-					err('u');
+				zpg = alookup(id);
+				if (zpg == NULL) {
+					xerr('u', "Undefined Area.");
 				}
 			} else {
 				unget(c);
 			}
 		}
-		if (espa) {
-			outdp(espa, &e1, 0);
-		} else {
-			outdp(dot.s_area, &e1, 0);
-		}
+		outdp(zpg, &e1, 0);
 		lmode = SLIST;
 		break;
 
@@ -125,7 +122,7 @@ struct mne *mp;
 			outab(op+1);
 			break;
 		}
-		aerr();
+		xerr('a', "Register X Is Invalid.");
 		break;
 
 	case S_BRA:
@@ -134,7 +131,7 @@ struct mne *mp;
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
 		} else {
 			outrb(&e1, R_PCR);
@@ -163,12 +160,12 @@ struct mne *mp;
 			outrb(&e1, R_USGN);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_TYP2:
 		if ((reg = admode(abx)) == 0)
-			aerr();
+			xerr('a', "Register A, B, or X required.");
 
 	case S_TYP3:
 		if (!reg) {
@@ -178,13 +175,13 @@ struct mne *mp;
 		} else if (reg == S_B) {
 			reg = 0x40;
 		} else {
-			aerr();
+			xerr('a', "Register X is not allowed.");
 			reg = 0x00;
 		}
 		t1 = addr(&e1);
 		if (t1 == S_IMMED) {
 			if ((op|0x40) == 0xC7)
-				aerr();
+				xerr('a', "STA #__ and STB #__ are invalid.");
 			outab(op|reg);
 			outrb(&e1, 0);
 			break;
@@ -204,14 +201,14 @@ struct mne *mp;
 			outrb(&e1, R_USGN);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_TYP4:
 		t1 = addr(&e1);
 		if (t1 == S_IMMED) {
 			if ((op&0x0D) == 0x0D)
-				aerr();
+				xerr('a', "STS #__ and STX #__ are invalid.");
 			outab(op);
 			outrw(&e1, 0);
 			break;
@@ -231,7 +228,7 @@ struct mne *mp;
 			outrb(&e1, R_USGN);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_TYP5:
@@ -246,12 +243,12 @@ struct mne *mp;
 			outrb(&e1, R_USGN);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 
@@ -295,4 +292,9 @@ minit()
 	 * Byte Order
 	 */
 	hilo = 1;
+
+	/*
+	 * Zero Page Area Pointer
+	 */
+	zpg = NULL;
 }

@@ -1,7 +1,7 @@
 /* i08mch.c */
 
 /*
- *  Copyright (C) 2018-2019  Alan R. Baldwin
+ *  Copyright (C) 2018-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,9 +42,9 @@ char	*dsft	= "asm";
 /*
  * 8008 Cycle Count
  *
- *	opcycles = i80pg1[opcode]
+ *	opcycles = i08pg1[opcode]
  */
-static char i80pg1[256] = {
+static char i08pg1[256] = {
 /*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 /*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
 /*00*/   1,UN, 1, 1, 2, 1, 3, 1, 1, 1, 1, 1, 2, 1, 3, 1,
@@ -93,7 +93,7 @@ struct mne *mp;
 			outab(op | (v1<<3));
 		} else {
 			outab(op);
-			aerr();
+			xerr('a', "A and M are invalid.");
 		}
 		break;
 
@@ -108,12 +108,12 @@ struct mne *mp;
 			expr(&e1, 0);
 			if (is_abs(&e1)) {
 				if (e1.e_addr & ~0x07) {
-					aerr();
+					xerr('a', "Valid argument is 0 -> 7.");
 				}
 				v1 = (e1.e_addr & 0x07) << 3;
 				outab(op | v1);
 			} else {
-				outrbm(&e1, R_RST, op);
+				outrbm(&e1, R_RST | R_MBRO, op);
 			}
 		} else {
 			outab(op);
@@ -131,7 +131,7 @@ struct mne *mp;
 		} else {
 			outab(op);
 			outab(0);
-			aerr();
+			xerr('a', "Register required for first argument.");
 		}
 		break;
 
@@ -146,12 +146,12 @@ struct mne *mp;
 		if (is_abs(&e1)) {
 			if (e1.e_addr & ~0x07) {
 				outab(op);
-				aerr();
+				xerr('a', "Valid argument is 0 -> 7.");
 			} else {
 				outab(op | (e1.e_addr<<1));
 			}
 		} else {
-			outrbm(&e1, R_IN, op);
+			outrbm(&e1, R_IN | R_MBRO, op);
 		}
 		break;
 
@@ -159,13 +159,13 @@ struct mne *mp;
 		expr(&e1, 0);
 		if (is_abs(&e1)) {
 			if ((e1.e_addr & ~0x1F) || (e1.e_addr < 0x08)) {
-				outab(op | 0x08);
-				aerr();
+				outab(op | (0x08<<1));
+				xerr('a', "Valid argument is 8 -> 31.");
 			} else {
 				outab(op | (e1.e_addr<<1));
 			}
 		} else {
-			outrbm(&e1, R_OUT, op);
+			outrbm(&e1, R_OUT | R_MBRO, op);
 		}
 		break;
 
@@ -193,6 +193,7 @@ struct mne *mp;
 		default:
 			aerr();
 			outab(op);
+			xerr('a', "Valid options are REG or #__.");
 			break;
 		}
 		break;
@@ -220,17 +221,17 @@ struct mne *mp;
 			outrb(&e2, 0);
 		} else {
 			outab(op);
-			aerr();
+			xerr('a', "Valid options are REG,REG or REG,#__.");
 		}
 		break;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 	if (opcycles == OPCY_NONE) {
-		opcycles = i80pg1[cb[0] & 0xFF];
+		opcycles = i08pg1[cb[0] & 0xFF];
 	}
 }
 

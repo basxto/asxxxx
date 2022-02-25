@@ -1,7 +1,7 @@
 /* z8mch.c */
 
 /*
- *  Copyright (C) 2005-2014  Alan R. Baldwin
+ *  Copyright (C) 2005-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ struct mne *mp;
 				outrb(&e1, 0);		/* op  @R  */
 			}
 		} else {
-			aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -122,7 +122,7 @@ struct mne *mp;
 				outab(0xE0 + v1);
 			} else {
 				if (is_abs(&e1) && (v1 & 0x01)) {
-					aerr();
+					xerr('a', "Requires even address.");
 				}
 				outrb(&e1, 0);
 			}
@@ -135,7 +135,7 @@ struct mne *mp;
 				outrb(&e1, 0);
 			}
 		} else {
-			aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -203,7 +203,7 @@ struct mne *mp;
 			}
 			outrb(&e2, 0);
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -295,7 +295,7 @@ struct mne *mp;
 			outab((v2 << 4) + (t1 & 0x0F));
 			outrb(&e1, 0);
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 			
@@ -313,7 +313,7 @@ struct mne *mp;
 			outab(op + 0x10);
 			outab((v2 << 4) + v1);
 		} else {
- 	        	aerr();
+ 			xerr('a', "Allowed modes: R,@RR and @RR,R.");
 		}
 		break;
 
@@ -331,7 +331,7 @@ struct mne *mp;
 			outab(op + 0x10);
 			outab((v2 << 4) + v1);
 		} else {
- 	        	aerr();
+			xerr('a', "Allowed modes: @R,@RR and @RR,@R.");
 		}
 		break;
 
@@ -343,13 +343,13 @@ struct mne *mp;
 		if (t1 == S_R) {
 			op |= (v1 << 4);
 		} else {
-			aerr();
+			xerr('a', "First argument must be a register.");
 		}
 		outab(op);
 		if (mchpcr(&e2)) {
 			v2 = (int) (e2.e_addr - dot.s_addr - 1);
 			if ((v2 < -128) || (v2 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v2);
 		} else {
 			outrb(&e2, R_PCR);
@@ -370,7 +370,7 @@ struct mne *mp;
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
 		} else {
 			outrb(&e1, R_PCR);
@@ -397,29 +397,29 @@ struct mne *mp;
 			if (t2 == S_IRR) {
 				outab(0xE0 + v2);	/* JP  @rr    */
 			} else {
-				outrb(&e2, 0);		/* JP  @RR    */
+				outrb(&e2, 0);		/* JP  @__    */
 			}
 		} else {
-			aerr();
+			xerr('a', "Allowed modes: CC,addr / T,addr / @RR / @addr.");
 		}
 		break;
 
 	case S_CALL:
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
-		if ((t1 == S_IRR) || (t1 == S_INDX)) {	/* op  @RR  */
+		if ((t1 == S_IRR) || (t1 == S_INDX)) {	/* op  @  */
 			outab(op);
 			if (t1 == S_IRR) {
-				outab(0xE0 + v1);	/* op  @rr  */
+				outab(0xE0 + v1);	/* op  @RR  */
 			} else {
-				outrb(&e1, 0);		/* op  @RR  */
+				outrb(&e1, 0);		/* op  @__  */
 			}
 		} else
 		if (t1 == S_USER) {		
 			outab(op + 2);
 			outrw(&e1, 0);
 		} else {
-			aerr();
+			xerr('a', "Allowed modes: @RR / @addr / addr.");
 		}
 		break;
 
@@ -430,7 +430,7 @@ struct mne *mp;
 			outab(op);
 			outrb(&e1, 0);
 		} else {
-			aerr();
+			xerr('a', "Allowed modes: # / addr.");
 		}
 		break;
 
@@ -440,7 +440,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 

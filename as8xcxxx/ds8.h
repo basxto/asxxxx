@@ -1,7 +1,7 @@
 /* ds8.h */
 
 /*
- *  Copyright (C) 1998-2014  Alan R. Baldwin
+ *  Copyright (C) 1998-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -182,7 +182,6 @@ extern struct PreDef preDef[];
 extern	struct	adsym	reg51[];
 extern	int		addr(struct expr *esp);
 extern	int		admode(struct adsym *sp);
-extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 extern	int		reg(void);
 
@@ -197,7 +196,6 @@ extern	VOID		minit(void);
 extern	struct	adsym	reg51[];
 extern	int		addr();
 extern	int		admode();
-extern	int		any();
 extern	int		srch();
 extern	int		reg();
 

@@ -1,7 +1,7 @@
 /* asout.c */
 
 /*
- *  Copyright (C) 1989-2017  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -508,6 +508,7 @@ int r;
  *		VOID	out_lxb()	asout.c
  *		VOID	out_rw()	asout.c
  *		VOID	out_txb()	asout.c
+ *		VOID	xerr()		assubr.c
  *
  *	side effects:
  *		R and T Lines updated.  Listing updated.
@@ -551,21 +552,21 @@ int r;
 			 */
 			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_SGND) &&
 			   ((m & esp->e_addr) != m) && ((m & esp->e_addr) != 0))
-				aerr();
+				xerr('v', "Signed Number Exceeded Range.");
 
 			/*
 			 * Unsigned/Overflow Range Check
 			 */
 			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_USGN) &&
 			   ((n & esp->e_addr) != 0))
-				aerr();
+				xerr('v', "Unsigned Number Exceeded Range.");
 
 			/*
 			 * Page0 Range Check
 			 */
 			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_PAG0) &&
 			   ((n & esp->e_addr) != 0))
-				err('d');
+				xerr('d', "Page 0 Address Error.");
 
 			/*
 			 * R_MSB Option
@@ -746,7 +747,6 @@ a_uint v;
  *		char *	txtp		pointer to txt array
  *		
  *	functions called:
- *		VOID	aerr()		assubr.c
  *		int	hibyte()	asout.c
  *		int	lobyte()	asout.c
  *		VOID	outatxb()	asout.c
@@ -757,6 +757,7 @@ a_uint v;
  *		VOID	out_lxb()	asout.c
  *		VOID	out_rw()	asout.c
  *		VOID	out_txb()	asout.c
+ *		VOID	xerr()		assubr.c
  *
  *	side effects:
  *		R and T Lines updated.  Listing updated.
@@ -785,7 +786,7 @@ a_uint v;
 			   ((mp = modep[(r >> 8) & 0x0F]) != 0)) {
 			   	m = ~(mp->m_sbits >> 1);
 				if (((m & esp->e_addr) != m) && ((m & esp->e_addr) != 0))
-					aerr();
+					xerr('v', "Signed Number Exceeded Range.");
 			}
 			/*
 			 * Unsigned/Overflow Range Check
@@ -793,7 +794,7 @@ a_uint v;
 			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_USGN) &&
 			   ((mp = modep[(r >> 8) & 0x0F]) != 0)) {
 				if (~mp->m_sbits & esp->e_addr)
-					aerr();
+					xerr('v', "Unsigned Number Exceeded Range.");
 			}
 			/*
 			 * Page0 Range Check
@@ -801,7 +802,7 @@ a_uint v;
 			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_PAG0) &&
 			   ((mp = modep[(r >> 8) & 0x0F]) != 0)) {
 				if (~mp->m_sbits & esp->e_addr)
-					err('d');
+					xerr('d', "Page 0 Address Error.");
 			}
 
 			/*

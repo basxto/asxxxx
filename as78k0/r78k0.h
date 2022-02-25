@@ -1,7 +1,7 @@
 /* R78K0.H */
 
 /*
- *  Copyright (C) 2019  Alan R. Baldwin
+ *  Copyright (C) 2019-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@
 #define	S_EXT	40
 
 /*
- * 78KOS Instruction types
+ * 78KO Instruction types
  */
 #define	S_MOV	50
 #define	S_XCH	51
@@ -105,8 +105,6 @@
 #define	S_MUL	81
 #define	S_DIV	82
 
-#define	S_XERR	89
-
 /*
  * Set Direct Pointer
  */
@@ -121,8 +119,8 @@
 #define	REG8_B		3
 #define	REG8_E		4
 #define	REG8_D		5
-#define	REG8_H		6
-#define	REG8_L		7
+#define	REG8_L		6
+#define	REG8_H		7
 
 #define	REG16_AX	0
 #define	REG16_BC	1
@@ -174,7 +172,6 @@ extern	VOID		addrbit(struct expr *esp1, int *aindx1, int *amode1, struct expr *e
 extern	int		argdot(struct expr *esp, int *aindx, int flag);
 extern	int		dotarg(struct expr *esp, int *aindx, int flag);
 extern	int		admode(struct adsym *sp, int *aindx);
-extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 
 	/* r78kmch.c */
@@ -185,7 +182,6 @@ extern	VOID		pcrbra(struct expr *esp);
 extern	int		setbit(int b);
 extern	int		getbit(void);
 extern	VOID		mcherr(char *str);
-extern	a_uint		xerr;
 extern	struct	sdp	sdp;
 
 #else
@@ -197,7 +193,6 @@ extern	int		addrbit();
 extern	int		argdot();
 extern	int		dotarg();
 extern	int		admode();
-extern	int		any();
 extern	int		srch();
 
 	/* r78kmch.c */
@@ -208,7 +203,6 @@ extern	VOID		pcrbra();
 extern	int		setbit();
 extern	int		getbit();
 extern	VOID		mcherr();
-extern	a_uint		xerr;
 extern	struct	sdp	sdp;
 
 #endif

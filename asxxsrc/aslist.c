@@ -1,7 +1,7 @@
 /* aslist.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -971,6 +971,7 @@ int flag;
 	char *frmt;
 	char np[80];
 	char tp[80];
+	int n;
 
 	if (lop++ >= NLPP) {
 		if (flag) {
@@ -978,26 +979,19 @@ int flag;
 			 *12345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 *ASxxxx Assembler Vxx.xx  (Motorola 6809)                                Page 1
 			 */
+			sprintf(tp, "ASxxxx Assembler %s  (%s)", VERSION, cpu);
+			sprintf(np, "Page %u", ++page);
 		 	/*
 			 * Total string length is 78 characters.
 			 */
-			sprintf(tp, "ASxxxx Assembler %s  (%s)", VERSION, cpu);
-			sprintf(np, "%-78s", tp);
-			/*
-			 * Right justify page number in string.
-			 */
-			sprintf(tp, "Page %u", ++page);
-			strncpy(&np[strlen(np) - strlen(tp)], tp, strlen(tp));
+			n = 78 - strlen(tp) - strlen(np);
 			/*
 			 * Output string.
 			 */
-			fprintf(fp, "\f%s\n", np);
+			fprintf(fp, "\f%s%*s%s\n", tp, n, " " ,np);
 			/*
 			 *12345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 *Hexadecimal [16-Bits]                                 Sun Sep 15 17:22:25 2013
-			 */
-		 	/*
-			 * Total string length is 78 characters.
 			 */
 			switch(xflag) {
 			default:
@@ -1006,15 +1000,15 @@ int flag;
 			case 2:	frmt = "Decimal [%d-Bits]"; break;
 			}
 			sprintf(tp, frmt, 8 * a_bytes);
-			sprintf(np, "%-78s", tp);
-			/*
-			 * Right justify current time in string.
+			sprintf(np, "%.24s", ctime(&curtim));
+		 	/*
+			 * Total string length is 78 characters.
 			 */
-			strncpy(&np[strlen(np) - 24], ctime(&curtim), 24);
+			n = 78 - strlen(tp) - strlen(np);
 			/*
 			 * Output string.
 			 */
-			fprintf(fp, "%s\n", np);
+			fprintf(fp, "%s%*s%s\n", tp, n, " ", np);
 			fprintf(fp, "%s\n", tb);
 			fprintf(fp, "%s\n\n", stb);
 			if ((fp == lfp) && (asmc != NULL)) {

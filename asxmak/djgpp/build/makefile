@@ -30,6 +30,7 @@ ASXXXX =	as1802		\
 		as8048		\
 		as8051		\
 		as8085		\
+		as89lp		\
 		as8x300		\
 		as8xcxxx	\
 		asavr		\
@@ -103,6 +104,7 @@ SRC8008S=	$(ASXBAS)as8008s/
 SRC8048=	$(ASXBAS)as8048/
 SRC8051=	$(ASXBAS)as8051/
 SRC8085=	$(ASXBAS)as8085/
+SRC89LP=	$(ASXBAS)as89lp/
 SRC8X300=	$(ASXBAS)as8x300/
 SRC8xcxxx=	$(ASXBAS)as8xcxxx/
 SRCAVR=		$(ASXBAS)asavr/
@@ -602,6 +604,25 @@ as8085 :	$(ASXX) $(AS8085)
 		$(LD) $(LDFLAGS) -o as8085 $(ASXX) $(AS8085)
 		mv as8085.exe $(DSTEXE)as8085.exe
 		strip $(DSTEXE)as8085.exe
+
+
+####################################################################
+# AS89LP
+####################################################################
+
+AS89LP =	at89pst.o at89mch.o at89adr.o 
+
+at89pst.o :	$(SRC89LP)at89pst.c $(SRC89LP)at89.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+at89mch.o :	$(SRC89LP)at89mch.c $(SRC89LP)at89.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+at89adr.o :	$(SRC89LP)at89adr.c $(SRC89LP)at89.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+as89lp :	$(ASXX) $(AS89LP)
+		$(LD) $(LDFLAGS) -o as89lp $(ASXX) $(AS89LP)
+		mv as89lp.exe $(DSTEXE)as89lp.exe
+		strip $(DSTEXE)as89lp.exe
 
 
 ####################################################################

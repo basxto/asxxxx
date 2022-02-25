@@ -1,7 +1,7 @@
 /* scmpmch.c */
 
 /*
- *  Copyright (C) 2009-2014  Alan R. Baldwin
+ *  Copyright (C) 2009-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ struct mne *mp;
 				v1 = (int) (e1.e_addr - dot.s_addr);
 				/* Valid Range is -128 >> 0 >> +127 */
 				if ((v1 < -128) || (v1 > 127))
-					aerr();
+					xerr('a', "Branching Range Exceeded.");
 				outab(v1);
 			} else {
 				outrb(&e1, R_PCR0);
@@ -170,7 +170,7 @@ struct mne *mp;
 		outab(op);
 		outrb(&e1, 0);
 		if ((t1 != S_IMM) && (t1 != S_EXT)) {
-			aerr();
+			xerr('a', "Argument must be a #__ or a value.");
 		}
 		break;
 		 
@@ -192,7 +192,7 @@ struct mne *mp;
 				v1 = (int) (e1.e_addr - dot.s_addr - 1);
 				/* Valid Range is -128 >> 0 >> +127 */
 				if ((v1 < -128) || (v1 > 127))
-					aerr();
+					xerr('a', "Branching Range Exceeded.");
 				outab(v1);
 			} else {
 				outrb(&e1, R_PCR1);
@@ -221,10 +221,10 @@ struct mne *mp;
 		{
 			outab(op | (a1 & 0x03));
 			outrb(&e1, 0);
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		if (a1 & 0x04) {		/* @ not allowed */
-			aerr();
+			xerr('a', "Auto-Increment is invalid.");
 		}
 		break;
 
@@ -237,11 +237,11 @@ struct mne *mp;
 		t1 = addr(&e1);
 		a1 = aindx;	
 		if (a1 & 0x04) {
-			aerr();
+			xerr('a', "Auto-Increment is invalid.");
 		}
 		outab(op | (0x03 & a1));
 		if (t1 != S_PTR) {
-			aerr();
+			xerr('a', "Requires P0, P1, P2, P3, or PC.");
 		}
 		break;
 			
@@ -261,7 +261,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 

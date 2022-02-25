@@ -1,7 +1,7 @@
 /* m8cmch.c */
 
 /*
- *  Copyright (C) 2009-2014  Alan R. Baldwin
+ *  Copyright (C) 2009-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ struct mne *mp;
 			case S_IMM:	v2 = 1;	break;
 			case S_EXT:	v2 = 2;	break;
 			case S_INDX:	v2 = 3;	break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -102,7 +102,7 @@ struct mne *mp;
 		if ((t1 == S_SP) && (op == 0x00)) {
 			switch (t2) {
 			case S_IMM:		break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -113,7 +113,7 @@ struct mne *mp;
 			switch (t1) {
 			case S_EXT:	v1 = 4;	break;
 			case S_INDX:	v1 = 5;	break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -124,7 +124,7 @@ struct mne *mp;
 			switch (t1) {
 			case S_EXT:	v1 = 6;	break;
 			case S_INDX:	v1 = 7;	break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -132,7 +132,7 @@ struct mne *mp;
 			outrb(&e1, R_USGN);
 			outrb(&e2, R_USGN);
 		} else {
-			aerr();
+			xerr('a', "First argument: Invalid Addressing Mode.");
 			opcycles = OPCY_ERR;
 			return;
 		}
@@ -149,7 +149,7 @@ struct mne *mp;
 			case S_IMM:	v2 = 1;	break;
 			case S_EXT:	v2 = 2;	break;
 			case S_INDX:	v2 = 3;	break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -160,7 +160,7 @@ struct mne *mp;
 			switch (t1) {
 			case S_EXT:	v1 = 4;	break;
 			case S_INDX:	v1 = 5;	break;
-			default:	aerr();
+			default:	xerr('a', "First argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -168,7 +168,7 @@ struct mne *mp;
 			outrb(&e1, R_USGN);
 			outrb(&e2, R_USGN);
 		} else {
-			aerr();
+			xerr('a', "First argument not A or second argument not a #__ or constant.");
 			opcycles = OPCY_ERR;
 			return;
 		}
@@ -185,7 +185,7 @@ struct mne *mp;
 			case S_IMM:	v2 = 1;	break;
 			case S_EXT:	v2 = 2;	break;
 			case S_INDX:	v2 = 3;	break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -196,7 +196,7 @@ struct mne *mp;
 			switch (t1) {
 			case S_EXT:	v1 = 4;	break;
 			case S_INDX:	v1 = 5;	break;
-			default:	aerr();
+			default:	xerr('a', "First argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -210,7 +210,7 @@ struct mne *mp;
 			case S_F:	v1 = 0;	break;
 			case S_REXT:	v1 = 1;	break;
 			case S_RINDX:	v1 = 2; break;
-			default:	aerr();
+			default:	xerr('a', "First argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -219,7 +219,7 @@ struct mne *mp;
 				case 0x20:	op = 0x70;	break;
 				case 0x28:	op = 0x71;	break;
 				case 0x30:	op = 0x72;	break;
-				default:	aerr();
+				default:	xerr('a', "First argument: Invalid Addressing Mode.");
 						opcycles = OPCY_ERR;
 						return;
 				}
@@ -229,7 +229,7 @@ struct mne *mp;
 				case 0x20:	op = 0x40;	break;
 				case 0x28:	op = 0x42;	break;
 				case 0x30:	op = 0x44;	break;
-				default:	aerr();
+				default:	xerr('a', "Invalid Addressing Mode.");
 						opcycles = OPCY_ERR;
 						return;
 				}
@@ -240,7 +240,7 @@ struct mne *mp;
 			}
 			outrb(&e2, R_USGN);
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			opcycles = OPCY_ERR;
 			return;
 		}
@@ -253,7 +253,7 @@ struct mne *mp;
 		case S_A:	v1 = 0;	break;
 		case S_EXT:	v1 = 1;	break;
 		case S_INDX:	v1 = 2;	break;
-		default:	aerr();
+		default:	xerr('a', "Invalid Addressing Mode.");
 				opcycles = OPCY_ERR;
 				return;
 		}
@@ -267,7 +267,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		v1 = 1;
 		if (t1 != S_A) {
-			aerr();
+			xerr('a', "First argument must be A.");
 			opcycles = OPCY_ERR;
 			return;
 		}
@@ -282,7 +282,7 @@ struct mne *mp;
 		case S_X:	v1 = 1;	break;
 		case S_EXT:	v1 = 2;	break;
 		case S_INDX:	v1 = 3;	break;
-		default:	aerr();
+		default:	xerr('a', "Invalid Addressing Mode.");
 				opcycles = OPCY_ERR;
 				return;
 		}
@@ -304,12 +304,12 @@ struct mne *mp;
 			case S_INDX:	v1 = 1;	break;
 			case S_REXT:	v1 = 2;	break;
 			case S_RINDX:	v1 = 3;	break;
-			default:	aerr();
+			default:	xerr('a', "First argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
 		} else {
-			aerr();
+			xerr('a', "Second argument must be a #__.");
 			opcycles = OPCY_ERR;
 			return;
 		}
@@ -328,7 +328,7 @@ struct mne *mp;
 			switch (t1) {
 			case S_A:	v1 = 1;	break;
 			case S_X:	v1 = 2;	break;
-			default:	aerr();
+			default:	xerr('a', "First argument: Only A and X are valid.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -337,12 +337,12 @@ struct mne *mp;
 			switch (t2) {
 			case S_X:	v1 = 0;	break;
 			case S_SP:	v1 = 3;	break;
-			default:	aerr();
+			default:	xerr('a', "First argument: Only X and SP are valid.");
 					opcycles = OPCY_ERR;
 					return;
 			}
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			opcycles = OPCY_ERR;
 			return;
 		}
@@ -366,7 +366,7 @@ struct mne *mp;
 			outab(op + v2);
 			outrb(&e1, R_USGN);
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			opcycles = OPCY_ERR;
 			return;
 		}
@@ -386,7 +386,7 @@ struct mne *mp;
 			case S_X:	v2 = 11;	break;
 			case S_REXT:	v2 = 13;	break;
 			case S_RINDX:	v2 = 14;	break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -402,7 +402,7 @@ struct mne *mp;
 			case S_INDX:	v2 = 9;		break;
 			case S_A:	v2 = 12;	break;
 			case S_SP:	v2 = -1;	break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -417,7 +417,7 @@ struct mne *mp;
 			case S_IMM:	v2 = 5;		break;
 			case S_X:	v2 = 10;	break;
 			case S_EXT:	v2 = 15;	break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -431,7 +431,7 @@ struct mne *mp;
 			switch (t2) {
 			case S_A:	v2 = 4;		break;
 			case S_IMM:	v2 = 6;		break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -445,7 +445,7 @@ struct mne *mp;
 			switch (t2) {
 			case S_A:	v2 = 16;	break;
 			case S_IMM:	v2 = 18;	break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -459,7 +459,7 @@ struct mne *mp;
 			switch (t2) {
 			case S_A:	v2 = 17;	break;
 			case S_IMM:	v2 = 19;	break;
-			default:	aerr();
+			default:	xerr('a', "Second argument: Invalid Addressing Mode.");
 					opcycles = OPCY_ERR;
 					return;
 			}
@@ -469,7 +469,7 @@ struct mne *mp;
 				outrb(&e2, R_USGN);
 			}
 		} else {
-			aerr();
+			xerr('a', "First argument: Invalid Addressing Mode.");
 			opcycles = OPCY_ERR;
 			return;
 		}
@@ -486,7 +486,7 @@ struct mne *mp;
 			outab(op+0x08);
 			break;
 		}
-		aerr();
+		xerr('a', "Only A and X are valid.");
 		opcycles = OPCY_ERR;
 		return;
 
@@ -505,7 +505,7 @@ struct mne *mp;
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -2048) || (v1 > 2047)) {
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			}
 			outaw((op << 8) | (v1 & 0x0FFF));
 		} else {
@@ -518,7 +518,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		return;
 	}
 	if (opcycles == OPCY_NONE) {

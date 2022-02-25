@@ -1,7 +1,7 @@
 /* asmain.c */
 
 /*
- *  Copyright (C) 1989-2017  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -254,6 +254,7 @@ char *argv[];
 				 *   -c   Disable instruction cycle count in listing
 				 *   -f   Flag relocatable references by  `   in listing file
 				 *   -ff  Flag relocatable references by mode in listing file
+				 *   -k   Disable error output to listing file
 				 *   -p   Disable automatic listing pagination
 				 *   -u   Disable .list/.nlist processing
 				 *   -w   Wide listing format for symbol table
@@ -286,6 +287,11 @@ char *argv[];
 				case 'f':
 				case 'F':
 					++fflag;
+					break;
+
+				case 'k':
+				case 'K':
+					++kflag;
 					break;
 
 				case 'p':
@@ -768,6 +774,7 @@ int i;
  *		VOID	expr()		asexpr.c
  *		int	fndidx()	asmain.c
  *		FILE *	fopen()		c_library
+ *		int	fseek()		c_library
  *		int	get()		aslex.c
  *		VOID	getid()		aslex.c
  *		int	getmap()	aslex.c
@@ -819,7 +826,7 @@ asmbl()
 	int d, nc, uf;
 	int con_ovr, rel_abs, npg_pag, csg_dsg;
 	a_uint base, size, map, n, v;
-	int cnt, flags;
+	int skp, cnt, flags;
 	FILE * fp;
 	int m_type;
 
@@ -883,6 +890,8 @@ loop:
 		}
 		if (tp == NULL) {
 			tp=(struct tsym *) new (sizeof(struct tsym));
+			tp->t_area = dot.s_area;
+			tp->t_addr = dot.s_addr;
 			tp->t_lnk = symp->s_tsym;
 			tp->t_num = n;
 			tp->t_flg = 0;
@@ -1159,8 +1168,8 @@ loop:
 				}
 				break;
 
-			case O_IFF:	/* .if f */
-			case O_IFT:	/* .if t */
+			case O_IFF:		/* .if f */
+			case O_IFT:		/* .if t */
 			case O_IFTF:	/* .if tf */
 				if (tlevel == 0) {
 					err('i');
@@ -1526,54 +1535,133 @@ loop:
 		break;
 
 	case S_INCL:
-		lmode = SLIST;
-    		if (++incfil > MAXINC) {
-			--incfil;
-			err('i');
-			break;
-		}
-		if (incfil > maxinc) {
-			maxinc = incfil;
-		}
-		/*
-		 * Copy path of file opening the include file
-		 */
-		strncpy(fn,afn,afp);
-		/*
-		 * Concatenate the .include file specification
-		 */
-		getdstr(fn + afp, FILSPC + FILSPC - afp);
-		/*
-		 * If .include specifies a path
-		 * 	use it
-		 * else
-		 *	use path of file opening the include file
-		 */
-		if (fndidx(fn + afp) != 0) {
-			afilex(fn + afp, "");
-		} else {
-			afilex(fn, "");
-		}
-		/*
-		 * Open File
-		 */
-    		if ((fp = fopen(afntmp, "r")) == NULL) {
-			--incfil;
-			err('i');
-		} else {
-			asmi = (struct asmf *) new (sizeof (struct asmf));
-			asmi->next = asmc;
-			asmi->objtyp = T_INCL;
-			asmi->line = srcline;
-			asmi->flevel = flevel;
-			asmi->tlevel = tlevel;
-			asmi->lnlist = lnlist;
-			asmi->fp = fp;
-			asmi->afp = afptmp;
-			strcpy(asmi->afn,afntmp);
-			if (lnlist & LIST_PAG) {
-				lop = NLPP;
+		switch(mp->m_valu) {
+		case I_CODE:
+			lmode = SLIST;
+    			if (++incfil > MAXINC) {
+				--incfil;
+				err('i');
+				break;
 			}
+			if (incfil > maxinc) {
+				maxinc = incfil;
+			}
+			/*
+			 * Copy path of file opening the include file
+			 */
+			strncpy(fn,afn,afp);
+			/*
+			 * Concatenate the .include file specification
+			 */
+			getdstr(fn + afp, FILSPC + FILSPC - afp);
+			/*
+			 * If .include specifies a path
+			 * 	use it
+			 * else
+			 *	use path of file opening the include file
+			 */
+			if (fndidx(fn + afp) != 0) {
+				afilex(fn + afp, "");
+			} else {
+				afilex(fn, "");
+			}
+			/*
+			 * Open File
+			 */
+    			if ((fp = fopen(afntmp, "r")) == NULL) {
+				--incfil;
+				err('i');
+			} else {
+				asmi = (struct asmf *) new (sizeof (struct asmf));
+				asmi->next = asmc;
+				asmi->objtyp = T_INCL;
+				asmi->line = srcline;
+				asmi->flevel = flevel;
+				asmi->tlevel = tlevel;
+				asmi->lnlist = lnlist;
+				asmi->fp = fp;
+				asmi->afp = afptmp;
+				strcpy(asmi->afn,afntmp);
+				if (lnlist & LIST_PAG) {
+					lop = NLPP;
+				}
+			}
+			break;
+
+		case I_BNRY:
+			/*
+			 * Copy path of file opening the .incbin file
+			 */
+			strncpy(fn,afn,afp);
+			/*
+			 * Concatenate the .incbin file specification
+			 */
+			getdstr(fn + afp, FILSPC + FILSPC - afp);
+			/*
+			 * If .incbin specifies a path
+			 * 	use it
+			 * else
+			 *	use path of file opening the .incbin file
+			 */
+			if (fndidx(fn + afp) != 0) {
+				afilex(fn + afp, "");
+			} else {
+				afilex(fn, "");
+			}
+			/*
+			 * Skip Count
+			 */
+			skp = 0;
+			comma(0);
+			if (more() && !comma(0))
+				skp = (int) absexpr();
+			/*
+			 * Insert Count
+			 */
+#ifdef	LONGINT
+			cnt = 0x7FFFFFFFl;
+#else
+			cnt = 0x7FFFFFFF;
+#endif
+			comma(0);
+			if (more())
+				cnt = (int) absexpr();
+			/*
+			 * Open File
+			 */
+    			if ((fp = fopen(afntmp, "rb")) == NULL) {
+				xerr('i', "File not found.");
+				break;
+			}
+			/*
+			 * Skip To Position
+			 */
+			fseek(fp, skp, SEEK_SET);
+			if (fread(&c, 1, 1, fp) != 1) {
+				xerr('i', "Offset past End-Of-File.");
+				break;
+			}
+			fseek(fp, skp, SEEK_SET);
+			/*
+			 * Read Bytes
+			 */
+			while (cnt > 0) {
+				if (fread(&c, 1, 1, fp) == 1) {
+					outab(c);
+				} else {
+					break;
+				}
+				cnt -= 1;
+			}
+			/*
+			 * Close File
+			 */
+			fclose(fp);
+			break;
+
+		default:
+			xerr('i', "Internal ___PST.C Error.");
+			break;
 		}
 		break;
 
@@ -2192,7 +2280,9 @@ loop:
 		if (e1.e_addr != 0) {
 			err('e');
 		}
-		lmode = SLIST;
+		lmode = ELIST;
+		eqt_area = NULL;
+		laddr = e1.e_addr;
 		break;
 
 	case S_MSB:
@@ -2261,12 +2351,12 @@ loop:
 		if (asmc->objtyp == T_ASM) {
 
 #if NOICE
-	                /*
-		         * NoICE	JLH
+			/*
+			 * NoICE	JLH
 			 */
-	                if (jflag && (pass == 1)) {
+			if (jflag && (pass == 1)) {
 				DefineNoICE_Line();
-                	}
+			}
 #endif
 
 #if SDCDB
@@ -2785,6 +2875,7 @@ char *usetxt[] = {
 	"  -c   Disable instruction cycle count in listing",
 	"  -f   Flag relocatable references by  `   in listing file",
 	"  -ff  Flag relocatable references by mode in listing file",
+	"  -k   Disable error messages to listing file",
 	"  -p   Disable automatic listing pagination",
 	"  -u   Disable .list/.nlist processing",
 	"  -w   Wide listing format for symbol table",

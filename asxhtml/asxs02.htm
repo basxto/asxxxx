@@ -64,6 +64,7 @@ operands.  Legal operands differ with each directive.
 <LI><A HREF= #ifalt>  Alternate .if Directive Forms </A>
 <LI><A HREF= #iif>  Immediate Conditional Assembly Directives </A>
 <LI><A HREF= #include>  .include Directive </A>
+<LI><A HREF= #incbin>  .incbin Directive </A>
 <LI><A HREF= #define>  .define and .undefine Directives </A>
 <LI><A HREF= #setdp>  .setdp Directive </A>
 <LI><A HREF= #bits>  .16bit, .24bit, and .32bit Directives </A>
@@ -189,9 +190,11 @@ value.
 
    Examples of listing options:  
 
-        .list   (meb)   ; lists macro generated binary
-
-        .list   (me)    ; lists macro expansions
+        .list   (meb)   ; macro processing lists only
+                        ; generated binary and location
+        
+        .list   (me)    ; listing options are enabled
+                        ; during macro processing
 
         .nlist  (src)   ; .nlist src lines not listed
 
@@ -263,7 +266,7 @@ where:  string  represents a text string.  The string is printed
                 characters,  as  long  as the characters are not
                 contained within  the  string  itself.   If  the
                 delimiting  characters  do  not  match, the .msg
-                directive will give the &ltq&gt error.  
+                directive will give the &lt;q&gt; error.  
 
 
    The  .msg  directive  is  useful to report assembly status or
@@ -281,7 +284,7 @@ Format:
 
 where:  exp     represents   an  absolute  expression.   If  the
                 evaluation of the expression results  in  a  non
-                zero value then an &lte&gt error is reported and the
+                zero value then an &lt;e&gt; error is reported and the
                 text line is listed in the generated error.  
 
 
@@ -456,7 +459,7 @@ where:  string  is a string of printable ascii characters.
                 characters,  as  long  as the characters are not
                 contained within  the  string  itself.   If  the
                 delimiting  characters  do not match, the .ascii
-                directive will give the &ltq&gt error.  
+                directive will give the &lt;q&gt; error.  
 
 The  .ascii,  .fcc, and .str directives place one binary byte of
 data for each character in the string into the object module.  
@@ -485,7 +488,7 @@ where:  string  is a string of printable ascii characters.
                 characters,  as  long  as the characters are not
                 contained within  the  string  itself.   If  the
                 delimiting  characters  do not match, the .ascis
-                and .strs directives will give the &ltq&gt error.  
+                and .strs directives will give the &lt;q&gt; error.  
 
 
    The .ascis and .strs directives place one binary byte of data
@@ -516,7 +519,7 @@ where:  string  is a string of printable ascii characters.
                 characters,  as  long  as the characters are not
                 contained within  the  string  itself.   If  the
                 delimiting  characters  do not match, the .asciz
-                and .strz directive will give the &ltq&gt error.  
+                and .strz directive will give the &lt;q&gt; error.  
 
 
    The .asciz and .strz directives place one binary byte of data
@@ -536,7 +539,7 @@ Format:
 
 where:  exp     represents   an  absolute  expression.   If  the
                 evaluation of the expression results  in  a  non
-                zero value then an &lte&gt error is reported and the
+                zero value then an &lt;e&gt; error is reported and the
                 text line is listed in the generated error.  
 
 
@@ -859,7 +862,7 @@ where:  exp     is  an absolute expression that becomes the cur-
                 rent location counter.  
 
 The  .org directive is valid only in an absolute program section
-and will give a &ltq&gt error if used in a relocatable program area.
+and will give a &lt;q&gt; error if used in a relocatable program area.
 The  .org  directive specifies that the current location counter
 is to become the specified absolute value.  
 
@@ -1005,23 +1008,12 @@ all valid .if/.else/.endif constructions:
         .endif                  ;is zero
 
 
-The .if/.else/.endif directives may be nested upto 10 levels.  
+All .if/.else/.endif directives are limited to a maximum nesting
+of 10 levels.  
 
-   The  .page  directive  is  processed within a false condition
-range to allow extended textual information to  be  incorporated
-in  the  source  program  with  out  the need to use the comment
-delimiter (;):  
-
-        .if     0
-
-        .page
-        This text will be bypassed during assembly
-        but appear in the listing file.
-        .
-        .
-        .
-
-        .endif
+   The  use of a .else directive outside a .if/.endif block will
+generate an &lt;i&gt; error.  Assemblies having unequal .if and .endif
+counts will cause an &lt;i&gt; error.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -1075,11 +1067,11 @@ conditions are determined by the .if/.else conditional state.
 nesting of 10 levels.  
 
    The  use  of the .iff, .ift, or .iftf directives outside of a
-conditional block results in a &lti&gt error code.  
+conditional block results in a &lt;i&gt; error code.  
 
    The  use of a .else directive outside a .if/.endif block will
-generate an &lti&gt error.  Assemblies having unequal .if and .endif
-counts will cause an &lti&gt error.  
+generate an &lt;i&gt; error.  Assemblies having unequal .if and .endif
+counts will cause an &lt;i&gt; error.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -1135,7 +1127,12 @@ all valid .if/.else/.endif constructions:
         .endif                  ;is zero
 
 
-The .ifxx/.else/.endif directives may be nested upto 10 levels. 
+All .if/.else/.endif directives are limited to a maximum nesting
+of 10 levels.  
+
+   The  use of a .else directive outside a .if/.endif block will
+generate an &lt;i&gt; error.  Assemblies having unequal .if and .endif
+counts will cause an &lt;i&gt; error.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -1167,22 +1164,32 @@ processed.  The range of true condition is optional  as  is  the
 are all valid .ifdef/.else/.endif constructions:  
 
         .ifdef  sym$1           ;lookup symbol sym$1
-        .byte   1,2             ;insert bytes if sym$1 is
-        .endif                  ;defined
+        .byte   1,2             ;insert bytes if sym$1
+        .endif                  ;is defined or
+                                ;assigned a value
 
         .ifdef  sym$2           ;lookup symbol sym$2
         .else
         .byte   3,4             ;insert bytes if sym$1
-        .endif                  ;is not defined
+        .endif                  ;is not defined and
+                                ;not assigned a value
 
         .ifdef  sym$3           ;lookup symbol sym$3
         .byte   12              ;insert this byte if sym$3
-        .else                   ;is defined
+        .else                   ;is defined/valued
         .byte   13              ;insert this byte if sym$3
-        .endif                  ;is not defined
+        .endif                  ;is not defined/valued
 
 
-The .ifdef/.else/.endif directives may be nested upto 10 levels. 
+Note  that the default assembler configuration of case sensitive
+means the testing for a defined symbol is also case sensitive.  
+
+   All  .if/.else/.endif  directives  are  limited  to a maximum
+nesting of 10 levels.  
+
+   The  use of a .else directive outside a .if/.endif block will
+generate an &lt;i&gt; error.  Assemblies having unequal .if and .endif
+counts will cause an &lt;i&gt; error.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -1215,22 +1222,28 @@ following are all valid .ifndef/.else/.endif constructions:
 
         .ifndef sym$1           ;lookup symbol sym$1
         .byte   1,2             ;insert bytes if sym$1 is
-        .endif                  ;not defined
+        .endif                  ;not defined and
+                                ;not assigned a value
 
         .ifndef sym$2           ;lookup symbol sym$2
         .else
         .byte   3,4             ;insert bytes if sym$1
-        .endif                  ;is defined
+        .endif                  ;is defined or
+                                ;is assigned a value
 
         .ifndef sym$3           ;lookup symbol sym$3
         .byte   12              ;insert this byte if sym$3
-        .else                   ;is not defined
+        .else                   ;is not defined/valued
         .byte   13              ;insert this byte if sym$3
-        .endif                  ;is defined
+        .endif                  ;is defined/valued
 
 
-The  .ifndef/.else/.endif  directives may be nested upto 10 lev-
-els.  
+All .if/.else/.endif directives are limited to a maximum nesting
+of 10 levels.  
+
+   The  use of a .else directive outside a .if/.endif block will
+generate an &lt;i&gt; error.  Assemblies having unequal .if and .endif
+counts will cause an &lt;i&gt; error.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -1281,8 +1294,8 @@ All .if/.else/.endif directives are limited to a maximum nesting
 of 10 levels.  
 
    The  use of a .else directive outside a .if/.endif block will
-generate an &lti&gt error.  Assemblies having unequal .if and .endif
-counts will cause an &lti&gt error.  
+generate an &lt;i&gt; error.  Assemblies having unequal .if and .endif
+counts will cause an &lt;i&gt; error.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -1333,8 +1346,8 @@ All .if/.else/.endif directives are limited to a maximum nesting
 of 10 levels.  
 
    The  use of a .else directive outside a .if/.endif block will
-generate an &lti&gt error.  Assemblies having unequal .if and .endif
-counts will cause an &lti&gt error.  
+generate an &lt;i&gt; error.  Assemblies having unequal .if and .endif
+counts will cause an &lt;i&gt; error.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -1390,8 +1403,8 @@ All .if/.else/.endif directives are limited to a maximum nesting
 of 10 levels.  
 
    The  use of a .else directive outside a .if/.endif block will
-generate an &lti&gt error.  Assemblies having unequal .if and .endif
-counts will cause an &lti&gt error.  
+generate an &lt;i&gt; error.  Assemblies having unequal .if and .endif
+counts will cause an &lt;i&gt; error.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -1447,8 +1460,8 @@ All .if/.else/.endif directives are limited to a maximum nesting
 of 10 levels.  
 
    The  use of a .else directive outside a .if/.endif block will
-generate an &lti&gt error.  Assemblies having unequal .if and .endif
-counts will cause an &lti&gt error.  
+generate an &lt;i&gt; error.  Assemblies having unequal .if and .endif
+counts will cause an &lt;i&gt; error.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -1496,8 +1509,8 @@ All .if/.else/.endif directives are limited to a maximum nesting
 of 10 levels.  
 
    The  use of a .else directive outside a .if/.endif block will
-generate an &lti&gt error.  Assemblies having unequal .if and .endif
-counts will cause an &lti&gt error.  
+generate an &lt;i&gt; error.  Assemblies having unequal .if and .endif
+counts will cause an &lt;i&gt; error.  
 
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
@@ -1547,12 +1560,6 @@ Alternate Format:
         .iif    b    (,)arg(,)          line_to_assemble
         .iif    nb   (,)arg(,)          line_to_assemble
         .iif    idn  (,)arg1,arg2(,)    line_to_assemble
-
-
-THE ASSEMBLER                                          PAGE 1-44
-GENERAL ASSEMBLER DIRECTIVES
-
-
         .iif    dif  (,)arg1,arg2(,)    line_to_assemble
 
         .iiff                           line_to_assemble
@@ -1569,6 +1576,53 @@ arguments are delimited with the form ^/symbol/ for each symbol.
    The   immediate   conditional  directives  donot  change  the
 .if/.else/.endif nesting level.  
 
+</PRE></B></H4>
+<H5><A HREF= #Directives> =&gt; Section Index</A></H5>
+<HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
+<H4><B><PRE>
+<A NAME = "incbin"></A><FONT COLOR="#FF0000">.incbin</FONT> Directive
+
+Format:  
+
+        .incbin          /string/ [,offset [,count]]    or 
+
+        .incbin         ^/string/ [,offset [,count]] 
+
+
+where:  string  represents  a string that is the file specifica-
+                tion of any file type.  
+
+        /  /    represent   the  delimiting  characters.   These
+                delimiters   may   be   any   paired    printing
+                characters,  as  long  as the characters are not
+                contained within  the  string  itself.   If  the
+                delimiting characters do not match, the .include
+                directive will give the &lt;q&gt; error.  
+
+   The  .incbin  directive  is  used to insert the contents of a
+file verbatim into the assembler as a byte stream.  This can  be
+handy  (for example) when including some arbitrary data directly
+into the executable output.  However, it is recommended  to  use
+this only for small pieces of data.  
+
+   The .incbin can be invoked with one or two optional arguments
+which specify the number of bytes to skip in the  file  and  the
+maximum number of bytes to insert into the output file.  
+
+.incbin "file.dat"              ; include the whole file
+.incbin "file.dat",1024         ; skip the first 1024 bytes
+.incbin "file.dat",1024,512     ; skip first 1024, and
+                                ; include at most 512 bytes
+
+The ',' delimiters can be any regular delimiter - space, tab, or
+','.  The offset and count arguments must be local, evaluate  to
+a  constant, and may be 0.  A blank offset is by default 0 and a
+blank count is the remainder of the file.  
+
+   An offset equal to or greater than the file length results in
+an &lt;i&gt; error.  A count that is larger than the  remaining  bytes
+in a file does not result in an error.
+  
 </PRE></B></H4>
 <H5><A HREF= #Directives> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
@@ -1590,7 +1644,7 @@ where:  string  represents  a string that is the file specifica-
                 characters,  as  long  as the characters are not
                 contained within  the  string  itself.   If  the
                 delimiting characters do not match, the .include
-                directive will give the &ltq&gt error.  
+                directive will give the &lt;q&gt; error.  
 
    The .include directive is used to insert a source file within
 the source file currently being assembled.  When this  directive
@@ -1625,7 +1679,7 @@ D:\proj\include1.asm is opened.
                          |                                           (rooted)                    |
              _____       |           _____                                                       |
             |     |      |          |     |                                                      |
-         ---| inc |  &lt---/       ---| bin |                                                      |
+         ---| inc |  &lt;---/       ---| bin |                                                      |
          |  |_____|              |  |_____|                                                      |
          |     |                 |     |                                                         |
          |     \___ inc4.asm     |     \___ ascheck.exe                                          |
@@ -1633,14 +1687,14 @@ D:\proj\include1.asm is opened.
          |                       |                                                               |
  _____   |   _____       _____   |   _____       _____                                           |
 |     |  |  |     |     |     |  |  |     |     |     |      (in prjct.asm directory)            |
-| C:\ |-----| ..\ |-----| __&gt |--+--| src |-----|prjct|  &lt-------------------------------\       |
+| C:\ |-----| ..\ |-----| __&gt; |--+--| src |-----|prjct|  &lt;-------------------------------\       |
 |_____|     |_____|  |  |_____|  |  |_____|  |  |_____|                                  |       |
                      |           |           |     |                .include "inc1.asm" -/       |
                      |     ^     |           |     \___ prjct.asm   .include "C:\inc\inc4.asm" --/
                      |     |     |           |     \___ inc1.asm    .include "..\inc\inc3.asm" -------\
     Current          |     |     |           |   _____              .include "src\inc\inc2.asm" -\    |
-    Working  ------&gt | &gt---/     |           |  |     |                                          |    |
-   Directory         |           |           ---| inc |  &lt---------------------------------------/    |
+    Working  ------&gt; | &gt;---/     |           |  |     |                                          |    |
+   Directory         |           |           ---| inc |  &lt;---------------------------------------/    |
                      |           |              |_____|   (relative to current working directory)     |
                      |           |                 |                                                  |
                      |           |                 \___ inc2.asm                                      |
@@ -1653,7 +1707,7 @@ D:\proj\include1.asm is opened.
                      |                                                                                |
                      |   _____                                                                        |
                      |  |     |                          (relative to current working directory)      |
-                     ---| inc |  &lt--------------------------------------------------------------------/
+                     ---| inc |  &lt;--------------------------------------------------------------------/
                         |_____|
                            |
                            \___ inc3.asm
@@ -1673,7 +1727,7 @@ D:\proj\include1.asm is opened.
                          |                                           (rooted)                    |
              _____       |           _____                                                       |
             |     |      |          |     |                                                      |
-         ---| inc |  &lt---/       ---| bin |                                                      |
+         ---| inc |  &lt;---/       ---| bin |                                                      |
          |  |_____|              |  |_____|                                                      |
          |     |                 |     |                                                         |
          |     \___ inc4.asm     |     \___ ascheck                                              |
@@ -1681,14 +1735,14 @@ D:\proj\include1.asm is opened.
          |                       |                                                               |
  _____   |   _____       _____   |   _____       _____                                           |
 |     |  |  |     |     |     |  |  |     |     |     |      (in prjct.asm directory)            |
-|  /  |-----| ../ |-----| __$ |--+--| src |-----|prjct|  &lt-------------------------------\       |
+|  /  |-----| ../ |-----| __$ |--+--| src |-----|prjct|  &lt;-------------------------------\       |
 |_____|     |_____|  |  |_____|  |  |_____|  |  |_____|                                  |       |
                      |           |           |     |                .include "inc1.asm" -/       |
                      |     ^     |           |     \___ prjct.asm   .include "/inc/inc4.asm" ----/
                      |     |     |           |     \___ inc1.asm    .include "../inc/inc3.asm" -------\
     Current          |     |     |           |   _____              .include "src/inc/inc2.asm" -\    |
-    Working  ------&gt | &gt---/     |           |  |     |                                          |    |
-   Directory         |           |           ---| inc |  &lt---------------------------------------/    |
+    Working  ------&gt; | &gt;---/     |           |  |     |                                          |    |
+   Directory         |           |           ---| inc |  &lt;---------------------------------------/    |
                      |           |              |_____|   (relative to current working directory)     |
                      |           |                 |                                                  |
                      |           |                 \___ inc2.asm                                      |
@@ -1701,7 +1755,7 @@ D:\proj\include1.asm is opened.
                      |                                                                                |
                      |   _____                                                                        |
                      |  |     |                          (relative to current working directory)      |
-                     ---| inc |  &lt--------------------------------------------------------------------/
+                     ---| inc |  &lt;--------------------------------------------------------------------/
                         |_____|
                            |
                            \___ inc3.asm
@@ -1734,7 +1788,7 @@ where:  string  represents  a string that is substituted for the
                 characters,  as  long  as the characters are not
                 contained within  the  string  itself.   If  the
                 delimiting  characters do not match, the .define
-                directive will give the &ltq&gt error.  
+                directive will give the &lt;q&gt; error.  
 
    The  .define  directive specifies a user defined string which
 is substituted for the keyword.  The substitution string may it-
@@ -1742,7 +1796,7 @@ self  contain other keywords that are substitutable.  The assem-
 bler resumes the parse of the line at the point the keyword  was
 found.  Care must be excersized to avoid any circular references
 within .define directives, otherwise the assembler may  enter  a
-'recursion runaway' resulting in an &lts&gt error.  
+'recursion runaway' resulting in an &lt;s&gt; error.  
 
    The  .undefine  directive removes the keyword as a substitut-
 able string.  No error is returned if the keyword  was  not  de-
@@ -1924,7 +1978,7 @@ Format:
 sembler output configuration.  These  directives  are  currently
 only enabled in assembler 'ascheck'.  
 
-   An  &ltm&gt error will be generated if the .lohi and .hilo direc-
+   An  &lt;m&gt; error will be generated if the .lohi and .hilo direc-
 tives are both used within the same assembly source file.  
 
 </PRE></B></H4>
@@ -1964,7 +2018,7 @@ record formats described in the linker section for details.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2019</B></P></H6>
+<H6><P><B>Last Updated: March 2021</B></P></H6>
 </BODY> 
 </HTML>
 

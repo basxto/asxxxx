@@ -221,61 +221,81 @@ listing file and printed on the stderr device.
 
    The assembler reports the errors on the stderr device as 
 
-        ?ASxxxx-Error-&lt*&gt in line nnn of filename
+        ?ASxxxx-Error-&lt;*&gt; in line nnn of filename
 
 where  * is the error code, nnn is the line number, and filename
-is the source/include file.  
+is the source/include file.  This line is followed by a  generic
+error message for the <*> error code.
 
    The errors are:  
 
-      &lt.&gt   This  error  is caused by an absolute direct assign-
+      &lt;.&gt;   This  error  is caused by an absolute direct assign-
             ment of the current location counter 
                   . = expression (incorrect) 
             rather than the correct 
                   . = . + expression 
 
-      &lta&gt   Indicates  a machine specific addressing or address-
+      &lt;a&gt;   Indicates  a machine specific addressing or address-
             ing mode error.  
 
-      &ltb&gt   Indicates a direct page boundary error.  
+      &lt;b&gt;   Indicates a direct page boundary error.  
 
-      &ltc&gt   Indicates modulus of .bndry directives to large.  
+      &lt;c&gt;   Indicates modulus of .bndry directives to large.  
 
-      &ltd&gt   Indicates a direct page addressing error.  
+      &lt;d&gt;   Indicates a direct page addressing error.  
 
-      &lte&gt   Caused by a .error or .assume directive.  
+      &lt;e&gt;   Caused by a .error or .assume directive.  
 
-      &lti&gt   Caused  by  an  .include file error or an .if/.endif
+      &lt;i&gt;   Caused  by  an  .include file error or an .if/.endif
             mismatch.  
 
-      &ltm&gt   Multiple  definitions  of  the  same label, multiple
+      &lt;m&gt;   Multiple  definitions  of  the  same label, multiple
             .module directives, multiple conflicting  attributes
             in  an  .area or .bank directive or the use of .hilo
             and lohi within the same assembly.  
 
-      &ltn&gt   An  .mexit,  .endm,  or .narg directive outside of a
+      &lt;n&gt;   An  .mexit,  .endm,  or .narg directive outside of a
             macro, repeat block or indefinite repeat block.  
 
-      &lto&gt   Directive  or  mnemonic error or the use of the .org
+      &lt;o&gt;   Directive  or  mnemonic error or the use of the .org
             directive in a relocatable area.  
 
-      &ltp&gt   Phase error:  label location changing between passes
+      &lt;p&gt;   Phase error:  label location changing between passes
             2 and 3.  Normally caused by having  more  than  one
             level of forward referencing.  
 
-      &ltq&gt   Questionable syntax:  missing or improper operators,
+      &lt;q&gt;   Questionable syntax:  missing or improper operators,
             terminators, or delimiters.  
 
-      &ltr&gt   Relocation  error:   logic  operation attempted on a
+      &lt;r&gt;   Relocation  error:   logic  operation attempted on a
             relocatable term, addition of two relocatable terms,
             subtraction  of two relocatable terms not within the
             same programming area or external symbols.  
 
-      &lts&gt   String Substitution / recursion error.  
+      &lt;s&gt;   String Substitution / recursion error.  
 
-      &ltu&gt   Undefined symbol encountered during assembly.  
+      &lt;u&gt;   Undefined symbol encountered during assembly.  
 
-      &ltz&gt   Divide by 0 or Modulus by 0 error:  result is 0.  
+      &lt;z&gt;   Divide by 0 or Modulus by 0 error:  result is 0.  
+
+
+   Most  assemblers  now include more descriptive error messages
+for &lt;a&gt;, &lt;o&gt;, and &lt;q&gt; errors.  Those assemblers updated to  pro-
+vide  the  expanded  error messages will show three lines on the
+stdout device as shown by this error:  
+
+    ?ASxxxx-Error-&lt;a&gt; in line 1867 of tez80e.asm
+                  &lt;a&gt; '1867         ld.l    sp,(var1)       ;a'
+                  &lt;a&gt; Only .SIS and .LIL suffixes allowed.
+
+
+   The  first line is the basic error in line xxxx message.  The
+second line lists the actual line in error followed by  a  third
+line containing the more specific error.  
+
+   The  listing  file (.lst) will have the first and third lines
+of the error message inserted preceeding the line containing the
+error.  
 
 </PRE></B></H4>
 <H5><A HREF="asmblr.htm#Index">  Return to the Assembler Index</A></H5>
@@ -504,8 +524,10 @@ Octal:           111 222 333
 Decimal:         111 222 333
 Hex:             11 22 33
 
-Parameter 1 is the listed parameters for the
-line designated by a bit position in the parameter:
+
+Parameter 1 specifies the parameters listed in the line.
+A bit is set for each listing option enabled during the
+assembly of the line.
 
         BIT 0   - LIST_ERR      Error Code(s)
         BIT 1   - LIST_LOC      Location
@@ -575,6 +597,6 @@ action.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2019</B></P></H6>
+<H6><P><B>Last Updated: March 2021</B></P></H6>
 </BODY> 
 </HTML>

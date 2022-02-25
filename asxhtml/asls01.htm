@@ -96,8 +96,8 @@ The linker commands are explained in some more detail:
     1.  -h        or NO ARGUMENTS Show this help list 
         Simply prints the help list on stdout.  
 
-    2.  -c        ASlink >> prompt mode.  
-        The  ASlink >>  prompt  mode reads linker commands from
+    2.  -c        ASlink &gt&gt prompt mode.  
+        The  ASlink &gt&gt  prompt  mode reads linker commands from
         stdin.  
 
     3.  -f file   Command file mode.  
@@ -209,13 +209,13 @@ ways:
      1.  If  the  library  file  contained an absolute path/file
          specification  then  this  is   the   object   module's
          path/file.  
-         (i.e.  C:\...) 
+         (i.e.  C:\...  or C:/...) 
 
      2.  If  the  library  file  contains  a  relative path/file
          specification then the concatenation of  the  path  and
          this  file  specification  becomes  the object module's
          path/file.  
-         (i.e.  \...) 
+         (i.e.  \...  or /...) 
 
 
    As  an example, assume there exists a library file termio.lib
@@ -279,15 +279,15 @@ bytes.  Any errors are noted on stderr and in the map file.
 The  linker  also  automatically  generates two symbols for each
 linked program area:  
 
-    'a_<area>'      The starting address of the area.  
+    'a_&ltarea&gt'      The starting address of the area.  
 
-    'l_<area>'      The length of the area.  
+    'l_&ltarea&gt'      The length of the area.  
 
 and two symbols for each area segment:  
 
-    'm_<area>_n'    The boundary modulus of the area segment.  
+    'm_&ltarea&gt_n'    The boundary modulus of the area segment.  
 
-    's_<area>_n'    The starting address of the area segment.  
+    's_&ltarea&gt_n'    The starting address of the area segment.  
 
 The  appended  '_n'  signifies  the area segment number within a
 linked area.  
@@ -465,8 +465,8 @@ value.
 
 
             The value of the element specifies if the normal in-
-            teger bit is active (bit <7> is set, 0x80) and  what
-            destination  bit  (bits  <4:0>,  0  -  31) should be
+            teger bit is active (bit &lt7&gt is set, 0x80) and  what
+            destination  bit  (bits  &lt4:0&gt,  0  -  31) should be
             loaded with this normal integer bit.  
 
 </PRE></B></H4>
@@ -566,8 +566,8 @@ current  values  were  assembled.  Relocation information is en-
 coded in groups of 4 bytes:  
 
      1.  n1 is the relocation mode and object format.  
-         1.  bits <1:0> specify the number of bytes to output 
-         2.  bits <2:3> normal(0x00) /   MSB   (0x0C) 
+         1.  bits &lt1:0&gt specify the number of bytes to output 
+         2.  bits &lt2:3&gt normal(0x00) /   MSB   (0x0C) 
                         signed(0x04) / unsigned(0x08) 
          3.  bit 4  normal(0x00)/page   '0' (0x10) reference 
          4.  bit 5  normal(0x00)/page 'nnn' (0x20) reference 
@@ -576,10 +576,10 @@ coded in groups of 4 bytes:
          6.  bit 7  relocatable area(0x00)/symbol(0x80) 
 
      2.  n2 is a byte index and a merge mode index 
-         1.  bits <3:0>  are a byte index into the corresponding
+         1.  bits &lt3:0&gt  are a byte index into the corresponding
              (i.e.  preceeding) T line data (i.e.  a pointer  to
              the data to be updated by the relocation).  
-         2.  bits <7:4> are an index into a selected merge mode.
+         2.  bits &lt7:4&gt are an index into a selected merge mode.
              Currently mode 0 simply specifies to  use  standard
              byte processing modes and merging is ignored.  
 
@@ -703,7 +703,6 @@ fining (Defin) the symbol:
          file        module      area        offset
   Refby  t           Pagetest    PROGRAM     0006
   Defin  t           Pagetest    DIRECT      0100
-
 
 If the symbol is defined in the same module as the reference the
 linker is unable to report the symbol name.  The assembler list-
@@ -901,8 +900,7 @@ coded in groups of 4 bytes:
          1.  bit 0  word(0x00)/byte(0x01) 
          2.  bit 1  relocatable area(0x00)/symbol(0x02) 
          3.  bit 2  normal(0x00)/PC relative(0x04) relocation 
-         4.  bit 3  1-byte(0x00)/2-byte(0x08)  object format for
-             byte data 
+         4.  bit 3  1-byte(0x00)/2-byte(0x08)  object format
          5.  bit 4  signed(0x00)/unsigned(0x10) byte data 
          6.  bit 5  normal(0x00)/page '0'(0x20) reference 
          7.  bit 6  normal(0x00)/page 'nnn'(0x40) reference 
@@ -994,8 +992,7 @@ where PAGE0 is the paged area.
 
    During  Pass  two the linker reads the T, R, and P lines per-
 forming the necessary relocations and  outputting  the  absolute
-code.  Various errors may be reported during this process 
-
+code.  Various errors may be reported during this process. 
 
 The P line processing can produce only one possible error:  
 
@@ -1475,6 +1472,6 @@ is the execution address.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2019</B></P></H6>
+<H6><P><B>Last Updated: March 2021</B></P></H6>
 </BODY> 
 </HTML>

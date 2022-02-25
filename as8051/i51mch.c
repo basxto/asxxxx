@@ -1,7 +1,7 @@
 /* i51mch.c */
 
 /*
- *  Copyright (C) 1998-2014  Alan R. Baldwin
+ *  Copyright (C) 1998-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ struct mne *mp;
 	case S_ACC:
 		t = addr(&e);
 		if (t != S_A)
-			aerr();
+			xerr('a', "Argument must be A.");
 		outab(op);
 		break;
 
@@ -143,13 +143,13 @@ struct mne *mp;
 		case S_DPTR:
 			if (op != 0)
 				/* only INC (op=0) has DPTR mode */
-				aerr();
+				xerr('a', "DPTR allowed only in INC instruction.");
 			else
 				outab( 0xA3);
 			break;
 
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -157,7 +157,7 @@ struct mne *mp;
 		/* A,#imm; A,direct; A,@R0; A,@R1; A,R0 to A,R7 */
 		t = addr(&e);
 		if (t != S_A)
-			aerr();
+			xerr('a', "First argument must be A.");
 		comma(1);
 		t1 = addr(&e1);
 		
@@ -182,7 +182,7 @@ struct mne *mp;
 			break;
 
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -211,7 +211,7 @@ struct mne *mp;
 				break;
 
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 
@@ -237,14 +237,14 @@ struct mne *mp;
 				break;
 
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 
 		case S_C:
 			/* XRL has no boolean version.  Trap it */
 			if (op == 0x60)
-				aerr();
+				xerr('a', "XRL does not support boolean.");
 
 			switch (t1) {
 			case S_DIR:
@@ -259,12 +259,12 @@ struct mne *mp;
 				break;
 			
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -272,7 +272,7 @@ struct mne *mp;
 		/* A,direct; A,@R0; A,@R1; A,R0 to A,R7 */
 		t = addr(&e);
 		if (t != S_A)
-			aerr();
+			xerr('a', "First argument must be A.");
 		comma(1);
 		t1 = addr(&e1);
 
@@ -292,7 +292,7 @@ struct mne *mp;
 			break;
 
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -325,7 +325,7 @@ struct mne *mp;
 				break;
 
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 
@@ -347,7 +347,7 @@ struct mne *mp;
 				break;
 
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 
@@ -388,7 +388,7 @@ struct mne *mp;
 				break;
 
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 
@@ -410,26 +410,26 @@ struct mne *mp;
 				break;
 
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 
 		case S_C:
 			if ((t1 != S_DIR) && (t1 != S_EXT))
-				aerr();
+				xerr('a', "Second argument must be an address.");
 			outab(0xA2);
 			outrb(&e1, R_PAG0);
 			break;
 
 		case S_DPTR:
 			if (t1 != S_IMMED)
-				aerr();
+				xerr('a', "#__ is required second argument.");
 			outab(0x90);
 			outrw(&e1, R_NORM);
 			break;
 
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -437,7 +437,7 @@ struct mne *mp;
 		/* Branch on bit set/clear */
 		t = addr(&e);
 		if ((t != S_DIR) && (t != S_EXT))
-			aerr();
+			xerr('a', "Argument must be an address.");
 
 		/* Benny */
 		comma(1);
@@ -449,7 +449,7 @@ struct mne *mp;
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
 		} else {
 			outrb(&e1, R_PCR);
@@ -467,7 +467,7 @@ struct mne *mp;
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
 		} else {
 			outrb(&e1, R_PCR);
@@ -495,9 +495,9 @@ struct mne *mp;
 			else if ((t1 == S_DIR) || (t1 == S_EXT)) {
 				outab(op + 5);
 				outrb(&e1, R_PAG0);
+			} else {
+				xerr('a', "Invalid Addressing Mode.");
 			}
-			else
-				aerr();
 			break;
 
 		case S_AT_R:
@@ -506,7 +506,7 @@ struct mne *mp;
 			expr(&e, 0);
 			outab(op);
 			if (t1 != S_IMMED)
-				aerr();
+				xerr('a', "#__ is required second argument.");
 			outrb(&e1, R_NORM);
 			break;
 	
@@ -516,12 +516,12 @@ struct mne *mp;
 			expr(&e, 0);
 			outab(op);
 			if (t1 != S_IMMED)
-				aerr();
+				xerr('a', "#__ is required second argument.");
 			outrb(&e1, R_NORM);
 			break;
 	
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 
@@ -529,7 +529,7 @@ struct mne *mp;
 		if (mchpcr(&e)) {
 			v1 = (int) (e.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
 		} else {
 			outrb(&e, R_PCR);
@@ -557,14 +557,14 @@ struct mne *mp;
 			break;
 
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 
 		/* branch destination */
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
 		} else {
 			outrb(&e1, R_PCR);
@@ -577,7 +577,7 @@ struct mne *mp;
 		/* @A+DPTR */
 		t = addr(&e);
 		if (t != S_AT_ADP)
-			aerr();
+			xerr('a', "JMP @A+DPTR is the only allowed mode.");
 		outab(op);
 		break;
 
@@ -585,15 +585,17 @@ struct mne *mp;
 		/* A,@A+DPTR  A,@A+PC */
 		t = addr(&e);
 		if (t != S_A)
-			aerr();
+			xerr('a', "First argument must be A.");
 		comma(1);
 		t1 = addr(&e1);
-		if (t1 == S_AT_ADP)
+		if (t1 == S_AT_ADP) {
 			outab(0x93);
-		else if (t1 == S_AT_APC)
+		} else
+		if (t1 == S_AT_APC) {
 			outab(0x83);
-		else
-			aerr();
+		} else {
+			xerr('a', "MOVC A,@A+DPTR; A,@A+PC are the allowed modes.");
+		}
 		break;
 
 	case S_MOVX:
@@ -614,33 +616,36 @@ struct mne *mp;
 				break;
 
 			default:
-				aerr();
+				xerr('a', "Second argument must be @DPTR or @Rn.");
 			}
 			break;
 
 		case S_AT_DP:
-			if (t1 == S_A)
+			if (t1 == S_A) {
 				outab(0xF0);
-			else
-				aerr();
+			} else {
+				xerr('a', "Second argument must A.");
+			}
 			break;
 
 		case S_AT_R:
-			if (t1 == S_A)
+			if (t1 == S_A) {
 				outab(0xF2 + e.e_addr);
-			else
-				aerr();
+			} else {
+				xerr('a', "Second argument must A.");
+			}
 			break;
 
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
 	/* MUL/DIV A,B */
 	case S_AB:  
 		t = addr(&e);
-		if (t != S_RAB) aerr();
+		if (t != S_RAB)
+			xerr('a', "A,B is the only valid argument.");
 		outab(op);
 		break;
 
@@ -649,10 +654,11 @@ struct mne *mp;
 		t = addr(&e);
 		switch (t) {
 		case S_A:
-			if (op == 0xB2)
+			if (op == 0xB2) {
 				outab(0xF4);
-			else
+			} else {
 				outab(0xE4);
+			}
 			break;
 
 		case S_C:
@@ -666,7 +672,7 @@ struct mne *mp;
 			break;
 
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -685,7 +691,7 @@ struct mne *mp;
 			break;
 
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -697,7 +703,7 @@ struct mne *mp;
 			e.e_mode = S_DIR;
 		} else
 		if ((t != S_DIR) && (t != S_EXT)) {
-			aerr();
+			xerr('a', "Argument must be an address.");
 			break;
 		}
 		outab(op);
@@ -708,7 +714,7 @@ struct mne *mp;
 	case S_XCHD:
 		t = addr(&e);
 		if (t != S_A)
-			aerr();
+			xerr('a', "First argument must A.");
 		comma(1);
 		t1 = addr(&e1);
 		switch (t1) {
@@ -717,13 +723,13 @@ struct mne *mp;
 			break;
 
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 	if (opcycles == OPCY_NONE) {
@@ -760,8 +766,6 @@ struct expr *esp;
  * Machine specific initialization
  */
 
-static int beenHere = 0;	/* set non-zero if we have done that... */
-
 VOID
 minit()
 {
@@ -781,7 +785,7 @@ minit()
 	 *	add the pre-defined symbols to the table
 	 *	as local symbols.
 	 */
-	if (beenHere == 0) {
+	if (pass == 0) {
 		pd = preDef;
 		while (pd->id) {
 			strcpy(pid, pd->id);
@@ -806,6 +810,5 @@ minit()
 			}
 			pd++;
 		}
-		beenHere = 1;
 	}
 }

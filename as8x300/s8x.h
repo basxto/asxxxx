@@ -1,7 +1,7 @@
 /* s8x.h */
 
 /*
- *  Copyright (C) 2018-2019  Alan R. Baldwin
+ *  Copyright (C) 2018-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -82,7 +82,6 @@
 
 #define	M_DATA	70		/* Replaced Data  Assembler Mnemonics */
 #define	M_ASCIX	71		/* Replaced ASCII Assembler Mnemonics */
-#define	S_XERR	72		/* Expanded Error Reporting */
 
 /*
  * Special Symbol Flags
@@ -114,8 +113,6 @@
 #define	R_VO5	0x0500		/* -----XXXXX------ */
 #define	R_LEN	0x0600		/* --------XXX----- */
 
-
-extern	a_uint xerr;
 
 struct adsym
 {
@@ -150,14 +147,12 @@ extern	VOID		naddr(struct expr *esp);
 extern	VOID		xaddr(struct expr *esp);
 extern	int		admode(struct adsym *sp);
 extern	int		srch(char *str);
-extern	int		any(int c, char *str);
 
 	/* sx8mch.c */
 extern	struct adsym	regsym[];
 extern	VOID		machine(struct mne *mp);
 extern	int		regchk(int src, int dst);
 extern	VOID		xtndout(struct expr *esp);
-extern	VOID		mcherr(char *str);
 extern	VOID		minit(void);
 
 #else
@@ -170,14 +165,12 @@ extern	VOID		naddr();
 extern	VOID		xaddr();
 extern	int		admode();
 extern	int		srch();
-extern	int		any();
 
 	/* s8xmch.c */
 extern	struct adsym	regsym[];
 extern	VOID		machine();
 extern	int		regchk();
 extern	VOID		xtndout();
-extern	VOID		mcherr();
 extern	VOID		minit();
 
 #endif

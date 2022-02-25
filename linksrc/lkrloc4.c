@@ -1,7 +1,7 @@
 /* lkrloc4.c */
 
 /*
- *  Copyright (C) 2003-2014  Alan R. Baldwin
+ *  Copyright (C) 2003-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,9 +32,9 @@
 
 #include "aslink.h"
 
-/*
+#if 0
 #define	DEBUG	1
-*/
+#endif
 
 /*)Module	lkrloc4.c
  *
@@ -402,7 +402,7 @@ relr4()
 			}
 			reli = symval(s[rindex]);
 #ifdef	DEBUG
-fprintf(stdout, "relr4-sym:  reli = %4X, rindex = %d\n", reli, rindex);
+fprintf(stdout, "relr4-sym:  reli = %X, rindex = %d\n", reli, rindex);
 #endif
 		} else {
 			if (rindex >= hp->h_narea) {
@@ -412,7 +412,7 @@ fprintf(stdout, "relr4-sym:  reli = %4X, rindex = %d\n", reli, rindex);
 			}
 			reli = a[rindex]->a_addr;
 #ifdef	DEBUG
-fprintf(stdout, "relr4-area: reli = %4X, rindex = %d\n", reli, rindex);
+fprintf(stdout, "relr4-area: reli = %X, rindex = %d\n", reli, rindex);
 #endif
 		}
 
@@ -439,6 +439,9 @@ fprintf(stdout, "relr4-area: reli = %4X, rindex = %d\n", reli, rindex);
 			case R4_PCRN:
 				pcrv  = (pcrv + argb) / pcb;
 				reli -= (pc + pcrv);
+#ifdef	DEBUG
+fprintf(stdout, "R4_PCRX: reli = %X\n", reli);
+#endif
 				break;
 			/*
 			 * Specific PCR mode offsets for the
@@ -456,12 +459,18 @@ fprintf(stdout, "relr4-area: reli = %4X, rindex = %d\n", reli, rindex);
 			case R4_PCR0N:
 				pcrv /=  pcb;
 				reli -= (pc + pcrv);
+#ifdef	DEBUG
+fprintf(stdout, "R4_PCRX: reli = %X\n", reli);
+#endif
 				break;
 			case R4_PAG0:
 			case R4_PAGN:
 				paga  = sdp.s_area->a_addr;
 				pags  = sdp.s_addr;
 				reli -= paga + pags;
+#ifdef	DEBUG
+fprintf(stdout, "R4_PAGN: paga = %X, pags = %X, reli = %X\n", paga, pags, reli);
+#endif
 				break;
 			case R4_PAGX0:
 			case R4_PAGX1:
@@ -489,6 +498,9 @@ fprintf(stdout, "relr4-area: reli = %4X, rindex = %d\n", reli, rindex);
 				 */
 				rtofst += (a_bytes - argb);
 			}
+#ifdef	DEBUG
+fprintf(stdout, "R4_RELV: relv = %X\n", relv);
+#endif
 
 			/*
 			 * Mask Value Selection
@@ -527,6 +539,12 @@ fprintf(stdout, "relr4-area: reli = %4X, rindex = %d\n", reli, rindex);
 			}
 #endif
 
+#ifdef	DEBUG
+fprintf(stdout, "relr4: relv = %X\n", relv);
+fprintf(stdout, "     :    m = %X\n", m);
+fprintf(stdout, "     :    n = %X\n", n);
+fprintf(stdout, "     : mode = %X\n", mode);
+#endif
 			/*
 			 * Signed Value Checking
 			 */
@@ -607,9 +625,14 @@ fprintf(stdout, "relr4-area: reli = %4X, rindex = %d\n", reli, rindex);
 			 * and offset argument.
 			 */
 			case R4_PCR:
+			case R4_PCR | R4_MBRS:		/* Allowed Only In Merge Mode */
+			case R4_PCR | R4_MBRU:		/* Allowed Only In Merge Mode */
 			case R4_PCRN:
 				pcrv  = (pcrv + argb) / pcb;
 				reli -= (pc + pcrv);
+#ifdef	DEBUG
+fprintf(stdout, "R4_PCRX_MERGE: reli = %X\n", reli);
+#endif
 				break;
 			/*
 			 * Specific PCR mode offsets for the
@@ -627,12 +650,18 @@ fprintf(stdout, "relr4-area: reli = %4X, rindex = %d\n", reli, rindex);
 			case R4_PCR0N:
 				pcrv /=  pcb;
 				reli -= (pc + pcrv);
+#ifdef	DEBUG
+fprintf(stdout, "R4_PCRX_MERGE: reli = %X\n", reli);
+#endif
 				break;
 			case R4_PAG0:
 			case R4_PAGN:
 				paga  = sdp.s_area->a_addr;
 				pags  = sdp.s_addr;
 				reli -= paga + pags;
+#ifdef	DEBUG
+fprintf(stdout, "R4_PAGN_MERGE: paga = %X, pags = %X, reli = %X\n", paga, pags, reli);
+#endif
 				break;
 			case R4_PAGX0:
 			case R4_PAGX1:
@@ -651,7 +680,7 @@ fprintf(stdout, "relr4-area: reli = %4X, rindex = %d\n", reli, rindex);
 				relv = adw_xb(argb, reli, rtp);
 			}
 #ifdef	DEBUG
-fprintf(stdout, "relr4-merge: relv = %4X\n", relv);
+fprintf(stdout, "relr4-merge: relv = %X\n", relv);
 #endif
 
 			/*
@@ -673,7 +702,7 @@ fprintf(stdout, "relr4-merge: relv = %4X\n", relv);
 			ptb_xb(0 , rtp);
 			adw_xb(argb, v, rtp);
 #ifdef	DEBUG
-fprintf(stdout, "relr4-merge: v = %4X\n", v);
+fprintf(stdout, "relr4-merge: v = %X\n", v);
 #endif
 
 			/*
@@ -682,21 +711,34 @@ fprintf(stdout, "relr4-merge: v = %4X\n", v);
 			n = hp->m_list[rxm]->m_sbits;
 			m = ~(n >> 1);
 			n = ~(n >> 0);
+#ifdef	DEBUG
+fprintf(stdout, "relr4-merge: relv = %X\n", relv);
+fprintf(stdout, "           :    m = %X\n", m);
+fprintf(stdout, "           :    n = %X\n", n);
+fprintf(stdout, "           : mode = %X\n", mode);
+#endif
 
 			/*
-			 * Signed Merge Bit Range Checking
+			 * Signed and Unsigned Checking Allowed
+			 * For Non Paged Modes And Basic PCR Mode
 			 */
-			if (((mode & (R4_SGND | R4_USGN | R4_PAGX | R4_PCR)) == R4_SGND) &&
-			   ((relv & m) != m) && ((relv & m) != 0))
-				error = 10;
-
-			/*
-			 * Unsigned Merge Bit Range Checking
-			 * Overflow Merge Bit Range Checking
-			 */
-			if (((mode & (R4_SGND | R4_USGN | R4_PAGX | R4_PCR)) == R4_USGN) &&
-			   (relv & n))
-				error = 11;
+			if (((mode & (R4_PCR | R4_PAGE)) == R4_NOPAG) ||
+			    ((mode & (R4_PCR | R4_PAGE)) == R4_PCR)) {
+				/*
+				 * Signed Merge Bit Range Checking
+				 */
+				if (((mode & (R4_SGND | R4_USGN)) == R4_SGND) &&
+				   ((relv & m) != m) && ((relv & m) != 0))
+					error = 10;
+			
+				/*
+				 * Unsigned Merge Bit Range Checking
+				 * Overflow Merge Bit Range Checking
+				 */
+				if (((mode & (R4_SGND | R4_USGN)) == R4_USGN) &&
+				   (relv & n))
+					error = 11;
+			}
 
 			/*
 			 * PCR  Relocation Error Checking
@@ -882,6 +924,9 @@ relp4()
 		lkerr++;
 		return;
 	}
+#ifdef	DEBUG
+fprintf(stdout, "relp4-relocation-area: aindex = %4X\n", aindex);
+#endif
 
 	/*
 	 * Do remaining relocations
@@ -921,12 +966,20 @@ relp4()
 		lkerr++;
 		return;
 	}
+#ifdef	DEBUG
+fprintf(stdout, "relp4-paged: aindex = %4X\n", aindex);
+#endif
+
 	sdp.s_areax = a[aindex];
 	sdp.s_area = sdp.s_areax->a_bap;
 	sdp.s_addr = adb_xb(0,a_bytes*2);
 	if (rtcnt > a_bytes*3) {
 		p_mask = adb_xb(0,a_bytes*3);
 	}
+#ifdef	DEBUG
+fprintf(stdout, "relp4-sdp: area = %s, addr = %X, p_mask = %X\n", sdp.s_areax->a_bap->a_id, sdp.s_addr, p_mask);
+#endif
+
 	if (sdp.s_area->a_addr & p_mask || sdp.s_addr & p_mask)
 		relerp4("Page Definition Boundary Error");
 }

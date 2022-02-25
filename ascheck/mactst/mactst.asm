@@ -1,6 +1,6 @@
 	.title	Macro Processor Tests
-	.nlist	(md)
-	.list	(meb)
+;	.nlist	(md)
+	.list	(me,meb)
 
 	;	The Macro Processor directives are:
 	;
@@ -276,6 +276,14 @@ LESS:	.opcode	2		;LESS is defined as a label
 	  .iif    tf	LESS	sym1,sym1
 	  .byte	0xE3
 	.endif
+
+	  .byte	0xE0
+	  .iif    f	LESS	sym1,sym2
+	  .byte 0xE1
+	  .iif	  t	LESS	sym2,sym1
+	  .byte	0xE2
+	  .iif    tf	LESS	sym1,sym1
+	  .byte	0xE3
 
 	.if	eq,0
 	  .byte	0xF0

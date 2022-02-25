@@ -1,7 +1,7 @@
 /* ez80pst.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -107,13 +107,13 @@ char	mode2[32] = {	/* R_3BIT */
 struct	mode	mode[3] = {
     {	&mode0[0],	0,	0x00FFFFFFl,	0x00FFFFFFl	},	/* Normal 24-BIT Mode */
     {	&mode1[0],	0,	0x0000FFFFl,	0x0000FFFFl	},	/* Z80 16-BIT Mode */
-    {	&mode2[0],	1,	0x00000038l,	0x00000007l	}	/* BIT, RST and SET 3-BIT Mode */
+    {	&mode2[0],	1,	0x00000038l,	0x00000007l	}	/* BIT, RES and SET 3-BIT Mode */
 };
 #else
 struct	mode	mode[3] = {
     {	&mode0[0],	0,	0x00FFFFFF,	0x00FFFFFF	},	/* Normal 24-BIT Mode */
     {	&mode1[0],	0,	0x0000FFFF,	0x0000FFFF	},	/* Z80 16-BIT Mode */
-    {	&mode2[0],	1,	0x00000038,	0x00000007	}	/* BIT, RST and SET 3-BIT Mode */
+    {	&mode2[0],	1,	0x00000038,	0x00000007	}	/* BIT, RES and SET 3-BIT Mode */
 };
 #endif
 
@@ -156,7 +156,8 @@ struct	mne	mne[] = {
     {	NULL,	".title",	S_HEADER,	0,	O_TITLE	},
     {	NULL,	".sbttl",	S_HEADER,	0,	O_SBTTL	},
     {	NULL,	".module",	S_MODUL,	0,	0	},
-    {	NULL,	".include",	S_INCL,		0,	0	},
+    {	NULL,	".include",	S_INCL,		0,	I_CODE	},
+    {	NULL,	".incbin",	S_INCL,		0,	I_BNRY	},
     {	NULL,	".area",	S_AREA,		0,	0	},
     {	NULL,	".bank",	S_BANK,		0,	0	},
     {	NULL,	".org",		S_ORG,		0,	0	},

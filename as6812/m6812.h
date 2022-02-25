@@ -1,7 +1,7 @@
 /* m6812.h */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -160,10 +160,10 @@ extern struct opdata mc6811[];
 extern	int		addr(struct expr *esp);
 extern	int		addr1(struct expr *esp);
 extern	int		admode(struct adsym *sp);
-extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 
 	/* m12mch.c */
+extern	struct  area	*zpg;
 extern	VOID		machine(struct mne *mp);
 extern	VOID		genout(int cpg, int op, int rf, struct expr *esp);
 extern	VOID		movout(struct expr *esp, int indx, int offset);
@@ -179,10 +179,10 @@ extern	VOID		minit(void);
 extern	int		addr();
 extern	int		addr1();
 extern	int		admode();
-extern	int		any();
 extern	int		srch();
 
 	/* m12mch.c */
+extern	struct  area	*zpg;
 extern	VOID		machine();
 extern	VOID		genout();
 extern	VOID		movout();

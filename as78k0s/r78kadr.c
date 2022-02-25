@@ -1,7 +1,7 @@
 /* R78KADR.C */
 
 /*
- *  Copyright (C) 2014 Alan R. Baldwin
+ *  Copyright (C) 2014-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,6 +33,18 @@ int *aindx;
 	int amode;
 	int c;
 	a_uint v;
+	char *p;
+
+	/* fix order of '<', '>', and '#' */
+	p = ip;
+	if (((c = getnb()) == '<') || (c == '>')) {
+		p = ip-1;
+		if (getnb() == '#') {
+			*p = *(ip-1);
+			*(ip-1) = c;
+		}
+	}
+	ip = p;
 
 	*aindx = 0;
 	if (admode(reg8, aindx)) {
@@ -46,7 +58,7 @@ int *aindx;
 	} else
 	if ((c = getnb()) == '[') {
 		if (admode(reg16, aindx) == 0) {
-			aerr();
+			xerr('a', "Missing 16-Bit register argument");
 		}
 		c = getnb();
 		if ((c == '+') || (c == ',')) {
@@ -57,7 +69,7 @@ int *aindx;
 			amode = S_IDX;
 		}
 		if (getnb() != ']') {
-			aerr();
+			xerr('q', "Missing ']'");
 		}
 	} else
 	if (c == '#') {
@@ -114,7 +126,7 @@ int *aindx;
 				amode = S_SFR;
 			} else {
 				amode = S_EXT;
-				aerr();
+				xerr('a', "Address is outside of SFR Range");
 			}
 		} else {
 			amode = S_SFR;
@@ -227,7 +239,7 @@ int *eidx;
 			}
 		}
 		if (cnt < 1) {
-			aerr();
+			xerr('a', "Missing .??? argument");
 		} else
 		if (cnt == 1) {
 			q = strchr(ip+1, '.');
@@ -348,7 +360,7 @@ int flag;
 	if ((getnb() == '[') &&
 	     admode(reg16, aindx) && (*aindx == REG16_HL)) {
 		if (getnb() != ']') {
-			aerr();
+			xerr('q', "Missing ']'");
 		}
 		return(S_REG16);
 	}
@@ -406,6 +418,23 @@ int flag;
 }
 
 /*
+ * When building a table that has variations of a common
+ * symbol always start with the most complex symbol first.
+ * for example if x, x+, and x++ are in the same table
+ * the order should be x++, x+, and then x.  The search
+ * order is then most to least complex.
+ */
+
+/*
+ * When searching symbol tables that contain characters
+ * not of type LTR16, eg with '-' or '+', always search
+ * the more complex symbol tables first. For example:
+ * searching for x+ will match the first part of x++,
+ * a false match if the table with x+ is searched
+ * before the table with x++.
+ */
+
+/*
  * Enter admode() to search a specific addressing mode table
  * for a match. Return 1 on a match or 0 for no match.
  */
@@ -455,24 +484,10 @@ char *str;
 	}
 
 	if (!*str)
-		if (any(*ptr," \t\n+,];")) {
+		if (!(ctype[*ptr & 0x007F] & LTR16)) {
 			ip = ptr;
 			return(1);
 		}
-	return(0);
-}
-
-/*
- *      any --- does str contain c?
- */
-int
-any(c,str)
-int c;
-char *str;
-{
-	while (*str)
-		if(*str++ == c)
-			return(1);
 	return(0);
 }
 

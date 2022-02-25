@@ -1,7 +1,7 @@
 /* R78K0MCH.C */
 
 /*
- *  Copyright (C) 2019  Alan R. Baldwin
+ *  Copyright (C) 2019-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include "asxxxx.h"
 #include "r78k0.h"
 
-char	*cpu	= "Renesas/NEC 78K/O";
+char	*cpu	= "Renesas/NEC 78K/0";
 char	*dsft	= "asm";
 
 /*
@@ -43,7 +43,7 @@ char	*dsft	= "asm";
 #define	P3	((char) (OPCY_NONE | 0x03))
 
 /*
- * 78KO Cycle Count
+ * 78K0 Cycle Count
  *
  *	opcycles = r78k0pg[opcode]
  */
@@ -135,7 +135,6 @@ static char *Page[4] = {
     r78k0pg, r78k0pg31, r78k0pg61, r78k0pg71
 };
 
-a_uint xerr;
 int setdp;
 
 /*
@@ -177,14 +176,14 @@ struct mne *mp;
 			expr(&e1, 0);
 			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
 				if (e1.e_addr & 0xFF) {
-					err('b');
+					xerr('a', "A 256 Byte Boundary Required.");
 				}
 			}
 			if ((c = getnb()) == ',') {
 				getid(id, -1);
 				espa = alookup(id);
 				if (espa == NULL) {
-					err('u');
+					xerr('u', "Undefined Area.");
 				}
 			} else {
 				unget(c);
@@ -194,14 +193,6 @@ struct mne *mp;
 			outdp(espa, &e1, 0);
 		} else {
 			outdp(dot.s_area, &e1, 0);
-		}
-		lmode = SLIST;
-		break;
-
-	case S_XERR:
-		xerr = 0;
-		if (more()) {
-			xerr = absexpr();
 		}
 		lmode = SLIST;
 		break;
@@ -249,14 +240,14 @@ struct mne *mp;
 						outab(op + 0x09);
 						outrb(&e2, 0);
 					} else {
-						mcherr("HL is the only 16-Bit register allowed");
+						xerr('a', "HL is the only 16-Bit register allowed.");
 					}
 					break;
 				case S_IDX:	/* A,[HL] */
 					if (x2 == REG16_HL) {
 						outab(op + 0x0F);
 					} else {
-						mcherr("HL is the only 16-Bit register allowed");
+						xerr('a', "HL is the only 16-Bit register allowed.");
 					}
 					break;
 				case S_IHLR:	/* A,[HL+B]  or  A,[HL+C] */
@@ -264,16 +255,16 @@ struct mne *mp;
 					case REG8_B:	outab(RK0PG31);   outab(op | 0x0B);	break;
 					case REG8_C:	outab(RK0PG31);   outab(op | 0x0A);	break;
 					default:
-						mcherr("B and C are the only 8-Bit registers allowed");
+						xerr('a', "B and C are the only 8-Bit registers allowed.");
 						break;
 					}
 					break;
 				default:
-					aerr();
+					xerr('a', "Invalid Addressing Mode.");
 					break;
 				}
 			} else {
-				mcherr("A is the only 8-Bit register allowed");
+				xerr('a', "A is the only 8-Bit register allowed.");
 			}
 			break;
 		case S_SADDR:	/* saddr,#Byte */
@@ -282,11 +273,11 @@ struct mne *mp;
 				outrb(&e1, 0);
 				outrb(&e2, 0);
 			} else {
-				aerr();
+				xerr('a', "Immediate(#) second argument required.");
 			}
 			break;
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		break;
@@ -299,7 +290,7 @@ struct mne *mp;
 			outab(op);
 			outrw(&e2, 0);
 		} else {
-			mcherr("AX is the only 16-Bit register allowed");
+			xerr('a', "AX is the only 16-Bit register allowed.");
 		}
 		break;
 
@@ -314,7 +305,7 @@ struct mne *mp;
 					outab(RK0PG61);
 					outrbm(&e2, R_3BIT, op | 0x88);
 				} else {
-					mcherr("A is the only 8-Bit register allowed");
+					xerr('a', "A is the only 8-Bit register allowed.");
 				}
 				break;
 			case S_SPCL:	/* PSW.bit  or  PSW,#bit */
@@ -323,7 +314,7 @@ struct mne *mp;
 					outrbm(&e2, R_3BIT, op);
 					outab(0x1E);
 				} else {
-					mcherr("PSW is the only special register allowed");
+					xerr('a', "PSW is the only special register allowed.");
 				}
 				break;
 			case S_SFR:	/* sfr.bit  or  sfr,#bit */
@@ -341,18 +332,18 @@ struct mne *mp;
 					outab(RK0PG71);
 					outrbm(&e2, R_3BIT, op | 0x80);
 				} else {
-					mcherr("Only [HL] is allowed");
+					xerr('a', "Only [HL] is allowed.");
 				}
 				break;
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 			if (eidx != 0) {
 				ip = iptr + eidx;
 			}
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 		
@@ -361,16 +352,16 @@ struct mne *mp;
 		if ((t1 == S_REG8) && (x1 == REG8_A)) {
 			outab(op);
 		} else {
-			mcherr("A is the only 8-Bit register allowed");
+			xerr('a', "A is the only 8-Bit register allowed.");
 		}
 		if (comma(0)) {
 			t2 = addr(&e2, &x2);
 			if (is_abs(&e2)) {
 				if (e2.e_addr != 1) {
-					mcherr("A value of 1 is required");
+					xerr('a', "A value of 1 is required.");
 				}
 			} else {
-				mcherr("A constant value of 1 is required");
+				xerr('a', "A constant value of 1 is required.");
 			}
 		}
 		break;
@@ -380,7 +371,7 @@ struct mne *mp;
 		if ((t1 == S_IDX) && (x1 == REG16_HL)) {
 			outaw(op);
 		} else {
-			mcherr("Only [HL] is allowed");
+			xerr('a', "Only [HL] is allowed.");
 		}
 		break;
 
@@ -400,7 +391,7 @@ struct mne *mp;
 			}
 			outrb(&e1, 0);
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -410,7 +401,7 @@ struct mne *mp;
 		if (t1 == S_REG16) {
 			outab(op | (x1 << 1));
 		} else {
-			mcherr("Only 16-Bit registers are allowed");
+			xerr('a', "Only 16-Bit registers are allowed.");
 		}
 		break;
 
@@ -423,7 +414,7 @@ struct mne *mp;
 				/* A,R8n   R8n != A */
 				if (x1 == REG8_A) {
 					if (x2 == REG8_A) {
-						mcherr("XCH  A,A  is not allowed");
+						xerr('a', "XCH  A,A  is not allowed.");
 					} else {
 						outab(op | x2);
 					}
@@ -431,12 +422,12 @@ struct mne *mp;
 				/* R8n,A   R8n != A */
 				if (x2 == REG8_A) {
 					if (x1 == REG8_A) {
-						mcherr("XCH  A,A  is not allowed");
+						xerr('a', "XCH  A,A  is not allowed.");
 					} else {
 						outab(op | x1);
 					}
 				} else {
-					aerr();
+					xerr('a', "Invalid Addressing Mode.");
 				}
 			} else
 			if (x1 == REG8_A) {
@@ -463,7 +454,7 @@ struct mne *mp;
 					if (x2 == REG16_HL) {
 						outab(0x07);
 					} else {
-						mcherr("DE and HL are the only 16-Bit registers allowed");
+						xerr('a', "DE and HL are the only 16-Bit registers allowed.");
 					}
 					break;
 				case S_IDXB:	/* A,[HL+Byte]  or  A,[HL,Byte] */
@@ -471,7 +462,7 @@ struct mne *mp;
 						outab(0xDE);
 						outrb(&e2, 0);
 					} else {
-						mcherr("HL is the only 16-Bit register allowed");
+						xerr('a', "HL is the only 16-Bit register allowed.");
 					}
 					break;
 				case S_IHLR:	/* A,[HL+B]  or  A,[HL+C] */
@@ -479,17 +470,17 @@ struct mne *mp;
 					case REG8_B:	outab(RK0PG31);   outab(0x8B);	break;
 					case REG8_C:	outab(RK0PG31);   outab(0x8A);	break;
 					default:
-						mcherr("B and C are the only 8-Bit registers allowed");
+						xerr('a', "B and C are the only 8-Bit registers allowed.");
 						break;
 					}
 					break;
 				default:
-					aerr();
+					xerr('a', "Invalid Addressing Mode.");
 					break;
 				}
 			}
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -506,10 +497,10 @@ struct mne *mp;
 			if ((x1 != REG16_AX) && (x2 == REG16_AX)) {
 				outab(op | (x1 << 1));
 			} else {
-				mcherr("XCHW  AX,AX  is not allowed");
+				xerr('a', "XCHW  AX,AX  is not allowed.");
 			}
 		} else {
-			aerr();
+			xerr('a', "16-Bit register arguments are required.");
 		}
 		break;
 
@@ -526,7 +517,7 @@ struct mne *mp;
 			if ((x1 != REG8_A) && (x2 == REG8_A)) {
 				outab(0x70 | x1);
 			} else {
-				mcherr("MOV  A,A  is not allowed");
+				xerr('a', "MOV  A,A  is not allowed.");
 			}
 		} else
 		/* R8n,#Byte */
@@ -536,11 +527,11 @@ struct mne *mp;
 		} else
 		if ((t1 == S_REG8) && (x1 == REG8_A)) {
 			switch(t2) {
-			case S_SPCL:
+			case S_SPCL: /* A,PSW */
 				if (x2 == SPCL_PSW) {
-					outaw(0x1E11);
+					outaw(0x1EF0);
 				} else {
-					mcherr("PSW is the only special register allowed");
+					xerr('a', "PSW is the only special register allowed.");
 				}
 				break;
 			case S_SADDR:	/* A,saddr */
@@ -561,7 +552,7 @@ struct mne *mp;
 					outab(0xAE);
 					outrb(&e2, 0);
 				} else {
-					mcherr("HL is the only 16-Bit register allowed");
+					xerr('a', "HL is the only 16-Bit register allowed.");
 				}
 				break;
 			case S_IDX:
@@ -573,7 +564,7 @@ struct mne *mp;
 				if (x2 == REG16_DE) {
 					outab(0x85);
 				} else {
-					mcherr("DE and HL are the only 16-Bit registers allowed");
+					xerr('a', "DE and HL are the only 16-Bit registers allowed.");
 				}
 				break;
 			case S_IHLR:	/* A,[HL+B]  or  A,[HL+C] */
@@ -581,17 +572,24 @@ struct mne *mp;
 				case REG8_B:	outab(0xAB);	break;
 				case REG8_C:	outab(0xAA);	break;
 				default:
-					mcherr("B and C are the only 8-Bit registers allowed");
+					xerr('a', "B and C are the only 8-Bit registers allowed.");
 					break;
 				}
 				break;
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 		} else
 		if ((t2 == S_REG8) && (x2 == REG8_A)) {
 			switch(t1) {
+			case S_SPCL:	/* PSW,A */
+				if (x1 == SPCL_PSW) {
+					outaw(0x1EF2);
+				} else{
+					xerr('a', "PSW is the only special register allowed.");
+				}
+				break;
 			case S_SADDR:	/* saddr,A */
 				outab(0xF2);
 				outrb(&e1, 0);
@@ -610,7 +608,7 @@ struct mne *mp;
 					outab(0xBE);
 					outrb(&e1, 0);
 				} else {
-					mcherr("HL is the only 16-Bit register allowed");
+					xerr('a', "HL is the only 16-Bit register allowed.");
 				}
 				break;
 			case S_IDX:
@@ -622,7 +620,7 @@ struct mne *mp;
 				if (x1 == REG16_DE) {
 					outab(0x95);
 				} else {
-					mcherr("DE and HL are the only 16-Bit registers allowed");
+					xerr('a', "DE and HL are the only 16-Bit registers allowed.");
 				}
 				break;
 			case S_IHLR:	/* [HL+B],A  or  [HL+C],A */
@@ -630,12 +628,12 @@ struct mne *mp;
 				case REG8_B:	outab(0xBB);	break;
 				case REG8_C:	outab(0xBA);	break;
 				default:
-					mcherr("B and C are the only 8-Bit registers allowed");
+					xerr('a', "B and C are the only 8-Bit registers allowed.");
 					break;
 				}
 				break;
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 		} else
@@ -653,32 +651,31 @@ struct mne *mp;
 			switch(x1) {
 			case REG8_B:	outab(op | 0xBB);	break;
 			case REG8_C:	outab(op | 0xBA);	break;
-			default:	aerr();		break;
+			default:
+				xerr('a', "Invalid Addressing Mode.");
+				break;
 			}
 			break;
 		} else
 		if ((t1 == S_SPCL) && (x1 == SPCL_PSW)) {
 			switch(t2) {
-			case S_REG8:
+			case S_REG8:	/* PSW,A */
 				if (x2 == REG8_A) {
-					outab(0x1EF2);
+					outaw(0x1EF2);
 				} else{
-					mcherr("A is the only 8-Bit register allowed");
+					xerr('a', "A is the only 8-Bit register allowed.");
 				}
 				break;
-			case S_SADDR:	/* PSW,saddr */
-			case S_SFR:	/* PSW,sfr */
-			case S_EXT:	/* PSW,addr16 */
-			case S_AEXT:	/* PSW,!addr16 */
+			case S_IMM:	/* PSW,#byte */
 				outaw(0x1E11);
 				outrb(&e2, 0);
 				break;
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -695,11 +692,19 @@ struct mne *mp;
 			if ((x1 != REG16_AX) && (x2 == REG16_AX)) {
 				outab(0xD0 | (x1 << 1));
 			} else {
-				aerr();
+				xerr('a', "MOVW AX,AX is invalid.");
 			}
 		} else
 		if (t2 == S_IMM) {
 			switch(t1) {
+			case S_SPCL:	/* SP,#Word */
+				if (x1 == SPCL_SP) {
+					outaw(0x1CEE);
+					outrw(&e2, 0);
+				} else {
+					xerr('a', "SP is the only special register allowed.");
+				}
+				break;
 			case S_REG16:	/* R16n,#Word */
 				outab(op + (x1 << 1));
 				outrw(&e2, 0);
@@ -715,12 +720,19 @@ struct mne *mp;
 				outrw(&e2, 0);
 				break;
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 		} else
 		if ((t1 == S_REG16) && (x1 == REG16_AX)) {
 			switch(t2) {
+			case S_SPCL:	/* AX,SP */
+				if (x2 == SPCL_SP) {
+					outaw(0x1C89);
+				} else {
+					xerr('a', "SP is the only special register allowed.");
+				}
+				break;
 			case S_SADDR:	/* AX,saddr */
 				outab(0x89);
 				outrb(&e2, 0);
@@ -735,12 +747,19 @@ struct mne *mp;
 				outrw(&e2, 0);
 				break;
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 		} else
 		if ((t2 == S_REG16) && (x2 == REG16_AX)) {
 			switch(t1) {
+			case S_SPCL:	/* SP,AX */
+				if (x1 == SPCL_SP) {
+					outaw(0x1C99);
+				} else {
+					xerr('a', "SP is the only special register allowed.");
+				}
+				break;
 			case S_SADDR:	/* saddr,AX */
 				outab(0x99);
 				outrb(&e1, 0);
@@ -755,11 +774,11 @@ struct mne *mp;
 				outrw(&e1, 0);
 				break;
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		break;
 
@@ -775,7 +794,7 @@ struct mne *mp;
 						outab(RK0PG61);
 						outrbm(&e2, R_3BIT, op | 0x88);
 					} else {
-						mcherr("A is the only 8-Bit register allowed");
+						xerr('a', "A is the only 8-Bit register allowed.");
 					}
 					break;
 				case S_SPCL:	/* PSW.bit  or  PSW,#bit */
@@ -784,7 +803,7 @@ struct mne *mp;
 						outrbm(&e2, R_3BIT, op);
 						outab(0x1E);
 					} else {
-						mcherr("PSW is the only special register allowed");
+						xerr('a', "PSW is the only special register allowed.");
 					}
 					break;
 				case S_SFR:	/* sfr.bit  or  sfr,#bit */
@@ -802,18 +821,18 @@ struct mne *mp;
 						outab(RK0PG71);
 						outrbm(&e2, R_3BIT, op | 0x80);
 					} else {
-						aerr();
+						xerr('a', "Invalid Addressing Mode.");
 					}
 					break;
 				default:
-					aerr();
+					xerr('a', "Invalid Addressing Mode.");
 					break;
 				}
 				if (eidx != 0) {
 					ip = iptr + eidx;
 				}
 			} else {
-				mcherr("Only special register CY allowed as destination");
+				xerr('a', "Only special register CY allowed as destination.");
 			}
 		} else {
 			iptr = ip;
@@ -831,7 +850,7 @@ struct mne *mp;
 							outab(RK0PG61);
 							outrbm(&e2, R_3BIT, 0x89);
 						} else {
-							mcherr("A is the only 8-Bit register allowed");
+							xerr('a', "A is the only 8-Bit register allowed.");
 						}
 						break;
 					case S_SPCL:	/* PSW.bit  or  PSW,#bit */
@@ -840,7 +859,7 @@ struct mne *mp;
 							outrbm(&e2, R_3BIT, 0x01);
 							outab(0x1E);
 						} else {
-							mcherr("PSW is the only special register allowed");
+							xerr('a', "PSW is the only special register allowed.");
 						}
 						break;
 					case S_SFR:	/* sfr.bit  or  sfr,#bit */
@@ -858,14 +877,14 @@ struct mne *mp;
 						outrbm(&e2, R_3BIT, 0x81);
 						break;
 					default:
-						aerr();
+						xerr('a', "Invalid Addressing Mode.");
 						break;
 					}
 				} else {
-					mcherr("Only special register CY allowed as source");
+					xerr('a', "Only special register CY allowed as source.");
 				}
 			} else {
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			if (cidx != 0) {
 				iptr[cidx] = ',';
@@ -880,7 +899,7 @@ struct mne *mp;
 		if (admode(reg8, &x1) && (x1 == REG8_X)) {
 			outaw(op);
 		} else {
-			mcherr("X is the only 8-Bit register allowed");
+			xerr('a', "X is the only 8-Bit register allowed.");
 		}
 		break;
 
@@ -888,7 +907,7 @@ struct mne *mp;
 		if (admode(reg8, &x1) && (x1 == REG8_C)) {
 			outaw(op);
 		} else {
-			mcherr("C is the only 8-Bit register allowed");
+			xerr('a', "C is the only 8-Bit register allowed.");
 		}
 		break;
 
@@ -904,11 +923,11 @@ struct mne *mp;
 					outab(0x20);
 					break;
 				default:
-					aerr();
+					xerr('a', "Invalid Addressing Mode.");
 					break;
 				}
 			} else {
-				mcherr("CY is the only special register allowed");
+				xerr('a', "CY is the only special register allowed.");
 			}
 			break;
 		}
@@ -921,7 +940,7 @@ struct mne *mp;
 					outab(RK0PG61);
 					outrbm(&e2, R_3BIT, op | 0x80);
 				} else {
-					mcherr("A is the only 8-Bit register allowed");
+					xerr('a', "A is the only 8-Bit register allowed.");
 				}
 				break;
 			case S_SPCL:	/* PSW.bit  or  PSW,#bit */
@@ -929,7 +948,7 @@ struct mne *mp;
 					outrbm(&e2, R_3BIT, op);
 					outab(0x1E);
 				} else {
-					mcherr("PSW is the only special register allowed");
+					xerr('a', "PSW is the only special register allowed.");
 				}
 				break;
 			case S_SFR:	/* sfr.bit  or  sfr,#bit */
@@ -946,15 +965,15 @@ struct mne *mp;
 					outab(RK0PG71);
 					outrbm(&e2, R_3BIT, (op & 0x03) | 0x80);
 				} else {
-					aerr();
+					xerr('a', "Invalid Addressing Mode.");
 				}
 				break;
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 		} else {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		if (eidx != 0) {
 			ip = iptr + eidx;
@@ -965,7 +984,7 @@ struct mne *mp;
 		if (admode(spcl, &x1) && (x1 == SPCL_CY)) {
 			outab(op);
 		} else {
-			aerr();
+			xerr('a', "CY is the only special register allowed.");
 		}
 		break;
 
@@ -991,7 +1010,7 @@ struct mne *mp;
 						outrbm(&e2, R_3BIT, 0x0E);
 						pcrbra(&e3);
 					} else {
-						mcherr("A is the only 8-Bit register allowed");
+						xerr('a', "A is the only 8-Bit register allowed.");
 					}
 					break;
 				case S_SPCL:	/* PSW.bit,addr  or  PSW,#bit,addr */
@@ -1000,7 +1019,7 @@ struct mne *mp;
 						outab(0x1E);
 						pcrbra(&e3);
 					} else {
-						mcherr("PSW is the only special register allowed");
+						xerr('a', "PSW is the only special register allowed.");
 					}
 					break;
 				case S_SFR:	/* sfr.bit,addr  or  sfr,#bit,addr */
@@ -1020,15 +1039,15 @@ struct mne *mp;
 					pcrbra(&e3);
 					break;
 				default:
-					aerr();
+					xerr('a', "Invalid Addressing Mode.");
 					break;
 				}
 			} else {
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		if (cidx != 0) {
@@ -1061,7 +1080,7 @@ struct mne *mp;
 						outrbm(&e2, R_3BIT, 0x0F);
 						pcrbra(&e3);
 					} else {
-						mcherr("A is the only 8-Bit register allowed");
+						xerr('a', "A is the only 8-Bit register allowed.");
 					}
 					break;
 				case S_SPCL:	/* PSW.bit,addr  or  PSW,#bit,addr */
@@ -1071,7 +1090,7 @@ struct mne *mp;
 						outab(0x1E);
 						pcrbra(&e3);
 					} else {
-						mcherr("PSW is the only special register allowed");
+						xerr('a', "PSW is the only special register allowed.");
 					}
 					break;
 				case S_SFR:	/* sfr.bit,addr  or  sfr,#bit,addr */
@@ -1092,15 +1111,15 @@ struct mne *mp;
 					pcrbra(&e3);
 					break;
 				default:
-					aerr();
+					xerr('a', "Invalid Addressing Mode.");
 					break;
 				}
 			} else {
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		if (cidx != 0) {
@@ -1133,7 +1152,7 @@ struct mne *mp;
 						outrbm(&e2, R_3BIT, 0x0D);
 						pcrbra(&e3);
 					} else {
-						mcherr("A is the only 8-Bit register allowed");
+						xerr('a', "A is the only 8-Bit register allowed.");
 					}
 					break;
 				case S_SPCL:	/* PSW.bit,addr  or  PSW,#bit,addr */
@@ -1143,7 +1162,7 @@ struct mne *mp;
 						outab(0x1E);
 						pcrbra(&e3);
 					} else {
-						mcherr("PSW is the only special register allowed");
+						xerr('a', "PSW is the only special register allowed.");
 					}
 					break;
 				case S_SFR:	/* sfr.bit,addr  or  sfr,#bit,addr */
@@ -1164,15 +1183,15 @@ struct mne *mp;
 					pcrbra(&e3);
 					break;
 				default:
-					aerr();
+					xerr('a', "Invalid Addressing Mode.");
 					break;
 				}
 			} else {
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 			}
 			break;
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		if (cidx != 0) {
@@ -1200,11 +1219,11 @@ struct mne *mp;
 			if (x1 == REG16_AX) {
 				outaw(op);
 			} else {
-				mcherr("AX is the only 16-Bit register allowed");
+				xerr('a', "AX is the only 16-Bit register allowed.");
 			}
 			break;
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		break;
@@ -1220,7 +1239,7 @@ struct mne *mp;
 			pcrbra(&e1);
 			break;
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		break;
@@ -1251,16 +1270,16 @@ struct mne *mp;
 					outab(0x8B);
 					pcrbra(&e2);
 				} else {
-					mcherr("B and C are the only 8-Bit registers allowed");
+					xerr('a', "B and C are the only 8-Bit registers allowed.");
 				}
 				break;
 			default:
-				aerr();
+				xerr('a', "Invalid Addressing Mode.");
 				break;
 			}
 			break;
 		default:
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 			break;
 		}
 		break;
@@ -1271,7 +1290,7 @@ struct mne *mp;
 			outab(op);
 			outrw(&e1, 0);
 		} else {
-			aerr();
+			xerr('a', "Requires ADDR16 or !ADDR16.");
 		}
 		break;
 
@@ -1286,14 +1305,14 @@ struct mne *mp;
 				if ((e1.e_addr >= 0x0800) && (e1.e_addr <= 0x0FFF)) {
 					outaw(op | ((e1.e_addr & 0x0700) >> 4) | ((e1.e_addr & 0x00FF) << 8));
 				} else {
-					mcherr("Address is outside of CallF Range");
+					xerr('a', "Address is outside of CallF Range");
 				}
 			} else {
 				outrwm(&e1, R_11BIT, op);
 			}
 			break;
 		default:
-			mcherr("Invalid CALLF argument");
+			xerr('a', "Invalid CALLF argument");
 			break;
 		}
 		break;
@@ -1308,7 +1327,7 @@ struct mne *mp;
 			case S_AEXT:	/* !addr16 */
 				if (is_abs(&e1)) {
 					if ((0xFF81 & e1.e_addr) || ((0x0040 & e1.e_addr) != 0x0040)) {
-						mcherr("Address is odd or outside of CallT Range");
+						xerr('a', "Address is odd or outside of CallT Range.");
 					}
 					outab(op | (e1.e_addr & 0x3E));
 				} else {
@@ -1316,13 +1335,13 @@ struct mne *mp;
 				}
 				break;
 			default:
-				mcherr("Invalid CALLT argument");
+				xerr('a', "Invalid CALLT argument.");
 			}
 			if (getnb() != ']') {
-				mcherr("Missing ']'");
+				xerr('q', "Missing ']'.");
 			}
 		} else {
-			mcherr("CALLT [arg] is the required syntax");
+			xerr('a', "CALLT [arg] is the required syntax.");
 		}
 		break;
 
@@ -1336,12 +1355,14 @@ struct mne *mp;
 		/* PSW */
 		if ((t1 == S_SPCL) && (x1 == SPCL_PSW)) {
 			switch(rf) {
-			case S_PSH:	outab(0x23);	break;
-			case S_POP:	outab(0x22);	break;
-			default:	aerr();		break;
+			case S_PSH:	outab(0x22);	break;
+			case S_POP:	outab(0x23);	break;
+			default:
+				xerr('a', "Only the  PSW is allowed.");
+				break;
 			}
 		} else {
-			mcherr("Only the 16-Bit registers and PSW are allowed");
+			xerr('a', "Only the 16-Bit registers and PSW are allowed.");
 		}
 		break;
 
@@ -1350,7 +1371,7 @@ struct mne *mp;
 			outab(RK0PG61);
 			outab(op | ((x1 & 2) << 4) | ((x1 & 1) << 3));
 		} else {
-			mcherr("RB0, RB1, RB2, or RB3 bank required");
+			xerr('a', "RB0, RB1, RB2, or RB3 bank required.");
 		}
 		break;
 
@@ -1364,7 +1385,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 
@@ -1385,41 +1406,13 @@ struct expr *esp;
 	if (mchpcr(esp)) {
 		v = (int) (esp->e_addr - dot.s_addr - 1);
 		if ((v < -128) || (v > 127))
-			mcherr("Destination outside of branching range");
+			xerr('a', "Branching Range Exceeded.");
 		outab(v);
 	} else {
 		outrb(esp, R_PCR);
 	}
 	if (esp->e_mode != S_USER)
 		rerr();
-}
-
-/*
- * Expanded Error Reporting
- */
-VOID
-mcherr(str)
-char *str;
-{
-	if (xerr == 0) {
-		aerr();
-	} else {
-		err('x');
-		if (pass == 2) {
-			if (xerr > 1) {
-				fprintf(stdout, "?ASxxxx-Error-<x> in line %d of %s\n", getlnm(), afn);
-				fprintf(stdout, "              <x> %s\n", str);
-			}
-			if ((xerr > 2) && (lfp != NULL)) {
-				fprintf(lfp, "?ASxxxx-Error-<x> in line %d of %s\n", getlnm(), afn);
-				fprintf(lfp, "              <x> %s\n", str);
-				if (hfp != NULL) {
-					listhlr(HLR_NLST, SLIST, 0);
-					listhlr(HLR_NLST, SLIST, 0);
-				}
-			}
-		}
-	}
 }
 
 /*
@@ -1457,13 +1450,10 @@ minit()
 	 * Byte Order
 	 */
 	hilo = 0;
+
 	/*
 	 * Initialize SFR Page
 	 */
 	setdp = 0;
-	/*
-	 * Extended Error Flag
-	 */
-	xerr = 0;
 }
 

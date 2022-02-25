@@ -1,7 +1,7 @@
 /* m11mch.c */
 
 /*
- *  Copyright (C) 1989-2014  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -136,6 +136,7 @@ static char *Page[4] = {
     m11pg1, m11pg2, m11pg3, m11pg4
 };
 
+struct area *zpg;
 
 /*
  * Process a machine op.
@@ -146,7 +147,6 @@ struct mne *mp;
 {
 	int op, t1, t2;
 	struct expr e1, e2, e3;
-	struct area *espa;
 	char id[NCPS];
 	int c, reg, cpg, type, v1, v3;
 
@@ -161,29 +161,25 @@ struct mne *mp;
 
 	case S_SDP:
 		opcycles = OPCY_SDP;
-		espa = NULL;
+		zpg = dot.s_area;
 		if (more()) {
 			expr(&e1, 0);
 			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
 				if (e1.e_addr) {
-					err('b');
+					xerr('b', "Only Page 0 Allowed.");
 				}
 			}
 			if ((c = getnb()) == ',') {
 				getid(id, -1);
-				espa = alookup(id);
-				if (espa == NULL) {
-					err('u');
+				zpg = alookup(id);
+				if (zpg == NULL) {
+					xerr('u', "Undefined Area.");
 				}
 			} else {
 				unget(c);
 			}
 		}
-		if (espa) {
-			outdp(espa, &e1, 0);
-		} else {
-			outdp(dot.s_area, &e1, 0);
-		}
+		outdp(zpg, &e1, 0);
 		lmode = SLIST;
 		break;
 
@@ -213,7 +209,7 @@ struct mne *mp;
 			outab(op+6);
 			break;
 		}
-		aerr();
+		xerr('a', "Register D Is Invalid.");
 		break;
 
 	case S_BRA:
@@ -222,7 +218,7 @@ struct mne *mp;
 		if (mchpcr(&e1)) {
 			v1 = (int) (e1.e_addr - dot.s_addr - 1);
 			if ((v1 < -128) || (v1 > 127))
-				aerr();
+				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
 		} else {
 			outrb(&e1, R_PCR);
@@ -250,7 +246,7 @@ struct mne *mp;
 				outab(0x05);
 				break;
 			}
-			aerr();
+			xerr('a', "Register D Is Invalid.");
 			break;
 		}
 		if (t1 == S_INDX || t1 == S_INDY) {
@@ -265,14 +261,13 @@ struct mne *mp;
 			outrw(&e1, 0);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_TYP2:
-		if ((reg = admode(abdxy)) == 0)
-			aerr();
-
 	case S_TYP3:
+		if (((reg = admode(abdxy)) == 0) && (type == S_TYP2))
+			xerr('a', "Register A, B, Or D Required.");
 		if (!reg) {
 			reg = op & 0x40;
 		} else
@@ -289,17 +284,17 @@ struct mne *mp;
 			if (op == 0x8B) {
 				op = 0xC3;
 			} else {
-				aerr();
+				xerr('a', "Register D Is Invalid.");
 			}
 			reg = 0x00;
 		} else {
-			aerr();
+			xerr('a', "Register X Or Y Is Invalid.");
 			reg = 0x00;
 		}
 		t1 = addr(&e1);
 		if (t1 == S_IMMED) {
 			if ((op|0x40) == 0xC7)
-				aerr();
+				xerr('a', "STA #__ And STB #__ Are Invalid.");
 			if (op == 0x83 || op == 0xC3) {
 				outab(op|reg);
 				outrw(&e1, 0);
@@ -326,14 +321,14 @@ struct mne *mp;
 			outrw(&e1, 0);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_TYP4:
 		t1 = addr(&e1);
 		if (t1 == S_IMMED) {
 			if ((op&0x0D) == 0x0D)
-				aerr();
+				xerr('a', "STS #__ , STD #__, and JSR #__ Are Invalid.");
 			outab(op);
 			outrw(&e1, 0);
 			break;
@@ -355,7 +350,7 @@ struct mne *mp;
 			outrw(&e1, 0);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_TYP5:
@@ -372,7 +367,7 @@ struct mne *mp;
 			outrw(&e1, 0);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_PG3:
@@ -385,7 +380,7 @@ struct mne *mp;
 		t1 = addr(&e1);
 		if (t1 == S_IMMED) {
 			if (op == 0xCF)
-				aerr();
+				xerr('a', "STX #__ And STY #__ Are Invalid.");
 			if (cpg)
 				outab(cpg);
 			outab(op);
@@ -423,7 +418,7 @@ struct mne *mp;
 			outrw(&e1, 0);
 			break;
 		}
-		aerr();
+		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_BTB:
@@ -452,16 +447,16 @@ struct mne *mp;
 		} else {
 			outab(op);
 			outrb(&e1, 0);
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		if (t2 != S_IMMED)
-			aerr();
+			xerr('a', "Immediate(#) Mode Is Invalid.");
 		outrb(&e2, 0);
 		if (type == S_BTB) {
 			if (mchpcr(&e3)) {
 				v3 = (int) (e3.e_addr - dot.s_addr - 1);
 				if ((v3 < -128) || (v3 > 127))
-					aerr();
+					xerr('a', "Branching Range Exceeded.");
 				outab(v3);
 			} else {
 				outrb(&e3, R_PCR);
@@ -473,7 +468,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 
@@ -520,4 +515,9 @@ minit()
 	 * Byte Order
 	 */
 	hilo = 1;
+
+	/*
+	 * Zero Page
+	 */
+	zpg = NULL;
 }

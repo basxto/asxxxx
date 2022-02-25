@@ -1,7 +1,7 @@
 /* asxxxx.h */
 
 /*
- *  Copyright (C) 1989-2017  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -50,8 +50,8 @@
  * Local Definitions
  */
 
-#define	VERSION	"V05.30"
-#define	COPYRIGHT "2019"
+#define	VERSION	"V05.40"
+#define	COPYRIGHT "2021"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -505,7 +505,9 @@ struct	sym
 #define	  O_TITLE    0		/* .title */
 #define	  O_SBTTL    1		/* .sbttl */
 #define	S_MODUL		5	/* .module */
-#define	S_INCL		6	/* .include */
+#define	S_INCL		6	/* .include, .incbin */
+#define	  I_CODE     0		/* .include */
+#define	  I_BNRY     1		/* .incbin */
 #define	S_AREA		7	/* .area */
 #define	S_ATYP		8	/* .area type */
 #define	S_BANK		9	/* .bank */
@@ -1023,6 +1025,8 @@ extern	int	jflag;		/*	-j, enable NoICE Debug Symbols
 				 */
 #endif
 
+extern	int	kflag;		/*	-k, disable error output to .lst file
+				 */
 extern	int	lflag;		/*	-l, generate listing flag
 				 */
 extern	int	oflag;		/*	-o, generate relocatable output flag
@@ -1108,6 +1112,10 @@ extern	char	*ep;		/*	pointer into error list
 				 */
 extern	char	eb[NERR];	/*	array of generated error codes
 				 */
+extern	char	*ex[NERR];	/*	array of error string pointers
+				 */
+extern	int	exmode;		/*	expanded error code mode
+				 */
 extern	char	*ip;		/*	pointer into the assembler-source
 				 *	text line in ib[]
 				 */
@@ -1134,8 +1142,6 @@ extern	int	opcycles;	/*	opcode execution cycles
 extern	char	tb[NTITL];	/*	Title string buffer
 				 */
 extern	char	stb[NSBTL];	/*	Subtitle string buffer
-				 */
-extern	char	erb[NINPUT+4];	/*	Error string buffer
 				 */
 extern	char	symtbl[];	/*	string "Symbol Table"
 				 */
@@ -1256,6 +1262,7 @@ extern	VOID		symglob(void);
 extern	VOID		aerr(void);
 extern	VOID		diag(void);
 extern	VOID		err(int c);
+extern	VOID		xerr(int c, char *str);
 extern	char *		errors[];
 extern	char *		geterr(int c);
 extern	VOID		qerr(void);
@@ -1437,6 +1444,7 @@ extern	VOID		symglob();
 extern	VOID		aerr();
 extern	VOID		diag();
 extern	VOID		err();
+extern	VOID		xerr();
 extern	char *		errors[];
 extern	char *		geterr();
 extern	VOID		qerr();

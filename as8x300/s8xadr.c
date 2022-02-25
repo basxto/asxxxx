@@ -1,7 +1,7 @@
 /* s8xadr.c */
 
 /*
- *  Copyright (C) 2018-2019  Alan R. Baldwin
+ *  Copyright (C) 2018-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,6 +33,20 @@ struct expr *esp;
 struct expr *nsp;
 struct expr *xsp;
 {
+	char c;
+	char *p;
+
+	/* fix order of '<', '>', and '#' */
+	p = ip;
+	if (((c = getnb()) == '<') || (c == '>')) {
+		p = ip-1;
+		if (getnb() == '#') {
+			*p = *(ip-1);
+			*(ip-1) = c;
+		}
+	}
+	ip = p;
+
 	aindx = 0;
 
 	/*
@@ -64,7 +78,7 @@ struct expr *esp;
 	c = getnb();
 	if ((c == ',') || (c == ';') || (c == '\0')) {
 		ip = ips;
-		mcherr("Missing argument");
+		xerr('a', "Missing argument");
 		return;
 	}
 	ip = ips;
@@ -137,7 +151,7 @@ struct expr *esp;
 			esp->e_addr = aindx;
 			esp->e_mode = A_REG;
 			if (comma(0)) {
-				mcherr("Form (Rn,N) is not allowed");
+				xerr('a', "Form (Rn,N) is not allowed");
 			}
 		} else
 		/* A_EXT | A_LIV | A_RIV */
@@ -146,7 +160,7 @@ struct expr *esp;
 			if (comma(0)) {
 				v = absexpr();
 				if (v > 8) {
-					mcherr("Bits more than 8");
+					xerr('a', "Bits more than 8");
 				}
 				esp->e_addr &= ~0x07;
 				esp->e_addr |= (v & 0x07);
@@ -179,7 +193,7 @@ struct expr *esp;
 		ips = ip;
 		while (*ips != ']') {
 			if (*(++ips) == 0) {
-				qerr();
+				xerr('q', "Missing ']'.");
 			}
 		}
 		*ips = 0;
@@ -189,7 +203,7 @@ struct expr *esp;
 		v_bits = 0;
 		while (more()) {
 			if (argcnt >= d_xdef) {
-				mcherr("More fields than defined");
+				xerr('a', "More fields than defined");
 				break;
 			}
 			d_bits = xfield[argcnt].d_bits;
@@ -212,7 +226,7 @@ struct expr *esp;
 				}
 				if ((d_skip == 0) && (argval & ~v_mask)) {
 					sprintf(id, "Value %d exceeds maximum bit range of %d", argval, v_mask);
-					mcherr(id);
+					xerr('a', id);
 				}
 				v_xtnd &= ~(v_mask << (16 - v_bits));
 				v_xtnd |= ((argval & v_mask) << (16 - v_bits));
@@ -228,6 +242,23 @@ struct expr *esp;
 		unget(c);
 	}
 }
+
+/*
+ * When building a table that has variations of a common
+ * symbol always start with the most complex symbol first.
+ * for example if x, x+, and x++ are in the same table
+ * the order should be x++, x+, and then x.  The search
+ * order is then most to least complex.
+ */
+
+/*
+ * When searching symbol tables that contain characters
+ * not of type LTR16, eg with '-' or '+', always search
+ * the more complex symbol tables first. For example:
+ * searching for x+ will match the first part of x++,
+ * a false match if the table with x+ is searched
+ * before the table with x++.
+ */
 
 /*
  * Enter admode() to search a specific addressing mode table
@@ -264,13 +295,9 @@ int
 srch(str)
 char *str;
 {
-	char c;
 	char *ptr;
 
 	ptr = ip;
-	if (any(*ptr,",;([") || (*ptr == 0)) {
-		return(0);
-	}
 
 	while (*ptr && *str) {
 		if (ccase[*ptr & 0x007F] != ccase[*str & 0x007F])
@@ -284,26 +311,11 @@ char *str;
 	}
 
 	if (!*str) {
-		while ((c=*ptr) == ' ' || c == '\t') { ptr++; }
-		if (any(*ptr,",;([") || (c == 0)) {
+		if (!(ctype[*ptr & 0x007F] & LTR16)) {
 			ip = ptr;
 			return(1);
 		}
 	}
-	return(0);
-}
-
-/*
- *      any --- does str contain c?
- */
-int
-any(c,str)
-int c;
-char *str;
-{
-	while (*str)
-		if(*str++ == c)
-			return(1);
 	return(0);
 }
 

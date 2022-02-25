@@ -335,7 +335,7 @@
 	rlc			; 02
 	rnc			; 03
 	adi	ival+0x00	; 04r00
-	rst	rval+0		;r05
+	rst	rval+0		;u05
 	mvi	a,ival+0x01	; 06r01
 	ret			; 07
 	inr	b		; 08
@@ -343,7 +343,7 @@
 	rrc			; 0A
 	rnz			; 0B
 	aci	ival+0x02	; 0Cr02
-	rst	rval+1		;r0D
+	rst	rval+1		;u0D
 	mvi	b,ival+0x03	; 0Er03
 	; --------------------- ; 0F
 
@@ -352,7 +352,7 @@
 	ral			; 12
 	rp			; 13
 	sui	ival+0x04	; 14r04
-	rst	rval+2		;r15
+	rst	rval+2		;u15
 	mvi	c,ival+0x05	; 16r05
 	; --------------------- ; 17
 	inr	d		; 18
@@ -360,7 +360,7 @@
 	rar			; 1A
 	rpo			; 1B
 	sbi	ival+0x06	; 1Cr06
-	rst	rval+3		;r1D
+	rst	rval+3		;u1D
 	mvi	d,ival+0x07	; 1Er07
 	; --------------------- ; 1F
 
@@ -371,7 +371,7 @@
 	; --------------------- ; 22
 	rc			; 23
 	ani	ival+0x08	; 24r08
-	rst	rval+4		;r25
+	rst	rval+4		;u25
 	mvi	e,ival+0x09	; 26r09
 	; --------------------- ; 27
 	inr	h		; 28
@@ -379,7 +379,7 @@
 	; --------------------- ; 2A
 	rz			; 2B
 	xri	ival+0x0A	; 2Cr0A
-	rst	rval+5		;r2D
+	rst	rval+5		;u2D
 	mvi	h,ival+0x0B	; 2Er0B
 	; --------------------- ; 2F
 
@@ -388,7 +388,7 @@
 	; --------------------- ; 32
 	rm			; 33
 	ori	ival+0x0C	; 34r0C
-	rst	rval+6		;r35
+	rst	rval+6		;u35
 	mvi	l,ival+0x0D	; 36r0D
 	; --------------------- ; 37
 	; --------------------- ; 38
@@ -396,81 +396,81 @@
 	; --------------------- ; 3A
 	rpe			; 3B
 	cpi	ival+0x0E	; 3Cr0E
-	rst	rval+7		;r3D
+	rst	rval+7		;u3D
 	mvi	m,ival+0x0F	; 3Er0F
 	; --------------------- ; 3F
 
 	.page
 
 	jnc	jcval+0x0001	; 40r01s00
-	in	port+0		;r41
+	in	port+0		;u41
 	cnc	jcval+0x0102	; 42r02s01
-	in	port+1		;r43
+	in	port+1		;u43
 	jmp	jcval+0x0203	; 44r03s02
-	in	port+2		;r45
+	in	port+2		;u45
 	call	jcval+0x0304	; 46r04s03
-	in	port+3		;r47
+	in	port+3		;u47
 	jnz	jcval+0x0405	; 48r05s04
-	in	port+4		;r49
+	in	port+4		;u49
 	cnz	jcval+0x0506	; 4Ar06s05
-	in	port+5		;r4B
+	in	port+5		;u4B
 	; --------------------- ; 4C
-	in	port+6		;r4D
+	in	port+6		;u4D
 	; --------------------- ; 4E
-	in	port+7		;r4F
+	in	port+7		;u4F
 
 	jp	jcval+0x0607	; 50r07s06
-	out	port+8		;r51
+	out	port+8		;u51
 	cp	jcval+0x0708	; 52r08s07
-	out	port+9		;r53
+	out	port+9		;u53
 	; --------------------- ; 54
-	out	port+10		;r55
+	out	port+10		;u55
 	; --------------------- ; 56
-	out	port+11		;r57
+	out	port+11		;u57
 	jpo	jcval+0x0809	; 58r09s08
-	out	port+12		;r59
+	out	port+12		;u59
 	cpo	jcval+0x090A	; 5Ar0As09
-	out	port+13		;r5B
+	out	port+13		;u5B
 	; --------------------- ; 5C
-	out	port+14		;r5D
+	out	port+14		;u5D
 	; --------------------- ; 5E
-	out	port+15		;r5F
+	out	port+15		;u5F
 
 	.page
 
 	jc	jcval+0x0A0B	; 60r0Bs0A
-	out	port+16		;r61
+	out	port+16		;u61
 	cc	jcval+0x0B0C	; 62r0Cs0B
-	out	port+17		;r63
+	out	port+17		;u63
 	; --------------------- ; 64
-	out	port+18		;r65
+	out	port+18		;u65
 	; --------------------- ; 66
-	out	port+19		;r67
+	out	port+19		;u67
 	jz	jcval+0x0C0D	; 68r0Ds0C
-	out	port+20		;r69
+	out	port+20		;u69
 	cz	jcval+0x0D0E	; 6Ar0Es0D
-	out	port+21		;r6B
+	out	port+21		;u6B
 	; --------------------- ; 6C
-	out	port+22		;r6D
+	out	port+22		;u6D
 	; --------------------- ; 6E
-	out	port+23		;r6F
+	out	port+23		;u6F
 
 	jm	jcval+0x0E0F	; 70r0Fs0E
-	out	port+24		;r71
+	out	port+24		;u71
 	cm	jcval+0x0F10	; 72r10s0F
-	out	port+25		;r73
+	out	port+25		;u73
 	; --------------------- ; 74
-	out	port+26		;r75
+	out	port+26		;u75
 	; --------------------- ; 76
-	out	port+27		;r77
+	out	port+27		;u77
 	jpe	jcval+0x1011	; 78r11s10
-	out	port+28		;r79
+	out	port+28		;u79
 	cpe	jcval+0x1112	; 7Ar12s11
-	out	port+29		;r7B
+	out	port+29		;u7B
 	; --------------------- ; 7C
-	out	port+30		;r7D
+	out	port+30		;u7D
 	; --------------------- ; 7E
-	out	port+31		;r7F
+	out	port+31		;u7F
 
 	.page
 

@@ -14,6 +14,55 @@
 
 
 <H4><B><PRE>
+PROCESSOR SPECIFIC DIRECTIVES 
+
+.8085 Directive 
+
+Format:  
+
+        .8085 
+
+The  .8085  directive  enables  processing  of the standard 8085
+specific  mnemonics.   Unspecified  8085  instructions  will  be
+flagged  with  an  &lt;o&gt; error.  Addressing modes not supported by
+the 8085 will be flagged with an &lt;a&gt; error.  
+
+   The  .8085  directive  also  selects the 8085 specific cycles
+count to be output.  
+
+   The  AS8085  assembler defaults to the standard 8085 instruc-
+tion set if no processor specific directive is given.  
+
+
+.8085x Directive 
+
+Format:  
+
+        .8085x 
+
+The  .8085x directive enables processing of the standard and un-
+specified 8085 instructions.  Addressing modes not supported  by
+the 8085 will be flagged with an &lt;a&gt; error.  
+
+   The  .8085x  directive  also selects the 8085 specific cycles
+count to be output.  
+
+
+.8080 Directive 
+
+Format:  
+
+        .8080 
+
+The  .8080  directive  enables  processing  of the standard 8080
+specific mnemonics.  All non 8080 instructions will  be  flagged
+with  an  &lt;o&gt; error.  Addressing modes not supported by the 8080
+will be flagged with an &lt;a&gt; error.  
+
+   The  .8080  directive  also  selects the 8080 specific cycles
+count to be output.  
+
+
 8085 REGISTER SET 
 
 The  following  is  a  list  of  the 8080/8085 registers used by
@@ -59,11 +108,12 @@ Inherent Instructions
         ei              hlt
         nop             pchl
         ral             rar
-        ret             rim
-        rrc             rlc
-        sim             sphl
+        ret             rrc
+        rlc             sphl
         stc             xchg
         xthl
+        rim     (Not 8080)
+        sim     (Not 8080)
 
 
 Register/Memory/Immediate Instructions 
@@ -141,13 +191,13 @@ Unspecified Instructions
 
         arhl
         dsub
-        
-        jnx5    addr
-        jx5     addr
-        
+
+        jnx5    addr    _or_    jnk     addr
+        jx5     addr    _or_    jk      addr
+
         ldhi    #data
         ldsi    #data
-        
+
         lhlx
         rdel
         rstv
@@ -593,6 +643,6 @@ UNSPECIFIED OPCODE ARTICLE
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2019</B></P></H6>
+<H6><P><B>Last Updated: March 2021</B></P></H6>
 </BODY> 
 </HTML>

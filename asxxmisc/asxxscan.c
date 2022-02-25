@@ -1,7 +1,7 @@
 /* asxscn.c */
 
 /*
- *  Copyright (C) 1989-2019  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ int inpfil;		/* Input File Counter		*/
 int radix;		/* Radix Value			*/
 int a_bytes;		/* Address Bytes		*/
 int iflag;		/* Ignore Relocation Flags	*/
+int cflag;		/* Comment starts at last ';'	*/
 int vlines;		/* Valid Lines Scanned		*/
 int aserr;		/* Error Counter		*/
 
@@ -157,6 +158,11 @@ char *argv[];
 					iflag = 1;
 					break;
 
+				case 'c':
+				case 'C':
+					cflag = 1;
+					break;
+
 				default:
 					usage();
 					asexit(ER_FATAL);
@@ -269,15 +275,15 @@ loop:
 			switch(a_bytes) {
 			default:
 			case 2: n = 3; m = 4; k = 6; x = 3;  /* frmt = "%04X" */; break;
-			case 3: n = 6; m = 6; k = 4; x = 3; /* frmt = "%06X" */; break;
-			case 4: n = 4; m = 8; k = 4; x = 3; /* frmt = "%08X" */; break;
+			case 3: n = 6; m = 6; k = 7; x = 3; /* frmt = "%06X" */; break;
+			case 4: n = 4; m = 8; k = 7; x = 3; /* frmt = "%08X" */; break;
 			}
 			break;
 		case 10:
 			r = RAD10;
 			switch(a_bytes) {
 			default:
-			case 2: n = 4; m = 5; k = 7; x = 4; /* frmt = "%05u" */; break;
+			case 2: n = 4; m = 5; k = 4; x = 4; /* frmt = "%05u" */; break;
 			case 3: n = 5; m = 8; k = 5; x = 4; /* frmt = "%08u" */; break;
 			case 4: n = 3; m = 10; k = 5; x = 4; /* frmt = "%010u" */; break;
 			}
@@ -286,7 +292,7 @@ loop:
 			r = RAD8;
 			switch(a_bytes) {
 			default:
-			case 2: n = 3; m = 6; k = 7; x = 4; /* frmt = "%06o" */; break;
+			case 2: n = 3; m = 6; k = 4; x = 4; /* frmt = "%06o" */; break;
 			case 3: n = 5; m = 8; k = 5; x = 4; /* frmt = "%08o" */; break;
 			case 4: n = 2; m = 11; k = 5; x = 4;  /* frmt = "%011o" */; break;
 			}
@@ -328,10 +334,14 @@ loop:
 			goto loop;
 		}
 
-		/*
-		 * Scan for last ';'
-		 */
-		if ((q = strrchr(p, ';')) == NULL)
+		if (cflag) {
+		/* Scan for last ';' */
+			q = strrchr(p, ';');
+		} else {
+		/* Scan for first ';' */
+			q = strchr(p, ';');
+		}
+		if (q == NULL)
 			goto loop;
 		if (*q++ != ';')
 			goto loop;
@@ -597,6 +607,7 @@ char *usetxt[] = {
 	"  3    24-Bit  address",
 	"  4    32-Bit  address",
 	"  i    ignore relocation flags",
+	"  c    comment starts at last ';'",
 	"",
 	NULL
 };

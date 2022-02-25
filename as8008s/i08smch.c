@@ -1,7 +1,7 @@
 /* i08smch.c */
 
 /*
- *  Copyright (C) 2018-2019  Alan R. Baldwin
+ *  Copyright (C) 2018-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -95,12 +95,12 @@ struct mne *mp;
 			expr(&e1, 0);
 			if (is_abs(&e1)) {
 				if (e1.e_addr & ~0x07) {
-					aerr();
+					xerr('a', "Valid argument is 0 -> 7.");
 				}
 				v1 = (e1.e_addr & 0x07) << 3;
 				outab(op | v1);
 			} else {
-				outrbm(&e1, R_RST, op);
+				outrbm(&e1, R_RST | R_MBRO, op);
 			}
 		} else {
 			outab(op);
@@ -123,13 +123,12 @@ struct mne *mp;
 		expr(&e1, 0);
 		if (is_abs(&e1)) {
 			if (e1.e_addr & ~0x07) {
-				outab(op);
-				aerr();
-			} else {
-				outab(op | (e1.e_addr<<1));
+				xerr('a', "Valid argument is 0 -> 7.");
 			}
+			v1 = (e1.e_addr & 0x07) << 1;
+			outab(op | v1);
 		} else {
-			outrbm(&e1, R_INP, op);
+			outrbm(&e1, R_INP | R_MBRO, op);
 		}
 		break;
 
@@ -137,13 +136,13 @@ struct mne *mp;
 		expr(&e1, 0);
 		if (is_abs(&e1)) {
 			if ((e1.e_addr & ~0x1F) || (e1.e_addr < 0x08)) {
-				outab(op | 0x08);
-				aerr();
+				outab(op | (0x08<<1));
+				xerr('a', "Valid argument is 8 -> 31.");
 			} else {
 				outab(op | (e1.e_addr<<1));
 			}
 		} else {
-			outrbm(&e1, R_OUT, op);
+			outrbm(&e1, R_OUT | R_MBRO, op);
 		}
 		break;
 
@@ -159,7 +158,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Internal Opcode Error.");
 		break;
 	}
 	if (opcycles == OPCY_NONE) {

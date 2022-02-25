@@ -14,18 +14,18 @@ ASlink Relocating Linker</H2>
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 <H4><PRE>
 
-Version 5.30, January 2019 
+ASxxxx Cross Assemblers, Version 5.40, March 2021 
 
    The  ASxxxx  assemblers are a series of microprocessor assem-
 blers written in the C programming  language.   This  collection
 contains  cross  assemblers  for the 1802, S2650, SC/MP, MPS430,
 6100, 61860,  6500,  6800(6802/6808),  6801(6803/HD6303),  6804,
 6805,  68HC(S)08,  6809,  68HC11, 68HC(S)12, 68HC16, 740, 78K/0,
-78K/0S,  8008,  8008S,  8048(8041/8022/8021)  8051,  8085(8080),
-8X300(8X305),   DS8XCXXX,   AVR,   EZ80,   F2MC8L/FX,   F8/3870,
+78K/0S, 8008,  8008S,  8048(8041/8022/8021),  8051,  8085(8080),
+AT89LP,  8X300(8X305),  DS8XCXXX, AVR, EZ80, F2MC8L/FX, F8/3870,
 GameBoy(Z80), H8/3xx, Cypress PSoC(M8C), PIC, Rabbit  2000/3000,
 ST6,  ST7,  ST8,  Z8, Z80(HD64180), and Z280 series microproces-
-sors.  
+sors.
 
 </PRE></H4>
 
@@ -33,33 +33,22 @@ sors.
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 
 <H4>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="asmblr.htm ">... The Assembler Description</A><BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="asmcro.htm ">... The Macro Processor Description</A><BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="aslink.htm ">... The Linker Description</A><BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="asxmpl.htm ">... Assembly and Linking Example</A><BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="asxbld.htm ">... Building ASxxxx and ASlink</A><BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="asutil.htm ">... ASxxxx Utility Programs</A><BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="aschng.htm ">... ASxxxx Change Log</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="asmblr.htm ">The Assembler Description</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="asmcro.htm ">The Macro Processor Description</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="aslink.htm ">The Linker Description</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="asxmpl.htm ">Assembly and Linking Example</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="asxbld.htm ">Building ASxxxx and ASlink</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="asutil.htm ">ASxxxx Utility Programs</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="asnote.htm ">ASxxxx Notes and Tips</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="aschng.htm ">ASxxxx Change Log</A><BR>
 <BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="asmlnk.htm">... ASxxxx Documentation as a Single HTML File</A><BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="asmlnk.txt">... ASxxxx Documentation as a Single TEXT File</A><BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="asmlnk.pdf">... ASxxxx Documentation as a Single PDF File</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="asmlnk.htm">ASxxxx Documentation as a Single HTML File</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="asmlnk.txt">ASxxxx Documentation as a Single TEXT File</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="asmlnk.pdf">ASxxxx Documentation as a Single PDF File</A><BR>
 <BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="ascont.htm#Contributors">... Contributors</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="ascont.htm#Contributors">Contributors</A><BR>
 <BR>
-<IMG SRC = "yellow.gif" ALT = "-">
-<A HREF="asxxxx.htm#JUMP">... Exit the ASxxxx Documentation</A><BR>
+<IMG SRC = "yellow.gif" ALT = "-"> ... <A HREF="asxxxx.htm#JUMP">Exit the ASxxxx Documentation</A><BR>
 <BR><BR>
 <IMG SRC = "green.gif" ALT = "-"> ... The Assemblers:<BR>
 
@@ -83,10 +72,11 @@ sors.
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as78k0.htm ">AS78K0</A>    Renesas/NEC 78K/0 Series Microprocessors
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as78k0s.htm ">AS78K0S</A>   Renesas/NEC 78K/0S Series Microprocessors
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as8008.htm ">AS8008</A>    8008
-  <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as8008.htm ">AS8008S</A>   8008
+  <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as8008s.htm ">AS8008S</A>   8008 (MCS-8 syntax of SIM-8)
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as8048.htm ">AS8048</A>    8048, 8041, 8022, and 8021
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as8051.htm ">AS8051</A>    8051
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as8085.htm ">AS8085</A>    8085 and 8080
+  <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as89lp.htm ">AS89LP</A>    AT89LP Series Microprocessors
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as8x3x.htm ">AS8X300</A>   8X300 and 8X305 Microcontrollers
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="as8xcx.htm ">AS8XCXXX</A>  DS8xCxxx Series Microprocessors
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="asavr.htm ">ASAVR</A>     AVR Series Microprocessors
@@ -103,7 +93,7 @@ sors.
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="asst7.htm ">ASST7</A>     STMicroelectronics ST7
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="asst8.htm ">ASST8</A>     STMicroelectronics STM8
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="asz8.htm ">ASZ8</A>      Z8
-  <IMG SRC = "orange.gif" ALT = "-"> <A HREF="asz80.htm ">ASZ80</A>     Z80 and HD64180
+  <IMG SRC = "orange.gif" ALT = "-"> <A HREF="asz80.htm ">ASZ80</A>     Z80, HD64180, 8085, and 8080
   <IMG SRC = "orange.gif" ALT = "-"> <A HREF="asz280.htm ">ASZ280</A>    Z280, Z180, and Z80
 
 </PRE></H4>
@@ -120,6 +110,6 @@ sors.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: January 2019</B></P></H6>
+<H6><P><B>Last Updated: March 2021</B></P></H6>
 </BODY> 
 </HTML>

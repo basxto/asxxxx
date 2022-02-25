@@ -1,8 +1,7 @@
 /* s6186mch.c */
 
 /*
- *  Copyright (C) 2003-2014  Alan R. Baldwin
- *
+ *  Copyright (C) 2003-2021
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -87,14 +86,14 @@ struct mne *mp;
 	case S_CAL:
 		t1 = addr(&e1);
 		if (t1 != S_EXT) {
-			aerr();
+			xerr('a', "Address Required.");
 		}
 		/*
 		 *	CAL	label
 		 */
 		if (is_abs(&e1)) {
 			if (e1.e_addr & ~0x1FFF) {
-				aerr();
+				xerr('a', "Adressing Range Exceeded.");
 			}
 			outaw((op << 8) | (e1.e_addr & 0x1FFF));
 		} else {
@@ -105,7 +104,7 @@ struct mne *mp;
 	case S_ADI:
 		t1 = addr(&e1);
 		if ((t1 != S_IMM) && (t1 != S_EXT)) {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		/*
 		 *	ADI	#0x03
@@ -121,11 +120,11 @@ struct mne *mp;
 		 */
 		t1 = addr(&e1);
 		if (t1 != S_EXT) {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		if (is_abs(&e1)) {
 			if (e1.e_addr & ~0x3F) {
-				aerr();
+				xerr('a', "Value > 63.");
 			}
 			outab(op | (e1.e_addr & 0x3F));
 		} else {
@@ -136,7 +135,7 @@ struct mne *mp;
 	case S_JMP:
 		t1 = addr(&e1);
 		if (t1 != S_EXT) {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		/*
 		 *	JMP	label
@@ -148,7 +147,7 @@ struct mne *mp;
 	case S_JRP:
 		t1 = addr(&e1);
 		if (t1 != S_EXT) {
-			aerr();
+			xerr('a', "Invalid Addressing Mode.");
 		}
 		if (is_abs(&e1)) {
 			/*
@@ -181,7 +180,7 @@ struct mne *mp;
 		}
 		outab(op);
 		if (e1.e_addr & ~0xFF) {
-			aerr();
+			xerr('a', "Value > 255.");
 		}
 		outab(e1.e_addr & 0xFF);
 		break;
@@ -222,7 +221,7 @@ struct mne *mp;
 		}
 		outab(op);
 		if (e1.e_addr & ~0xFF) {
-			aerr();
+			xerr('a', "Value > 255.");
 		}
 		outab(e1.e_addr & 0xFF);
 		break;
@@ -253,7 +252,7 @@ struct mne *mp;
 		opcycles = OPCY_SBASIC;
 		do {
 			if ((d = getnb()) == '\0') {
-				qerr();
+				xerr('q', ".BASIC requires at least 1 argument.");
 			}
 			while ((c = getmap(d)) >= 0) {
 				outab(ascii2sbasic(c));
@@ -264,7 +263,7 @@ struct mne *mp;
 
 	default:
 		opcycles = OPCY_ERR;
-		err('o');
+		xerr('o', "Invalid Internal Opcode.");
 		break;
 	}
 

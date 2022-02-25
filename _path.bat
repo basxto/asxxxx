@@ -13,6 +13,8 @@ REM    vc6
 REM    vs05
 REM    vs10
 REM    vs13
+REM    vs15
+REM    vs19
 REM    watcom
 REM
 
@@ -26,7 +28,7 @@ REM Djgpp
 if %1.==DJGPP. goto DJGPP
 if %1.==djgpp. goto DJGPP
 REM Linux
-if %1.==LINUX. goto CYGWIN
+if %1.==LINUX. goto LINUX
 if %1.==linux. goto LINUX
 REM Symantec
 if %1.==SYMANTEC. goto SYMANTEC
@@ -49,6 +51,9 @@ if %1.==vs13. goto VS13
 REM VS15
 if %1.==VS15. goto VS15
 if %1.==vs15. goto VS15
+REM VS19
+if %1.==VS19. goto VS19
+if %1.==vs19. goto VS19
 REM Watcom
 if %1.==WATCOM. goto WATCOM
 if %1.==watcom. goto WATCOM
@@ -95,6 +100,10 @@ goto EXIT
 path=r:\asxv5pxx\asxmak\vs15\exe
 goto EXIT
 
+:VS19
+path=r:\asxv5pxx\asxmak\vs19\exe
+goto EXIT
+
 :WATCOM
 path=r:\asxv5pxx\asxmak\watcom\exe
 goto EXIT
@@ -115,6 +124,7 @@ echo vs05      VS05
 echo vs10      VS10
 echo vs13      VS13
 echo vs15      VS15
+echo vs19      VS19
 echo watcom    WATCOM
 echo --------  --------
 echo.

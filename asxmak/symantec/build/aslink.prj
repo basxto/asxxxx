@@ -1,10 +1,10 @@
 82569
-R:\ASXV5PXX\ASXMAK\SYMANTEC\BUILD\aslink.prj
+R:\asxv5pxx\asxmak\symantec\build\aslink.prj
 aslink.OPN
 novcs
 aslink.DEF
 6
-1150359060
+1150362660
 0 0 0 0 0 "..\..\..\LINKSRC\lkarea.c"
 0 0 0 0 0 "..\..\..\LINKSRC\lkbank.c"
 0 0 0 0 0 "..\..\..\LINKSRC\lkdata.c"

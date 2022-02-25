@@ -264,8 +264,9 @@ term()
 	struct sym *sp;
 	char id[NCPS];
 
+	r = 10;
 	c = getnb();
-	if (c == '#') { c = getnb(); }
+	while (c == '+' || c == '#') { c = getnb(); }
 	if (c == '(') {
 		v = expr(0);
 		if (getnb() != ')') {
@@ -299,8 +300,38 @@ term()
 			v >>= 8;
 		return(v&0377);
 	}
+	if (c == '$') {
+		c = get();
+		if (c == '%' || c == '&' || c == '#' || c == '$') {
+			switch (c) {
+				case '%':
+					r = 2;
+					break;
+				case '&':
+					r = 8;
+					break;
+				case '#':
+					r = 10;
+					break;
+				case '$':
+					r = 16;				
+					break;
+				default:
+					break;
+			}
+			c = get();
+			v = 0;
+			while ((n = digit(c, r)) >= 0) {
+				v = r*v + n;
+				c = get();
+			}
+			unget(c);
+			return((v & s_mask) ? v | ~v_mask : v & v_mask);
+		}
+		unget(c);
+		c = '$';
+	}
 	if (ctype[c] & DIGIT) {
-		r = 10;
 		if (c == '0') {
 			c = get();
 			switch (c) {
