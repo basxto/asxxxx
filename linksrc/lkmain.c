@@ -62,7 +62,7 @@
  *
  *	The function main() evaluates the command line arguments to
  *	determine if the linker parameters are to input through 'stdin'
- *	or read from a command file.  The functiond getline() and parse()
+ *	or read from a command file.  The functiond nxtline() and parse()
  *	are to input and evaluate the linker parameters.  The linking process
  *	proceeds by making the first pass through each .rel file in the order
  *	presented to the linker.  At the end of the first pass the setbase(),
@@ -116,7 +116,6 @@
  *		VOID	chkbank()	lkbank.c
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
- *		int	getline()	lklex.c
  *		VOID	library()	lklibr.c
  *		VOID	link()		lkmain.c
  *		VOID	lkexit()	lkmain.c
@@ -124,6 +123,7 @@
  *		VOID	lnkarea()	lkarea.c
  *		VOID	map()		lkmain.c
  *		VOID	new()		lksym.c
+ *		int	nxtline()	lklex.c
  *		int	parse()		lkmain.c
  *		VOID	reloc()		lkreloc.c
  *		VOID	search()	lklibr.c
@@ -256,7 +256,7 @@ char *argv[];
 		hp = NULL;
 		radix = 10;
 
-		while (getline()) {
+		while (nxtline()) {
 			ip = ib;
 			link();
 		}
@@ -1005,7 +1005,7 @@ parse()
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
  *		VOID	getfid()	lklex.c
- *		int	getline()	lklex.c
+ *		int	nxtline()	lklex.c
  *		int	parse()		lkmain.c
  *
  *	side effects:
@@ -1021,7 +1021,7 @@ doparse()
 	filep = startp;
 	while (1) {
 		ip = ib;
-		if (getline() == 0)
+		if (nxtline() == 0)
 			break;
 		if (pflag && cfp->f_type != F_STD)
 			fprintf(stdout, "ASlink >> %s\n", ip);

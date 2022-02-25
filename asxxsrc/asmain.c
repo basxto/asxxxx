@@ -157,7 +157,6 @@
  *		VOID	err()		assubr.c
  *		VOID	exprmasks()	asexpr.c
  *		int	fprintf()	c_library
- *		int	getline()	aslex.c
  *		int	int32siz()	asmain.c
  *		VOID	list()		aslist.c
  *		VOID	lstsym()	aslist.c
@@ -165,6 +164,7 @@
  *		VOID	minit()		___mch.c
  *		VOID *	new()		assym.c
  *		VOID	newdot()	asmain.c
+ *		int	nxtline()	aslex.c
  *		VOID	outbuf()	asout.c
  *		VOID	outchk()	asout.c
  *		VOID	outgsd()	asout.c
@@ -400,7 +400,7 @@ char *argv[];
 		symp = &dot;
 		mcrinit();
 		minit();
-		while ((i = getline()) != 0) {
+		while ((i = nxtline()) != 0) {
 			cp = cb;
 			cpt = cbt;
 			ep = eb;

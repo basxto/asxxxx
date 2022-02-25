@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#   16 January 2009			Created for LINUX     / make /
+#   3 March 2010			Created for LINUX     / make /
 #
 ######################################################################
 
@@ -81,7 +81,41 @@ clean:
 	rm -f $(SRCSCMP)*.o
 	rm -f $(SRCZ8)*.o
 	rm -f $(SRCZ80)*.o
-	rm -f *.new
+	rm -f as1802
+	rm -f as2650
+	rm -f as430
+	rm -f as61860
+	rm -f as6500
+	rm -f as6800
+	rm -f as6801
+	rm -f as6804
+	rm -f as6805
+	rm -f as6808
+	rm -f as6809
+	rm -f as6811
+	rm -f as6812
+	rm -f as6816
+	rm -f as740
+	rm -f as8048
+	rm -f as8051
+	rm -f as8085
+	rm -f as8xcxxx
+	rm -f asavr
+	rm -f asez80
+	rm -f asf2mc8
+	rm -f asgb
+	rm -f ash8
+	rm -f asm8c
+	rm -f aspic
+	rm -f asrab
+	rm -f asscmp
+	rm -f ascheck
+	rm -f asz8
+	rm -f asz80
+	rm -f aslink
+	rm -f asxscn
+	rm -f asxcnv
+	rm -f s19os9
 	rm -f $(DSTEXE)*
 
 prep:
@@ -120,7 +154,41 @@ prep:
 	rm -f $(SRCSCMP)*.o
 	rm -f $(SRCZ8)*.o
 	rm -f $(SRCZ80)*.o
-	rm -f *.new
+	rm -f as1802
+	rm -f as2650
+	rm -f as430
+	rm -f as61860
+	rm -f as6500
+	rm -f as6800
+	rm -f as6801
+	rm -f as6804
+	rm -f as6805
+	rm -f as6808
+	rm -f as6809
+	rm -f as6811
+	rm -f as6812
+	rm -f as6816
+	rm -f as740
+	rm -f as8048
+	rm -f as8051
+	rm -f as8085
+	rm -f as8xcxxx
+	rm -f asavr
+	rm -f asez80
+	rm -f asf2mc8
+	rm -f asgb
+	rm -f ash8
+	rm -f asm8c
+	rm -f aspic
+	rm -f asrab
+	rm -f asscmp
+	rm -f ascheck
+	rm -f asz8
+	rm -f asz80
+	rm -f aslink
+	rm -f asxscn
+	rm -f asxcnv
+	rm -f s19os9
 
 
 CC=		gcc
@@ -137,7 +205,7 @@ ASXBAS:=	../../../
 SRCASX:=	$(ASXBAS)asxxsrc/
 SRCLNK:=	$(ASXBAS)linksrc/
 SRCMISC:=	$(ASXBAS)asxxmisc/
-SRCS19OS9=	$(ASXBAS)s19os9/
+SRCS19OS9:=	$(ASXBAS)s19os9/
 DSTEXE:=	$(ASXBAS)asxmak/linux/exe/
 
 SRC1802=	$(ASXBAS)as1802/
@@ -172,16 +240,10 @@ SRCSCMP=	$(ASXBAS)asscmp/
 SRCZ8=		$(ASXBAS)asz8/
 SRCZ80=		$(ASXBAS)asz80/
 
-.SUFFIXES:	.c .o .new
+.SUFFIXES:	.c .o
 
 %.o: %.c
 	$(CC) $(CCFLAGS) -I$(SRCMISC) -I$(SRCASX) -c $< -o $@
-
-%: %.new
-	strip $<
-	cp $< $@
-	cp $< $(DSTEXE)$@
-	chmod 777 $(DSTEXE)$@
 
 
 ASXX =	asdata.o asexpr.o aslex.o aslist.o	\
@@ -203,8 +265,11 @@ AS1802SRC =	$(addprefix $(SRC1802),$(AS1802))
 
 $(AS1802SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC1802)1802.h
 
-as1802.new:	$(ASXXSRC) $(AS1802SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS1802SRC) -o as1802.new
+as1802:	$(ASXXSRC) $(AS1802SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS1802SRC) -o as1802
+	cp as1802 $(DSTEXE)as1802
+	strip $(DSTEXE)as1802
+	chmod 777 $(DSTEXE)as1802
 
 
 ####################################################################
@@ -217,8 +282,11 @@ AS2650SRC =	$(addprefix $(SRC2650),$(AS2650))
 
 $(AS2650SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC2650)s2650.h
 
-as2650.new:	$(ASXXSRC) $(AS2650SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS2650SRC) -o as2650.new
+as2650:	$(ASXXSRC) $(AS2650SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS2650SRC) -o as2650
+	cp as2650 $(DSTEXE)as2650
+	strip $(DSTEXE)as2650
+	chmod 777 $(DSTEXE)as2650
 
 
 ####################################################################
@@ -231,9 +299,11 @@ AS430SRC =	$(addprefix $(SRC430),$(AS430))
 
 $(AS430SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC430)m430.h
 
-as430.new:	$(ASXXSRC) $(AS430SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS430SRC) -o as430.new
-
+as430:	$(ASXXSRC) $(AS430SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS430SRC) -o as430
+	cp as430 $(DSTEXE)as430
+	strip $(DSTEXE)as430
+	chmod 777 $(DSTEXE)as430
 
 ####################################################################
 # AS61860
@@ -245,8 +315,11 @@ AS61860SRC =	$(addprefix $(SRC61860),$(AS61860))
 
 $(AS61860SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC61860)s61860.h
 
-as61860.new:	$(ASXXSRC) $(AS61860SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS61860SRC) -o as61860.new
+as61860:	$(ASXXSRC) $(AS61860SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS61860SRC) -o as61860
+	cp as61860 $(DSTEXE)as61860
+	strip $(DSTEXE)as61860
+	chmod 777 $(DSTEXE)as61860
 
 
 ####################################################################
@@ -259,8 +332,11 @@ AS6500SRC =	$(addprefix $(SRC6500),$(AS6500))
 
 $(AS6500SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6500)r6500.h
 
-as6500.new:	$(ASXXSRC) $(AS6500SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6500SRC) -o as6500.new
+as6500:	$(ASXXSRC) $(AS6500SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6500SRC) -o as6500
+	cp as6500 $(DSTEXE)as6500
+	strip $(DSTEXE)as6500
+	chmod 777 $(DSTEXE)as6500
 
 
 ####################################################################
@@ -273,8 +349,11 @@ AS6800SRC =	$(addprefix $(SRC6800),$(AS6800))
 
 $(AS6800SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6800)m6800.h
 
-as6800.new:	$(ASXXSRC) $(AS6800SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6800SRC) -o as6800.new
+as6800:	$(ASXXSRC) $(AS6800SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6800SRC) -o as6800
+	cp as6800 $(DSTEXE)as6800
+	strip $(DSTEXE)as6800
+	chmod 777 $(DSTEXE)as6800
 
 
 ####################################################################
@@ -287,8 +366,11 @@ AS6801SRC =	$(addprefix $(SRC6801),$(AS6801))
 
 $(AS6801SRC):	 $(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6801)m6801.h
 
-as6801.new:	$(ASXXSRC) $(AS6801SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6801SRC) -o as6801.new
+as6801:	$(ASXXSRC) $(AS6801SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6801SRC) -o as6801
+	cp as6801 $(DSTEXE)as6801
+	strip $(DSTEXE)as6801
+	chmod 777 $(DSTEXE)as6801
 
 
 ####################################################################
@@ -301,8 +383,11 @@ AS6804SRC =	$(addprefix $(SRC6804),$(AS6804))
 
 $(AS6804SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6804)m6804.h
 
-as6804.new:	$(ASXXSRC) $(AS6804SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6804SRC) -o as6804.new
+as6804:	$(ASXXSRC) $(AS6804SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6804SRC) -o as6804
+	cp as6804 $(DSTEXE)as6804
+	strip $(DSTEXE)as6804
+	chmod 777 $(DSTEXE)as6804
 
 
 ####################################################################
@@ -315,8 +400,11 @@ AS6805SRC =	$(addprefix $(SRC6805),$(AS6805))
 
 $(AS6805SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6805)m6805.h
 
-as6805.new:	$(ASXXSRC) $(AS6805SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6805SRC) -o as6805.new
+as6805:	$(ASXXSRC) $(AS6805SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6805SRC) -o as6805
+	cp as6805 $(DSTEXE)as6805
+	strip $(DSTEXE)as6805
+	chmod 777 $(DSTEXE)as6805
 
 
 ####################################################################
@@ -329,8 +417,11 @@ AS6808SRC =	$(addprefix $(SRC6808),$(AS6808))
 
 $(AS6808SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6808)m6808.h
 
-as6808.new:	$(ASXXSRC) $(AS6808SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6808SRC) -o as6808.new
+as6808:	$(ASXXSRC) $(AS6808SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6808SRC) -o as6808
+	cp as6808 $(DSTEXE)as6808
+	strip $(DSTEXE)as6808
+	chmod 777 $(DSTEXE)as6808
 
 
 ####################################################################
@@ -343,8 +434,11 @@ AS6809SRC =	$(addprefix $(SRC6809),$(AS6809))
 
 $(AS6809SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6809)m6809.h
 
-as6809.new:	$(ASXXSRC) $(AS6809SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6809SRC) -o as6809.new
+as6809:	$(ASXXSRC) $(AS6809SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6809SRC) -o as6809
+	cp as6809 $(DSTEXE)as6809
+	strip $(DSTEXE)as6809
+	chmod 777 $(DSTEXE)as6809
 
 
 ####################################################################
@@ -357,8 +451,11 @@ AS6811SRC =	$(addprefix $(SRC6811),$(AS6811))
 
 $(AS6811SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6811)m6811.h
 
-as6811.new:	$(ASXXSRC) $(AS6811SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6811SRC) -o as6811.new
+as6811:	$(ASXXSRC) $(AS6811SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6811SRC) -o as6811
+	cp as6811 $(DSTEXE)as6811
+	strip $(DSTEXE)as6811
+	chmod 777 $(DSTEXE)as6811
 
 
 ####################################################################
@@ -371,8 +468,11 @@ AS6812SRC =	$(addprefix $(SRC6812),$(AS6812))
 
 $(AS6812SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6812)m6812.h
 
-as6812.new:	$(ASXXSRC) $(AS6812SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6812SRC) -o as6812.new
+as6812:	$(ASXXSRC) $(AS6812SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6812SRC) -o as6812
+	cp as6812 $(DSTEXE)as6812
+	strip $(DSTEXE)as6812
+	chmod 777 $(DSTEXE)as6812
 
 
 ####################################################################
@@ -385,8 +485,11 @@ AS6816SRC =	$(addprefix $(SRC6816),$(AS6816))
 
 $(AS6816SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6816)m6816.h
 
-as6816.new:	$(ASXXSRC) $(AS6816SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6816SRC) -o as6816.new
+as6816:	$(ASXXSRC) $(AS6816SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6816SRC) -o as6816
+	cp as6816 $(DSTEXE)as6816
+	strip $(DSTEXE)as6816
+	chmod 777 $(DSTEXE)as6816
 
 
 ####################################################################
@@ -399,8 +502,11 @@ AS740SRC =	$(addprefix $(SRC740),$(AS740))
 
 $(AS740SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC740)m740.h
 
-as740.new:	$(ASXXSRC) $(AS740SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS740SRC) -o as740.new
+as740:	$(ASXXSRC) $(AS740SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS740SRC) -o as740
+	cp as740 $(DSTEXE)as740
+	strip $(DSTEXE)as740
+	chmod 777 $(DSTEXE)as740
 
 
 ####################################################################
@@ -413,8 +519,11 @@ AS8048SRC =	$(addprefix $(SRC8048),$(AS8048))
 
 $(AS8048SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC8048)i8048.h
 
-as8048.new:	$(ASXXSRC) $(AS8048SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8048SRC) -o as8048.new
+as8048:	$(ASXXSRC) $(AS8048SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8048SRC) -o as8048
+	cp as8048 $(DSTEXE)as8048
+	strip $(DSTEXE)as8048
+	chmod 777 $(DSTEXE)as8048
 
 
 ####################################################################
@@ -427,8 +536,11 @@ AS8051SRC =	$(addprefix $(SRC8051),$(AS8051))
 
 $(AS8051SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC8051)i8051.h
 
-as8051.new:	$(ASXXSRC) $(AS8051SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8051SRC) -o as8051.new
+as8051:	$(ASXXSRC) $(AS8051SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8051SRC) -o as8051
+	cp as8051 $(DSTEXE)as8051
+	strip $(DSTEXE)as8051
+	chmod 777 $(DSTEXE)as8051
 
 
 ####################################################################
@@ -441,8 +553,11 @@ AS8085SRC =	$(addprefix $(SRC8085),$(AS8085))
 
 $(AS8085SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC8085)i8085.h
 
-as8085.new:	$(ASXXSRC) $(AS8085SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8085SRC) -o as8085.new
+as8085:	$(ASXXSRC) $(AS8085SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8085SRC) -o as8085
+	cp as8085 $(DSTEXE)as8085
+	strip $(DSTEXE)as8085
+	chmod 777 $(DSTEXE)as8085
 
 
 ####################################################################
@@ -455,8 +570,11 @@ AS8XCXXXSRC =	$(addprefix $(SRC8XCXXX),$(AS8XCXXX))
 
 $(AS8XCXXXSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC8XCXXX)ds8.h
 
-as8xcxxx.new:	$(ASXXSRC) $(AS8XCXXXSRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8XCXXXSRC) -o as8xcxxx.new
+as8xcxxx:	$(ASXXSRC) $(AS8XCXXXSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8XCXXXSRC) -o as8xcxxx
+	cp as8xcxxx $(DSTEXE)as8xcxxx
+	strip $(DSTEXE)as8xcxxx
+	chmod 777 $(DSTEXE)as8xcxxx
 
 
 ####################################################################
@@ -469,8 +587,11 @@ ASAVRSRC =	$(addprefix $(SRCAVR),$(ASAVR))
 
 $(ASAVRSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCAVR)avr.h
 
-asavr.new:	$(ASXXSRC) $(ASAVRSRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASAVRSRC) -o asavr.new
+asavr:	$(ASXXSRC) $(ASAVRSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASAVRSRC) -o asavr
+	cp asavr $(DSTEXE)asavr
+	strip $(DSTEXE)asavr
+	chmod 777 $(DSTEXE)asavr
 
 
 ####################################################################
@@ -483,8 +604,11 @@ ASCHECKSRC =	$(addprefix $(SRCCHECK),$(ASCHECK))
 
 $(ASCHECKSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCCHECK)chk.h
 
-ascheck.new:	$(ASXXSRC) $(ASCHECKSRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASCHECKSRC) -o ascheck.new
+ascheck:	$(ASXXSRC) $(ASCHECKSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASCHECKSRC) -o ascheck
+	cp ascheck $(DSTEXE)ascheck
+	strip $(DSTEXE)ascheck
+	chmod 777 $(DSTEXE)ascheck
 
 
 ####################################################################
@@ -497,8 +621,11 @@ ASEZ80SRC =	$(addprefix $(SRCEZ80),$(ASEZ80))
 
 $(ASEZ80SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCEZ80)ez80.h
 
-asez80.new:	$(ASXXSRC) $(ASEZ80SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASEZ80SRC) -o asez80.new
+asez80:	$(ASXXSRC) $(ASEZ80SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASEZ80SRC) -o asez80
+	cp asez80 $(DSTEXE)asez80
+	strip $(DSTEXE)asez80
+	chmod 777 $(DSTEXE)asez80
 
 
 ####################################################################
@@ -511,8 +638,11 @@ ASF2MC8SRC =	$(addprefix $(SRCF2MC8),$(ASF2MC8))
 
 $(ASF2MC8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCF2MC8)f2mc8.h
 
-asf2mc8.new:	$(ASXXSRC) $(ASF2MC8SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASF2MC8SRC) -o asf2mc8.new
+asf2mc8:	$(ASXXSRC) $(ASF2MC8SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASF2MC8SRC) -o asf2mc8
+	cp asf2mc8 $(DSTEXE)asf2mc8
+	strip $(DSTEXE)asf2mc8
+	chmod 777 $(DSTEXE)asf2mc8
 
 
 ####################################################################
@@ -525,8 +655,11 @@ ASGBSRC =	$(addprefix $(SRCGB),$(ASGB))
 
 $(ASGBSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCGB)gb.h
 
-asgb.new:	$(ASXXSRC) $(ASGBSRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASGBSRC) -o asgb.new
+asgb:	$(ASXXSRC) $(ASGBSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASGBSRC) -o asgb
+	cp asgb $(DSTEXE)asgb
+	strip $(DSTEXE)asgb
+	chmod 777 $(DSTEXE)asgb
 
 
 ####################################################################
@@ -539,8 +672,11 @@ ASH8SRC =	$(addprefix $(SRCH8),$(ASH8))
 
 $(ASH8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCH8)h8.h
 
-ash8.new:	$(ASXXSRC) $(ASH8SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASH8SRC) -o ash8.new
+ash8:	$(ASXXSRC) $(ASH8SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASH8SRC) -o ash8
+	cp ash8 $(DSTEXE)ash8
+	strip $(DSTEXE)ash8
+	chmod 777 $(DSTEXE)ash8
 
 
 ####################################################################
@@ -553,8 +689,11 @@ ASM8CSRC =	$(addprefix $(SRCM8C),$(ASM8C))
 
 $(ASM8CSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCM8C)m8c.h
 
-asm8c.new:	$(ASXXSRC) $(ASM8CSRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASM8CSRC) -o asm8c.new
+asm8c:	$(ASXXSRC) $(ASM8CSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASM8CSRC) -o asm8c
+	cp asm8c $(DSTEXE)asm8c
+	strip $(DSTEXE)asm8c
+	chmod 777 $(DSTEXE)asm8c
 
 
 ####################################################################
@@ -567,8 +706,11 @@ ASPICSRC =	$(addprefix $(SRCPIC),$(ASPIC))
 
 $(ASPICSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCPIC)pic.h
 
-aspic.new:	$(ASXXSRC) $(ASPICSRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASPICSRC) -o aspic.new
+aspic:	$(ASXXSRC) $(ASPICSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASPICSRC) -o aspic
+	cp aspic $(DSTEXE)aspic
+	strip $(DSTEXE)aspic
+	chmod 777 $(DSTEXE)aspic
 
 
 ####################################################################
@@ -581,8 +723,11 @@ ASRABSRC =	$(addprefix $(SRCRAB),$(ASRAB))
 
 $(ASRABSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCRAB)rab.h
 
-asrab.new:	$(ASXXSRC) $(ASRABSRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASRABSRC) -o asrab.new
+asrab:	$(ASXXSRC) $(ASRABSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASRABSRC) -o asrab
+	cp asrab $(DSTEXE)asrab
+	strip $(DSTEXE)asrab
+	chmod 777 $(DSTEXE)asrab
 
 
 ####################################################################
@@ -595,8 +740,11 @@ ASSCMPSRC =	$(addprefix $(SRCSCMP),$(ASSCMP))
 
 $(ASSCMPSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCSCMP)scmp.h
 
-asscmp.new:	$(ASXXSRC) $(ASSCMPSRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASSCMPSRC) -o asscmp.new
+asscmp:	$(ASXXSRC) $(ASSCMPSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASSCMPSRC) -o asscmp
+	cp asscmp $(DSTEXE)asscmp
+	strip $(DSTEXE)asscmp
+	chmod 777 $(DSTEXE)asscmp
 
 
 ####################################################################
@@ -609,8 +757,11 @@ ASZ8SRC =	$(addprefix $(SRCZ8),$(ASZ8))
 
 $(ASZ8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCZ8)z8.h
 
-asz8.new:	$(ASXXSRC) $(ASZ8SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASZ8SRC) -o asz8.new
+asz8:	$(ASXXSRC) $(ASZ8SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASZ8SRC) -o asz8
+	cp asz8 $(DSTEXE)asz8
+	strip $(DSTEXE)asz8
+	chmod 777 $(DSTEXE)asz8
 
 
 ####################################################################
@@ -623,8 +774,11 @@ ASZ80SRC =	$(addprefix $(SRCZ80),$(ASZ80))
 
 $(ASZ80SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCZ80)z80.h
 
-asz80.new:	$(ASXXSRC) $(ASZ80SRC)
-	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASZ80SRC) -o asz80.new
+asz80:	$(ASXXSRC) $(ASZ80SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASZ80SRC) -o asz80
+	cp asz80 $(DSTEXE)asz80
+	strip $(DSTEXE)asz80
+	chmod 777 $(DSTEXE)asz80
 
 
 ####################################################################
@@ -640,8 +794,11 @@ ASLINKSRC =	$(addprefix $(SRCLNK),$(ASLINK))
 
 $(ASLINK):	$(SRCMISC)alloc.h $(SRCLNK)aslink.h
 
-aslink.new:	$(ASLINKSRC)
-	$(LD) $(LDFLAGS) $(ASLINKSRC) -o aslink.new
+aslink:	$(ASLINKSRC)
+	$(LD) $(LDFLAGS) $(ASLINKSRC) -o aslink
+	cp aslink $(DSTEXE)aslink
+	strip $(DSTEXE)aslink
+	chmod 777 $(DSTEXE)aslink
 
 
 ####################################################################
@@ -649,8 +806,11 @@ aslink.new:	$(ASLINKSRC)
 ####################################################################
 
 $(SRCMISC)asxxconv.o:	$(SRCASX)asxxxx.h
-asxcnv.new:	$(SRCMISC)asxxconv.o
-	$(LD) $(LDFLAGS) $(SRCMISC)asxxconv.o -o asxcnv.new
+asxcnv:	$(SRCMISC)asxxconv.o
+	$(LD) $(LDFLAGS) $(SRCMISC)asxxconv.o -o asxcnv
+	cp asxcnv $(DSTEXE)asxcnv
+	strip $(DSTEXE)asxcnv
+	chmod 777 $(DSTEXE)asxcnv
 
 
 ####################################################################
@@ -658,8 +818,11 @@ asxcnv.new:	$(SRCMISC)asxxconv.o
 ####################################################################
 
 $(SRCMISC)asxxscan.o:	$(SRCASX)asxxxx.h
-asxscn.new:	$(SRCMISC)asxxscan.o
-	$(LD) $(LDFLAGS) $(SRCMISC)asxxscan.o -o asxscn.new
+asxscn:	$(SRCMISC)asxxscan.o
+	$(LD) $(LDFLAGS) $(SRCMISC)asxxscan.o -o asxscn
+	cp asxscn $(DSTEXE)asxscn
+	strip $(DSTEXE)asxscn
+	chmod 777 $(DSTEXE)asxscn
 
 
 ####################################################################
@@ -667,10 +830,13 @@ asxscn.new:	$(SRCMISC)asxxscan.o
 ####################################################################
 
 $(SRCS19OS9)s19os9.o:	$(SRCASX)asxxxx.h
-s19os9.new:	$(SRCS19OS9)s19os9.o
-	$(LD) $(LDFLAGS) $(SRCS19OS9)s19os9.o -o s19os9.new
+s19os9:	$(SRCS19OS9)s19os9.o
+	$(LD) $(LDFLAGS) $(SRCS19OS9)s19os9.o -o s19os9
+	cp s19os9 $(DSTEXE)s19os9
+	strip $(DSTEXE)s19os9
+	chmod 777 $(DSTEXE)s19os9
 
 
-### end #########################################################
+### end ############################################################
 
 

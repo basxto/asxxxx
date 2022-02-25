@@ -3,7 +3,7 @@
 #		DJGPP V02.03  'GNU make' Version
 #		================================
 #
-#   16  January  2009		GCC 4.0.1 / make 3.79.1
+#   3  March  2010		GCC 4.0.1 / make 3.79.1
 #
 ####################################################################
 
@@ -179,7 +179,7 @@ s26pst.o :	$(SRC2650)s26pst.c $(SRC2650)s2650.h $(SRCASX)asxxxx.h
 s26mch.o :	$(SRC2650)s26mch.c $(SRC2650)s2650.h $(SRCASX)asxxxx.h
 		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
 
-as2650 :		$(ASXX) $(AS2650)
+as2650 :	$(ASXX) $(AS2650)
 		$(LD) $(LDFLAGS) -o as2650 $(ASXX) $(AS2650)
 		mv as2650.exe $(DSTEXE)as2650.exe
 		strip $(DSTEXE)as2650.exe

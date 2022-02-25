@@ -95,7 +95,7 @@ unsigned char	os9crc[3];	/* OS9 CRC			*/
  *		int		fclose()	c_library
  *		FILE		fopen()		c_library
  *		int		fprintf()	c_library
- *		int		getline()	s19os9.c
+ *		int		nxtline()	s19os9.c
  *		VOID		usage()		s19os9.c
  *		unsigned char	os9_chk()	s19os9.c
  *		int		os9_hdr()	s19os9.c
@@ -179,7 +179,7 @@ char *argv[];
 	 * S19 Input Scanner
 	 */
 	lincnt = 0;
-	while (getline()) {
+	while (nxtline()) {
 		lincnt += 1;
 		ip = ib;
 		/*
@@ -453,12 +453,12 @@ unsigned char *crc;
 	return (ec);
 }
 
-/*)Function	int	getline()
+/*)Function	int	nxtline()
  *
- *	The function getline() reads a line of text from the S19
+ *	The function nxtline() reads a line of text from the S19
  *	text file.  The input text line is transferred into the
  *	global string ib[] and converted to a NULL terminated string.
- *	The function getline() returns a (1) after succesfully
+ *	The function nxtline() returns a (1) after succesfully
  *	reading a line,	or a (0) if the End-Of-File is found.
  *
  *	local variables:
@@ -478,7 +478,7 @@ unsigned char *crc;
  */
 
 int
-getline()
+nxtline()
 {
 	if (fgets(ib, NINPUT, inpfp) == NULL) {
 		fclose(inpfp);

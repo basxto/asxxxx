@@ -47,10 +47,10 @@
  *		int	fndidx()
  *		int	get()
  *		VOID	getid()
- *		int	getline()
  *		int	getnb()
  *		int	main()
  *		int	more()
+ *		int	nxtline()
  *		int	changekey()
  *		VOID	scanline()
  *		VOID	unget()
@@ -83,7 +83,7 @@
  *		FILE *	afile()		pictoasx.c
  *		VOID	ptoaexit()	pictoasx.c
  *		int	fprintf()	c-library
- *		int	getline()	pictoasx.c
+ *		int	nxtline()	pictoasx.c
  *		VOID	usage()		pictoasx.c
  *
  *	side effects:
@@ -126,7 +126,7 @@ char *argv[];
 	}
 	if (ifp == NULL)
 		usage(ER_WARNING);
-	while (getline()) {
+	while (nxtline()) {
 		fprintf(ofp, "%s\n", ib);
 	}
 	ptoaexit(ER_NONE);
@@ -503,9 +503,9 @@ int c;
 			--ip;
 }
 
-/*)Function	int	getline()
+/*)Function	int	nxtline()
  *
- *	The function getline() reads a line of text from an assembly
+ *	The function nxtline() reads a line of text from an assembly
  *	source text file.  The input text line is transferred into the
  *	global string ib[] and converted to a NULL terminated string.
  *	The function scanline() is called to process any substitutions
@@ -530,7 +530,7 @@ int c;
  */
 
 int
-getline()
+nxtline()
 {
 	if (fgets(ib, NINPUT, ifp) == NULL) {
 		return (0);
