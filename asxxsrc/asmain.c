@@ -888,6 +888,14 @@ loop:
 
 	case S_LISTING:
 		lmode = NLIST;
+		if (more()) {
+			n = absexpr() ? 1 : 0;
+		} else {
+			n = 0;
+		}
+		if (!n && flevel)
+			return;
+
 		switch(mp->m_valu) {
 		case O_LIST:
 			if (nlevel) {
@@ -905,8 +913,16 @@ loop:
 		return;
 
 	case S_PAGE:
-		lop = NLPP;
 		lmode = NLIST;
+		if (more()) {
+			n = absexpr() ? 1 : 0;
+		} else {
+			n = 0;
+		}
+		if (!n && nlevel)
+			return;
+
+		lop = NLPP;
 		return;
 
 	default:
@@ -1010,12 +1026,33 @@ loop:
 			--incfil;
 			err('i');
 		} else {
-			lop = NLPP;
 			incline[incfil] = 0;
 			strcpy(afn, afntmp);
 			afp = afptmp;
 			strcpy(incfn[incfil],afn);
 			incfp[incfil] = afp;
+/*
+			if (more()) {
+				if (getnb() != ',') {
+					qerr();
+				}
+				n = absexpr() ? 1 : 0;
+			} else {
+				if ((sp = slookup(".__ictrl")) != NULL) {
+					if (!(sp->s_flag & S_ASG) || (sp->s_area != NULL)) {
+						n = 0;
+					} else {
+						n = sp->s_addr ? 1 : 0;
+					}
+				} else {
+					n = 0;
+				}
+				n = 1;
+			}
+*/
+			if (!nlevel) {
+				lop = NLPP;
+			}
 		}
 		break;
 

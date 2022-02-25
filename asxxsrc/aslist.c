@@ -1027,7 +1027,7 @@ FILE *fp;
 		}
 		if (wflag) {
 			putc('\n', fp);		/* JLH */
-			slew(fp, 0);
+			slew(fp, pflag);
 			++i;
 		} else {
 			if (++i % 2 == 0) {

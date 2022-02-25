@@ -11,7 +11,63 @@ ASxxxx Cross Assembler Updates
 <H2>ASxxxx Cross Assembler Updates</H2>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<B><PRE><H4>
+Version 4.11 Optional Update 1
+2006_11_01
+<BR><a href="ftp://shop-pdp.kent.edu/u01411.zip">
+Update_01 for the ASxxxx Assembler and Linker Version 4.11 (52K)</a><BR>
+(use 'pkunzip -d U01411.ZIP' for extraction with MS-DOS)<BR>
+(use 'unzip -L -a U01411.ZIP' for extraction with Linux)<BR>
+<BR>
 
+   This  update  for  Version  4.11  of the  ASxxxx Cross
+Assemblers  modifies  the  functionality  of  the  .list,
+.nlist, .page, and .include directives.
+
+   The  .list and .nlist  directives are now  modified by
+.if &#47; .else &#47; .endif  processing  so that they are active
+only in a TRUE clause.
+
+   The  .page  and  .include  directives are now modified
+by the  .list  and  .nlist  directives so that pagination
+occurs only when listing is active.
+
+   The new  default functionality for the  .list,  .nlist
+and  .page  directives  may  be  modified by including an
+optional argument in the  directive as shown here for the
+.list directive:
+
+      .list    arg
+		
+a non-zero argument invokes the directive irrespective of
+the .if &#47; .else &#47; .endif status.
+
+
+   Merge the update asxv4pxx directory and subdirectories
+with the V4.11 distribution.  The following files will be
+overwritten:
+
+[asxv4pxx\asxxsrc]:
+      asexpr.c
+      aslex.c
+      aslist.c
+      asmain.c
+      asout.c
+      asxxxx.h
+
+[asxv4pxx\asxxhtml]
+      asxupt.htm
+
+   You must recompile all the ASxxxx assemblers to
+incorporate the update.
+
+        Note:
+           This update includes Patch 01 for Version 4.11
+           of the ASxxxx Cross Assemblers.
+
+</H4></PRE></B>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
 <H3><B>Version 4.11</B></H3>
 
 <H4><B><PRE>
@@ -119,6 +175,6 @@ specify case insensitivity.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: June 2006</B></P></H6>
+<H6><P><B>Last Updated: November 2006</B></P></H6>
 </BODY>
 </HTML>

@@ -11,7 +11,7 @@
  *   With enhancements from
  *
  *	Bill McKinnon (BM)
- *	w_mckinnon@conknet.com
+ *	w_mckinnon at conknet dot com
  */
 
 #include "asxxxx.h"

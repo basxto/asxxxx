@@ -11,10 +11,10 @@
  *   With enhancements from
  *
  *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *	jhartman at compuserve dot com
  *
  *	Bill McKinnon (BM)
- *	w_mckinnon@conknet.com
+ *	w_mckinnon at conknet dot com
  *
  *	Boisy G. Petri (BGP)
  *	boisy at boisypitre dot com
@@ -36,7 +36,7 @@
  * Local Definitions
  */
 
-#define	VERSION	"V04.11"
+#define	VERSION	"V04.11 Optional Update 1"
 
 /*
  * To include NoICE Debugging set non-zero

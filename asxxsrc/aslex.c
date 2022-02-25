@@ -420,7 +420,6 @@ int d;
 int
 getline()
 {
-
 loop:	if (incfil >= 0) {
 		if (fgets(ib, NINPUT, ifp[incfil]) == NULL) {
 			fclose(ifp[incfil]);
@@ -432,7 +431,9 @@ loop:	if (incfil >= 0) {
 				strcpy(afn, srcfn[cfile]);
 				afp = srcfp[cfile];
 			}
-			lop = NLPP;
+			if (!nlevel) {
+				lop = NLPP;
+			}
 			goto loop;
 		} else {
 			++incline[incfil];
