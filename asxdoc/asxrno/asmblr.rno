@@ -1684,6 +1684,45 @@ not used. (Currently only the as8xCxxx and aspic assemblers can
 use the _.16bit, _.24bit, or _.32bit directives in special mode.)
 
 
+.header level 2;.\m\s\b Directive 
+.break
+Format:
+.skip;.indent 8
+_.msb	n
+.skip
+  The .msb directive is only available in selected assemblers
+which support 24 or 32-bit addressing.
+
+  The assembler operator '>' selects the upper byte (MSB) when
+included in an assembler instruction.  The default assembler
+mode is to select bits <15:8> as the MSB.  The .msb directive
+allows the programmer to specify a particular byte as the
+'MSB' when the address space is larger than 16-bits.
+
+  The assembler directive ##.msb#n## configures the assembler
+to select a particular byte as MSB. Given a 32-bit address
+of MNmn (M(3) is <31:24>, N(2) is <23:16>, m(1) is <15:8>,
+and n(0) is <7:0>) the following examples show how to select
+a particular address byte:
+.skip
+.literal
+	.msb 1		;select byte 1 of address
+			;<M(3):N(2):m(1):n(0)>
+	LD A,>MNmn	;byte m <15:8> ==>> A
+	...
+
+	.msb 2		;select byte 2 of address
+			;<M(3):N(2):m(1):n(0)>
+	LD A,>MNmn	;byte N <23:16> ==>> A
+	...
+
+	.msb 3		;select byte 3 of address
+			;<M(3):N(2):m(1):n(0)>
+	LD A,>MNmn	;byte M <31:24> ==>> A
+	...
+.end literal
+
+
 .header level 2;_.end Directive
 Format:
 .skip;.indent 8

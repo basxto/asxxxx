@@ -14,7 +14,8 @@ all:	as430 as740 as1802 as6500	\
 	as6808 as6809 as6811 as6812	\
 	as6816 as61860			\
 	as8051 as8085			\
-	asz80 asgb asrab		\
+	asz80 asgb asez80		\
+	asrab				\
 	ash8 as8xcxxx			\
 	asavr aspic			\
 	ascheck				\
@@ -43,6 +44,7 @@ clean:
 	rm -f $(SRC8085)*.o
 	rm -f $(SRCZ80)*.o
 	rm -f $(SRCGB)*.o
+	rm -f $(SRCEZ80)*.o
 	rm -f $(SRCRAB)*.o
 	rm -f $(SRC8XCXXX)*.o
 	rm -f $(SRCH8)*.o
@@ -86,6 +88,7 @@ SRC8051=	$(ASXBAS)as8051/
 SRC8085=	$(ASXBAS)as8085/
 SRCZ80=		$(ASXBAS)asz80/
 SRCGB=		$(ASXBAS)asgb/
+SRCEZ80=	$(ASXBAS)asez80/
 SRCRAB=		$(ASXBAS)asrab/
 SRC8XCXXX=	$(ASXBAS)as8xcxxx/
 SRCH8=		$(ASXBAS)ash8/
@@ -363,6 +366,20 @@ $(ASGBSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCGB)gb.h
 
 asgb.new:	$(ASXXSRC) $(ASGBSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASGBSRC) -o asgb.new
+
+
+####################################################################
+# ASEZ80
+####################################################################
+
+ASEZ80 =	ez80adr.o ez80ext.o ez80mch.o ez80pst.o
+
+ASEZ80SRC =	$(addprefix $(SRCEZ80),$(ASEZ80))
+
+$(ASEZ80SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCEZ80)ez80.h
+
+asez80.new:	$(ASXXSRC) $(ASEZ80SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASEZ80SRC) -o asez80.new
 
 
 ####################################################################

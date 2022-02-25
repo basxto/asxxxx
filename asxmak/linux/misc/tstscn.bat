@@ -34,20 +34,22 @@
 ../exe/asxscn ../../../asxtst/asmt2blo.lst
 ../exe/asgb -glaxff ../../../asxtst/asmt2blo.asm
 ../exe/asxscn ../../../asxtst/asmt2blo.lst
+../exe/asez80 -glaxff ../../../asxtst/asmt3blo.asm
+../exe/asxscn -3 ../../../asxtst/asmt3blo.lst
 ../exe/asrab -glaxff ../../../asxtst/asmt2blo.asm
 ../exe/asxscn ../../../asxtst/asmt2blo.lst
 ../exe/as8xcxxx -glaxff ../../../asxtst/asmt2bhi.asm
 ../exe/asxscn ../../../asxtst/asmt2bhi.lst
-../exe/as8xcxxx -glaxff ../../../asxtst/asmt3bhi.asm
-../exe/asxscn -3 ../../../asxtst/asmt3bhi.lst
+../exe/as8xcxxx -glaxff ../../../asxtst/a24bit.asm ../../../asxtst/asmt3bhi.asm
+../exe/asxscn -3 ../../../asxtst/a24bit.lst
 ../exe/ash8 -glaxff ../../../asxtst/asmt2bhi.asm
 ../exe/asxscn ../../../asxtst/asmt2bhi.lst
-../exe/asavr -glaxff ../../../asxtst/asmt4blo.asm
-../exe/asxscn -4 ../../../asxtst/asmt4blo.lst
+../exe/asavr -glaxff ../../../asxtst/a32bit.asm ../../../asxtst/asmt4blo.asm
+../exe/asxscn -4 ../../../asxtst/a32bit.lst
 ../exe/aspic -glaxff ../../../asxtst/asmt2bhi.asm
 ../exe/asxscn ../../../asxtst/asmt2bhi.lst
-../exe/aspic -glaxff ../../../asxtst/asmt4bhi.asm
-../exe/asxscn -4 ../../../asxtst/asmt4bhi.lst
+../exe/aspic -glaxff ../../../asxtst/a32bit.asm ../../../asxtst/asmt4bhi.asm
+../exe/asxscn -4 ../../../asxtst/a32bit.lst
 ../exe/ascheck -glaxff ../../../asxtst/asmt2bhi.asm
 ../exe/asxscn ../../../asxtst/asmt2bhi.lst
 
@@ -105,6 +107,10 @@
 ../exe/asxscn ../../../asz80/tz80.lst
 ../exe/asgb -glaxff ../../../asgb/tgb.asm
 ../exe/asxscn ../../../asgb/tgb.lst
+../exe/asez80 -gloaxff ../../../asez80/tez80.asm
+../exe/aslink -mxu -g varx=0 ../../../asez80/tez80
+../exe/asxscn -3 ../../../asez80/tez80.lst
+../exe/asxscn -3i ../../../asez80/tez80.rst
 ../exe/asrab -gloabxff ../../../asrab/trabl.asm
 ../exe/aslink -nxu ../../../asrab/trabl
 ../exe/asxscn ../../../asrab/trabl.lst

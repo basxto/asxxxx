@@ -552,7 +552,7 @@ The linker provides detailed error messages allowing the programmer
 to quickly find the errant code.  As the linker completes pass#1 over
 the input file(s) it reports any page boundary or page length errors
 as follows:
-.tp 6;.skip
+.tp 8;.skip
 .literal
 ?ASlink-Warning-Paged Area PAGE0 Boundary Error
 
@@ -562,6 +562,14 @@ and/or
 .end literal
 .skip
 where PAGE0 is the paged area.
+
+Also during Pass #1 any bank size (length) errors will be
+reported as follows:
+.tp 6;.skip
+.literal
+?ASlink-Warning-Size limit exceeded in bank BANK
+.end literal
+where BANK is the bank name.
 
 During Pass two the linker reads the T, R, and P lines performing the
 necessary relocations and outputting the absolute code.  Various 

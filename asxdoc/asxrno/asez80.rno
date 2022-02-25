@@ -1,0 +1,263 @@
+.appendix ASEZ80 Assembler 
+
+.header level 1;Acknowledgment 
+Thanks to Patrick Head for his contribution
+of the ASEZ80 cross assembler.
+.skip 1
+.literal
+   Patrick Head
+
+	patrick at phead dot net
+.end literal
+.skip 2 
+.header level 1;Processor Specific Directives 
+  The ASEZ80 assembler is a port of the ASZ80 assembler.  This
+assembler can process EZ80 code in Z80 and ADL modes in any
+combination within the source file. The following processor
+specific assembler directives specify which mode the assembler
+is to process the assembler source code.
+
+
+.header level 2;.\a\d\l Directive 
+.break
+Format:
+.skip;.indent 8
+_.adl	[n]
+.skip
+The assembler is informed by the .adl directive to assemble the
+subsequent code using the full 24-Bit addressing capabilities of
+the EZ80 processor.  The optional argument, n, allows the assembly
+mode to be controlled by a varaible.  A non-zero value for n
+enables ADL mode and a zero value enables the Z80 mode.  The
+default mode of the assembler is Z80.
+
+
+.header level 2;.\z80 Directive 
+.break
+Format:
+.skip;.indent 8
+_.z80	[n]
+.skip
+The assembler is informed by the .z80 directive to assemble the
+subsequent code using the banked 16-Bit addressing capabilities of
+the EZ80 processor.  The optional argument, n, allows the assembly
+mode to be controlled by a varaible.  A non-zero value for n
+enables Z80 mode and a zero value enables the ADL mode.  The
+default mode of the assembler is Z80.
+
+
+.header level 2;.\m\s\b Directive 
+.break
+Format:
+.skip;.indent 8
+_.msb	n
+.skip
+  The assembler operator '>' selects the upper byte (MSB) when
+included in an assembler instruction.  The normal assembler
+mode is to select bits <15:8> as the MSB.  The .msb directive
+allows the programmer to specify a particular byte as the
+'MSB' when the address space is larger than 16-bits.
+
+  For a 24-bit EZ80 address the assembler directive .msb n
+configures the assembler to select a particular byte as MSB.
+Given a 24-bit address of Mmn (M is <23:16>, m is <15:8>,
+and n is <7:0>) the following examples show how to select
+a particular address byte:
+.skip
+.literal
+	.msb 1		;select byte 1 of address
+			;<M(2):m(1):n(0)>
+	LD A,>Mmn	;byte m <15:8> ==>> A
+	...
+
+	.msb 2		;select byte 2 of address
+			;<M(2):m(1):n(0)>
+	LD A,>Mmn	;byte M <23:16> ==>> A
+	LD MB,A	        ;place in MBASE register
+.end literal
+
+.page
+.header level 1;EZ80 Addressing and Instructions 
+.header level 2; Instruction Symbols 
+.skip 1
+.literal
+b          Bit select
+                (000 = bit 0, 001 = bit 1,
+                 010 = bit 2, 011 = bit 3,
+                 100 = bit 4, 101 = bit 5,
+                 110 = bit 6, 111 = bit 7)
+cc         condition code C, NC, Z, NZ, P, M, PE, PO
+           test of single bit in FLAGS register
+cc'        condition code C, NC, Z, NZ
+           test of single bit in FLAGS register
+d          an 8-bit two's complement displacement with
+           value from -128 to 127.
+I          Interrupt Page Address Register
+ir or ir'  8-bit CPU register IXH(IX:[15:8]),
+           IXL (IX:[7:0], IYH (IY:[15:8]), IYL (IY:[7:0])
+IX/Y       CPU register IX or IY
+(IX/Y+d)   A location in memory with address formed by the
+           sum of the contents of the Index Register, IX
+           or IY, and the two's complement displacement d.
+MB         Z80 Memory Mode Base Address Register
+Mmn        A 24-bit immediate data value
+(Mmn)      A 24-bit value indicating a location in
+           memory at this address.
+mn         A 16-bit immediate data value
+(mn)       A 16-bit value indicating a location in
+           memory at this address.
+n          8-bit immediate data value
+R          Refresh Counter Register
+r or r'    8-bit CPU register A, B, C, D, E, H, L
+rr         16 or 24-bit CPU register BC, DE, HL
+rxy        16 or 24-bit CPU register BC, DE, HL, IX, IY
+SP         Stack Pointer, Can indicate either the
+           StackPointer Short register (SPS) or the
+           StackPointer Long register (SPL).
+.end literal 
+
+.page
+.literal
+	C  -	carry bit set
+	NC -	carry bit clear
+	Z  -	zero bit set
+	NZ -	zero bit clear
+	M  -	sign bit set
+	P  -	sign bit clear
+	PE -	parity even
+	PO -	parity odd
+.end literal 
+.skip 2
+The terms b, d, Mmn, mn, and n may all be expressions.
+
+.page
+.header level 2; EZ80 Instructions 
+.break;
+The following list of instructions (with explicit addressing modes) are
+available for the EZ80.
+
+.skip 1
+.literal
+ADC A,(HL)		DEC (HL)		INI
+ADC A,ir		DEC ir			INI2
+ADC A,(IX/Y+d)		DEC IX/Y		INI2R
+ADC A,n	        	DEC (IX/Y+d)
+ADC A,r	        	DEC r			INIM
+ADC HL,rr		DEC rr			INIMR
+ADC HL,SP		DEC SP
+						INIR
+ADD A,(HL)		DI			INIRX
+ADD A,ir
+ADD A,(IX/Y+d)		DJNZ d			JP cc,Mmn
+ADD A,n	        				JP HL
+ADD A,r	        	EI			JP IX/Y
+ADD HL,rr					JP Mmn
+ADD HL,SP		EX AF,AF'
+ADD IX/Y,rxy		EX DE,HL		JR cc',d
+ADD IX/Y,SP		EX (SP),HL		JR d
+			EX (SP),IX/Y
+AND A,HL					LD A,I
+AND A,ir		EXX			LD A,(IX/Y+d)
+AND A,(IX/Y+d)					LD A,MB
+AND A,n			HALT			LD A,(Mmn)
+AND A,r						LD A,R
+			IM n			LD A,(rr)
+BIT b,(HL)		IM A,(n)		LD (HL),IX/Y
+BIT b, (IX/Y+d)		IN r,(BC)		LD (HL),n
+BIT b,r						LD (HL),r
+			IN0 r,(n)		LD (HL),rr
+CALL cc,Mmn					LD IY,(SP+n)
+CALL mn			INC (HL)		LD I,HL
+			INC ir			LD I,A
+CP A,(HL)		INC IX/Y		LD ir,ir'
+CP A,ir			INC (IX/Y+d)		LD ir,n
+CP A,(IX/Y+d)		INC r			LD ir,r
+CP A,r			INC SP			LD IX/Y,(HL)
+ 						LD IX/Y,(IX/Y+d)
+CPD			IND			LD IX/Y,Mmn
+CPDR			IND2			LD IX/Y,(Mmn)
+			IND2R			LD (IX/Y+d),IX/Y
+CPI						LD (IX/Y+d),n
+CPIR			INDM			LD (IX/Y+d),r
+			INDMR			LD (IX/Y+d),rr
+CPL						LD MB,A
+			INDR			LD (Mmn),A
+DAA			INDRX			LD (Mmn),IX/Y
+.end literal
+ 
+.page
+.literal
+LD (Mmn),rr		OTDR			RL r
+LD (Mmn),SP		OTDRX
+LD R,A						RLA
+LD r,(HL)		OTI2R
+LD r,ir						RLC (HL)
+LD r,(IX/Y+d)		OTIM			RLC (IX/Y+d)
+LD r,n			OTIMR			RLC r
+LD r,r'
+LD rr,(HL)		OTIR			RLCA
+LD rr,(IX/Y+d)		OTIRX
+LD rr,Mmn					RLD
+LD rr,(Mmn)		OUT (BC),r
+LD (rr),A		OUT (C),r		RR (HL)
+LD SP,HL		OUT (n),A		RR (IX/Y+d)
+LD SP,IX/Y					RR r
+LD SP,Mmn		OUTD
+LD SP,(Mmn)		OUTD2			RRA
+
+LDD			OUTI			RRC (HL)
+LDDR			OUTI2			RRC (IX/Y+d)
+			RL (IX+d)		RRC r
+LDI			RL (IY+d
+LDIR						RRCA
+			PEA IX+d
+LEA IX/Y,IX+d		PEA IY+d		RRD
+LEA IX/Y,IY+d
+LEA rr,IX+d		POP AF			RSMIX
+LEA rr,IY+d		POP IX/Y
+			POP rr			RST n
+MLT rr
+MLT SP			PUSH AF			SBC A,(HL)
+			PUSH IX/Y		SBC A,ir
+NEG			PUSH rr			SBC A,(IX/Y+d)
+						SBC A,n
+NOP			RES b,(IX/Y+d)		SBC A,r
+			RES b,r			SBC HL,rr
+OR A,(HL)					SBC HL,SP
+OR A,ir			RET
+OR A,(IX/Y+d)		RET cc			SCF
+OR A,n
+OR A,r			RETI			SET b,(HL)
+						SET b,(IX/Y+d)
+OTD2R			RETN			SET b,r
+
+OTDM			RL (HL)			SLA (HL)
+OTDMR			RL (IX/Y+d)		SLA (IX/Y+d)
+.end literal 
+
+.page
+.literal
+SLA r			STMIX			TSTIO n
+
+SLP			SUB A,(HL)		XOR A,(HL)
+			SUB A,ir		XOR A,ir
+SRA (HL)		SUB A,(IX/Y+d)		XOR A,(IX/Y+d)
+SRA (IX/Y+d)		SUB A,n			XOR A,n
+SRA r			SUB A,r			XOR A,r
+
+SRL (HL)		TST A,(HL)
+SRL (IX/Y+d)		TST A,n
+SRL r			TST A,r
+.end literal
+
+
+.skip 4
+  The accumulator 'A' argument is optional in all of the
+following instructions:
+.skip
+.literal
+ADC A,...		CP A,...		SUB A,...
+ADD A,...		OR A,...		TST A,...
+AND A,...		SBC A,...		XOR A,...
+.end literal
+

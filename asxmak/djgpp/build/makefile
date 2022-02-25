@@ -14,7 +14,8 @@ all:	as430.sv as740.sv as1802.sv as6500.sv	\
 	as6808.sv as6809.sv as6811.sv as6812.sv	\
 	as6816.sv as61860			\
 	as8051.sv as8085.sv			\
-	asz80.sv asgb.sv asrab.sv		\
+	asz80.sv asgb.sv asez80.sv		\
+	asrab.sv				\
 	as8xcxxx.sv ash8.sv			\
 	asavr.sv aspic.sv			\
 	ascheck.sv				\
@@ -44,6 +45,7 @@ as8051:		as8051.sv
 as8085:		as8085.sv
 asz80:		asz80.sv
 asgb:		asgb.sv
+asez80:		asez80.sv
 asrab:		asrab.sv
 as8xcxxx:	as8xcxxx.sv
 ash8:		ash8.sv
@@ -91,6 +93,7 @@ SRC8051=	$(ASXBAS)as8051/
 SRC8085=	$(ASXBAS)as8085/
 SRCZ80=		$(ASXBAS)asz80/
 SRCGB=		$(ASXBAS)asgb/
+SRCEZ80=	$(ASXBAS)asez80/
 SRCRAB=		$(ASXBAS)asrab/
 SRC8xcxxx=	$(ASXBAS)as8xcxxx/
 SRCH8=		$(ASXBAS)ash8/
@@ -105,7 +108,8 @@ VPATH =		$(SRCASX);	$(SRCLNK);	$(SRCMISC);	\
 		$(SRC6805);	$(SRC6808);	$(SRC6809);	\
 		$(SRC6811);	$(SRC6812);	$(SRC6816);	\
 		$(SRC61860);	$(SRC8051);	$(SRC8085);	\
-		$(SRCZ80);	$(SRCGB);	$(SRCRAB);	\
+		$(SRCZ80);	$(SRCGB);	$(SRCEZ80);	\
+		$(SRCRAB);					\
 		$(SRC8xcxxx);	$(SRCH8);			\
 		$(SRCAVR);	$(SRCPIC);			\
 		$(SRCCHECK);
@@ -402,6 +406,21 @@ gbadr.o :	$(SRCGB)gbadr.c $(SRCGB)gb.h $(SRCASX)asxxxx.h
 
 asgb.new:	$(ASXX) $(ASGB)
 	$(LD) $(LDFLAGS) $(ASXX) $(ASGB) -o asgb.new
+
+
+####################################################################
+# ASEZ80
+####################################################################
+
+ASEZ80 =	ez80ext.o ez80pst.o ez80mch.o ez80adr.o
+
+ez80ext.o :	$(SRCEZ80)ez80ext.c $(SRCEZ80)ez80.h $(SRCASX)asxxxx.h
+ez80pst.o :	$(SRCEZ80)ez80pst.c $(SRCEZ80)ez80.h $(SRCASX)asxxxx.h
+ez80mch.o :	$(SRCEZ80)ez80mch.c $(SRCEZ80)ez80.h $(SRCASX)asxxxx.h
+ez80adr.o :	$(SRCEZ80)ez80adr.c $(SRCEZ80)ez80.h $(SRCASX)asxxxx.h
+
+asez80.new:	$(ASXX) $(ASEZ80)
+	$(LD) $(LDFLAGS) $(ASXX) $(ASEZ80) -o asez80.new
 
 
 ####################################################################

@@ -3,7 +3,7 @@
 #		Cygwin 'GNU make' Version
 #		=========================
 #
-#   6  October  2003
+#   26  May  2004
 #
 ####################################################################
 
@@ -12,11 +12,12 @@ ASXXXX =	as430 as740 as1802 as6500	\
 		as6808 as6809 as6811 as6812	\
 		as6816 as61860			\
 		as8051 as8085			\
-		asz80 asgb asrab		\
+		asz80 asgb asez80		\
+		asrab				\
 		as8xcxxx ash8			\
 		asavr aspic			\
-		ascheck	\
-		aslink	\
+		ascheck				\
+		aslink				\
 		asxcnv asxscn
 	
 ####################################################################
@@ -78,6 +79,7 @@ SRC8xcxxx=	$(ASXBAS)as8xcxxx/
 SRCH8=		$(ASXBAS)ash8/
 SRCZ80=		$(ASXBAS)asz80/
 SRCGB=		$(ASXBAS)asgb/
+SRCEZ80=	$(ASXBAS)asez80/
 SRCRAB=		$(ASXBAS)asrab/
 SRCAVR=		$(ASXBAS)asavr/
 SRCPIC=		$(ASXBAS)aspic/
@@ -484,6 +486,27 @@ asgb :		$(ASXX) $(ASGB)
 		$(LD) $(LDFLAGS) -o asgb $(ASXX) $(ASGB)
 		cp asgb.exe $(DSTEXE)asgb.exe
 		strip $(DSTEXE)asgb.exe
+
+
+####################################################################
+# ASEZ80
+####################################################################
+
+ASEZ80 =	ez80ext.o ez80pst.o ez80mch.o ez80adr.o
+
+ez80ext.o :	$(SRCEZ80)ez80ext.c $(SRCEZ80)ez80.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+ez80pst.o :	$(SRCEZ80)ez80pst.c $(SRCEZ80)ez80.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+ez80mch.o :	$(SRCEZ80)ez80mch.c $(SRCEZ80)ez80.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+ez80adr.o :	$(SRCEZ80)ez80adr.c $(SRCEZ80)ez80.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+asez80 :		$(ASXX) $(ASEZ80)
+		$(LD) $(LDFLAGS) -o asez80 $(ASXX) $(ASEZ80)
+		cp asez80.exe $(DSTEXE)asez80.exe
+		strip $(DSTEXE)asez80.exe
 
 
 ####################################################################

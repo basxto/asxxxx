@@ -15,11 +15,11 @@
 
            The ASxxxx Cross Assembler and Linker package (V4.00 November
         2003)  contains  cross  assemblers  for  the  AVR,  PIC,  Rabbit
-        2000/3000, DS8xCxxx, z80(hd64180), GameBoy(Z80), MPS430, H8/3xx,
-        6800(6802/6808), 6801(hd6303), 6804, 6805, 68HC08, 6809, 68HC11,
-        68HC12,  68HC16,  8051,  8085(8080),  6500, 1802, 740, and 61860
-        series microprocessors.  Complete source code is  provided  with
-        the assembler/linker submission.  
+        2000/3000,  ez80,  z80(hd64180), GameBoy(Z80), DS8xCxxx, MPS430,
+        H8/3xx, 6800(6802/6808), 6801(hd6303), 6804, 6805, 68HC08, 6809,
+        68HC11,  68HC12,  68HC16, 8051, 8085(8080), 6500, 1802, 740, and
+        61860 series microprocessors.  Complete source code is  provided
+        with the assembler/linker submission.  
 
 
 

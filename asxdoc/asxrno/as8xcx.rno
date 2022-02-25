@@ -102,6 +102,35 @@ location loading the mode bits into the ACON register:
 .skip
 
 
+.header level 2;The .\m\s\b Directive 
+
+The .msb directive is available in the ASEZ80 assembler.
+
+The assembler operator '>' selects the upper byte (MSB) when
+included in an assembler instruction.  The default assembler
+mode is to select bits <15:8> as the MSB.  The .msb directive
+allows the programmer to specify a particular byte as the
+'MSB' when the address space is larger than 16-bits.
+
+  The assembler directive ##.msb#n## configures the assembler
+to select a particular byte as MSB. Given a 24-bit address
+of Mmn (N(2) is <23:16>, m(1) is <15:8>, and n(0) is <7:0>)
+the following examples show how to select a particular
+address byte:
+.skip
+.literal
+	.msb 1		;select byte 1 of address
+			;<M(3):N(2):m(1):n(0)>
+	LD A,>MNmn	;byte m <15:8> ==>> A
+	...
+
+	.msb 2		;select byte 2 of address
+			;<M(3):N(2):m(1):n(0)>
+	LD A,>MNmn	;byte N <23:16> ==>> A
+	...
+.end literal
+
+
 .page
 .header level 1;DS8XCXXX Register Set
 

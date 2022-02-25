@@ -34,21 +34,23 @@
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
 ..\exe\asgb.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
+..\exe\asez80.exe -glaxff ..\..\..\asxtst\asmt3blo.asm
+..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3blo.lst
 ..\exe\asrab.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
 ..\exe\as8xcxxx.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
-..\exe\as8xcxxx.exe -glaxff ..\..\..\asxtst\asmt3bhi.asm
-..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3bhi.lst
+..\exe\as8xcxxx.exe -glaxff ..\..\..\asxtst\a24bit.asm ..\..\..\asxtst\asmt3bhi.asm
+..\exe\asxscn.exe -3 ..\..\..\asxtst\a24bit.lst
 ..\exe\ash8.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
-..\exe\asavr.exe -glaxff ..\..\..\asxtst\asmt4blo.asm
-..\exe\asxscn.exe -4 ..\..\..\asxtst\asmt4blo.lst
+..\exe\asavr.exe -glaxff ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4blo.asm
+..\exe\asxscn.exe -4 ..\..\..\asxtst\a32bit.lst
 ..\exe\aspic.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
-..\exe\aspic.exe -glaxff ..\..\..\asxtst\asmt4bhi.asm
+..\exe\aspic.exe -glaxff ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4bhi.asm
 ..\exe\asxscn.exe -4 ..\..\..\asxtst\asmt4bhi.lst
-..\exe\ascheck.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\ascheck.exe -glaxff ..\..\..\asxtst\a32bit.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 
 ..\exe\as430.exe -gloaxff ..\..\..\as430\t430.asm
@@ -105,6 +107,10 @@
 ..\exe\asxscn.exe ..\..\..\asz80\tz80.lst
 ..\exe\asgb.exe -glaxff ..\..\..\asgb\tgb.asm
 ..\exe\asxscn.exe ..\..\..\asgb\tgb.lst
+..\exe\asez80.exe -gloaxff ..\..\..\asez80\tez80.asm
+..\exe\aslink.exe -mxu -g varx=0 ..\..\..\asez80\tez80
+..\exe\asxscn.exe -3 ..\..\..\asez80\tez80.lst
+..\exe\asxscn.exe -3i ..\..\..\asez80\tez80.rst
 ..\exe\asrab.exe -gloabxff ..\..\..\asrab\trabl.asm
 ..\exe\aslink.exe -nxu ..\..\..\asrab\trabl
 ..\exe\asxscn.exe ..\..\..\asrab\trabl.lst
