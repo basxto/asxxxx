@@ -1,7 +1,7 @@
 /* h8pst.c */
 
 /*
- * (C) Copyright 1994-2001
+ * (C) Copyright 1994-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin

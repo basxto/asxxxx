@@ -1,7 +1,7 @@
 /* lkout.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -146,18 +146,18 @@ int i;
  *	the relocated data.
  *
  *	local variables:
- *		addr_t	j		temporary
+ *		a_uint	j		temporary
  *
  *	global variables:
  *		int	hilo		byte order
  *		FILE *	ofp		output file handle
  *		int	rtcnt		count of data words
  *		int	rtflg[]		output the data flag
- *		addr_t	rtval[]		relocated data
+ *		a_uint	rtval[]		relocated data
  *		char	rtbuf[]		output buffer
- *		addr_t	rtadr0		address temporary
- *		addr_t	rtadr1		address temporary
- *		addr_t	rtadr2		address temporary
+ *		a_uint	rtadr0		address temporary
+ *		a_uint	rtadr1		address temporary
+ *		a_uint	rtadr2		address temporary
  *
  *	functions called:
  *		int	fprintf()	c_library
@@ -185,7 +185,7 @@ VOID
 ixx(i)
 int i;
 {
-	register addr_t j;
+	register a_uint j;
 	register int k;
 
 	if (i) {
@@ -243,9 +243,9 @@ int i;
  *	in the standard Intel format.
  *
  *	local variables:
- *		addr_t	chksum		byte checksum
- *		addr_t	lo_addr		address within segment
- *		addr_t	hi_addr		segment number
+ *		a_uint	chksum		byte checksum
+ *		a_uint	lo_addr		address within segment
+ *		a_uint	hi_addr		segment number
  *		int	i		loop counter
  *		int	max		number of data bytes
  *		int	reclen		record length
@@ -253,8 +253,8 @@ int i;
  *	global variables:
  *		FILE *	ofp		output file handle
  *		char	rtbuf[]		output buffer
- *		addr_t	rtadr0		address temporary
- *		addr_t	rtadr1		address temporary
+ *		a_uint	rtadr0		address temporary
+ *		a_uint	rtadr1		address temporary
  *
  *	functions called:
  *		int	fprintf()	c_library
@@ -278,10 +278,10 @@ int i;
 VOID
 iflush()
 {
-	addr_t	chksum;
+	a_uint	chksum;
 	register int i,max,reclen;
-	addr_t lo_addr;
-	addr_t hi_addr;
+	a_uint lo_addr;
+	a_uint hi_addr;
 
 	max = rtadr1 - rtadr0;
 	if (max) {
@@ -382,7 +382,7 @@ iflush()
  *	the relocated data.
  *
  *	local variables:
- *		addr_t	j		temporary
+ *		a_uint	j		temporary
  *		char *	frmt		temporary format specifier
  *
  *	global variables:
@@ -390,11 +390,11 @@ iflush()
  *		FILE *	ofp		output file handle
  *		int	rtcnt		count of data words
  *		int	rtflg[]		output the data flag
- *		addr_t	rtval[]		relocated data
+ *		a_uint	rtval[]		relocated data
  *		char	rtbuf[]		output buffer
- *		addr_t	rtadr0		address temporary
- *		addr_t	rtadr1		address temporary
- *		addr_t	rtadr2		address temporary
+ *		a_uint	rtadr0		address temporary
+ *		a_uint	rtadr1		address temporary
+ *		a_uint	rtadr2		address temporary
  *
  *	functions called:
  *		int	fprintf()	c_library
@@ -421,7 +421,7 @@ VOID
 sxx(i)
 int i;
 {
-	register addr_t j;
+	register a_uint j;
 	register int k;
 	register char *frmt;
 
@@ -485,7 +485,7 @@ int i;
  *	in the standard Motorola format.
  *
  *	local variables:
- *		addr_t	chksum		byte checksum
+ *		a_uint	chksum		byte checksum
  *		int	i		loop counter
  *		int	max		number of data bytes
  *		int	reclen		record length
@@ -493,8 +493,8 @@ int i;
  *	global variables:
  *		FILE *	ofp		output file handle
  *		char	rtbuf[]		output buffer
- *		addr_t	rtadr0		address temporary
- *		addr_t	rtadr1		address temporary
+ *		a_uint	rtadr0		address temporary
+ *		a_uint	rtadr1		address temporary
  *
  *	functions called:
  *		int	fprintf()	c_library
@@ -517,7 +517,7 @@ int i;
 VOID
 sflush()
 {
-	addr_t	addr,chksum;
+	a_uint	addr,chksum;
 	char *frmt;
 	register int i,max,reclen;
 

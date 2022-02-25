@@ -1,7 +1,7 @@
 /* m05adr.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -20,7 +20,7 @@ register struct expr *esp;
 {
 	register int c;
 	register struct area *espa;
-	register addr_t espv;
+	register a_uint espv;
 	char *tcp;
 
 	if ((c = getnb()) == '#') {

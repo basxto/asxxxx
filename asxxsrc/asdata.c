@@ -1,7 +1,7 @@
 /* asdata.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -117,16 +117,16 @@ int	fflag;		/*	-f(f), relocations flagged flag
 			 */
 int	a_bytes;	/*	REL file T Line address length
 			 */
-addr_t	a_mask;		/*	Address Mask
+a_uint	a_mask;		/*	Address Mask
 			 */
-addr_t	s_mask;		/*	Sign Mask
+a_uint	s_mask;		/*	Sign Mask
 			 */
-addr_t	v_mask;		/*	Value Mask
+a_uint	v_mask;		/*	Value Mask
 			 */
-addr_t	laddr;		/*	address of current assembler line
+a_uint	laddr;		/*	address of current assembler line
 			 *	or value of .if argument
 			 */
-addr_t	fuzz;		/*	tracks pass to pass changes in the
+a_uint	fuzz;		/*	tracks pass to pass changes in the
 			 *	address of symbols caused by
 			 *	variable length instruction formats
 			 */
@@ -185,7 +185,7 @@ char	module[NCPS+2];	/*	module name string
  *		char *	m_id;		Mnemonic (JLH)
  *		char	m_type;		Mnemonic subtype
  *		char	m_flag;		Mnemonic flags
- *		addr_t	m_valu;		Value
+ *		a_uint	m_valu;		Value
  *	};
  */
 struct	mne	*mnehash[NHASH];
@@ -212,7 +212,7 @@ struct	mne	*mnehash[NHASH];
  *		char	s_flag;		Symbol flags
  *		struct	area *s_area;	Area line, 0 if absolute
  *		int	s_ref;		Ref. number
- *		addr_t	s_addr;		Address
+ *		a_uint	s_addr;		Address
  *	};
  */
 struct	sym	sym[] = {
@@ -245,8 +245,8 @@ struct	sym *symhash[NHASH];	/*	array of pointers to NHASH
  *		struct	area *a_ap;	Area link
  *		char *	a_id;		Area Name
  *		int	a_ref;		Reference number
- *		addr_t	a_size;		Area size
- *		addr_t	a_fuzz;		Area fuzz
+ *		a_uint	a_size;		Area size
+ *		a_uint	a_fuzz;		Area fuzz
  *		int	a_flag;		Area flags
  *	};
  */

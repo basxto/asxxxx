@@ -1,7 +1,7 @@
 /* asexpr.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -39,7 +39,7 @@
  *
  *	asexpr.c contains the following functions:
  *		VOID	abscheck()
- *		addr_t	absexpr()
+ *		a_uint	absexpr()
  *		VOID	clrexpr()
  *		int	digit()
  *		VOID	expr()
@@ -68,8 +68,8 @@
  *		machine.
  *
  *	local variables:
- *		addr_t	ae		value from expr esp
- *		addr_t	ar		value from expr re
+ *		a_uint	ae		value from expr esp
+ *		a_uint	ar		value from expr re
  *		int	c		current assembler-source
  *					text character
  *		int	p		current operator priority
@@ -105,7 +105,7 @@ expr(esp, n)
 register struct expr *esp;
 int n;
 {
-	register addr_t ae, ar;	
+	register a_uint ae, ar;	
 	int c, p;
 	struct area *ap;
 	struct expr re;
@@ -229,7 +229,7 @@ int n;
 	unget(c);
 }
 
-/*)Function	addr_t	absexpr()
+/*)Function	a_uint	absexpr()
  *
  *	The function absexpr() evaluates an expression, verifies it
  *	is absolute (i.e. not position dependent or relocatable), and
@@ -251,7 +251,7 @@ int n;
  *		a 'r' error is reported.
  */
 
-addr_t
+a_uint
 absexpr()
 {
 	struct expr e;
@@ -733,9 +733,9 @@ register struct expr *esp;
  *
  *	global variables:
  *		int	a_bytes		T Line Bytes in Address
- *		addr_t	a_mask		Address mask
- *		addr_t	s_mask		Sign mask
- *		addr_t	v_mask		Value mask
+ *		a_uint	a_mask		Address mask
+ *		a_uint	s_mask		Sign mask
+ *		a_uint	v_mask		Value mask
  *
  *	functions called:
  *		none

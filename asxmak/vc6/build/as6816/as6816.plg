@@ -6,7 +6,7 @@
 --------------------Configuration: as6816 - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\WINDOWS\TEMP\RSP6262.TMP" with contents
+Creating temporary file "C:\WINDOWS\TEMP\RSP4274.TMP" with contents
 [
 /nologo /ML /W3 /GX /O2 /I "c:\asxxxx\asxxsrc" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Release/as6816.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "C:\ASXXXX\asxxsrc\asdata.c"
@@ -22,8 +22,8 @@ Creating temporary file "C:\WINDOWS\TEMP\RSP6262.TMP" with contents
 "C:\ASXXXX\as6816\m16mch.c"
 "C:\ASXXXX\as6816\m16pst.c"
 ]
-Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP6262.TMP" 
-Creating temporary file "C:\WINDOWS\TEMP\RSP6263.TMP" with contents
+Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP4274.TMP" 
+Creating temporary file "C:\WINDOWS\TEMP\RSP4275.TMP" with contents
 [
 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/as6816.pdb" /machine:I386 /out:"..\..\exe\as6816.exe" 
 .\Release\asdata.obj
@@ -39,7 +39,7 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 .\Release\m16mch.obj
 .\Release\m16pst.obj
 ]
-Creating command line "link.exe @C:\WINDOWS\TEMP\RSP6263.TMP"
+Creating command line "link.exe @C:\WINDOWS\TEMP\RSP4275.TMP"
 <h3>Output Window</h3>
 Compiling...
 asdata.c

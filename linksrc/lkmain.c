@@ -1,7 +1,7 @@
 /* lkmain.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -985,7 +985,7 @@ bassav()
  *		int	lkerr		error flag
  *
  *	 functions called:
- *		addr_t	expr()		lkeval.c
+ *		a_uint	expr()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
  *		int	getnb()		lklex.c
@@ -1094,7 +1094,7 @@ gblsav()
  *		int	lkerr		error flag
  *
  *	 functions called:
- *		addr_t	expr()		lkeval.c
+ *		a_uint	expr()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
  *		int	getnb()		lklex.c

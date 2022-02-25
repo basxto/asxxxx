@@ -1,7 +1,7 @@
 /* lkhead.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -55,7 +55,7 @@
  *				 	head structure
  *
  *	functions called:
- *		addr_t	expr()		lkeval.c
+ *		a_uint	expr()		lkeval.c
  *		VOID *	new()		lksym.c
  *		VOID	lkparea()	lkarea.c
  *

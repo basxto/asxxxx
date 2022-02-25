@@ -4,7 +4,7 @@ as8085.OPN
 novcs
 as8085.DEF
 8
-950221008
+1006007854
 0 0 0 0 0 "..\..\..\ASXXSRC\ASDATA.C"
 0 0 0 0 0 "..\..\..\ASXXSRC\ASEXPR.C"
 0 0 0 0 0 "..\..\..\ASXXSRC\ASLEX.C"

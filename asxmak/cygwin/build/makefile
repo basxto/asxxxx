@@ -1,7 +1,7 @@
 ####################################################################
 #  Makefile
-#		Linux 'GNU make' Version
-#		========================
+#		Cygwin 'GNU make' Version
+#		=========================
 #
 #  1  January  2002
 #
@@ -114,8 +114,8 @@ r65adr.o :	$(SRC6500)r65adr.c $(SRC6500)r6500.h $(SRCASX)asxxxx.h
 
 as6500 :	$(ASXX) $(AS6500)
 		$(LD) $(LDFLAGS) -o as6500 $(ASXX) $(AS6500)
-		cp as6500 $(DSTEXE)as6500
-		strip $(DSTEXE)as6500
+		cp as6500 $(DSTEXE)as6500.exe
+		strip $(DSTEXE)as6500.exe
 
 
 ####################################################################
@@ -135,8 +135,8 @@ m00adr.o :	$(SRC6800)m00adr.c $(SRC6800)m6800.h $(SRCASX)asxxxx.h
 
 as6800 :	$(ASXX) $(AS6800)
 		$(LD) $(LDFLAGS) -o as6800 $(ASXX) $(AS6800)
-		cp as6800 $(DSTEXE)as6800
-		strip $(DSTEXE)as6800
+		cp as6800 $(DSTEXE)as6800.exe
+		strip $(DSTEXE)as6800.exe
 
 
 ####################################################################
@@ -156,8 +156,8 @@ m01adr.o :	$(SRC6801)m01adr.c $(SRC6801)m6801.h $(SRCASX)asxxxx.h
 
 as6801 :	$(ASXX) $(AS6801)
 		$(LD) $(LDFLAGS) -o as6801 $(ASXX) $(AS6801)
-		cp as6801 $(DSTEXE)as6801
-		strip $(DSTEXE)as6801
+		cp as6801 $(DSTEXE)as6801.exe
+		strip $(DSTEXE)as6801.exe
 
 
 ####################################################################
@@ -177,8 +177,8 @@ m04adr.o :	$(SRC6804)m04adr.c $(SRC6804)m6804.h $(SRCASX)asxxxx.h
 
 as6804 :	$(ASXX) $(AS6804)
 		$(LD) $(LDFLAGS) -o as6804 $(ASXX) $(AS6804)
-		cp as6804 $(DSTEXE)as6804
-		strip $(DSTEXE)as6804
+		cp as6804 $(DSTEXE)as6804.exe
+		strip $(DSTEXE)as6804.exe
 
 
 ####################################################################
@@ -198,8 +198,8 @@ m05adr.o :	$(SRC6805)m05adr.c $(SRC6805)m6805.h $(SRCASX)asxxxx.h
 
 as6805 :	$(ASXX) $(AS6805)
 		$(LD) $(LDFLAGS) -o as6805 $(ASXX) $(AS6805)
-		cp as6805 $(DSTEXE)as6805
-		strip $(DSTEXE)as6805
+		cp as6805 $(DSTEXE)as6805.exe
+		strip $(DSTEXE)as6805.exe
 
 
 ####################################################################
@@ -219,8 +219,8 @@ m08adr.o :	$(SRC6808)m08adr.c $(SRC6808)m6808.h $(SRCASX)asxxxx.h
 
 as6808 :	$(ASXX) $(AS6808)
 		$(LD) $(LDFLAGS) -o as6808 $(ASXX) $(AS6808)
-		cp as6808 $(DSTEXE)as6808
-		strip $(DSTEXE)as6808
+		cp as6808 $(DSTEXE)as6808.exe
+		strip $(DSTEXE)as6808.exe
 
 
 ####################################################################
@@ -240,8 +240,8 @@ m09adr.o :	$(SRC6809)m09adr.c $(SRC6809)m6809.h $(SRCASX)asxxxx.h
 
 as6809 :	$(ASXX) $(AS6809)
 		$(LD) $(LDFLAGS) -o as6809 $(ASXX) $(AS6809)
-		cp as6809 $(DSTEXE)as6809
-		strip $(DSTEXE)as6809
+		cp as6809 $(DSTEXE)as6809.exe
+		strip $(DSTEXE)as6809.exe
 
 
 ####################################################################
@@ -261,8 +261,8 @@ m11adr.o :	$(SRC6811)m11adr.c $(SRC6811)m6811.h $(SRCASX)asxxxx.h
 
 as6811 :	$(ASXX) $(AS6811)
 		$(LD) $(LDFLAGS) -o as6811 $(ASXX) $(AS6811)
-		cp as6811 $(DSTEXE)as6811
-		strip $(DSTEXE)as6811
+		cp as6811 $(DSTEXE)as6811.exe
+		strip $(DSTEXE)as6811.exe
 
 
 ####################################################################
@@ -282,8 +282,8 @@ m12adr.o :	$(SRC6812)m12adr.c $(SRC6812)m6812.h $(SRCASX)asxxxx.h
 
 as6812 :	$(ASXX) $(AS6812)
 		$(LD) $(LDFLAGS) -o as6812 $(ASXX) $(AS6812)
-		cp as6812 $(DSTEXE)as6812
-		strip $(DSTEXE)as6812
+		cp as6812 $(DSTEXE)as6812.exe
+		strip $(DSTEXE)as6812.exe
 
 
 ####################################################################
@@ -303,8 +303,8 @@ m16adr.o :	$(SRC6816)m16adr.c $(SRC6816)m6816.h $(SRCASX)asxxxx.h
 
 as6816 :	$(ASXX) $(AS6816)
 		$(LD) $(LDFLAGS) -o as6816 $(ASXX) $(AS6816)
-		cp as6816 $(DSTEXE)as6816
-		strip $(DSTEXE)as6816
+		cp as6816 $(DSTEXE)as6816.exe
+		strip $(DSTEXE)as6816.exe
 
 
 ####################################################################
@@ -324,8 +324,8 @@ i51adr.o :	$(SRC8051)i51adr.c $(SRC8051)i8051.h $(SRCASX)asxxxx.h
 
 as8051 :	$(ASXX) $(AS8051)
 		$(LD) $(LDFLAGS) -o as8051 $(ASXX) $(AS8051)
-		cp as8051 $(DSTEXE)as8051
-		strip $(DSTEXE)as8051
+		cp as8051 $(DSTEXE)as8051.exe
+		strip $(DSTEXE)as8051.exe
 
 
 ####################################################################
@@ -343,8 +343,8 @@ i85mch.o :	$(SRC8085)i85mch.c $(SRC8085)i8085.h $(SRCASX)asxxxx.h
 
 as8085 :	$(ASXX) $(AS8085)
 		$(LD) $(LDFLAGS) -o as8085 $(ASXX) $(AS8085)
-		cp as8085 $(DSTEXE)as8085
-		strip $(DSTEXE)as8085
+		cp as8085 $(DSTEXE)as8085.exe
+		strip $(DSTEXE)as8085.exe
 
 
 ####################################################################
@@ -364,8 +364,8 @@ ds8adr.o :	$(SRC8xcxxx)ds8adr.c $(SRC8xcxxx)ds8.h $(SRCASX)asxxxx.h
 
 as8xcxxx :	$(ASXX) $(AS8xcxxx)
 		$(LD) $(LDFLAGS) -o as8xcxxx $(ASXX) $(AS8xcxxx)
-		cp as8xcxxx $(DSTEXE)as8xcxxx
-		strip $(DSTEXE)as8xcxxx
+		cp as8xcxxx $(DSTEXE)as8xcxxx.exe
+		strip $(DSTEXE)as8xcxxx.exe
 
 
 ####################################################################
@@ -385,8 +385,8 @@ h8adr.o :	$(SRCH8)h8adr.c $(SRCH8)h8.h $(SRCASX)asxxxx.h
 
 ash8 :		$(ASXX) $(ASH8)
 		$(LD) $(LDFLAGS) -o ash8 $(ASXX) $(ASH8)
-		cp ash8 $(DSTEXE)ash8
-		strip $(DSTEXE)ash8
+		cp ash8 $(DSTEXE)ash8.exe
+		strip $(DSTEXE)ash8.exe
 
 
 ####################################################################
@@ -406,8 +406,8 @@ z80adr.o :	$(SRCZ80)z80adr.c $(SRCZ80)z80.h $(SRCASX)asxxxx.h
 
 asz80 :		$(ASXX) $(ASZ80)
 		$(LD) $(LDFLAGS) -o asz80 $(ASXX) $(ASZ80)
-		cp asz80 $(DSTEXE)asz80
-		strip $(DSTEXE)asz80
+		cp asz80 $(DSTEXE)asz80.exe
+		strip $(DSTEXE)asz80.exe
 
 
 ####################################################################
@@ -427,8 +427,8 @@ gbadr.o :	$(SRCGB)gbadr.c $(SRCGB)gb.h $(SRCASX)asxxxx.h
 
 asgb :		$(ASXX) $(ASGB)
 		$(LD) $(LDFLAGS) -o asgb $(ASXX) $(ASGB)
-		cp asgb $(DSTEXE)asgb
-		strip $(DSTEXE)asgb
+		cp asgb $(DSTEXE)asgb.exe
+		strip $(DSTEXE)asgb.exe
 
 
 ####################################################################
@@ -441,8 +441,8 @@ ASLINK =	lkmain.o lkarea.o lkdata.o lkeval.o	\
 
 aslink :	$(ASLINK)
 		$(LD) $(LDFLAGS) -o aslink $(ASLINK)
-		cp aslink $(DSTEXE)aslink
-		strip $(DSTEXE)aslink
+		cp aslink $(DSTEXE)aslink.exe
+		strip $(DSTEXE)aslink.exe
 
 lkmain.o :	$(SRCLNK)lkmain.c $(SRCLNK)aslink.h
 		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
@@ -479,8 +479,8 @@ asxcnv.o :	$(SRCMISC)asxcnv.c $(SRCASX)asxxxx.h
 
 asxcnv :	$(ASXCNV)
 		$(LD) $(LDFLAGS) -o asxcnv $(ASXCNV)
-		cp asxcnv $(DSTEXE)asxcnv
-		strip $(DSTEXE)asxcnv
+		cp asxcnv $(DSTEXE)asxcnv.exe
+		strip $(DSTEXE)asxcnv.exe
 
 
 ####################################################################
@@ -494,10 +494,8 @@ asxscn.o :	$(SRCMISC)asxscn.c $(SRCASX)asxxxx.h
 
 asxscn :	$(ASXSCN)
 		$(LD) $(LDFLAGS) -o asxscn $(ASXSCN)
-		cp asxscn $(DSTEXE)asxscn
-		strip $(DSTEXE)asxscn
+		cp asxscn $(DSTEXE)asxscn.exe
+		strip $(DSTEXE)asxscn.exe
 
 
 ### end #########################################################
-
-

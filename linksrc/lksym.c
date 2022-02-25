@@ -1,7 +1,7 @@
 /* lksym.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -40,7 +40,7 @@
  *		int	symeq()
  *		VOID	syminit()
  *		VOID	symmod()
- *		addr_t	symval()
+ *		a_uint	symval()
  *
  *	lksym.c contains the static variables:
  *		char *	pnext
@@ -109,7 +109,7 @@ syminit()
  *		int	lkerr		error flag
  *
  *	functions called:
- *		addr_t	eval()		lkeval.c
+ *		a_uint	eval()		lkeval.c
  *		VOID	exit()		c_library
  *		int	fprintf()	c_library
  *		int	get()		lklex.c
@@ -155,7 +155,7 @@ newsym()
 	if (c == 'D') {
 		i = eval();
 		if (tsp->s_type & S_DEF) {
-			if (tsp->s_addr != (addr_t) i) {
+			if (tsp->s_addr != (a_uint) i) {
 				fprintf(stderr,
 					"Multiple definition of %s\n", id);
 				lkerr++;
@@ -164,7 +164,7 @@ newsym()
 			/*
 			 * Set value and area extension link.
 			 */
-			tsp->s_addr = (addr_t) i;
+			tsp->s_addr = (a_uint) i;
 			tsp->s_axp = axp;
 			tsp->s_type |= S_DEF;
 			tsp->m_id = hp->m_id;
@@ -248,7 +248,7 @@ int f;
 	return (sp);
 }
 
-/*)Function	addr_t	symval(tsp)
+/*)Function	a_uint	symval(tsp)
  *
  *		sym *	tsp		pointer to a symbol structure
  *
@@ -257,7 +257,7 @@ int f;
  *	value to the areax base address.
  *
  *	local variables:
- *		addr_t	val		relocated address value
+ *		a_uint	val		relocated address value
  *
  *	global variables:
  *		none
@@ -269,11 +269,11 @@ int f;
  *		none
  */
 
-addr_t
+a_uint
 symval(tsp)
 register struct sym *tsp;
 {
-	register addr_t val;
+	register a_uint val;
 
 	val = tsp->s_addr;
 	if (tsp->s_axp) {

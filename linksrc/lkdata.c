@@ -1,7 +1,7 @@
 /* lkdata.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -80,7 +80,7 @@ int	pass;		/*	linker pass number
 int	rtcnt;		/*	count of elements in the
 			 *	rtval[] and rtflg[] arrays
 			 */
-addr_t	rtval[NTXT];	/*	data associated with relocation
+a_uint	rtval[NTXT];	/*	data associated with relocation
 			 */
 int	rtflg[NTXT];	/*	indicates if rtval[] value is
 			 *	to be sent to the output file.
@@ -89,11 +89,11 @@ char	rtbuf[NMAX];	/*	S19/IHX output buffer
 			 */
 int	rtaflg = 1;	/*	rtbuf[] processing
 			 */
-addr_t	rtadr0 = 0;	/*
+a_uint	rtadr0 = 0;	/*
 			 */
-addr_t	rtadr1 = 0;	/*
+a_uint	rtadr1 = 0;	/*
 			 */
-addr_t	rtadr2 = 0;	/*
+a_uint	rtadr2 = 0;	/*
 			 */
 int	obj_flag = 0;	/*	Linked file/library object output flag
 			 */
@@ -101,11 +101,11 @@ int	a_bytes;	/*	REL file T Line address length
 			 */
 int	hilo;		/*	REL file byte ordering
 			 */
-addr_t	a_mask;		/*	Address Mask
+a_uint	a_mask;		/*	Address Mask
 			 */
-addr_t	s_mask;		/*	Sign Mask
+a_uint	s_mask;		/*	Sign Mask
 			 */
-addr_t	v_mask;		/*	Value Mask
+a_uint	v_mask;		/*	Value Mask
 			 */
 int	gline;		/*	LST file relocation active
 			 *	for current line
@@ -224,8 +224,8 @@ struct	head	*hp;	/*	Pointer to the current
  *	{
  *		struct	area	*a_ap;		Area link
  *		struct	areax	*a_axp;		Area extension link
- *		addr_t	a_addr;			Beginning address of area
- *		addr_t	a_size;			Total size of the area
+ *		a_uint	a_addr;			Beginning address of area
+ *		a_uint	a_size;			Total size of the area
  *		char	a_bset;			Area base address set
  *		char	a_flag;			Flag byte
  *		char *	a_id;			Name
@@ -258,8 +258,8 @@ struct	area	*ap;	/*	Pointer to the current
  *		struct	areax	*a_axp;		Area extension link
  *		struct	area	*a_bap;		Base area link
  *		struct	head	*a_bhp;		Base header link
- *		addr_t	a_addr;			Beginning address of section
- *		addr_t	a_size;			Size of the area in section
+ *		a_uint	a_addr;			Beginning address of section
+ *		a_uint	a_size;			Size of the area in section
  *	};
  */
 struct	areax	*axp;	/*	Pointer to the current
@@ -284,7 +284,7 @@ struct	areax	*axp;	/*	Pointer to the current
  *		struct	areax	*s_axp;		Symbol area link
  *		char	s_type;			Symbol subtype
  *		char	s_flag;			Flag byte
- *		addr_t	s_addr;			Address
+ *		a_uint	s_addr;			Address
  *		char	*s_id;			Name (JLH)
  *		char	*m_id;			Module
  *	};
@@ -339,7 +339,7 @@ struct	globl	*gsp;	/*	Pointer to the current
  *	{
  *		struct	area  *s_area;	Paged Area link
  *		struct	areax *s_areax;	Paged Area Extension Link
- *		addr_t	s_addr;		Page address offset
+ *		a_uint	s_addr;		Page address offset
  *	};
  */
 struct	sdp	sdp;	/* Base Page Structure */
@@ -358,9 +358,9 @@ struct	sdp	sdp;	/* Base Page Structure */
  *	{
  *		int	aindex;		Linking area
  *		int	mode;		Relocation mode
- *		addr_t	rtbase;		Base address in section
+ *		a_uint	rtbase;		Base address in section
  *		int	rindex;		Area/Symbol reloaction index
- *		addr_t	rval;		Area/Symbol offset value
+ *		a_uint	rval;		Area/Symbol offset value
  *	};
  */
 struct	rerr	rerr;	/*	Structure containing the

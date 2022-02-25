@@ -1,7 +1,7 @@
 /* m08pst.c */
 
 /*
- * (C) Copyright 1993-2001
+ * (C) Copyright 1993-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin

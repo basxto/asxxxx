@@ -1,7 +1,7 @@
 /* lkeval.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -33,15 +33,15 @@
  *
  *	lkeval.c contains the following functions:
  *		int	digit()
- *		addr_t	eval()
- *		addr_t	expr()
+ *		a_uint	eval()
+ *		a_uint	expr()
  *		int	oprio()
- *		addr_t	term()
+ *		a_uint	term()
  *
  *	lkeval.c contains no local/static variables
  */
 
-/*)Function	addr_t	eval()
+/*)Function	a_uint	eval()
  *
  *	The function eval() evaluates a character string to a
  *	numerical value.
@@ -56,7 +56,7 @@
  *	local variables:
  *		int	c		character from input string
  *		int	v		value of character in current radix
- *		addr_t	n		evaluation value
+ *		a_uint	n		evaluation value
  *
  *	global variables:
  *		int	radix		current number conversion radix
@@ -72,11 +72,11 @@
  *		numerical value.
  */
 
-addr_t
+a_uint
 eval()
 {
 	register int c, v;
-	register addr_t n;
+	register a_uint n;
 
 	c = getnb();
 	n = 0;
@@ -88,7 +88,7 @@ eval()
 	return((n & s_mask) ? n | ~v_mask : n & v_mask);
 }
 
-/*)Function	addr_t	expr(n)
+/*)Function	a_uint	expr(n)
  *
  *		int	n		a firewall priority; all top
  *					level calls (from the user)
@@ -107,8 +107,8 @@ eval()
  *	local variables:
  *		int	c		current input text character
  *		int	p		current operator priority
- *		addr_t	v		value returned by term()
- *		addr_t	ve		value returned by a
+ *		a_uint	v		value returned by term()
+ *		a_uint	ve		value returned by a
  *					recursive call to expr()
  *
  *	global variables:
@@ -131,12 +131,12 @@ eval()
  *		text string.
  */
 
-addr_t
+a_uint
 expr (n)
 int n;
 {
 	register int c, p;
-	register addr_t v, ve;
+	register a_uint v, ve;
 
 	v = term();
 	while (ctype[c = getnb()] & BINOP) {
@@ -210,7 +210,7 @@ int n;
 	return(v);
 }
 
-/*)Function	addr_t	term()
+/*)Function	a_uint	term()
  *
  *	The function term() evaluates a single constant
  *	or symbol value prefaced by any unary operator
@@ -229,7 +229,7 @@ int n;
  *		int	n		value of digit in current radix
  *		int	r		current evaluation radix
  *		sym *	sp		pointer to a sym structure
- *		addr_t	v		evaluation value
+ *		a_uint	v		evaluation value
  *
  *	global variables:
  *		char	ctype[]		array of character types, one per
@@ -245,18 +245,18 @@ int n;
  *		int	getmap()	lklex.c
  *		int	getnb()		lklex.c
  *		sym *	lkpsym()	lksym.c
- *		addr_t	symval()	lksym.c
+ *		a_uint	symval()	lksym.c
  *		VOID	unget()		lklex.c
  *
  *	side effects:
  *		An arithmetic term is evaluated by scanning input text.
  */
 
-addr_t
+a_uint
 term()
 {
 	register int c, r, n;
-	register addr_t v;
+	register a_uint v;
 	struct sym *sp;
 	char id[NCPS];
 

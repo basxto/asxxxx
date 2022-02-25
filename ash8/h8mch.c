@@ -1,7 +1,7 @@
 /* h8mch.c */
 
 /*
- * (C) Copyright 1994-2001
+ * (C) Copyright 1994-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -35,7 +35,7 @@ struct mne *mp;
 	struct area *espa;
 	int t1, t2, v1, v2;
 	char id[NCPS];
-	addr_t pc;
+	a_uint pc;
 
 	clrexpr(&e1);
 	clrexpr(&e2);
@@ -784,7 +784,7 @@ int
 abstype(esp)
 register struct expr *esp;
 {
-	addr_t espv;
+	a_uint espv;
 	struct area *espa;
 
 	espv = esp->e_addr;

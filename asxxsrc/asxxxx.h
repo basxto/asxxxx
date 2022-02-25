@@ -1,7 +1,7 @@
 /* asxxxx.h */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -17,7 +17,7 @@
  *	w_mckinnon@conknet.com
  */
 
-#define	VERSION	"V03.10"
+#define	VERSION	"V03.11"
 
 /*)Module	asxxxx.h
  *
@@ -97,7 +97,7 @@
 #define	dca	area[0]		/* Dca, default code area */
 
 
-typedef	unsigned int addr_t;
+typedef	unsigned int a_uint;
 
 /*
  *	The area structure contains the parameter values for a
@@ -118,8 +118,8 @@ struct	area
 	struct	area *a_ap;	/* Area link */
 	char *	a_id;		/* Area Name */
 	int	a_ref;		/* Ref. number */
-	addr_t	a_size;		/* Area size */
-	addr_t	a_fuzz;		/* Area fuzz */
+	a_uint	a_size;		/* Area size */
+	a_uint	a_fuzz;		/* Area fuzz */
 	int	a_flag;		/* Area flags */
 };
 
@@ -249,7 +249,7 @@ struct	mne
 	char	*m_id;		/* Mnemonic (JLH) */
 	char	m_type;		/* Mnemonic subtype */
 	char	m_flag;		/* Mnemonic flags */
-	addr_t	m_valu;		/* Value */
+	a_uint	m_valu;		/* Value */
 };
 
 /*
@@ -274,7 +274,7 @@ struct	sym
 	char	s_flag;		/* Symbol flags */
 	struct	area *s_area;	/* Area line, 0 if absolute */
 	int	s_ref;		/* Ref. number */
-	addr_t	s_addr;		/* Address */
+	a_uint	s_addr;		/* Address */
 };
 
 #define	S_GBL		01	/* Global */
@@ -329,7 +329,7 @@ struct	tsym
 	char t_num;		/* 0-255$ */
 	char t_flg;		/* flags */
 	struct	area *t_area;	/* Area */
-	addr_t	t_addr;		/* Address */
+	a_uint	t_addr;		/* Address */
 };
 
 /*
@@ -422,16 +422,16 @@ extern	int	fflag;		/*	-f(f), relocations flagged flag
 				 */
 extern	int	a_bytes;	/*	REL file T Line address length
 				 */
-extern	addr_t	a_mask;		/*	Address Mask
+extern	a_uint	a_mask;		/*	Address Mask
 				 */
-extern	addr_t	s_mask;		/*	Sign Mask
+extern	a_uint	s_mask;		/*	Sign Mask
 				 */
-extern	addr_t	v_mask;		/*	Value Mask
+extern	a_uint	v_mask;		/*	Value Mask
 				 */
-extern	addr_t	laddr;		/*	address of current assembler line,
+extern	a_uint	laddr;		/*	address of current assembler line,
 				 *	equate, or value of .if argument
 				 */
-extern	addr_t	fuzz;		/*	tracks pass to pass changes in the
+extern	a_uint	fuzz;		/*	tracks pass to pass changes in the
 				 *	address of symbols caused by
 				 *	variable length instruction formats
 				 */
@@ -539,7 +539,7 @@ struct	expr
 {
 	char	e_mode;		/* Address mode */
 	char	e_flag;		/* Symbol flag */
-	addr_t	e_addr;		/* Address */
+	a_uint	e_addr;		/* Address */
 	union	{
 		struct area *e_ap;
 		struct sym  *e_sp;
@@ -579,7 +579,7 @@ extern	VOID		asmbl(void);
 extern	int		fndidx(char *str);
 extern	int		main(int argc, char *argv[]);
 extern	VOID		newdot(struct area *nap);
-extern	VOID		phase(struct area *ap, addr_t a);
+extern	VOID		phase(struct area *ap, a_uint a);
 extern	char *		usetxt[];
 extern	VOID		usage(int n);
 
@@ -618,7 +618,7 @@ extern	VOID		rerr(void);
 
 /* asexpr.c */
 extern	VOID		abscheck(struct expr *esp);
-extern	addr_t		absexpr(void);
+extern	a_uint		absexpr(void);
 extern	VOID		clrexpr(struct expr *esp);
 extern	int		digit(int c, int r);
 extern	VOID		exprmasks(int n);
@@ -750,7 +750,7 @@ extern	VOID		rerr();
 
 /* asexpr.c */
 extern	VOID		abscheck();
-extern	addr_t		absexpr();
+extern	a_uint		absexpr();
 extern	VOID		clrexpr();
 extern	int		digit();
 extern	VOID		exprmasks();

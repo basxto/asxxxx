@@ -34,8 +34,8 @@
 
 
 
-                                 Version   3.10
-                                  November 2001
+                                 Version   3.11
+                                  January 2002
 
 
                                                                   Page 2
@@ -179,7 +179,7 @@
         
 
 
-        ASxxxx Cross Assemblers, Version 3.10, November 2001 
+        ASxxxx Cross Assemblers, Version 3.11, January 2002 
 
         Submitted by Alan R.  Baldwin, 
         Kent State University, Kent, Ohio 
@@ -229,14 +229,21 @@
         the ASxxxx assembler listing files with the absolute linked  ad-
         dresses and data.  
 
-           The  assemblers  and  linker have been tested using GCC 2.7.2
-        with LINUX, Symantec C/C++ V6.1/V7.2, DJGPP (GCC 2.8.1) and  VC6
-        with  MS-DOS/Windows  3.x/95/98.   Complete  source code and do-
-        cumentation for the assemblers and linker is included  with  the
-        distribution.   Additionally,  test  code for each assembler and
-        several microprocessor monitors ( ASSIST05 for the 6805,  MONDEB
-        and  ASSIST09  for  the  6809, and BUFFALO 2.5 for the 6811) are
-        included as working examples of use of these assemblers.  
+           The  assemblers  and  linker  have  been  tested using Linux,
+        DJGPP,  Cygwin-1.3.x,  Sun   Solaris   (GCC),   Symantec   C/C++
+        V6.1/V7.2,  and VC6 with MS-DOS/Windows 3.x/9x/NT/2000/XP.  Com-
+        plete source code  and  documentation  for  the  assemblers  and
+        linker  is  included  with the distribution.  Additionally, test
+        code for each assembler and several  microprocessor  monitors  (
+        ASSIST05  for  the  6805,  MONDEB and ASSIST09 for the 6809, and
+
+
+                                                                  Page 6
+        
+
+
+        BUFFALO 2.5 for the 6811) are included as  working  examples  of
+        use of these assemblers.  
 
 
         CHAPTER 1  THE ASSEMBLER                                     1-1 

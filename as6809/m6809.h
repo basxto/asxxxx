@@ -1,7 +1,7 @@
 /* m6809.h */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -88,7 +88,7 @@ extern	int	aindx;
 
 struct	sdp
 {
-	addr_t	s_addr;
+	a_uint	s_addr;
 	struct	area *	s_area;
 };
 

@@ -1,7 +1,7 @@
 /* lklist.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -113,8 +113,8 @@ char *str;
  *	output.
  *
  *	local variables:
- *		addr_t	ai		temporary
- *		addr_t	aj		temporary
+ *		a_uint	ai		temporary
+ *		a_uint	aj		temporary
  *		int	i		loop counter
  *		int	n		repeat counter
  *		char *	frmta		temporary format specifier
@@ -142,7 +142,7 @@ register struct area *xp;
 {
 	register int i, n;
 	register char *frmta, *frmtb, *ptr;
- 	addr_t	ai, aj;
+ 	a_uint	ai, aj;
 
        	if (lop++ >= NLPP) {
 		newpag(mfp);
@@ -279,9 +279,9 @@ register struct area *xp;
  *		char *	frmt		temporary format specifier
  *		char *	ptr		pointer to an id string
  *		int	nmsym		number of symbols in area
- *		addr_t	a0		temporary
- *		addr_t	ai		temporary
- *		addr_t	aj		temporary
+ *		a_uint	a0		temporary
+ *		a_uint	ai		temporary
+ *		a_uint	aj		temporary
  *		sym *	sp		pointer to a symbol structure
  *		sym **	p		pointer to an array of
  *					pointers to symbol structures
@@ -312,7 +312,7 @@ struct area *xp;
 	register int i, j, n;
 	register char *frmt, *ptr;
 	int nmsym;
-	addr_t a0, ai, aj;
+	a_uint a0, ai, aj;
 	struct sym *sp;
 	struct sym **p;
 
@@ -494,7 +494,7 @@ struct area *xp;
  *	output file.
  *
  *	local variables:
- *		addr_t	pc		current program counter address
+ *		a_uint	pc		current program counter address
  *
  *	global variables:
  *		int	a_bytes		T Line Address Bytes
@@ -506,12 +506,12 @@ struct area *xp;
  *					output RST file
  *		int	rtcnt		count of data words
  *		int	rtflg[]		output the data flag
- *		addr_t	rtval[]		relocated data
+ *		a_uint	rtval[]		relocated data
  *		FILE	*tfp		The file handle to the current
  *					LST file being scanned
  *
  *	functions called:
- *		addr_t	adb_xb()	lkrloc.c
+ *		a_uint	adb_xb()	lkrloc.c
  *		int	fclose()	c_library
  *		int	fgets()		c_library
  *		int	fprintf()	c_library
@@ -527,7 +527,7 @@ VOID
 lkulist(i)
 int i;
 {
-	addr_t pc;
+	a_uint pc;
 
 	/*
 	 * Exit if listing file is not open
@@ -662,7 +662,7 @@ ee DDDDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(32)
 
 VOID
 lkalist(pc)
-addr_t pc;
+a_uint pc;
 {
 	char str[16];
 	char *frmt;
@@ -796,7 +796,7 @@ loop:	if (tfp == NULL)
  *
  *	global variables:
  *		int	a_bytes		T Line Address Bytes
- *		addr_t	a_mask		address masking parameter
+ *		a_uint	a_mask		address masking parameter
  *		int	gcntr		data byte counter
  *					set to -1 for a continuation line
  *		int	gline		get a line from the LST file
@@ -858,7 +858,7 @@ ee DDDDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(32)
 
 VOID
 lkglist(pc,v)
-addr_t pc;
+a_uint pc;
 int v;
 {
 	char str[16];

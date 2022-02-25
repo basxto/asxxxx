@@ -1,7 +1,7 @@
 /* r65ext.c */
 
 /*
- * (C) Copyright 1995-2001
+ * (C) Copyright 1995-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin

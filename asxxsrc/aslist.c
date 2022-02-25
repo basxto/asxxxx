@@ -1,7 +1,7 @@
 /* aslist.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -67,7 +67,7 @@
  *		char *	ep		pointer into error list
  *					array eb[]
  *		char	ib[]		assembler-source text line
- *		addr_t	laddr		address of current assembler line,
+ *		a_uint	laddr		address of current assembler line,
  *				 	equate, or value of .if argument
  *		FILE *	lfp		list output file handle
  *		int	line		current assembler source line number

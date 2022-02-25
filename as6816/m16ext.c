@@ -1,7 +1,7 @@
 /* M16EXT:C */
 
 /*
- * (C) Copyright 1991-2001
+ * (C) Copyright 1991-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin

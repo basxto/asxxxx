@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,7 +16,7 @@
  *	w_mckinnon@conknet.com
  */
 
-#define	VERSION	"V03.10"
+#define	VERSION	"V03.11"
 
 /*)Module	aslink.h
  *
@@ -192,7 +192,7 @@
 /*
  *	General assembler address type
  */
-typedef unsigned int addr_t;
+typedef unsigned int a_uint;
 
 /*
  *	The structures of head, area, areax, and sym are created
@@ -238,8 +238,8 @@ struct	area
 {
 	struct	area	*a_ap;	/* Area link */
 	struct	areax	*a_axp;	/* Area extension link */
-	addr_t	a_addr;		/* Beginning address of area */
-	addr_t	a_size;		/* Total size of the area */
+	a_uint	a_addr;		/* Beginning address of area */
+	a_uint	a_size;		/* Total size of the area */
 	char	a_bset;		/* Area base address set */
 	char	a_flag;		/* Flag byte */
 	char *	a_id;		/* Name */
@@ -265,8 +265,8 @@ struct	areax
 	struct	areax	*a_axp;	/* Area extension link */
 	struct	area	*a_bap;	/* Base area link */
 	struct	head	*a_bhp;	/* Base header link */
-	addr_t	a_addr;		/* Beginning address of section */
-	addr_t	a_size;		/* Size of the area in section */
+	a_uint	a_addr;		/* Beginning address of section */
+	a_uint	a_size;		/* Size of the area in section */
 };
 
 /*
@@ -287,7 +287,7 @@ struct	sym
 	struct	areax	*s_axp;	/* Symbol area link */
 	char	s_type;		/* Symbol subtype */
 	char	s_flag;		/* Flag byte */
-	addr_t	s_addr;		/* Address */
+	a_uint	s_addr;		/* Address */
 	char	*s_id;		/* Name (JLH) */
 	char	*m_id;		/* Module symbol define in */
 };
@@ -341,7 +341,7 @@ struct	sdp
 {
 	struct	area  *s_area;	/* Paged Area link */
 	struct	areax *s_areax;	/* Paged Area Extension Link */
-	addr_t	s_addr;		/* Page address offset */
+	a_uint	s_addr;		/* Page address offset */
 };
 
 /*
@@ -358,9 +358,9 @@ struct	rerr
 {
 	int	aindex;		/* Linking area */
 	int	mode;		/* Relocation mode */
-	addr_t	rtbase;		/* Base address in section */
+	a_uint	rtbase;		/* Base address in section */
 	int	rindex;		/* Area/Symbol reloaction index */
-	addr_t	rval;		/* Area/Symbol offset value */
+	a_uint	rval;		/* Area/Symbol offset value */
 };
 
 /*
@@ -593,7 +593,7 @@ extern	int	pass;		/*	linker pass number
 extern	int	rtcnt;		/*	count of elements in the
 				 *	rtval[] and rtflg[] arrays
 				 */
-extern	addr_t	rtval[];	/*	data associated with relocation
+extern	a_uint	rtval[];	/*	data associated with relocation
 				 */
 extern	int	rtflg[];	/*	indicates if rtval[] value is
 				 *	to be sent to the output file.
@@ -602,11 +602,11 @@ extern	char	rtbuf[];	/*	S19/IHX output buffer
 				 */
 extern	int	rtaflg;		/*	rtbuf[] processing
 				 */
-extern	addr_t	rtadr0;		/*
+extern	a_uint	rtadr0;		/*
 				 */
-extern	addr_t	rtadr1;		/*
+extern	a_uint	rtadr1;		/*
 				 */
-extern	addr_t	rtadr2;		/*
+extern	a_uint	rtadr2;		/*
 				 */
 extern	int	obj_flag;	/*	Linked file/library object output flag
 				 */
@@ -614,11 +614,11 @@ extern	int	a_bytes;	/*	REL file T Line address length
 				 */
 extern	int	hilo;		/*	REL file byte ordering
 				 */
-extern	addr_t	a_mask;		/*	Address Mask
+extern	a_uint	a_mask;		/*	Address Mask
 				 */
-extern	addr_t	s_mask;		/*	Sign Mask
+extern	a_uint	s_mask;		/*	Sign Mask
 				 */
-extern	addr_t	v_mask;		/*	Value Mask
+extern	a_uint	v_mask;		/*	Value Mask
 				 */
 extern	int	gline;		/*	LST file relocation active
 				 *	for current line
@@ -703,14 +703,14 @@ extern	VOID		symdef(FILE *fp);
 extern	int		symeq(char *p1, char *p2, int cflag);
 extern	VOID		syminit(void);
 extern	VOID		symmod(FILE *fp, struct sym *tsp);
-extern	addr_t		symval(struct sym *tsp);
+extern	a_uint		symval(struct sym *tsp);
 
 /* lkeval.c */
 extern	int		digit(int c, int r);
-extern	addr_t		eval(void);
-extern	addr_t		expr(int n);
+extern	a_uint		eval(void);
+extern	a_uint		expr(int n);
 extern	int		oprio(int c);
-extern	addr_t		term(void);
+extern	a_uint		term(void);
 
 /* lklist.c */
 extern	int		dgt(int rdx, char *str, int n);
@@ -718,19 +718,19 @@ extern	VOID		newpag(FILE *fp);
 extern	VOID		slew(struct area *xp);
 extern	VOID		lstarea(struct area *xp);
 extern	VOID		lkulist(int i);
-extern	VOID		lkalist(addr_t pc);
-extern	VOID		lkglist(addr_t pc, int v);
+extern	VOID		lkalist(a_uint pc);
+extern	VOID		lkglist(a_uint pc, int v);
 
 /* lkrloc.c */
-extern	addr_t		adb_1b(addr_t v, int i);
-extern	addr_t		adb_2b(addr_t v, int i);
-extern	addr_t		adb_3b(addr_t v, int i);
-extern	addr_t		adb_4b(addr_t v, int i);
-extern	addr_t		adb_xb(addr_t v, int i);
-extern	addr_t		adb_hi(addr_t v, int i);
-extern	addr_t		adb_lo(addr_t v, int i);
-extern	addr_t		adw_xb(int x, addr_t v, int i);
-extern	addr_t		evword(void);
+extern	a_uint		adb_1b(a_uint v, int i);
+extern	a_uint		adb_2b(a_uint v, int i);
+extern	a_uint		adb_3b(a_uint v, int i);
+extern	a_uint		adb_4b(a_uint v, int i);
+extern	a_uint		adb_xb(a_uint v, int i);
+extern	a_uint		adb_hi(a_uint v, int i);
+extern	a_uint		adb_lo(a_uint v, int i);
+extern	a_uint		adw_xb(int x, a_uint v, int i);
+extern	a_uint		evword(void);
 extern	VOID		rele(void);
 extern	VOID		reloc(int c);
 extern	VOID		relt(void);
@@ -741,7 +741,7 @@ extern	char *		errmsg[];
 extern	VOID		errdmp(FILE *fptr, char *str);
 extern	VOID		relerp(char *str);
 extern	VOID		erpdmp(FILE *fptr, char *str);
-extern	VOID		prntval(FILE *fptr, addr_t v);
+extern	VOID		prntval(FILE *fptr, a_uint v);
 
 /* lklibr.c */
 extern	VOID		addfile(char *path, char *libfil);
@@ -808,14 +808,14 @@ extern	VOID		symdef();
 extern	int		symeq();
 extern	VOID		syminit();
 extern	VOID		symmod();
-extern	addr_t		symval();
+extern	a_uint		symval();
 
 /* lkeval.c */
 extern	int		digit();
-extern	addr_t		eval();
-extern	addr_t		expr();
+extern	a_uint		eval();
+extern	a_uint		expr();
 extern	int		oprio();
-extern	addr_t		term();
+extern	a_uint		term();
 
 /* lklist.c */
 extern	int		dgt();
@@ -827,15 +827,15 @@ extern	VOID		lkalist();
 extern	VOID		lkglist();
 
 /* lkrloc.c */
-extern	addr_t		adb_1b();
-extern	addr_t		adb_2b();
-extern	addr_t		adb_3b();
-extern	addr_t		adb_4b();
-extern	addr_t		adb_xb();
-extern	addr_t		adb_hi();
-extern	addr_t		adb_lo();
-extern	addr_t		adw_xb();
-extern	addr_t		evword();
+extern	a_uint		adb_1b();
+extern	a_uint		adb_2b();
+extern	a_uint		adb_3b();
+extern	a_uint		adb_4b();
+extern	a_uint		adb_xb();
+extern	a_uint		adb_hi();
+extern	a_uint		adb_lo();
+extern	a_uint		adw_xb();
+extern	a_uint		evword();
 extern	VOID		rele();
 extern	VOID		reloc();
 extern	VOID		relt();

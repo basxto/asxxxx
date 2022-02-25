@@ -1,7 +1,7 @@
 /* m05mch.c */
 
 /*
- * (C) Copyright 1989-2001
+ * (C) Copyright 1989-2002
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -23,7 +23,7 @@ struct mne *mp;
 {
 	register int op, t1, t2, type;
 	struct expr e1, e2, e3;
-	addr_t espv;
+	a_uint espv;
 	struct area *espa;
 	char id[NCPS];
 	int c, v1;
