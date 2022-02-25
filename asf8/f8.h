@@ -1,7 +1,7 @@
-/* f2mc8.h */
+/* f8.h */
 
 /*
- *  Copyright (C) 2005-2012  Alan R. Baldwin
+ *  Copyright (C) 2012  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,15 +23,15 @@
  */
 
 /*)BUILD
-	$(PROGRAM) =	ASF2MC8
+	$(PROGRAM) =	ASF8
 	$(INCLUDE) = {
 		ASXXXX.H
-		F2MC8.H
+		F8.H
 	}
 	$(FILES) = {
-		F2MC8MCH.C
-		F2MC8ADR.C
-		F2MC8PST.C
+		F8MCH.C
+		F8ADR.C
+		F8PST.C
 		ASMAIN.C
 		ASMCRO.C
 		ASDBG.C
@@ -48,81 +48,73 @@
 
 struct adsym
 {
-	char	a_str[4];	/* addressing string */
+	char	a_str[6];	/* addressing string */
 	int	a_val;		/* addressing mode value */
 };
 
-
 /*
- * Extended Addressing Modes
+ * Merge Modes
  */
-#define	R_3BIT	0x0100		/* 3-Bit Addressing Mode */
 
+#define	M_3BIT		0x0100
+#define	M_4BIT		0x0200
 
 /*
  * Addressing types
  */
-#define	S_A	30
-#define	S_T	31
+#define	S_RAIW	30
+#define	S_RSID	31
+#define S_RKQ	32
+#define	S_R8	33
+#define	S_R16	34
+#define	S_IMMED	35
+#define	S_EXT	36
 
 /*
- * PC, SP, IX, EP  ->  aindex = 0, 1, 2, 3
+ * Specific Registers
  */
-#define	S_PC	32
-#define	S_SP	33
-#define	S_IX	34
-#define	S_EP	35
+#define	S_J	0x09
+#define	S_HU	0x0A
+#define	S_HL	0x0B
+#define	S_KU	0x0C
+#define	S_KL	0x0D
+#define	S_QU	0x0E
+#define	S_QL	0x0F
 
-#define	S_PS	36
+#define	S_P0	0x00
+#define	S_P	0x01
+#define	S_DC	0x02
+#define	S_DC1	0x03
+#define	S_H	0x04
+#define	S_K	0x05
+#define	S_Q	0x06
 
-#define	S_IMMED	37
-#define	S_DIR	38
-#define	S_EXT	39
-#define	S_INDX	40
-
-/*
- * R0 - R7,  aindex = 0 - 7
- */
-#define	S_R	48
+#define	S_A	0x00
+#define	S_IS	0x01
+#define	S_W	0x02
 
 /*
  * Instruction types
  */
-#define	S_AOP	60
+#define S_IM3	60
+#define	S_IM4	61
+#define	S_IM8	62
+#define	S_IM16	63
+#define	S_SLSR	64
+#define	S_LR	65
+#define	S_ROP	66
+#define	S_IO	67
+#define	S_IOS	68
+#define	S_INH	69
 
-#define	S_MOV	62
-#define	S_MOVW	63
-#define	S_OP	64
-
-#define	S_JMP	66
-#define	S_CALL	67
-#define	S_CALLV	68
-#define	S_PUSH	69
-#define	S_XCH	70
-#define	S_XCHW	71
-#define	S_BIT	72
-#define	S_BRAB	73
-#define	S_DEC	74
-#define	S_DECW	75
-#define	S_BRA	76
-#define	S_INH	77
+#define	S_BRT	70
+#define	S_BRF	71
+#define	S_BRA	72
 
 /*
  * Set Direct Pointer
  */
 #define	S_SDP	80
-
-/*
- * Machine Type
- */
-#define	S_CPU	81
-
-/*
- * Processor Types (S_CPU)
- */
-#define	X_8L	0
-#define	X_8FX	1
-
 
 
 	/* machine dependent functions */
@@ -130,8 +122,12 @@ struct adsym
 #ifdef	OTHERSYSTEM
 
 	/* f8adr.c */
-extern	int		aindex;
-extern	struct	adsym	reg[];
+extern 	int		aindx;
+extern	struct	adsym	regaiw[];
+extern	struct	adsym	regsid[];
+extern	struct	adsym	regkq[];
+extern	struct	adsym	reg8[];
+extern	struct	adsym	reg16[];
 extern	int		addr(struct expr *esp);
 extern	int		admode(struct adsym *sp);
 extern	int		any(int c, char *str);
@@ -145,8 +141,12 @@ extern	VOID		minit(void);
 #else
 
 	/* f8adr.c */
-extern	int		aindex;
-extern	struct	adsym	reg[];
+extern 	int		aindx;
+extern	struct	adsym	regaiw[];
+extern	struct	adsym	regsid[];
+extern	struct	adsym	regkq[];
+extern	struct	adsym	reg8[];
+extern	struct	adsym	reg16[];
 extern	int		addr();
 extern	int		admode();
 extern	int		any();

@@ -433,13 +433,13 @@ struct mne *mp;
 		}
 		break;
 
-	case S_BITBR:   // JB, JBC, JNB bit,rel
+	case S_BITBR:   /* JB, JBC, JNB bit,rel */
 		/* Branch on bit set/clear */
 		t = addr(&e);
 		if ((t != S_DIR) && (t != S_EXT))
 			aerr();
 
-		// Benny
+		/* Benny */
 		comma(1);
 		expr(&e1, 0);
 
@@ -458,9 +458,9 @@ struct mne *mp;
 			rerr();
 		break;
 
-	case S_BR:  // JC, JNC, JZ, JNZ
+	case S_BR:  /* JC, JNC, JZ, JNZ */
 		/* Relative branch */
-		// Benny
+		/* Benny */
 		expr(&e1, 0);
 		outab(op);
 
@@ -482,7 +482,7 @@ struct mne *mp;
 		comma(1);
 		t1 = addr(&e1);
 
-		// Benny
+		/* Benny */
 		comma(1);
 		switch (t) {
 		case S_A:
@@ -501,7 +501,7 @@ struct mne *mp;
 			break;
 
 		case S_AT_R:
-			op = (op + 6 + e.e_addr);
+			op = (op + 6 + (int) e.e_addr);
 			clrexpr(&e);
 			expr(&e, 0);
 			outab(op);
@@ -511,7 +511,7 @@ struct mne *mp;
 			break;
 	
 		case S_REG:
-			op = (op + 8 + e.e_addr);
+			op = (op + 8 + (int) e.e_addr);
 			clrexpr(&e);
 			expr(&e, 0);
 			outab(op);
@@ -541,7 +541,7 @@ struct mne *mp;
 	case S_DJNZ:
 		/* Dir,dest;  Reg,dest */
 		t = addr(&e);
-		// Benny
+		/* Benny */
 		comma(1);
 		expr(&e1, 0);
 

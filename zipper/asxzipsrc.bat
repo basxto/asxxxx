@@ -18,6 +18,13 @@ rem
 zip -d asxv5pxx.zip asxv5pxx\asxdoc\* asxv5pxx\asxhtmw\*
 zip -d asxv5pxx.zip asxv5pxx\updater\* asxv5pxx\test\*
 rem
+zip -d asxv5pxx.zip asxv5pxx\asxmak\cygwin\exe\* asxv5pxx\asxmak\djgpp\exe\*
+zip -d asxv5pxx.zip asxv5pxx\asxmak\linux\exe\* asxv5pxx\asxmak\symantec\exe\*
+zip -d asxv5pxx.zip asxv5pxx\asxmak\turboc30\exe\* asxv5pxx\asxmak\vc6\exe\*
+zip -d asxv5pxx.zip asxv5pxx\asxmak\vs05\exe\* asxv5pxx\asxmak\vs10\exe\*
+zip -d asxv5pxx.zip asxv5pxx\asxmak\watcom\exe\*
+zip -T asxv5pxx.zip
+rem
 rem  Remove Zip and Unzip Utilities
 rem
 zip -d asxv5pxx.zip asxv5pxx\zipper\*.exe

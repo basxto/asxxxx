@@ -1,7 +1,7 @@
 /* lkmain.c */
 
 /*
- *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *  Copyright (C) 1989-2012  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -1458,7 +1458,7 @@ int n;
 	char	**dp;
 
 	fprintf(stderr, "\nASxxxx Linker %s", VERSION);
-	fprintf(stderr, "\nCopyright (C) 2009  Alan R. Baldwin");
+	fprintf(stderr, "\nCopyright (C) %s  Alan R. Baldwin", COPYRIGHT);
 	fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);

@@ -30,6 +30,7 @@ ASXXXX =	as1802		\
 		ascheck		\
 		asez80		\
 		asf2mc8		\
+		asf8		\
 		asgb		\
 		ash8		\
 		asm8c		\
@@ -95,6 +96,7 @@ SRCAVR=		$(ASXBAS)asavr/
 SRCCHECK=	$(ASXBAS)ascheck/
 SRCEZ80=	$(ASXBAS)asez80/
 SRCF2MC8=	$(ASXBAS)asf2mc8/
+SRCF8=		$(ASXBAS)asf8/
 SRCGB=		$(ASXBAS)asgb/
 SRCH8=		$(ASXBAS)ash8/
 SRCM8C=		$(ASXBAS)asm8c/
@@ -573,19 +575,38 @@ asez80 :		$(ASXX) $(ASEZ80)
 # ASF2MC8
 ####################################################################
 
-ASF2MC8 =	f8pst.o f8mch.o f8adr.o
+ASF2MC8 =	f2mc8pst.o f2mc8mch.o f2mc8adr.o
 
-f8pst.o :	$(SRCF2MC8)f8pst.c $(SRCF2MC8)f2mc8.h $(SRCASX)asxxxx.h
+f2mc8pst.o :	$(SRCF2MC8)f2mc8pst.c $(SRCF2MC8)f2mc8.h $(SRCASX)asxxxx.h
 		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
-f8mch.o :	$(SRCF2MC8)f8mch.c $(SRCF2MC8)f2mc8.h $(SRCASX)asxxxx.h
+f2mc8mch.o :	$(SRCF2MC8)f2mc8mch.c $(SRCF2MC8)f2mc8.h $(SRCASX)asxxxx.h
 		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
-f8adr.o :	$(SRCF2MC8)f8adr.c $(SRCF2MC8)f2mc8.h $(SRCASX)asxxxx.h
+f2mc8adr.o :	$(SRCF2MC8)f2mc8adr.c $(SRCF2MC8)f2mc8.h $(SRCASX)asxxxx.h
 		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
 
 asf2mc8 :	$(ASXX) $(ASF2MC8)
 		$(LD) $(LDFLAGS) -o asf2mc8 $(ASXX) $(ASF2MC8)
 		mv asf2mc8.exe $(DSTEXE)asf2mc8.exe
 		strip $(DSTEXE)asf2mc8.exe
+
+
+####################################################################
+# ASF8
+####################################################################
+
+ASF8 =	f8pst.o f8mch.o f8adr.o
+
+f8pst.o :	$(SRCF8)f8pst.c $(SRCF8)f8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+f8mch.o :	$(SRCF8)f8mch.c $(SRCF8)f8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+f8adr.o :	$(SRCF8)f8adr.c $(SRCF8)f8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+asf8 :	$(ASXX) $(ASF8)
+		$(LD) $(LDFLAGS) -o asf8 $(ASXX) $(ASF8)
+		mv asf8.exe $(DSTEXE)asf8.exe
+		strip $(DSTEXE)asf8.exe
 
 
 ####################################################################

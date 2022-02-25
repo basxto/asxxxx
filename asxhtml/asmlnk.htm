@@ -18,6 +18,8 @@
 
 
 
+
+
                                 ASxxxx Assemblers
 
 
@@ -29,8 +31,8 @@
 
 
 
-                                 Version   5.03
-                                  October 2010
+                                 Version   5.05
+                                   August 2012
 
 
         CHAPTER 1  THE ASSEMBLER                                     1-1 
@@ -200,11 +202,11 @@
           4.6.1     Graphical User Interface                         4-6 
           4.6.2     Command Line Interface                           4-6 
           4.7     BUILDING ASXXXX AND ASLINK WITH
-                  OPEN WATCOM V1.7                                   4-7 
+                  MS VISUAL STUDIO 2010                              4-7 
           4.7.1     Graphical User Interface                         4-7 
           4.7.2     Command Line Interface                           4-7 
           4.8     BUILDING ASXXXX AND ASLINK WITH
-                  SYMANTEC C/C++ V7.2                                4-8 
+                  OPEN WATCOM V1.9                                   4-8 
 
 
                                                                  Page iv
@@ -213,6 +215,11 @@
 
           4.8.1     Graphical User Interface                         4-8 
           4.8.2     Command Line Interface                           4-8 
+          4.9     BUILDING ASXXXX AND ASLINK WITH
+                  SYMANTEC C/C++ V7.2                                4-9 
+          4.9.1     Graphical User Interface                         4-9 
+          4.9.2     Command Line Interface                           4-9 
+          4.10    THE _CLEAN.BAT AND _PREP.BAT FILES                4-10 
 
         APPENDIX A  ASXSCN LISTING FILE SCANNER                      A-1 
 
@@ -258,16 +265,16 @@
           AC.2.7    Input / Output                                  AC-3 
           AC.2.8    Miscellaneos                                    AC-3 
           AC.2.9    Program Status                                  AC-4 
-
-        APPENDIX AD  AS430 ASSEMBLER                                AD-1 
-          AD.1    MPS430 REGISTER SET                               AD-1 
-          AD.2    MPS430 ADDRESSING MODES                           AD-2 
-          AD.2.1    MPS430 Instruction Mnemonics                    AD-3 
 
 
                                                                   Page v
         
 
+
+        APPENDIX AD  AS430 ASSEMBLER                                AD-1 
+          AD.1    MPS430 REGISTER SET                               AD-1 
+          AD.2    MPS430 ADDRESSING MODES                           AD-2 
+          AD.2.1    MPS430 Instruction Mnemonics                    AD-3 
 
         APPENDIX AE  AS61860 ASSEMBLER                              AE-1 
           AE.1    ACKNOWLEDGMENT                                    AE-1 
@@ -316,17 +323,17 @@
 
         APPENDIX AG  AS6800 ASSEMBLER                               AG-1 
           AG.1    6800 REGISTER SET                                 AG-1 
-          AG.2    6800 INSTRUCTION SET                              AG-1 
-          AG.2.1    Inherent Instructions                           AG-2 
-          AG.2.2    Branch Instructions                             AG-2 
-          AG.2.3    Single Operand Instructions                     AG-3 
-          AG.2.4    Double Operand Instructions                     AG-4 
 
 
                                                                  Page vi
         
 
 
+          AG.2    6800 INSTRUCTION SET                              AG-1 
+          AG.2.1    Inherent Instructions                           AG-2 
+          AG.2.2    Branch Instructions                             AG-2 
+          AG.2.3    Single Operand Instructions                     AG-3 
+          AG.2.4    Double Operand Instructions                     AG-4 
           AG.2.5    Jump and Jump to Subroutine Instructions        AG-4 
           AG.2.6    Long Register Instructions                      AG-5 
 
@@ -374,17 +381,17 @@
           AK.1.4    .hc05 Directive                                 AK-2 
           AK.1.5    The .__.CPU.  Variable                          AK-2 
           AK.2    68HC(S)08 REGISTER SET                            AK-3 
-          AK.3    68HC(S)08 INSTRUCTION SET                         AK-3 
-          AK.3.1    Control Instructions                            AK-4 
-          AK.3.2    Bit Manipulation Instructions                   AK-4 
-          AK.3.3    Branch Instructions                             AK-4 
-          AK.3.4    Complex Branch Instructions                     AK-5 
 
 
                                                                 Page vii
         
 
 
+          AK.3    68HC(S)08 INSTRUCTION SET                         AK-3 
+          AK.3.1    Control Instructions                            AK-4 
+          AK.3.2    Bit Manipulation Instructions                   AK-4 
+          AK.3.3    Branch Instructions                             AK-4 
+          AK.3.4    Complex Branch Instructions                     AK-5 
           AK.3.5    Read-Modify-Write Instructions                  AK-5 
           AK.3.6    Register\Memory Instructions                    AK-6 
           AK.3.7    Double Operand Move Instruction                 AK-6 
@@ -432,17 +439,17 @@
           AN.3.6    Branch on Bit Clear or Set                      AN-5 
           AN.3.7    Single Operand Instructions                     AN-6 
           AN.3.8    Double Operand Instructions                     AN-7 
-          AN.3.9    Move Instructions                               AN-7 
-          AN.3.10   D-register Instructions                         AN-7 
-          AN.3.11   Index/Stack Register Instructions               AN-8 
-          AN.3.12   Jump and Jump/Call to Subroutine
-                    Instructions                                    AN-8 
 
 
                                                                Page viii
         
 
 
+          AN.3.9    Move Instructions                               AN-7 
+          AN.3.10   D-register Instructions                         AN-7 
+          AN.3.11   Index/Stack Register Instructions               AN-8 
+          AN.3.12   Jump and Jump/Call to Subroutine
+                    Instructions                                    AN-8 
           AN.3.13   Other Special Instructions                      AN-8 
           AN.3.14   Register - Register Instructions                AN-8 
           AN.3.15   Condition Code Register Instructions            AN-8 
@@ -490,17 +497,17 @@
           AR.1    ACKNOWLEDGMENT                                    AR-1 
           AR.2    8051 REGISTER SET                                 AR-1 
           AR.3    8051 INSTRUCTION SET                              AR-2 
-          AR.3.1    Inherent Instructions                           AR-2 
-          AR.3.2    Move Instructions                               AR-3 
-          AR.3.3    Single Operand Instructions                     AR-3 
-          AR.3.4    Two Operand Instructions                        AR-4 
-          AR.3.5    Call and Return Instructions                    AR-4 
 
 
                                                                  Page ix
         
 
 
+          AR.3.1    Inherent Instructions                           AR-2 
+          AR.3.2    Move Instructions                               AR-3 
+          AR.3.3    Single Operand Instructions                     AR-3 
+          AR.3.4    Two Operand Instructions                        AR-4 
+          AR.3.5    Call and Return Instructions                    AR-4 
           AR.3.6    Jump Instructions                               AR-4 
           AR.3.7    Predefined Symbols:  SFR Map                    AR-5 
           AR.3.8    Predefined Symbols:  SFR Bit Addresses          AR-6 
@@ -548,17 +555,17 @@
           AT.6.4    Optional Symbols:  Control Bits                AT-16 
           AT.7    DS80C320/DS80C323 SPECIAL FUNCTION REGISTERS     AT-17 
           AT.7.1    SFR Map                                        AT-17 
-          AT.7.2    Bit Addressable Registers:  Generic            AT-18 
-          AT.7.3    Bit Addressable Registers:  Specific           AT-19 
-          AT.7.4    Optional Symbols:  Control Bits                AT-20 
-          AT.8    DS80C390 SPECIAL FUNCTION REGISTERS              AT-21 
-          AT.8.1    SFR Map                                        AT-21 
 
 
                                                                   Page x
         
 
 
+          AT.7.2    Bit Addressable Registers:  Generic            AT-18 
+          AT.7.3    Bit Addressable Registers:  Specific           AT-19 
+          AT.7.4    Optional Symbols:  Control Bits                AT-20 
+          AT.8    DS80C390 SPECIAL FUNCTION REGISTERS              AT-21 
+          AT.8.1    SFR Map                                        AT-21 
           AT.8.2    Bit Addressable Registers:  Generic            AT-22 
           AT.8.3    Bit Addressable Registers:  Specific           AT-23 
           AT.8.4    Optional Symbols:  Control Bits                AT-24 
@@ -606,16 +613,17 @@
           AV.3.5    Block Transfer and Compare Instructions         AV-8 
           AV.3.6    Exchange Instructions                           AV-8 
           AV.3.7    Input/Output Instructions                       AV-8 
-          AV.3.8    Load Instructions                               AV-9 
-          AV.3.9    Logical Instructions                            AV-9 
-          AV.3.10   Processor Control Instructions                  AV-9 
-          AV.3.11   Program Flow Instructions                       AV-9 
-          AV.3.12   Shift and Rotate Instructions                   AV-9 
 
 
                                                                  Page xi
         
 
+
+          AV.3.8    Load Instructions                               AV-9 
+          AV.3.9    Logical Instructions                            AV-9 
+          AV.3.10   Processor Control Instructions                  AV-9 
+          AV.3.11   Program Flow Instructions                       AV-9 
+          AV.3.12   Shift and Rotate Instructions                   AV-9 
 
         APPENDIX AW  ASF2MC8 ASSEMBLER                              AW-1 
           AW.1    PROCESSOR SPECIFIC DIRECTIVES                     AW-1 
@@ -629,188 +637,198 @@
           AW.3.3    Branch/Jump/Call Instructions                   AW-4 
           AW.3.4    Other Instructions                              AW-4 
 
-        APPENDIX AX  ASGB ASSEMBLER                                 AX-1 
-          AX.1    ACKNOWLEDGEMENT                                   AX-1 
-          AX.2    INTRODUCTION                                      AX-1 
-          AX.3    GAMEBOY REGISTER SET AND CONDITIONS               AX-1 
-          AX.4    GAMEBOY INSTRUCTION SET                           AX-2 
-          AX.4.1    .tile Directive                                 AX-2 
-          AX.4.2    Potentially Controversial Mnemonic Selection    AX-4 
-          AX.4.2.1    Auto-Indexing Loads                           AX-4 
-          AX.4.2.2    Input and Output Operations                   AX-4 
-          AX.4.2.3    The 'stop' Instruction                        AX-5 
-          AX.4.3    Inherent Instructions                           AX-5 
-          AX.4.4    Implicit Operand Instructions                   AX-5 
-          AX.4.5    Load Instructions                               AX-6 
-          AX.4.6    Call/Return Instructions                        AX-6 
-          AX.4.7    Jump Instructions                               AX-6 
-          AX.4.8    Bit Manipulation Instructions                   AX-6 
-          AX.4.9    Input and Output Instructions                   AX-7 
-          AX.4.10   Register Pair Instructions                      AX-7 
+        APPENDIX AX  ASF8 ASSEMBLER                                 AX-1 
+          AX.1    F8 REGISTERS                                      AX-2 
+          AX.2    F8 INSTRUCTION SET                                AX-3 
+          AX.2.1    Accumulator Group Instructions                  AX-4 
+          AX.2.2    Branch Instructions                             AX-4 
+          AX.2.3    Memory Reference Instructions                   AX-4 
+          AX.2.4    Address Register Instructions                   AX-4 
+          AX.2.5    Scratchpad Register Instructions                AX-5 
+          AX.2.6    Miscellaneous Instructions                      AX-5 
 
-        APPENDIX AY  ASH8 ASSEMBLER                                 AY-1 
-          AY.1    H8/3XX REGISTER SET                               AY-1 
-          AY.2    H8/3XX INSTRUCTION SET                            AY-1 
-          AY.2.1    Inherent Instructions                           AY-2 
-          AY.2.2    Branch Instructions                             AY-2 
-          AY.2.3    Single Operand Instructions                     AY-3 
-          AY.2.4    Double Operand Instructions                     AY-4 
-          AY.2.5    Mov Instructions                                AY-5 
-          AY.2.6    Bit Manipulation Instructions                   AY-6 
-          AY.2.7    Extended Bit Manipulation Instructions          AY-7 
-          AY.2.8    Condition Code Instructions                     AY-7 
-          AY.2.9    Other Instructions                              AY-8 
-          AY.2.10   Jump and Jump to Subroutine Instructions        AY-8 
+        APPENDIX AY  ASGB ASSEMBLER                                 AY-1 
+          AY.1    ACKNOWLEDGEMENT                                   AY-1 
+          AY.2    INTRODUCTION                                      AY-1 
+          AY.3    GAMEBOY REGISTER SET AND CONDITIONS               AY-1 
+          AY.4    GAMEBOY INSTRUCTION SET                           AY-2 
+          AY.4.1    .tile Directive                                 AY-2 
+          AY.4.2    Potentially Controversial Mnemonic Selection    AY-4 
+          AY.4.2.1    Auto-Indexing Loads                           AY-4 
+          AY.4.2.2    Input and Output Operations                   AY-4 
+          AY.4.2.3    The 'stop' Instruction                        AY-5 
+          AY.4.3    Inherent Instructions                           AY-5 
+          AY.4.4    Implicit Operand Instructions                   AY-5 
+          AY.4.5    Load Instructions                               AY-6 
+          AY.4.6    Call/Return Instructions                        AY-6 
+          AY.4.7    Jump Instructions                               AY-6 
+          AY.4.8    Bit Manipulation Instructions                   AY-6 
+          AY.4.9    Input and Output Instructions                   AY-7 
+          AY.4.10   Register Pair Instructions                      AY-7 
 
-        APPENDIX AZ  ASM8C ASSEMBLER                                AZ-1 
-          AZ.1    M8C REGISTER SET                                  AZ-1 
-          AZ.2    M8C ADDRESSING MODES                              AZ-1 
-          AZ.3    M8C INSTRUCTION SET                               AZ-2 
-          AZ.3.1    Double Operand Arithmetic Instructions          AZ-2 
-          AZ.3.2    Double Operand Logic Instructions               AZ-3 
-          AZ.3.3    Miscellaneous Double Operand Instructions       AZ-3 
+        APPENDIX AZ  ASH8 ASSEMBLER                                 AZ-1 
+          AZ.1    H8/3XX REGISTER SET                               AZ-1 
+          AZ.2    H8/3XX INSTRUCTION SET                            AZ-1 
+          AZ.2.1    Inherent Instructions                           AZ-2 
+          AZ.2.2    Branch Instructions                             AZ-2 
 
 
                                                                 Page xii
         
 
 
-          AZ.3.4    Single Operand Shift/Rotate Instructions        AZ-3 
-          AZ.3.5    Miscellaneous Single Operand Instructions       AZ-4 
-          AZ.3.6    Move Instructions                               AZ-4 
-          AZ.3.7    Inherent Instructions                           AZ-5 
-          AZ.3.8    Branching Instructions                          AZ-5 
-          AZ.3.9    Relative Table Read Instruction                 AZ-5 
+          AZ.2.3    Single Operand Instructions                     AZ-3 
+          AZ.2.4    Double Operand Instructions                     AZ-4 
+          AZ.2.5    Mov Instructions                                AZ-5 
+          AZ.2.6    Bit Manipulation Instructions                   AZ-6 
+          AZ.2.7    Extended Bit Manipulation Instructions          AZ-7 
+          AZ.2.8    Condition Code Instructions                     AZ-7 
+          AZ.2.9    Other Instructions                              AZ-8 
+          AZ.2.10   Jump and Jump to Subroutine Instructions        AZ-8 
 
-        APPENDIX BA  ASPIC ASSEMBLER                                BA-1 
-          BA.1    PIC ASSEMBLER NOTES                               BA-1 
-          BA.2    PROCESSOR SPECIFIC DIRECTIVES                     BA-1 
-          BA.2.1    .pic Directive                                  BA-2 
-          BA.2.2    .picnopic Directive                             BA-3 
-          BA.2.3    .pic12bit Directive                             BA-3 
-          BA.2.4    .pic14bit Directive                             BA-3 
-          BA.2.5    .pic16bit Directive                             BA-3 
-          BA.2.6    .pic20bit Directive                             BA-3 
-          BA.2.7    The .__.CPU.  Variable                          BA-4 
-          BA.2.8    .picfix Directive                               BA-4 
-          BA.2.9    .maxram Directive                               BA-5 
-          BA.2.10   .badram Directive                               BA-5 
-          BA.2.11   .setdmm Directive                               BA-5 
-          BA.3    12-BIT OPCODE PIC                                 BA-6 
-          BA.4    14-BIT OPCODE PIC                                 BA-6 
-          BA.5    16-BIT OPCODE PIC                                 BA-8 
-          BA.6    20-BIT ADDRESSING PIC                             BA-9 
-          BA.7    PIC OPCODES                                      BA-10 
+        APPENDIX BA  ASM8C ASSEMBLER                                BA-1 
+          BA.1    M8C REGISTER SET                                  BA-1 
+          BA.2    M8C ADDRESSING MODES                              BA-1 
+          BA.3    M8C INSTRUCTION SET                               BA-2 
+          BA.3.1    Double Operand Arithmetic Instructions          BA-2 
+          BA.3.2    Double Operand Logic Instructions               BA-3 
+          BA.3.3    Miscellaneous Double Operand Instructions       BA-3 
+          BA.3.4    Single Operand Shift/Rotate Instructions        BA-3 
+          BA.3.5    Miscellaneous Single Operand Instructions       BA-4 
+          BA.3.6    Move Instructions                               BA-4 
+          BA.3.7    Inherent Instructions                           BA-5 
+          BA.3.8    Branching Instructions                          BA-5 
+          BA.3.9    Relative Table Read Instruction                 BA-5 
 
-        APPENDIX BB  ASRAB ASSEMBLER                                BB-1 
-          BB.1    ACKNOWLEDGMENT                                    BB-1 
+        APPENDIX BB  ASPIC ASSEMBLER                                BB-1 
+          BB.1    PIC ASSEMBLER NOTES                               BB-1 
           BB.2    PROCESSOR SPECIFIC DIRECTIVES                     BB-1 
-          BB.2.1    .r2k Directive                                  BB-2 
-          BB.2.2    .hd64 Directive                                 BB-2 
-          BB.2.3    .z80 Directive                                  BB-2 
-          BB.2.4    The .__.CPU.  Variable                          BB-3 
-          BB.3    RABBIT 2000/3000 ADDRESSING AND INSTRUCTIONS      BB-4 
-          BB.3.1    Instruction Symbols                             BB-4 
-          BB.3.2    Rabbit Instructions                             BB-6 
-          BB.4    Z80/HD64180 ADDRESSING AND INSTRUCTIONS           BB-8 
-          BB.4.1    Inherent Instructions                           BB-9 
-          BB.4.2    Implicit Operand Instructions                   BB-9 
-          BB.4.3    Load Instruction                               BB-10 
-          BB.4.4    Call/Return Instructions                       BB-10 
-          BB.4.5    Jump and Jump to Subroutine Instructions       BB-10 
-          BB.4.6    Bit Manipulation Instructions                  BB-11 
-          BB.4.7    Interrupt Mode and Reset Instructions          BB-11 
-          BB.4.8    Input and Output Instructions                  BB-11 
-          BB.4.9    Register Pair Instructions                     BB-11 
-          BB.4.10   HD64180 Specific Instructions                  BB-12 
+          BB.2.1    .pic Directive                                  BB-2 
+          BB.2.2    .picnopic Directive                             BB-3 
+          BB.2.3    .pic12bit Directive                             BB-3 
+          BB.2.4    .pic14bit Directive                             BB-3 
+          BB.2.5    .pic16bit Directive                             BB-3 
+          BB.2.6    .pic20bit Directive                             BB-3 
+          BB.2.7    The .__.CPU.  Variable                          BB-4 
+          BB.2.8    .picfix Directive                               BB-4 
+          BB.2.9    .maxram Directive                               BB-5 
+          BB.2.10   .badram Directive                               BB-5 
+          BB.2.11   .setdmm Directive                               BB-5 
+          BB.3    12-BIT OPCODE PIC                                 BB-6 
+          BB.4    14-BIT OPCODE PIC                                 BB-6 
+          BB.5    16-BIT OPCODE PIC                                 BB-8 
+          BB.6    20-BIT ADDRESSING PIC                             BB-9 
+          BB.7    PIC OPCODES                                      BB-10 
 
-        APPENDIX BC  ASSCMP ASSEMBLER                               BC-1 
-          BC.1    SC/MP REGISTER SET                                BC-1 
-          BC.2    SC/MP ADDRESSING MODES                            BC-1 
+        APPENDIX BC  ASRAB ASSEMBLER                                BC-1 
+          BC.1    ACKNOWLEDGMENT                                    BC-1 
+          BC.2    PROCESSOR SPECIFIC DIRECTIVES                     BC-1 
+          BC.2.1    .r2k Directive                                  BC-2 
+          BC.2.2    .hd64 Directive                                 BC-2 
+          BC.2.3    .z80 Directive                                  BC-2 
+          BC.2.4    The .__.CPU.  Variable                          BC-3 
+          BC.3    RABBIT 2000/3000 ADDRESSING AND INSTRUCTIONS      BC-4 
+          BC.3.1    Instruction Symbols                             BC-4 
 
 
                                                                Page xiii
         
 
 
-          BC.3    SC/MP INSTRUCTION SET                             BC-2 
-          BC.3.1    Memory Reference Instructions                   BC-2 
-          BC.3.2    Immediate Instructions                          BC-2 
-          BC.3.3    Extension Register Instructions                 BC-3 
-          BC.3.4    Memory Increment/Decrement Instructions         BC-3 
-          BC.3.5    Transfer Instructions                           BC-3 
-          BC.3.6    Pointer Register Move Instructions              BC-3 
-          BC.3.7    Shift, Rotate, Serial I/O Instructions          BC-3 
-          BC.3.8    Single-Byte Miscellaneous Instructions          BC-4 
-          BC.3.9    Double-Byte Miscellaneous Instruction           BC-4 
+          BC.3.2    Rabbit Instructions                             BC-6 
+          BC.4    Z80/HD64180 ADDRESSING AND INSTRUCTIONS           BC-8 
+          BC.4.1    Inherent Instructions                           BC-9 
+          BC.4.2    Implicit Operand Instructions                   BC-9 
+          BC.4.3    Load Instruction                               BC-10 
+          BC.4.4    Call/Return Instructions                       BC-10 
+          BC.4.5    Jump and Jump to Subroutine Instructions       BC-10 
+          BC.4.6    Bit Manipulation Instructions                  BC-11 
+          BC.4.7    Interrupt Mode and Reset Instructions          BC-11 
+          BC.4.8    Input and Output Instructions                  BC-11 
+          BC.4.9    Register Pair Instructions                     BC-11 
+          BC.4.10   HD64180 Specific Instructions                  BC-12 
 
-        APPENDIX BD  ASST6 ASSEMBLER                                BD-1 
-          BD.1    ST6 REGISTER SET                                  BD-1 
-          BD.2    ST6 INSTRUCTION SET                               BD-1 
-          BD.2.1    Inherent Instructions                           BD-2 
-          BD.2.2    Conditional Branch Instructions                 BD-2 
-          BD.2.3    Bit Manipulation Instructions                   BD-2 
-          BD.2.4    Single Operand Instructions                     BD-2 
-          BD.2.5    Double Operand Instructions                     BD-2 
-          BD.2.6    Call to Subroutine and Jump Instructions        BD-3 
-          BD.2.7    Load and Store Instructions                     BD-3 
+        APPENDIX BD  ASSCMP ASSEMBLER                               BD-1 
+          BD.1    SC/MP REGISTER SET                                BD-1 
+          BD.2    SC/MP ADDRESSING MODES                            BD-1 
+          BD.3    SC/MP INSTRUCTION SET                             BD-2 
+          BD.3.1    Memory Reference Instructions                   BD-2 
+          BD.3.2    Immediate Instructions                          BD-2 
+          BD.3.3    Extension Register Instructions                 BD-3 
+          BD.3.4    Memory Increment/Decrement Instructions         BD-3 
+          BD.3.5    Transfer Instructions                           BD-3 
+          BD.3.6    Pointer Register Move Instructions              BD-3 
+          BD.3.7    Shift, Rotate, Serial I/O Instructions          BD-3 
+          BD.3.8    Single-Byte Miscellaneous Instructions          BD-4 
+          BD.3.9    Double-Byte Miscellaneous Instruction           BD-4 
 
-        APPENDIX BE  ASST7 ASSEMBLER                                BE-1 
-          BE.1    ST7 REGISTER SET                                  BE-1 
-          BE.2    ST7 INSTRUCTION SET                               BE-1 
-          BE.2.1    Inherent Instructions                           BE-4 
-          BE.2.2    Conditional Branch Instructions                 BE-4 
-          BE.2.3    Bit Test and Branch Instructions                BE-4 
-          BE.2.4    Bit Manipulation Instructions                   BE-5 
-          BE.2.5    Single Operand Instructions                     BE-5 
-          BE.2.6    Double Operand Instructions                     BE-5 
-          BE.2.7    Call to Subroutine and Jump Instructions        BE-5 
+        APPENDIX BE  ASST6 ASSEMBLER                                BE-1 
+          BE.1    ST6 REGISTER SET                                  BE-1 
+          BE.2    ST6 INSTRUCTION SET                               BE-1 
+          BE.2.1    Inherent Instructions                           BE-2 
+          BE.2.2    Conditional Branch Instructions                 BE-2 
+          BE.2.3    Bit Manipulation Instructions                   BE-2 
+          BE.2.4    Single Operand Instructions                     BE-2 
+          BE.2.5    Double Operand Instructions                     BE-2 
+          BE.2.6    Call to Subroutine and Jump Instructions        BE-3 
+          BE.2.7    Load and Store Instructions                     BE-3 
 
-        APPENDIX BF  ASST8 ASSEMBLER                                BF-1 
-          BF.1    ST8 REGISTER SET                                  BF-1 
-          BF.2    ST8 INSTRUCTION SET                               BF-1 
-          BF.2.1    Inherent Instructions                           BF-5 
-          BF.2.2    Conditional Branch Instructions                 BF-5 
-          BF.2.3    Bit Test and Branch Instructions                BF-5 
+        APPENDIX BF  ASST7 ASSEMBLER                                BF-1 
+          BF.1    ST7 REGISTER SET                                  BF-1 
+          BF.2    ST7 INSTRUCTION SET                               BF-1 
+          BF.2.1    Inherent Instructions                           BF-4 
+          BF.2.2    Conditional Branch Instructions                 BF-4 
+          BF.2.3    Bit Test and Branch Instructions                BF-4 
           BF.2.4    Bit Manipulation Instructions                   BF-5 
-          BF.2.5    Single Operand Instructions                     BF-6 
-          BF.2.6    Double Operand Instructions                     BF-6 
-          BF.2.7    Call to Subroutine and Jump Instructions        BF-7 
+          BF.2.5    Single Operand Instructions                     BF-5 
+          BF.2.6    Double Operand Instructions                     BF-5 
+          BF.2.7    Call to Subroutine and Jump Instructions        BF-5 
 
-        APPENDIX BG  ASZ8 ASSEMBLER                                 BG-1 
-          BG.1    Z8 REGISTER SET                                   BG-1 
-          BG.2    Z8 INSTRUCTION SET                                BG-1 
-          BG.2.1    Load Instructions                               BG-2 
-          BG.2.2    Arithmetic Instructions                         BG-2 
-          BG.2.3    Logical Instructions                            BG-3 
-          BG.2.4    Program Control Instructions                    BG-3 
-          BG.2.5    Bit Manipulation Instructions                   BG-3 
+        APPENDIX BG  ASST8 ASSEMBLER                                BG-1 
+          BG.1    ST8 REGISTER SET                                  BG-1 
+          BG.2    ST8 INSTRUCTION SET                               BG-1 
 
 
                                                                 Page xiv
         
 
 
-          BG.2.6    Block Transfer Instructions                     BG-3 
-          BG.2.7    Rotate and Shift Instructions                   BG-3 
-          BG.2.8    Cpu Control Instructions                        BG-3 
+          BG.2.1    Inherent Instructions                           BG-5 
+          BG.2.2    Conditional Branch Instructions                 BG-5 
+          BG.2.3    Bit Test and Branch Instructions                BG-5 
+          BG.2.4    Bit Manipulation Instructions                   BG-5 
+          BG.2.5    Single Operand Instructions                     BG-6 
+          BG.2.6    Double Operand Instructions                     BG-6 
+          BG.2.7    Call to Subroutine and Jump Instructions        BG-7 
 
-        APPENDIX BH  ASZ80 ASSEMBLER                                BH-1 
-          BH.1    .z80 DIRECTIVE                                    BH-1 
-          BH.2    .hd64 DIRECTIVE                                   BH-1 
-          BH.3    THE .__.CPU.  VARIABLE                            BH-2 
-          BH.4    Z80 REGISTER SET AND CONDITIONS                   BH-2 
-          BH.5    Z80 INSTRUCTION SET                               BH-3 
-          BH.5.1    Inherent Instructions                           BH-4 
-          BH.5.2    Implicit Operand Instructions                   BH-4 
-          BH.5.3    Load Instruction                                BH-5 
-          BH.5.4    Call/Return Instructions                        BH-5 
-          BH.5.5    Jump and Jump to Subroutine Instructions        BH-5 
-          BH.5.6    Bit Manipulation Instructions                   BH-6 
-          BH.5.7    Interrupt Mode and Reset Instructions           BH-6 
-          BH.5.8    Input and Output Instructions                   BH-6 
-          BH.5.9    Register Pair Instructions                      BH-6 
-          BH.5.10   HD64180/Z180 Specific Instructions              BH-7 
+        APPENDIX BH  ASZ8 ASSEMBLER                                 BH-1 
+          BH.1    Z8 REGISTER SET                                   BH-1 
+          BH.2    Z8 INSTRUCTION SET                                BH-1 
+          BH.2.1    Load Instructions                               BH-2 
+          BH.2.2    Arithmetic Instructions                         BH-2 
+          BH.2.3    Logical Instructions                            BH-3 
+          BH.2.4    Program Control Instructions                    BH-3 
+          BH.2.5    Bit Manipulation Instructions                   BH-3 
+          BH.2.6    Block Transfer Instructions                     BH-3 
+          BH.2.7    Rotate and Shift Instructions                   BH-3 
+          BH.2.8    Cpu Control Instructions                        BH-3 
+
+        APPENDIX BI  ASZ80 ASSEMBLER                                BI-1 
+          BI.1    .z80 DIRECTIVE                                    BI-1 
+          BI.2    .hd64 DIRECTIVE                                   BI-1 
+          BI.3    THE .__.CPU.  VARIABLE                            BI-2 
+          BI.4    Z80 REGISTER SET AND CONDITIONS                   BI-2 
+          BI.5    Z80 INSTRUCTION SET                               BI-3 
+          BI.5.1    Inherent Instructions                           BI-4 
+          BI.5.2    Implicit Operand Instructions                   BI-4 
+          BI.5.3    Load Instruction                                BI-5 
+          BI.5.4    Call/Return Instructions                        BI-5 
+          BI.5.5    Jump and Jump to Subroutine Instructions        BI-5 
+          BI.5.6    Bit Manipulation Instructions                   BI-6 
+          BI.5.7    Interrupt Mode and Reset Instructions           BI-6 
+          BI.5.8    Input and Output Instructions                   BI-6 
+          BI.5.9    Register Pair Instructions                      BI-6 
+          BI.5.10   HD64180/Z180 Specific Instructions              BI-7 
 
 
                                                                   Page 2
@@ -850,7 +868,11 @@
                 U.S.A.  
 
 
+                http://shop-pdp.net 
                 http://shop-pdp.kent.edu/ 
+
+                baldwin@shop-pdp.net 
+                baldwin@shop-pdp.kent.edu 
 
                 baldwin@kent.edu 
                 tel:  (330) 672 2531 
@@ -868,7 +890,7 @@
 
 
 
-           Copyright (C) 1989-2010 Alan R.  Baldwin 
+           Copyright (C) 1989-2012 Alan R.  Baldwin 
 
            This  program  is  free  software:   you  can redistribute it
         and/or modify it under the  terms  of  the  GNU  General  Public
@@ -1034,13 +1056,37 @@
 
                 Mike McCarty
                 mike dot mccarty at sbcglobal dot net
+
+
+
+
+        Thanks  to  Mengjin Su for his contribution of the PIC18Fxxx Ex-
+        tended Instructions.  
+
+                Mengjin Su
+                msu at micron dot com
+
+
+
+
 
 
                                                                   Page 7
         
 
 
-        ASxxxx Cross Assemblers, Version 5.03, October 2010 
+        Thanks  to  Carl  Rash for his contribution of the Visual Studio
+        2010 project files.  
+
+                Carl Rash
+                crash at triad dot rr dot com
+
+
+                                                                  Page 8
+        
+
+
+        ASxxxx Cross Assemblers, Version 5.05, August 2012 
 
         Submitted by Alan R.  Baldwin, 
         Kent State University, Kent, Ohio 
@@ -1058,14 +1104,14 @@
         61860, 6500,  6800(6802/6808),  6801(6803/HD6303),  6804,  6805,
         68HC(S)08,     6809,    68HC11,    68HC(S)12,    68HC16,    740,
         8048(8041/8022/8021)  8051,  8085(8080),  DS8xCxxx,  AVR,  EZ80,
-        F2MC8L/FX,  GameBoy(Z80), H8/3xx, Cypress PSoC(M8C), PIC, Rabbit
-        2000/3000, asst6, asst7,  asst8,  Z8,  and  Z80(HD64180)  series
-        microprocessors.   Each  assembler has a device specific section
-        which includes:  (1) device description, byte  order,  and  file
-        extension  information,  (2) a table of assembler general direc-
-        tives, special directives, assembler  mnemonics  and  associated
-        operation  codes,  (3)  machine specific code for processing the
-        device mnemonics, addressing modes, and special directives.  
+        F2MC8L/FX,  F8/3870,  GameBoy(Z80),  H8/3xx,  Cypress PSoC(M8C),
+        PIC, Rabbit 2000/3000, asst6, asst7, asst8, Z8, and Z80(HD64180)
+        series  microprocessors.   Each  assembler has a device specific
+        section which includes:  (1) device description, byte order, and
+        file  extension  information,  (2)  a table of assembler general
+        directives, special directives, assembler  mnemonics  and  asso-
+        ciated operation codes, (3) machine specific code for processing
+        the device mnemonics, addressing modes, and special directives. 
 
            The assemblers have a common device independent section which
         handles the details of file input/output, symbol  table  genera-
@@ -1094,18 +1140,19 @@
         listing files with the absolute linked addresses and data.  
 
 
-                                                                  Page 8
+                                                                  Page 9
         
 
 
            The  assemblers  and  linker have been tested using Linux and
         DJGPP, Cygwin, Symantec C/C++ V7.2, Borland Turbo C++ 3.0,  Open
-        Watcom V1.7a, VC6, and Visual Studio 2005.  Complete source code
-        and documentation for the assemblers and linker is included with
-        the  distribution.   Additionally,  test code for each assembler
-        and several microprocessor monitors (  ASSIST05  for  the  6805,
-        MONDEB  and ASSIST09 for the 6809, and BUFFALO 2.5 for the 6811)
-        are included as working examples of use of these assemblers.  
+        Watcom  V1.9,  VC6,  Visual Studio 2005, and Visual Studio 2010.
+        Complete source code and documentation for  the  assemblers  and
+        linker  is  included  with the distribution.  Additionally, test
+        code for each assembler and several  microprocessor  monitors  (
+        ASSIST05  for  the  6805,  MONDEB and ASSIST09 for the 6809, and
+        BUFFALO 2.5 for the 6811) are included as  working  examples  of
+        use of these assemblers.  
 
 
 
@@ -6815,13 +6862,14 @@
         Linux, DOS, and various flavors of Windows using the Linux  GCC,
         the Cygwin environment, the DJGPP environment, and the graphical
         user   interfaces   and    command    line    environments    of
-        MS Visual C++ V6.0,   MS Visual Studio 2005,   Open Watcom V1.7,
-        Symantec C/C++ V7.2, and Turbo C 3.0.  
+        MS Visual C++ V6.0,                       MS Visual Studio 2005,
+        MS Visual Studio 2010,  Open Watcom V1.7,   Symantec C/C++ V7.2,
+        and Turbo C 3.0.  
 
            Makefiles  for  Linux,  Cygwin,  DJGPP,  project  files and a
         makefile for Turbo C and psuedo makefiles and project files  for
-        VC6, VS2005, Open Watcom and Symantec are available to build all
-        the assemblers and the linker.  
+        VC6,  VS2005,  VS2010, Open Watcom and Symantec are available to
+        build all the assemblers and the linker.  
 
            Unpack  the  asxv5pxx.zip  file into an appropriate directory
         using the utility appropriate to your environment.  For  DOS  or
@@ -6847,13 +6895,13 @@
         'asxv5pxx' which will contain source directories for  each  sup-
         ported  processor  (as6800, asz80, ...), the machine independent
         source  (asxxsrc),  the  linker  source   (linksrc),   and   the
-        miscellaneous sources (asxxmisc).  Other directories include the
 
 
         BUILDING ASXXXX AND ASLINK                              Page 4-2
         
 
 
+        miscellaneous sources (asxxmisc).  Other directories include the
         documentation (asxdoc), test file directory (asxtst),  html  do-
         cumentation  (asxhtml),  NoICE  support  files  (noice), various
         debug monitors that can be assembled with the ASxxxx  assemblers
@@ -6904,14 +6952,14 @@
 
         will compile and link all the ASxxxx assemblers, the ASlink pro-
         gram, and the utility programs asxscn and asxcnv.  The make file
-        can make a single program by invoking make with the specific as-
-        sembler, linker, or utility you wish to build:  
+        can  make  a  single  program by invoking make with the specific
 
 
         BUILDING ASXXXX AND ASLINK                              PAGE 4-3
         BUILDING ASXXXX AND ASLINK UNDER CYGWIN
 
 
+        assembler, linker, or utility you wish to build:  
 
                 make aslink
 
@@ -6945,7 +6993,7 @@
            The  Borland  product  is  available in the Borland Turbo C++
         Suite which contains C++ Builder 1.0, Turbo C++ 4.5 for  Windows
         and  Turbo C++ 3.0 for DOS.  The DOS IDE will install and run on
-        any version of Windows (including Windows Vista [Longhorn]).  
+        x86 (16 or 32 bit) versions of Windows (not x64 versions).  
 
 
         4.4.1  Graphical User Interface 
@@ -7010,9 +7058,6 @@
         file calls the _setpath.bat file to set the path to the compiler
         directories in the environment variable PATH  and  then  invokes
         'make all'.  
-
-           The  command  file  _clean.bat may be used to remove all com-
-        piled .obj files and linked .exe executables.  
 
 
 
@@ -7086,10 +7131,10 @@
         4.6.1  Graphical User Interface 
 
 
-           Each  ASxxxx Assembler has a VS05 project file (*.vcproj) lo-
-        cated in a subdirectory of \asxv5pxx\asxmak\vs05\build.   Simply
-        enter  this project filename into the VS05 IDE and build/rebuild
-        the assembler.  
+           Each  ASxxxx  Assembler  has a VS2005 project file (*.vcproj)
+        located in a subdirectory of \asxv5pxx\asxmak\vs05\build.   Sim-
+        ply  enter  this  project  filename  into  the  VS2005  IDE  and
+        build/rebuild the assembler.  
 
 
         4.6.2  Command Line Interface 
@@ -7097,7 +7142,7 @@
 
            Open      a      command     prompt     window     in     the
         \asxv5pxx\asxmak\vs05\build directory.  The file make.bat  found
-        in  the  directory  can  be used to invoke the VS05 command line
+        in  the  directory can be used to invoke the VS2005 command line
         compiler.  The make.bat file assumes that the  Visual  C++  com-
         piler  has  been  installed in the default location.  If this is
         not the case then the line 
@@ -7125,8 +7170,8 @@
                 make aslink
 
 
-        The  VS05 command line compiler uses the information in the cor-
-        responding .vcproj file to compile and link the programs.  
+        The  VS2005  command  line  compiler uses the information in the
+        corresponding .vcproj file to compile and link the programs.  
 
            The  command  'make clean' is not required or valid as a make
         of anything does a complete rebuild of the program.  
@@ -7134,14 +7179,72 @@
 
 
         BUILDING ASXXXX AND ASLINK                              PAGE 4-7
-        BUILDING ASXXXX AND ASLINK WITH OPEN WATCOM V1.7
+        BUILDING ASXXXX AND ASLINK WITH MS VISUAL STUDIO 2010
 
 
-        4.7  BUILDING ASXXXX AND ASLINK WITH OPEN WATCOM V1.7 
+        4.7  BUILDING ASXXXX AND ASLINK WITH MS VISUAL STUDIO 2010 
 
 
 
         4.7.1  Graphical User Interface 
+
+
+           Each  ASxxxx  Assembler has a VS2010 project file (*.vcxproj)
+        located in a subdirectory of \asxv5pxx\asxmak\vs10\build.   Sim-
+        ply  enter  this  project  filename  into  the  VS2010  IDE  and
+        build/rebuild the assembler.  
+
+
+        4.7.2  Command Line Interface 
+
+
+           Open      a      command     prompt     window     in     the
+        \asxv5pxx\asxmak\vs10\build directory.  The file make.bat  found
+        in  the  directory can be used to invoke the VS2010 command line
+        compiler.  The make.bat file assumes that the  Visual  C++  com-
+        piler  has  been  installed in the default location.  If this is
+        not the case then the line 
+
+        call "c:\Program Files (x86)\Microsoft Visual Studio 10.0\
+                         VC\bin\vcvars32.bat"
+
+        must  be changed to match your environment.  The compiled object
+        code      modules      will      be      placed      in      the
+        \asxv5pxx\asxmak\vs10\build\as----\release directory and the ex-
+        ecutable files will be placed in  the  \asxv5pxx\asxmak\vs10\exe
+        directory.  
+
+
+
+           The command 
+
+                make all
+
+        will compile and link all the ASxxxx assemblers, the ASlink pro-
+        gram, and the utility programs asxscn and asxcnv.  The make file
+        can make a single program by invoking make with the specific as-
+        sembler, linker, or utility you wish to build:  
+
+                make aslink
+
+
+        The  VS2010  command  line  compiler uses the information in the
+        corresponding .vcxproj file to compile and link the programs.  
+
+           The  command  'make clean' is not required or valid as a make
+        of anything does a complete rebuild of the program.  
+
+
+
+        BUILDING ASXXXX AND ASLINK                              PAGE 4-8
+        BUILDING ASXXXX AND ASLINK WITH OPEN WATCOM V1.9
+
+
+        4.8  BUILDING ASXXXX AND ASLINK WITH OPEN WATCOM V1.9 
+
+
+
+        4.8.1  Graphical User Interface 
 
 
            Each ASxxxx Assembler has a set of project files (.prj, .tgt,
@@ -7150,7 +7253,7 @@
         ject files to match your local file locations.  
 
 
-        4.7.2  Command Line Interface 
+        4.8.2  Command Line Interface 
 
 
            Open      a      command     prompt     window     in     the
@@ -7190,8 +7293,8 @@
         file calls the _setpath.bat file to set the path to the compiler
 
 
-        BUILDING ASXXXX AND ASLINK                              PAGE 4-8
-        BUILDING ASXXXX AND ASLINK WITH OPEN WATCOM V1.7
+        BUILDING ASXXXX AND ASLINK                              PAGE 4-9
+        BUILDING ASXXXX AND ASLINK WITH OPEN WATCOM V1.9
 
 
         directories in the environment variable PATH  and  then  invokes
@@ -7201,7 +7304,7 @@
         of anything does a complete rebuild of the program.  
 
 
-        4.8  BUILDING ASXXXX AND ASLINK WITH SYMANTEC C/C++ V7.2 
+        4.9  BUILDING ASXXXX AND ASLINK WITH SYMANTEC C/C++ V7.2 
 
 
            The  Symantec  product is no longer available but is included
@@ -7213,7 +7316,7 @@
         2, or in Windows XP), Win95, and Windows NT.  
 
 
-        4.8.1  Graphical User Interface 
+        4.9.1  Graphical User Interface 
 
 
            Each  ASxxxx Assembler has a series of project specific files
@@ -7227,7 +7330,7 @@
         for each project.  
 
 
-        4.8.2  Command Line Interface 
+        4.9.2  Command Line Interface 
 
 
            Before  the  command line interface can be used you must per-
@@ -7248,7 +7351,7 @@
         must  be changed to match your environment.  The compiled object
 
 
-        BUILDING ASXXXX AND ASLINK                              PAGE 4-9
+        BUILDING ASXXXX AND ASLINK                             PAGE 4-10
         BUILDING ASXXXX AND ASLINK WITH SYMANTEC C/C++ V7.2
 
 
@@ -7280,8 +7383,16 @@
         directories in the environment variable PATH  and  then  invokes
         'make all'.  
 
-           The  command  file  _clean.bat may be used to remove all com-
-        piled .obj files and linked .exe executables.  
+
+        4.10  THE _CLEAN.BAT AND _PREP.BAT FILES 
+
+
+           Each  of  the  build  directories have two maintenance files:
+        _prep.bat and _clean.bat.  The command file  _prep.bat  prepares
+        the particular compiler directories for distribution by removing
+        all exteraneous files but keeping  the  final  compiled  execut-
+        ables.   The  _clean.bat command file performs the same function
+        as _prep.bat and removes the compiled executables.  
 
 
 
@@ -7866,7 +7977,861 @@
 
 
            Summary  of  changes/additions  to the ASxxxx Assemblers from
-        Version 4.11 to Version 5.03.  
+        Version 4.11 to Version 5.05.  
+
+        Version 5.00 Update 5
+        2012_08_01
+        
+        Update_05 for the ASxxxx Assembler and Linker Version 5.00
+        (use 'pkunzip -d u05500.zip' for extraction with MS-DOS)
+        (use 'unzip -L -a u05500.zip' for extraction with Linux)
+        
+               See the note about merging
+               this update with the
+               asxv5pxx distribution.
+        
+           This  update  for  Version  5.00  of the  ASxxxx Cross
+        Assemblers rolls up updates 1, 2, 3, and 4 with the addition of
+        a new assembler and fixes:
+        
+           (1)  A new cross assembler for the Fairchild
+                F8 microprocessor (or Mostek 3870).
+        
+           (2)  Minor syntactical changes for ANSI C compatability,
+                fix type conversion warnings, and update the
+                various build, make, and test files.
+        
+        
+           Update 4 Items
+        
+           (1)  The AS8048 base opcode value for the JMPP
+                instruction should be B3 and NOT 83.
+        
+           (2)  The AS8051 assembler calculates incorrect
+                offsets when using the program counter, ".",
+                as a destination in the instructions having
+                a PC-Relative addressing mode.  These
+                instructions include: jbc, jb, jbn, jc,
+                jnc, jz, jnz, cjne, and djnz.
+        
+        
+           Update 3 Items
+        
+           (1)  A new cross assembler for the Fairchild
+                F8 microprocessor (or Mostek 3870).
+        
+           (2)  Minor syntactical changes for ANSI C compatability,
+                fix type conversion warnings, and update the
+                various build, make, and test files.
+        
+           (1)  New cross assemblers for STMicroelectronics
+                ST6, ST7, and STM8 microprocessors.
+        
+           (2)  An ASlink list file update error fix (-u option)
+
+
+        CHANGE LOG                                              Page D-3
+        
+
+
+                causing some errors not to be inserted into the
+                created .rst file.
+        
+           (3)  An additional ASxxxx assembler option (-v) which
+                enables checking for out of range signed / unsigned
+                values in symbol equates and arithmetic operations.
+                This option has some ambiguities as internally the
+                assemblers use unsigned arithmetic for calculations.
+                (e.g. for a 2-byte machine -32768 and 32768 are both
+                represented as 0x8000)
+        
+        
+           Update 2 Items
+        
+           (1)  When using the assembler directive .end to specify
+                the code entry address the assembler fails to set
+                the variable .__.END. as a global.  Therefor the
+                value of .__.END. is not passed to the linker and
+                the start address frame is always zero.
+        
+           (2)  The linker will fail to create a start address frame
+                when there is no code generated within the area/bank
+                referenced by the .__.END. variable.
+        
+        
+           Update 1 Items
+        
+           (1)  The newest versions of gcc (and perhaps other
+                compilers) give warnings about missing arguments
+                in the fprintf() function.  This update replaces
+                fprintf(arg1, arg2) with fprintf(arg1, "%s", arg2)
+                in each affected line of code.
+        
+           (2)  The newest versions of gcc (and perhaps other
+                compilers) have defined 'getline' as a standard
+                function in 'stdio.h'.  This conflicts with the
+                function 'getline()' in the ASxxxx package.
+                All references to 'getline()' have been changed
+                to 'nxtline()'.
+        
+        
+           Before merging the asxv5pxx directory and subdirectories with
+        the V5.00 distribution the following files/directories must be
+        deleted:
+        
+                [asxv5pxx\asf2mc8\f8mch.c
+                [asxv5pxx\asf2mc8\f8adr.c
+                [asxv5pxx\asf2mc8\f8pst.c
+                [asxv5pxx\asf2mc8\f8.h
+        
+                [asxv5pxx\asxmak\vc6\asf2mc8]
+                [asxv5pxx\asxmak\vs05\asf2mc8]
+
+
+        CHANGE LOG                                              Page D-4
+        
+
+
+        
+        
+           Merge  the  update asxv5pxx directory and subdirectories with
+        the V5.00 distribution.  The following files  will  be  added  /
+        overwritten:  
+        
+        [asxv5pxx]
+            u01500.txt
+            u02500.txt
+            u03500.txt
+            u04500.txt
+            u05500.txt
+            _clean.bat
+            _path.bat
+            _prep.bat
+        
+        [asxv5pxx\as8048]
+            i48pst.c
+            t8048o.asm
+            t8048s.asm
+        
+        [asxv5pxx\as8051]
+            i51mch.c
+            t8051.bat
+            t8051r.asm
+            t8051rl.asm
+        
+        [asxv5pxx\ascheck\end]]
+            build.bat
+            t01.asm
+            t02.asm
+            t03.asm
+            t04.asm
+            t05.asm
+            t06.asm
+            t07.asm
+            t08.asm
+        
+        [asxv5pxx\asf2mc8]
+            f2mc8.h
+            f2mc8adr.c
+            f2mc8mch.c
+            f2mc8pst.c
+        
+        [asxv5pxx\asf8]
+            f8.h
+            f8adr.c
+            f8mch.c
+            f8pst.c
+            tf8err.asm
+            tf8err.bat
+            tf8ext.asm
+
+
+        CHANGE LOG                                              Page D-5
+        
+
+
+            tf8seq.asm
+            tf8seq.bat
+        
+        [asxv5pxx\aspic]
+            picmch.c
+        
+        [asxv5pxx\aspic\ptoa]
+            pictoasx.c
+            ptoa.h
+        
+        [asxv5pxx\asst6]
+            st6.h
+            st6adr.c
+            st6err.asm
+            st6err.bat
+            st6gbl.asm
+            st6mch.c
+            st6pst.c
+            tst6.asm
+            tst6.bat
+        
+        [asxv5pxx\asst7]
+            st7.h
+            st7adr.c
+            st7err.asm
+            st7err.bat
+            st7gbl.asm
+            st7mch.c
+            st7pst.c
+            tst7.asm
+            tst7.bat
+        
+        [asxv5pxx\asst8]
+            st8.h
+            st8adr.c
+            st8err.asm
+            st8err.bat
+            st8gbl.asm
+            st8mch.c
+            st8pst.c
+            tst8.asm
+            tst8.bat
+        
+        [asxv5pxx\asxhtml]
+            aschng.htm
+            ascont.htm
+            asmlnk.htm
+            asmlnk.pdf
+            asmlnk.txt
+            asf8.htm
+            asst6.htm
+            asst7.htm
+
+
+        CHANGE LOG                                              Page D-6
+        
+
+
+            asst8.htm
+            asxbld.htm
+            asxdoc.htm
+            asxxxx.htm
+        
+        [asxv5pxx\asxmak\cygwin\build]
+            makefile
+            _clean.bat
+            _prep.bat
+        
+        [asxv5pxx\asxmak\cygwin\build\backup]
+            makefile
+            _clean.bat
+            _prep.bat
+        
+        [asxv5pxx\asxmak\cygwin\misc]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\cygwin\misc\backup]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\djgpp\build]
+            build.bat
+            makefile
+            _clean.bat
+            _prep.bat
+        
+        [asxv5pxx\asxmak\djgpp\build\backup]
+            build.bat
+            makefile
+            _clean.bat
+            _prep.bat
+        
+        [asxv5pxx\asxmak\djgpp\misc]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\djgpp\misc\backup]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\linux\build]
+            makefile
+            _clean.bat
+            _prep.bat
+        
+        [asxv5pxx\asxmak\linux\build\backup]
+            makefile
+            _clean.bat
+            _prep.bat
+
+
+        CHANGE LOG                                              Page D-7
+        
+
+
+        
+        [asxv5pxx\asxmak\linux\misc]
+            tstscn.bat
+        
+        [asxv5pxx\asxmak\linux\misc\backup]
+            tstscn.bat
+        
+        [asxv5pxx\asxmak\symantec\build]
+            asf2mc8.def
+            asf2mc8.DPD
+            asf2mc8.lnk
+            asf2mc8.mak
+            asf2mc8.opn
+            asf2mc8.prj
+            asf8.DPD
+            asf8.LNK
+            asf8.MAK
+            asf8.OPN
+            asf8.prj
+            asst6.DEF
+            asst6.DPD
+            asst6.LNK
+            asst6.MAK
+            asst6.OPN
+            asst6.prj
+            asst7.DEF
+            asst7.DPD
+            asst7.LNK
+            asst7.MAK
+            asst7.OPN
+            asst7.prj
+            asst8.DEF
+            asst8.DPD
+            asst8.LNK
+            asst8.MAK
+            asst8.OPN
+            asst8.prj
+            make.bat
+            _clean.bat
+            _makeall.bat
+            _prep.bat
+            _setpath.bat
+        
+        [asxv5pxx\asxmak\symantec\build\backup]
+            make.bat
+            _clean.bat
+            _makeall.bat
+            _prep.bat
+            _setpath.bat
+        
+        [asxv5pxx\asxmak\symantec\misc]
+            tstscn.bat
+
+
+        CHANGE LOG                                              Page D-8
+        
+
+
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\symantec\misc\backup]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\turboc30\build]
+            asf2mc8.dsk
+            asf2mc8.prj
+            ASF8.DSK
+            ASF8.PRJ
+            ASST6.DSK
+            ASST6.PRJ
+            ASST7.DSK
+            ASST7.PRJ
+            ASST8.DSK
+            ASST8.PRJ
+            makefile
+            _clean.bat
+            _makeall.bat
+        
+        [asxv5pxx\asxmak\turboc30\build\backup]
+            makefile
+            _clean.bat
+            _makeall.bat
+            _prep.bat
+            _setpath.bat
+        
+        [asxv5pxx\asxmak\turboc30\misc]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\turboc30\misc\backup]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\vc6\build]
+            make.bat
+            _clean.bat
+            _prep.bat
+        
+        [asxv5pxx\asxmak\vc6\build\asf2mc8]
+            asf2mc8.dsp
+            asf2mc8.dsw
+        
+        [asxv5pxx\asxmak\vc6\build\asf8]
+            asf8.dsp
+            asf8.dsw
+        
+        [asxv5pxx\asxmak\vc6\build\asst6]
+            asst6.dsp
+            asst6.dsw
+
+
+        CHANGE LOG                                              Page D-9
+        
+
+
+        
+        [asxv5pxx\asxmak\vc6\build\asst7]
+            asst7.dsp
+            asst7.dsw
+        
+        [asxv5pxx\asxmak\vc6\build\asst8]
+            asst8.dsp
+            asst8.dsw
+        
+        [asxv5pxx\asxmak\vc6\build\backup]
+            make.bat
+            _clean.bat
+            _prep.bat
+        
+        [asxv5pxx\asxmak\vc6\misc]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\vc6\misc\backup]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\vs05\build]
+            make.bat
+            _clean.bat
+            _prep.bat
+        
+        [asxv5pxx\asxmak\vs05\build\asf2mc8]
+            asf2mc8.sln
+            asf2mc8.vcproj
+        
+        [asxv5pxx\asxmak\vs05\build\asf8]
+            asf8.sln
+            asf8.vcproj
+        
+        [asxv5pxx\asxmak\vs05\build\asst6]
+            asst6.sln
+            asst6.vcproj
+        
+        [asxv5pxx\asxmak\vs05\build\asst7]
+            asst7.sln
+            asst7.vcproj
+        
+        [asxv5pxx\asxmak\vs05\build\asst8]
+            asst8.sln
+            asst8.vcproj
+        
+        [asxv5pxx\asxmak\vs05\build\backup]
+            make.bat
+            _clean.bat
+            _prep.bat
+        
+
+
+        CHANGE LOG                                             Page D-10
+        
+
+
+        [asxv5pxx\asxmak\vs05\misc]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\vs05\misc\backup]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\vs10\build]
+            make.bat
+            _clean.bat
+            _prep.bat
+        
+        [asxv5pxx\asxmak\vs10\build\as1802]
+            as1802.sln
+            as1802.suo
+            as1802.vcxproj
+            as1802.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as2650]
+            as2650.sln
+            as2650.suo
+            as2650.vcxproj
+            as2650.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as430]
+            as430.sln
+            as430.suo
+            as430.vcxproj
+            as430.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as61860]
+            as61860.sln
+            as61860.suo
+            as61860.vcxproj
+            as61860.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as6500]
+            as6500.sln
+            as6500.suo
+            as6500.vcxproj
+            as6500.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as6800]
+            as6800.sln
+            as6800.suo
+            as6800.vcxproj
+            as6800.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as6801]
+            as6801.sln
+            as6801.suo
+
+
+        CHANGE LOG                                             Page D-11
+        
+
+
+            as6801.vcxproj
+            as6801.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as6804]
+            as6804.sln
+            as6804.suo
+            as6804.vcxproj
+            as6804.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as6805]
+            as6805.sln
+            as6805.suo
+            as6805.vcxproj
+            as6805.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as6808]
+            as6808.sln
+            as6808.suo
+            as6808.vcxproj
+            as6808.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as6809]
+            as6809.sln
+            as6809.suo
+            as6809.vcxproj
+            as6809.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as6811]
+            as6811.sln
+            as6811.suo
+            as6811.vcxproj
+            as6811.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as6812]
+            as6812.sln
+            as6812.suo
+            as6812.vcxproj
+            as6812.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as6816]
+            as6816.sln
+            as6816.suo
+            as6816.vcxproj
+            as6816.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as740]
+            as740.sln
+            as740.suo
+            as740.vcxproj
+            as740.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as8048]
+
+
+        CHANGE LOG                                             Page D-12
+        
+
+
+            as8048.sln
+            as8048.suo
+            as8048.vcxproj
+            as8048.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as8051]
+            as8051.sln
+            as8051.suo
+            as8051.vcxproj
+            as8051.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as8085]
+            as8085.sln
+            as8085.suo
+            as8085.vcxproj
+            as8085.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\as8xcxxx]
+            as8xcxxx.sln
+            as8xcxxx.suo
+            as8xcxxx.vcxproj
+            as8xcxxx.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asavr]
+            asavr.sln
+            asavr.suo
+            asavr.vcxproj
+            asavr.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\ascheck]
+            ascheck.sln
+            ascheck.suo
+            ascheck.vcxproj
+            ascheck.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asez80]
+            asez80.sln
+            asez80.suo
+            asez80.vcxproj
+            asez80.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asf2mc8]
+            asf2mc8.sln
+            asf2mc8.suo
+            asf2mc8.vcxproj
+            asf2mc8.vcxproj.filters
+        
+        pasxv5pxx\asxmak\vs10\build\asf8]
+            asf8.sln
+            asf8.suo
+            asf8.vcxproj
+            asf8.vcxproj.filters
+
+
+        CHANGE LOG                                             Page D-13
+        
+
+
+        
+        [asxv5pxx\asxmak\vs10\build\asgb]
+            asgb.sln
+            asgb.suo
+            asgb.vcxproj
+            asgb.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\ash8]
+            ash8.sln
+            ash8.suo
+            ash8.vcxproj
+            ash8.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\aslink]
+            aslink.sln
+            aslink.suo
+            aslink.vcxproj
+            aslink.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asm8c]
+            asm8c.sln
+            asm8c.suo
+            asm8c.vcxproj
+            asm8c.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\aspic]
+            aspic.sln
+            aspic.suo
+            aspic.vcxproj
+            aspic.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asrab]
+            asrab.sln
+            asrab.suo
+            asrab.vcxproj
+            asrab.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asscmp]
+            asscmp.sln
+            asscmp.suo
+            asscmp.vcxproj
+            asscmp.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asst6]
+            asst6.sln
+            asst6.suo
+            asst6.vcxproj
+            asst6.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asst7]
+            asst7.sln
+            asst7.suo
+
+
+        CHANGE LOG                                             Page D-14
+        
+
+
+            asst7.vcxproj
+            asst7.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asst8]
+            asst8.sln
+            asst8.suo
+            asst8.vcxproj
+            asst8.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asxcnv]
+            asxcnv.sln
+            asxcnv.suo
+            asxcnv.vcxproj
+            asxcnv.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asxscn]
+            asxscn.sln
+            asxscn.suo
+            asxscn.vcxproj
+            asxscn.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asz8]
+            asz8.sln
+            asz8.suo
+            asz8.vcxproj
+            asz8.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\asz80]
+            asz80.sln
+            asz80.suo
+            asz80.vcxproj
+            asz80.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\build\backup]
+            make.bat
+            _clean.bat
+            _prep.bat
+        
+        [asxv5pxx\asxmak\vs10\build\s19os9]
+            s19os9.sln
+            s19os9.vcxproj
+            s19os9.vcxproj.filters
+        
+        [asxv5pxx\asxmak\vs10\misc]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\vs10\misc\backup]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\watcom\build]
+
+
+        CHANGE LOG                                             Page D-15
+        
+
+
+            asf2mc8.lk1
+            asf2mc8.mk
+            asf2mc8.mk1
+            asf2mc8.tgt
+            asf2mc8.wpj
+            asf8.lk1
+            asf8.mk
+            asf8.mk1
+            asf8.tgt
+            asf8.wpj
+            asst6.lk1
+            asst6.mk
+            asst6.mk1
+            asst6.tgt
+            asst6.wpj
+            asst7.lk1
+            asst7.mk
+            asst7.mk1
+            asst7.tgt
+            asst7.wpj
+            asst8.lk1
+            asst8.mk
+            asst8.mk1
+            asst8.tgt
+            asst8.wpj
+            make.bat
+            _clean.bat
+            _makeall.bat
+            _prep.bat
+            _setpath.bat
+        
+        [asxv5pxx\asxmak\watcom\build\backup]
+            make.bat
+            _clean.bat
+            _makeall.bat
+            _prep.bat
+            _setpath.bat
+        
+        [asxv5pxx\asxmak\watcom\misc]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxmak\watcom\misc\backup]
+            tstscn.bat
+            tstwtee.bat
+        
+        [asxv5pxx\asxxmisc]
+            asxxscan.c
+        
+        [asxv5pxx\asxxsrc]
+            asdata.c
+            asexpr.c
+
+
+        CHANGE LOG                                             Page D-16
+        
+
+
+            aslex.c
+            aslist.c
+            asmain.c
+            asmcro.c
+            asout.c
+            assubr.c
+            asxxxx.h
+        
+        [asxv5pxx\linksrc]
+            aslink.h
+            lkbank.c
+            lkdata.c
+            lklex.c
+            lklist.c
+            lkmain.c
+            lkrloc3.c
+            lkrloc4.c
+            lksym.c
+        
+        [asxv5pxx\s19os9]
+            s19os9.c
+        
+        
+           You must recompile the ASxxxx Assemblers
+        to incorporate the update.
+
+
+
+        2011_07_24 Version 5.00 Update 4
+        
+           This  update  for  Version  5.00  of the  ASxxxx Cross
+        Assemblers includes fixes for the following errors:
+        
+           (1)  The AS8048 base opcode value for the
+                JMPP instruction should be B3 and NOT 83.
+        
+           (2)  The AS8051 assembler calculates incorrect
+                offsets when using the program counter, ".",
+                as a destination in the instructions having
+                a PC-Relative addressing mode.  These
+                instructions include: jbc, jb, jbn, jc,
+                jnc, jz, jnz, cjne, and djnz.
+
+
 
         2010_10_31 Version 5.00 Update 3
         
@@ -7875,6 +8840,12 @@
         three new assemblers and fixes:
         
            (1)  New cross assemblers for STMicroelectronics
+
+
+        CHANGE LOG                                             Page D-17
+        
+
+
                 ST6, ST7, and STM8 microprocessors.
         
            (2)  An ASlink list file update error fix (-u option)
@@ -7917,12 +8888,6 @@
                 function 'getline()' in the ASxxxx package.
                 All references to 'getline()' have been changed
                 to 'nxtline()'.
-
-
-        CHANGE LOG                                              Page D-3
-        
-
-
 
 
 
@@ -7933,6 +8898,12 @@
         
            (1)  When using the assembler directive .end to specify
                 the code entry address the assembler fails to set
+
+
+        CHANGE LOG                                             Page D-18
+        
+
+
                 the variable .__.END. as a global.  Therefor the
                 value of .__.END. is not passed to the linker and
                 the start address frame is always zero.
@@ -7975,12 +8946,6 @@
             .irpc       define an indefinite repeat macro by characters
             .rept       define a repeating macro
             .mexit      exit to end of macro
-
-
-        CHANGE LOG                                              Page D-4
-        
-
-
             .endm       end of macro
             .nchr       assign number of characters to a symbol
             .narg       assign number of expansion arguments to a symbol
@@ -7991,6 +8956,12 @@
 
            The  following  additional  conditionals  provide  testing of
         string arguments most useful within macros:  
+
+
+        CHANGE LOG                                             Page D-19
+        
+
+
 
             .ifb        if argument blank
             .ifnb       if argument not blank
@@ -8032,12 +9003,6 @@
             .if    tf           if condition is true or false
 
 
-
-
-        CHANGE LOG                                              Page D-5
-        
-
-
            The  immediate  conditional statements have been added to the
         ASxxxx  assemblers.   These   conditionals   can   replace   the
         .if / ... / .endif construct for a single assembler source line: 
@@ -8049,6 +9014,12 @@
             .iifne      if argument != 0
             .iiflt      if argument <  0
             .iifge      if argument >= 0
+
+
+        CHANGE LOG                                             Page D-20
+        
+
+
             .iifle      if argument <= 0
             .iifgt      if argument >  0
         
@@ -8090,12 +9061,6 @@
             .iif    tf          if condition is true or false
 
 
-
-
-        CHANGE LOG                                              Page D-6
-        
-
-
            The  listing  options  for the ASxxxx assemblers has been up-
         dated to enable/disable any of the following parameters from be-
         ing output to a generated listing file:  
@@ -8107,6 +9072,12 @@
             cyc         machine cycles
             lin         assembler source line number
             src         assembler source code
+
+
+        CHANGE LOG                                             Page D-21
+        
+
+
             pag         paging control
             lst         listing of .list / .nlist
             md          macro definition
@@ -8147,12 +9118,6 @@
 
             .nlist   1,(!,lst)  ; enables listing even within
                                 ; a FALSE conditional block
-
-
-        CHANGE LOG                                              Page D-7
-        
-
-
 
 
 
@@ -8165,6 +9130,12 @@
                 ; . == 0
         
                 .org    1
+
+
+        CHANGE LOG                                             Page D-22
+        
+
+
                 .bndry  4
                 ; . == 4
 
@@ -8184,7 +9155,7 @@
            Added the SC/MP ASSCMP assembler to ASxxxx.
 
 
-        CHANGE LOG                                              Page D-8
+        CHANGE LOG                                             Page D-23
         
 
 
@@ -8230,7 +9201,7 @@
            wrong object code. Changed from 37 2A  to  37 3A.
 
 
-        CHANGE LOG                                              Page D-9
+        CHANGE LOG                                             Page D-24
         
 
 
@@ -8276,7 +9247,7 @@
                compile the s19os9 program.
 
 
-        CHANGE LOG                                             Page D-10
+        CHANGE LOG                                             Page D-25
         
 
 
@@ -8328,7 +9299,7 @@
                 aspic
 
 
-        CHANGE LOG                                             Page D-11
+        CHANGE LOG                                             Page D-26
         
 
 
@@ -8385,7 +9356,7 @@
 
 
 
-        CHANGE LOG                                             Page D-12
+        CHANGE LOG                                             Page D-27
         
 
 
@@ -8443,7 +9414,7 @@
                  containing the .end directive.  
 
 
-        CHANGE LOG                                             Page D-13
+        CHANGE LOG                                             Page D-28
         
 
 
@@ -16603,13 +17574,219 @@
 
                                    APPENDIX AX
 
+                                 ASF8 ASSEMBLER
+
+
+
+
+           The AS8 assembler supports the F8 and 3870 processor cores.  
+
+
+        ASF8 ASSEMBLER                                         Page AX-2
+        
+
+
+        AX.1  F8 REGISTERS 
+
+
+           The  following  is a list of register designations recognized
+        by the ASF8 assembler:  
+
+                r0-r11  -       Registers
+        
+                j       -       Scratch Pad Register r9
+        
+                hu      -       MSB of register H the
+                                  Data Counter Buffer Register
+                                  Scratch Pad Register r10
+                hl      -       LSB of register H the
+                                  Data Counter Buffer Register
+                                  Scratch Pad Register r11
+        
+                ku      -       MSB of register K the
+                                  Stack Buffer Register
+                kl      -       LSB of register K the
+                                  Stack Buffer Register
+        
+                qu      -       MSB of register Q a
+                                  Buffer Register for the
+                                  Data Counter or Program Counter
+                ql      -       LSB of register Q a
+                                  Buffer Register for the
+                                  Data Counter or Program Counter
+        
+                a       -       Accumulator
+        
+                is      -       Scratch Pad Address Register (ISAR)
+        
+                w       -       Status Register
+        
+                s       -       Register Addressed
+                                by is (unchanged)
+        
+                i       -       Register Addressed
+                                by is (incremented)
+        
+                d       -       Register Addressed
+                                by is (decremented)
+        
+                pc0     -       Program Counter
+                or p0, pc
+        
+                pc1     -       Program Counter Buffer or
+                or p1, p        Stack Register
+        
+                dc0     -       Data Counter
+                or d0, dc
+
+
+        ASF8 ASSEMBLER                                         PAGE AX-3
+        F8 REGISTERS
+
+
+        
+
+
+        AX.2  F8 INSTRUCTION SET 
+
+
+           The  following  list specifies the format for each addressing
+        mode supported by ASF8:  
+
+                #nibble         immediate  4-Bit data
+                #byte           immediate  8-Bit data
+                #word           immediate 16-Bit data
+        
+                #t3             3-Bit test condition
+                                [Zero Carry Sign]
+        
+                #t4             4-Bit test condition
+                                [Overflow Zero Carry Sign]
+        
+                r               register r0-r11 addressing and
+                                indirect addressing s, i, and d
+                                j is equivalent to r9
+                                hu (MSB of h) is equivalent to r10
+                                hl (LSB of h) is equivalent to r11
+        
+                ku and kl       MSB and LSB of k register
+        
+                qu and ql       MSB and LSB of q register
+        
+                h, k, or q      16-Bit registers
+                p0, pc0, or pc
+                p1 or p
+                d0, dc0, or dc
+        
+                w               status register
+        
+                is              Indirect Scratchpad Address Register
+        
+                label           call/jmp/branch label
+
+        The  terms  nibble, byte, word, t3, t4, and label may all be ex-
+        pressions.  
+
+           The  following tables list all F8 mnemonics recognized by the
+        ASF8 assembler.  
+
+
+        ASF8 ASSEMBLER                                         PAGE AX-4
+        F8 INSTRUCTION SET
+
+
+        AX.2.1  Accumulator Group Instructions 
+
+                lnk                     ai      #byte
+                ni      #byte           clr
+                ci      #byte           com
+                xi      #byte           inc
+                li      #byte           lis     #nibble
+                oi      #byte           sl      1
+                sl      4               sr      1
+                sr      4
+
+
+        AX.2.2  Branch Instructions 
+
+                bc      label           bp      label
+                bz      label           bt      #t3,label
+                bm      label           bnc     label
+                bno     label           bnz     label
+                bf      #t4,label       br7     label
+                br      label           jmp     label
+
+
+        AX.2.3  Memory Reference Instructions 
+
+                am                      amd
+                nm                      cm
+                xm                      lm
+                om                      st
+
+
+        AX.2.4  Address Register Instructions 
+
+                adc                     pk
+                pi      #word           xdc
+                lr      dc,q            lr      dc,h
+                dci     #word           lr      p0,q
+                lr      p,k             pop
+                lr      q,dc            lr      h,dc
+                lr      k,p
+
+
+
+
+        ASF8 ASSEMBLER                                         PAGE AX-5
+        F8 INSTRUCTION SET
+
+
+        AX.2.5  Scratchpad Register Instructions 
+
+                as      r               asd     r
+                ds      r
+                lr      a,r
+                lr      a,ku            lr      a,kl
+                lr      a,qu            lr      a,ql
+                lr      r,a
+                lr      ku,a            lr      kl,a
+                lr      qu,a            lr      ql,a
+                ns      r               xs      r
+
+
+        AX.2.6  Miscellaneous Instructions 
+
+                di                      ei
+                in      #byte           ins     #nibble
+                out     #byte           outs    #nibble
+                lr      is,a            lr      a,is
+                lr      w,j             lr      j,w
+                lisl    #0-#7           lisu    #0-#7
+                nop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   APPENDIX AY
+
                                  ASGB ASSEMBLER
 
 
 
 
 
-        AX.1  ACKNOWLEDGEMENT 
+        AY.1  ACKNOWLEDGEMENT 
 
 
            Thanks  to  Roger Ivie for his contribution of the ASGB cross
@@ -16619,7 +17796,7 @@
                 ivie at cc dot usu dot edu
 
 
-        AX.2  INTRODUCTION 
+        AY.2  INTRODUCTION 
 
 
            The  Gameboy uses an 8-bit processor which is closely related
@@ -16631,7 +17808,7 @@
         ASGB is based on ASZ80 and therefore uses the Z80 mnemonic set. 
 
 
-        AX.3  GAMEBOY REGISTER SET AND CONDITIONS 
+        AY.3  GAMEBOY REGISTER SET AND CONDITIONS 
 
 
            The following is a complete list of register designations and
@@ -16647,11 +17824,11 @@
                 Z  - zero bit set
 
 
-        ASGB ASSEMBLER                                         PAGE AX-2
+        ASGB ASSEMBLER                                         PAGE AY-2
         GAMEBOY INSTRUCTION SET
 
 
-        AX.4  GAMEBOY INSTRUCTION SET 
+        AY.4  GAMEBOY INSTRUCTION SET 
 
 
            The following tables list all Gameboy mnemnoics recognized by
@@ -16687,7 +17864,7 @@
         ficial sources are available on the internet.  
 
 
-        AX.4.1  .tile Directive 
+        AY.4.1  .tile Directive 
 
 
         Format:  
@@ -16705,7 +17882,7 @@
 
 
 
-        ASGB ASSEMBLER                                         PAGE AX-3
+        ASGB ASSEMBLER                                         PAGE AY-3
         GAMEBOY INSTRUCTION SET
 
 
@@ -16761,7 +17938,7 @@
 
 
 
-        ASGB ASSEMBLER                                         PAGE AX-4
+        ASGB ASSEMBLER                                         PAGE AY-4
         GAMEBOY INSTRUCTION SET
 
 
@@ -16773,7 +17950,7 @@
                 .tile "**   ** ++   ++ ..   ..         "
 
 
-        AX.4.2  Potentially Controversial Mnemonic Selection 
+        AY.4.2  Potentially Controversial Mnemonic Selection 
 
 
              Although the Gameboy processor is based on the Z80, it does
@@ -16784,7 +17961,7 @@
         publically-available Gameboy assemblers.  
 
 
-        AX.4.2.1  Auto-Indexing Loads  - 
+        AY.4.2.1  Auto-Indexing Loads  - 
 
              The  Gameboy provides instructions to load or store the ac-
         cumulator indirectly via HL and then subsequently  increment  or
@@ -16797,7 +17974,7 @@
                 ldi a,(hl)      ldi (hl),a
 
 
-        AX.4.2.2  Input and Output Operations  - 
+        AY.4.2.2  Input and Output Operations  - 
 
              The  Gameboy  replaces the Z80's separate address space for
         I/O with a mechanism similar to the zero page addressing of pro-
@@ -16818,11 +17995,11 @@
 
 
 
-        ASGB ASSEMBLER                                         PAGE AX-5
+        ASGB ASSEMBLER                                         PAGE AY-5
         GAMEBOY INSTRUCTION SET
 
 
-        AX.4.2.3  The 'stop' Instruction  - 
+        AY.4.2.3  The 'stop' Instruction  - 
 
              The  publically-available  documentation  for  the  Gameboy
         lists the 'stop' instruction as the two-byte instruction 10  00,
@@ -16833,7 +18010,7 @@
         struction 10.  
 
 
-        AX.4.3  Inherent Instructions 
+        AY.4.3  Inherent Instructions 
 
 
                 ccf             cpl
@@ -16846,7 +18023,7 @@
                 swap
 
 
-        AX.4.4  Implicit Operand Instructions 
+        AY.4.4  Implicit Operand Instructions 
 
 
                 adc a,[]        adc []
@@ -16870,11 +18047,11 @@
 
 
 
-        ASGB ASSEMBLER                                         PAGE AX-6
+        ASGB ASSEMBLER                                         PAGE AY-6
         GAMEBOY INSTRUCTION SET
 
 
-        AX.4.5  Load Instructions 
+        AY.4.5  Load Instructions 
 
 
                 ld rg,[]        ld [],rg
@@ -16888,7 +18065,7 @@
                 ldi a,(hl)      ldi (hl),a
 
 
-        AX.4.6  Call/Return Instructions 
+        AY.4.6  Call/Return Instructions 
 
 
                 call C,label    ret C
@@ -16900,7 +18077,7 @@
                 rst n
 
 
-        AX.4.7  Jump Instructions 
+        AY.4.7  Jump Instructions 
 
 
                 jp C,label      jp NC,label
@@ -16913,7 +18090,7 @@
                 jr label
 
 
-        AX.4.8  Bit Manipulation Instructions 
+        AY.4.8  Bit Manipulation Instructions 
 
 
                 bit n,[]
@@ -16923,18 +18100,18 @@
 
 
 
-        ASGB ASSEMBLER                                         PAGE AX-7
+        ASGB ASSEMBLER                                         PAGE AY-7
         GAMEBOY INSTRUCTION SET
 
 
-        AX.4.9  Input and Output Instructions 
+        AY.4.9  Input and Output Instructions 
 
 
                 in a,(n)        in a,(c)
                 out (n),a       out (c),a
 
 
-        AX.4.10  Register Pair Instructions 
+        AY.4.10  Register Pair Instructions 
 
 
                 add hl,rp       add hl,sp
@@ -16955,7 +18132,7 @@
 
 
 
-                                   APPENDIX AY
+                                   APPENDIX AZ
 
                                  ASH8 ASSEMBLER
 
@@ -16963,7 +18140,7 @@
 
 
 
-        AY.1  H8/3XX REGISTER SET 
+        AZ.1  H8/3XX REGISTER SET 
 
         The following is a list of the H8 registers used by ASH8:  
 
@@ -16974,7 +18151,7 @@
                 ccr                     condition code
 
 
-        AY.2  H8/3XX INSTRUCTION SET 
+        AZ.2  H8/3XX INSTRUCTION SET 
 
 
              The  following  tables list all H8/3xx mnemonics recognized
@@ -17001,7 +18178,7 @@
         
 
 
-        ASH8 ASSEMBLER                                         PAGE AY-2
+        ASH8 ASSEMBLER                                         PAGE AZ-2
         H8/3XX INSTRUCTION SET
 
 
@@ -17026,7 +18203,7 @@
         struction, refer to the H8/3xx technical data for valid modes.  
 
 
-        AY.2.1  Inherent Instructions 
+        AZ.2.1  Inherent Instructions 
 
                 eepmov
                 nop
@@ -17035,7 +18212,7 @@
                 rts
 
 
-        AY.2.2  Branch Instructions 
+        AZ.2.2  Branch Instructions 
 
                 bcc     label                   bcs     label
                 beq     label                   bf      label
@@ -17051,11 +18228,11 @@
                 bsr     label
 
 
-        ASH8 ASSEMBLER                                         PAGE AY-3
+        ASH8 ASSEMBLER                                         PAGE AZ-3
         H8/3XX INSTRUCTION SET
 
 
-        AY.2.3  Single Operand Instructions 
+        AZ.2.3  Single Operand Instructions 
 
                 Free Form
         
@@ -17095,11 +18272,11 @@
                 push.w  rn                      pop.w   rn
 
 
-        ASH8 ASSEMBLER                                         PAGE AY-4
+        ASH8 ASSEMBLER                                         PAGE AZ-4
         H8/3XX INSTRUCTION SET
 
 
-        AY.2.4  Double Operand Instructions 
+        AZ.2.4  Double Operand Instructions 
 
                 Free Form
         
@@ -17151,11 +18328,11 @@
                                                 xor.b   #xx:8,ccr
 
 
-        ASH8 ASSEMBLER                                         PAGE AY-5
+        ASH8 ASSEMBLER                                         PAGE AZ-5
         H8/3XX INSTRUCTION SET
 
 
-        AY.2.5  Mov Instructions 
+        AZ.2.5  Mov Instructions 
 
                 Free Form
         
@@ -17205,11 +18382,11 @@
                 mov.b   rnB,label               mov.w   rn,label
 
 
-        ASH8 ASSEMBLER                                         PAGE AY-6
+        ASH8 ASSEMBLER                                         PAGE AZ-6
         H8/3XX INSTRUCTION SET
 
 
-        AY.2.6  Bit Manipulation Instructions 
+        AZ.2.6  Bit Manipulation Instructions 
 
                 bld     #xx:3,rnB               bld     #xx:3,@rn
                 bld     #xx:3,@dir              bld     #xx:3,dir
@@ -17252,11 +18429,11 @@
                 bixor   #xx:3,*@dir             bixor   #xx:3,*dir
 
 
-        ASH8 ASSEMBLER                                         PAGE AY-7
+        ASH8 ASSEMBLER                                         PAGE AZ-7
         H8/3XX INSTRUCTION SET
 
 
-        AY.2.7  Extended Bit Manipulation Instructions 
+        AZ.2.7  Extended Bit Manipulation Instructions 
 
                 bset    #xx:3,rnB               bset    #xx:3,@rn
                 bset    #xx:3,@dir              bset    #xx:3,dir
@@ -17287,7 +18464,7 @@
                 btst    rnB,*@dir               btst    rnB,*dir
 
 
-        AY.2.8  Condition Code Instructions 
+        AZ.2.8  Condition Code Instructions 
 
                 andc    #xx:8,ccr               andc    #xx:8
                 and     #xx:8,ccr               and.b   #xx:8,ccr
@@ -17304,11 +18481,11 @@
                 stc     ccr,rnB                 stc     rnB
 
 
-        ASH8 ASSEMBLER                                         PAGE AY-8
+        ASH8 ASSEMBLER                                         PAGE AZ-8
         H8/3XX INSTRUCTION SET
 
 
-        AY.2.9  Other Instructions 
+        AZ.2.9  Other Instructions 
 
                 divxu   rnB,rn                  divxu.b rnB,rn
         
@@ -17321,7 +18498,7 @@
                 movtpe.b  @label,rnB            movtpe.b  label,rnB
 
 
-        AY.2.10  Jump and Jump to Subroutine Instructions 
+        AZ.2.10  Jump and Jump to Subroutine Instructions 
 
                 jmp     @rn                     jmp     @@dir
                 jmp     @label                  jmp     label
@@ -17342,7 +18519,7 @@
 
 
 
-                                   APPENDIX AZ
+                                   APPENDIX BA
 
                                  ASM8C ASSEMBLER
 
@@ -17350,7 +18527,7 @@
 
 
 
-        AZ.1  M8C REGISTER SET 
+        BA.1  M8C REGISTER SET 
 
         The following is a list of the M8C registers used by ASM8C:  
 
@@ -17360,7 +18537,7 @@
                 F       -   Flags
 
 
-        AZ.2  M8C ADDRESSING MODES 
+        BA.2  M8C ADDRESSING MODES 
 
 
              The  M8C  instructions  may have none, one, or two operands
@@ -17388,7 +18565,7 @@
                                 by the mvi instruction and
 
 
-        ASM8C ASSEMBLER                                        PAGE AZ-2
+        ASM8C ASSEMBLER                                        PAGE BA-2
         M8C ADDRESSING MODES
 
 
@@ -17397,14 +18574,14 @@
 
 
 
-        AZ.3  M8C INSTRUCTION SET 
+        BA.3  M8C INSTRUCTION SET 
 
 
              The  following tables list all M8C mnemonics and addressing
         modes recognized by the ASM8C assembler.  
 
 
-        AZ.3.1  Double Operand Arithmetic Instructions 
+        BA.3.1  Double Operand Arithmetic Instructions 
 
                 adc  a,expr
                 adc  a,[expr]           adc  [expr],a
@@ -17433,11 +18610,11 @@
                 sub  [expr],expr        sub  [x+expr],expr
 
 
-        ASM8C ASSEMBLER                                        PAGE AZ-3
+        ASM8C ASSEMBLER                                        PAGE BA-3
         M8C INSTRUCTION SET
 
 
-        AZ.3.2  Double Operand Logic Instructions 
+        BA.3.2  Double Operand Logic Instructions 
 
                 and  a,expr             and  f,expr
                 and  a,[expr]           and  [expr],a
@@ -17458,7 +18635,7 @@
                 xor  reg[expr],expr     xor  reg[x+expr],expr
 
 
-        AZ.3.3  Miscellaneous Double Operand Instructions 
+        BA.3.3  Miscellaneous Double Operand Instructions 
 
                 swap a,x                swap a,sp
                 swap a,[expr]           swap a,[x+expr]
@@ -17467,7 +18644,7 @@
                 tst  reg[expr]          tst  reg[x+expr]
 
 
-        AZ.3.4  Single Operand Shift/Rotate Instructions 
+        BA.3.4  Single Operand Shift/Rotate Instructions 
 
                 asl  a
                 asl  [expr]             asl  [x+expr]
@@ -17482,11 +18659,11 @@
                 rrc  [expr]             rrc  [x+expr]
 
 
-        ASM8C ASSEMBLER                                        PAGE AZ-4
+        ASM8C ASSEMBLER                                        PAGE BA-4
         M8C INSTRUCTION SET
 
 
-        AZ.3.5  Miscellaneous Single Operand Instructions 
+        BA.3.5  Miscellaneous Single Operand Instructions 
 
                 cpl  a
         
@@ -17503,7 +18680,7 @@
                 tst  reg[expr]          tst  reg[x+expr]
 
 
-        AZ.3.6  Move Instructions 
+        BA.3.6  Move Instructions 
 
                 mov  a,x
                 mov  a,expr
@@ -17530,18 +18707,18 @@
 
 
 
-        ASM8C ASSEMBLER                                        PAGE AZ-5
+        ASM8C ASSEMBLER                                        PAGE BA-5
         M8C INSTRUCTION SET
 
 
-        AZ.3.7  Inherent Instructions 
+        BA.3.7  Inherent Instructions 
 
                 halt                    nop
                 romx                    ssc
                 ret                     reti
 
 
-        AZ.3.8  Branching Instructions 
+        BA.3.8  Branching Instructions 
 
                 lcall expr              ljmp  expr
                 jz    expr              jnz   expr
@@ -17549,7 +18726,7 @@
                 jacc  expr
 
 
-        AZ.3.9  Relative Table Read Instruction 
+        BA.3.9  Relative Table Read Instruction 
 
                 index expr
 
@@ -17566,7 +18743,7 @@
 
 
 
-                                   APPENDIX BA
+                                   APPENDIX BB
 
                                  ASPIC ASSEMBLER
 
@@ -17574,7 +18751,7 @@
 
 
 
-        BA.1  PIC ASSEMBLER NOTES 
+        BB.1  PIC ASSEMBLER NOTES 
 
         The  PIC  series  of  processors  uses  a non unified addressing
         scheme:  the instruction addressing is 1 per  instruction  word,
@@ -17591,7 +18768,7 @@
         divided by 2.  
 
 
-        BA.2  PROCESSOR SPECIFIC DIRECTIVES 
+        BB.2  PROCESSOR SPECIFIC DIRECTIVES 
 
 
              The  ASPIC  assembler has several processor specific assem-
@@ -17603,11 +18780,11 @@
 
 
 
-        ASPIC ASSEMBLER                                        PAGE BA-2
+        ASPIC ASSEMBLER                                        PAGE BB-2
         PROCESSOR SPECIFIC DIRECTIVES
 
 
-        BA.2.1  .pic Directive 
+        BB.2.1  .pic Directive 
 
         Format:  
 
@@ -17657,11 +18834,11 @@
 
 
 
-        ASPIC ASSEMBLER                                        PAGE BA-3
+        ASPIC ASSEMBLER                                        PAGE BB-3
         PROCESSOR SPECIFIC DIRECTIVES
 
 
-        BA.2.2  .picnopic Directive 
+        BB.2.2  .picnopic Directive 
 
         Format:  
 
@@ -17670,7 +18847,7 @@
              This directive deselects all processor specific mnemonics. 
 
 
-        BA.2.3  .pic12bit Directive 
+        BB.2.3  .pic12bit Directive 
 
         Format:  
 
@@ -17680,7 +18857,7 @@
         ics and opcode values to be used during the assembly process.  
 
 
-        BA.2.4  .pic14bit Directive 
+        BB.2.4  .pic14bit Directive 
 
         Format:  
 
@@ -17690,7 +18867,7 @@
         ics and opcode values to be used during the assembly process.  
 
 
-        BA.2.5  .pic16bit Directive 
+        BB.2.5  .pic16bit Directive 
 
         Format:  
 
@@ -17700,7 +18877,7 @@
         ics and opcode values to be used during the assembly process.  
 
 
-        BA.2.6  .pic20bit Directive 
+        BB.2.6  .pic20bit Directive 
 
         Format:  
 
@@ -17713,11 +18890,11 @@
 
 
 
-        ASPIC ASSEMBLER                                        PAGE BA-4
+        ASPIC ASSEMBLER                                        PAGE BB-4
         PROCESSOR SPECIFIC DIRECTIVES
 
 
-        BA.2.7  The .__.CPU.  Variable 
+        BB.2.7  The .__.CPU.  Variable 
 
 
              The  value of the pre-defined symbol '.__.CPU.' corresponds
@@ -17749,7 +18926,7 @@
         equal definitions.  
 
 
-        BA.2.8  .picfix Directive 
+        BB.2.8  .picfix Directive 
 
         Format:  
 
@@ -17768,11 +18945,11 @@
 
 
 
-        ASPIC ASSEMBLER                                        PAGE BA-5
+        ASPIC ASSEMBLER                                        PAGE BB-5
         PROCESSOR SPECIFIC DIRECTIVES
 
 
-        BA.2.9  .maxram Directive 
+        BB.2.9  .maxram Directive 
 
         Format:  
 
@@ -17781,7 +18958,7 @@
              Where value is the highest allowed ram address 
 
 
-        BA.2.10  .badram Directive 
+        BB.2.10  .badram Directive 
 
         Format:  
 
@@ -17799,7 +18976,7 @@
         register file address in the badram range.  
 
 
-        BA.2.11  .setdmm Directive 
+        BB.2.11  .setdmm Directive 
 
         Format:  
 
@@ -17826,11 +19003,11 @@
 
 
 
-        ASPIC ASSEMBLER                                        PAGE BA-6
+        ASPIC ASSEMBLER                                        PAGE BB-6
         12-BIT OPCODE PIC
 
 
-        BA.3  12-BIT OPCODE PIC 
+        BB.3  12-BIT OPCODE PIC 
 
 
         The 12-bit opcode family of PIC processors support the following
@@ -17866,7 +19043,7 @@
                 PIC12CR509A
 
 
-        BA.4  14-BIT OPCODE PIC 
+        BB.4  14-BIT OPCODE PIC 
 
 
         The 14-bit opcode family of PIC processors support the following
@@ -17884,7 +19061,7 @@
                                         to select the destination
 
 
-        ASPIC ASSEMBLER                                        PAGE BA-7
+        ASPIC ASSEMBLER                                        PAGE BB-7
         14-BIT OPCODE PIC
 
 
@@ -17942,7 +19119,7 @@
                 PIC16C710,      PIC16C711,      PIC16C715
 
 
-        ASPIC ASSEMBLER                                        PAGE BA-8
+        ASPIC ASSEMBLER                                        PAGE BB-8
         14-BIT OPCODE PIC
 
 
@@ -17960,7 +19137,7 @@
                 PIC16C923,      PIC16C924
 
 
-        BA.5  16-BIT OPCODE PIC 
+        BB.5  16-BIT OPCODE PIC 
 
 
         The 16-bit opcode family of PIC processors support the following
@@ -18000,7 +19177,7 @@
         
 
 
-        ASPIC ASSEMBLER                                        PAGE BA-9
+        ASPIC ASSEMBLER                                        PAGE BB-9
         16-BIT OPCODE PIC
 
 
@@ -18019,7 +19196,7 @@
                 PIC17CR43
 
 
-        BA.6  20-BIT ADDRESSING PIC 
+        BB.6  20-BIT ADDRESSING PIC 
 
 
              The  20-bit addressing family of PIC processors support the
@@ -18058,7 +19235,7 @@
                         label   label name
 
 
-        ASPIC ASSEMBLER                                       PAGE BA-10
+        ASPIC ASSEMBLER                                       PAGE BB-10
         20-BIT ADDRESSING PIC
 
 
@@ -18080,7 +19257,7 @@
                 PIC18C658,      PIC18C858
 
 
-        BA.7  PIC OPCODES 
+        BB.7  PIC OPCODES 
 
 
 
@@ -18116,7 +19293,7 @@
                 xorwf   []              PIC:12:14:16:20
 
 
-        ASPIC ASSEMBLER                                       PAGE BA-11
+        ASPIC ASSEMBLER                                       PAGE BB-11
         PIC OPCODES
 
 
@@ -18174,7 +19351,7 @@
         
 
 
-        ASPIC ASSEMBLER                                       PAGE BA-12
+        ASPIC ASSEMBLER                                       PAGE BB-12
         PIC OPCODES
 
 
@@ -18211,7 +19388,7 @@
 
 
 
-                                   APPENDIX BB
+                                   APPENDIX BC
 
                                  ASRAB ASSEMBLER
 
@@ -18221,7 +19398,7 @@
              
 
 
-        BB.1  ACKNOWLEDGMENT 
+        BC.1  ACKNOWLEDGMENT 
 
         Thanks to Ulrich Raich and Razaq Ijoduola for their contribution
         of the ASRAB cross assembler.  
@@ -18236,7 +19413,7 @@
 
 
 
-        BB.2  PROCESSOR SPECIFIC DIRECTIVES 
+        BC.2  PROCESSOR SPECIFIC DIRECTIVES 
 
 
              The ASRAB assembler is a port of the ASZ80 assembler.  This
@@ -18250,11 +19427,11 @@
 
 
 
-        ASRAB ASSEMBLER                                        PAGE BB-2
+        ASRAB ASSEMBLER                                        PAGE BC-2
         PROCESSOR SPECIFIC DIRECTIVES
 
 
-        BB.2.1  .r2k Directive 
+        BC.2.1  .r2k Directive 
 
         Format:  
 
@@ -18273,7 +19450,7 @@
              
 
 
-        BB.2.2  .hd64 Directive 
+        BC.2.2  .hd64 Directive 
 
         Format:  
 
@@ -18291,7 +19468,7 @@
              
 
 
-        BB.2.3  .z80 Directive 
+        BC.2.3  .z80 Directive 
 
         Format:  
 
@@ -18307,14 +19484,14 @@
 
 
 
-        ASRAB ASSEMBLER                                        PAGE BB-3
+        ASRAB ASSEMBLER                                        PAGE BC-3
         PROCESSOR SPECIFIC DIRECTIVES
 
 
              
 
 
-        BB.2.4  The .__.CPU.  Variable 
+        BC.2.4  The .__.CPU.  Variable 
 
 
              The  value of the pre-defined symbol '.__.CPU.' corresponds
@@ -18344,15 +19521,15 @@
         equal definitions.  
 
 
-        ASRAB ASSEMBLER                                        PAGE BB-4
+        ASRAB ASSEMBLER                                        PAGE BC-4
         PROCESSOR SPECIFIC DIRECTIVES
 
 
-        BB.3  RABBIT 2000/3000 ADDRESSING AND INSTRUCTIONS 
+        BC.3  RABBIT 2000/3000 ADDRESSING AND INSTRUCTIONS 
 
 
 
-        BB.3.1  Instruction Symbols 
+        BC.3.1  Instruction Symbols 
 
 
         b       Bit select
@@ -18395,7 +19572,7 @@
              
 
 
-        ASRAB ASSEMBLER                                        PAGE BB-5
+        ASRAB ASSEMBLER                                        PAGE BC-5
         RABBIT 2000/3000 ADDRESSING AND INSTRUCTIONS
 
 
@@ -18415,11 +19592,11 @@
         and v are not allowed to be external references.  
 
 
-        ASRAB ASSEMBLER                                        PAGE BB-6
+        ASRAB ASSEMBLER                                        PAGE BC-6
         RABBIT 2000/3000 ADDRESSING AND INSTRUCTIONS
 
 
-        BB.3.2  Rabbit Instructions 
+        BC.3.2  Rabbit Instructions 
 
 
              The  following list of instructions (with explicit address-
@@ -18470,7 +19647,7 @@
          CPL                    *LCALL x,mn
 
 
-        ASRAB ASSEMBLER                                        PAGE BB-7
+        ASRAB ASSEMBLER                                        PAGE BC-7
         RABBIT 2000/3000 ADDRESSING AND INSTRUCTIONS
 
 
@@ -18527,11 +19704,11 @@
 
 
 
-        ASRAB ASSEMBLER                                        PAGE BB-8
+        ASRAB ASSEMBLER                                        PAGE BC-8
         Z80/HD64180 ADDRESSING AND INSTRUCTIONS
 
 
-        BB.4  Z80/HD64180 ADDRESSING AND INSTRUCTIONS 
+        BC.4  Z80/HD64180 ADDRESSING AND INSTRUCTIONS 
 
         The following list specifies the format for each Z80/HD64180 ad-
         dressing mode supported by ASZ80:  
@@ -18570,11 +19747,11 @@
              
 
 
-        ASRAB ASSEMBLER                                        PAGE BB-9
+        ASRAB ASSEMBLER                                        PAGE BC-9
         Z80/HD64180 ADDRESSING AND INSTRUCTIONS
 
 
-        BB.4.1  Inherent Instructions 
+        BC.4.1  Inherent Instructions 
 
                 ccf             cpd
                 cpdr            cpi
@@ -18591,7 +19768,7 @@
              
 
 
-        BB.4.2  Implicit Operand Instructions 
+        BC.4.2  Implicit Operand Instructions 
 
                 adc     a,[]            adc     []
                 add     a,[]            add     []
@@ -18614,11 +19791,11 @@
              
 
 
-        ASRAB ASSEMBLER                                       PAGE BB-10
+        ASRAB ASSEMBLER                                       PAGE BC-10
         Z80/HD64180 ADDRESSING AND INSTRUCTIONS
 
 
-        BB.4.3  Load Instruction 
+        BC.4.3  Load Instruction 
 
                 ld      rg,[]           ld      [],rg
                 ld      (bc),a          ld      a,(bc)
@@ -18635,7 +19812,7 @@
              
 
 
-        BB.4.4  Call/Return Instructions 
+        BC.4.4  Call/Return Instructions 
 
                 call    C,label         ret     C
                 call    M,label         ret     M
@@ -18650,7 +19827,7 @@
              
 
 
-        BB.4.5  Jump and Jump to Subroutine Instructions 
+        BC.4.5  Jump and Jump to Subroutine Instructions 
 
                 jp      C,label         jp      M,label
                 jp      NC,label        jp      NZ,label
@@ -18666,11 +19843,11 @@
              
 
 
-        ASRAB ASSEMBLER                                       PAGE BB-11
+        ASRAB ASSEMBLER                                       PAGE BC-11
         Z80/HD64180 ADDRESSING AND INSTRUCTIONS
 
 
-        BB.4.6  Bit Manipulation Instructions 
+        BC.4.6  Bit Manipulation Instructions 
 
                 bit     n,[]
                 res     n,[]
@@ -18679,7 +19856,7 @@
              
 
 
-        BB.4.7  Interrupt Mode and Reset Instructions 
+        BC.4.7  Interrupt Mode and Reset Instructions 
 
                 im      n
                 im      n
@@ -18689,7 +19866,7 @@
              
 
 
-        BB.4.8  Input and Output Instructions 
+        BC.4.8  Input and Output Instructions 
 
                 in      a,(n)           in      rg,(c)
                 ind                     indr
@@ -18701,7 +19878,7 @@
              
 
 
-        BB.4.9  Register Pair Instructions 
+        BC.4.9  Register Pair Instructions 
 
                 add     hl,rp           add     ix,rp
                 add     iy,rp
@@ -18715,11 +19892,11 @@
              
 
 
-        ASRAB ASSEMBLER                                       PAGE BB-12
+        ASRAB ASSEMBLER                                       PAGE BC-12
         Z80/HD64180 ADDRESSING AND INSTRUCTIONS
 
 
-        BB.4.10  HD64180 Specific Instructions 
+        BC.4.10  HD64180 Specific Instructions 
 
                 in0     rg,(n)
                 out0    (n),rg
@@ -18744,7 +19921,7 @@
 
 
 
-                                   APPENDIX BC
+                                   APPENDIX BD
 
                                 ASSCMP ASSEMBLER
 
@@ -18752,7 +19929,7 @@
 
 
 
-        BC.1  SC/MP REGISTER SET 
+        BD.1  SC/MP REGISTER SET 
 
         The following is a list of the SC/MP registers used by ASSCMP:  
 
@@ -18760,7 +19937,7 @@
                 p1,p2,p3   -    16-bit pointer registers
 
 
-        BC.2  SC/MP ADDRESSING MODES 
+        BD.2  SC/MP ADDRESSING MODES 
 
 
              The  general addressing modes are normally described in the
@@ -18788,7 +19965,7 @@
 
 
 
-        ASSCMP ASSEMBLER                                       PAGE BC-2
+        ASSCMP ASSEMBLER                                       PAGE BD-2
         SC/MP ADDRESSING MODES
 
 
@@ -18809,14 +19986,14 @@
             ldi DATA
 
 
-        BC.3  SC/MP INSTRUCTION SET 
+        BD.3  SC/MP INSTRUCTION SET 
 
 
              The following tables list all SC/MP mnemonics recognized by
         the ASSCMP assembler.  
 
 
-        BC.3.1  Memory Reference Instructions 
+        BD.3.1  Memory Reference Instructions 
 
                 ld      @DISP(X) / #data        Load
                 st      @DISP(X) -------        Store
@@ -18828,7 +20005,7 @@
                 cad     @DISP(X) / #data        Complement and Add
 
 
-        BC.3.2  Immediate Instructions 
+        BD.3.2  Immediate Instructions 
 
                 ldi     #data / data    Load Immediate
                 ld      #data
@@ -18846,11 +20023,11 @@
                 cad     #data
 
 
-        ASSCMP ASSEMBLER                                       PAGE BC-3
+        ASSCMP ASSEMBLER                                       PAGE BD-3
         SC/MP INSTRUCTION SET
 
 
-        BC.3.3  Extension Register Instructions 
+        BD.3.3  Extension Register Instructions 
 
                 lde             Load AC from Extension
                 xae             Exchange AC and Extension
@@ -18862,13 +20039,13 @@
                 cae             Complement and Add Extension
 
 
-        BC.3.4  Memory Increment/Decrement Instructions 
+        BD.3.4  Memory Increment/Decrement Instructions 
 
                 dld     DISP(X)         Increment and Load
                 ild     DISP(X)         Decrement  aand Load
 
 
-        BC.3.5  Transfer Instructions 
+        BD.3.5  Transfer Instructions 
 
                 jmp     DISP(X)         Jump
                 jp      DISP(X)         Jump if Positive
@@ -18876,14 +20053,14 @@
                 jnz     DISP(X)         Jump if Not Zero
 
 
-        BC.3.6  Pointer Register Move Instructions 
+        BD.3.6  Pointer Register Move Instructions 
 
                 xpal    X               Exchange Pointer Low
                 xpah    X               Exchange Pointer High
                 xppc    X               Exchange Pointer with PC
 
 
-        BC.3.7  Shift, Rotate, Serial I/O Instructions 
+        BD.3.7  Shift, Rotate, Serial I/O Instructions 
 
                 sio             Serial Input/Output
                 sr              Shift Right
@@ -18894,11 +20071,11 @@
 
 
 
-        ASSCMP ASSEMBLER                                       PAGE BC-4
+        ASSCMP ASSEMBLER                                       PAGE BD-4
         SC/MP INSTRUCTION SET
 
 
-        BC.3.8  Single-Byte Miscellaneous Instructions 
+        BD.3.8  Single-Byte Miscellaneous Instructions 
 
                 halt            Halt
                 ccl             Clear Carry Link
@@ -18910,7 +20087,7 @@
                 nop             No Operation
 
 
-        BC.3.9  Double-Byte Miscellaneous Instruction 
+        BD.3.9  Double-Byte Miscellaneous Instruction 
 
                 dly     #data / data    Delay
 
@@ -18927,7 +20104,7 @@
 
 
 
-                                   APPENDIX BD
+                                   APPENDIX BE
 
                                  ASST6 ASSEMBLER
 
@@ -18935,7 +20112,7 @@
 
 
 
-        BD.1  ST6 REGISTER SET 
+        BE.1  ST6 REGISTER SET 
 
         The following is a list of the ST6 registers used by ASST6:  
 
@@ -18944,7 +20121,7 @@
                 v,w     -       8-bit scratch registers
 
 
-        BD.2  ST6 INSTRUCTION SET 
+        BE.2  ST6 INSTRUCTION SET 
 
 
              The following list specifies the format for each addressing
@@ -18972,18 +20149,18 @@
         ASST6 assembler.  
 
 
-        ASST6 ASSEMBLER                                        PAGE BD-2
+        ASST6 ASSEMBLER                                        PAGE BE-2
         ST6 INSTRUCTION SET
 
 
-        BD.2.1  Inherent Instructions 
+        BE.2.1  Inherent Instructions 
 
                 nop                     ret
                 reti                    stop
                 wait
 
 
-        BD.2.2  Conditional Branch Instructions 
+        BE.2.2  Conditional Branch Instructions 
 
                 jrc     label           jrnc    label
                 jrz     label           jrnz    label
@@ -18991,12 +20168,12 @@
                 jrs     #,*dir,label
 
 
-        BD.2.3  Bit Manipulation Instructions 
+        BE.2.3  Bit Manipulation Instructions 
 
                 set     #,*dir          res     #,*dir
 
 
-        BD.2.4  Single Operand Instructions 
+        BE.2.4  Single Operand Instructions 
 
                 clr     a               clr     *dir
                 com     a
@@ -19009,7 +20186,7 @@
                 rlc     a               sla     a
 
 
-        BD.2.5  Double Operand Instructions 
+        BE.2.5  Double Operand Instructions 
 
                 add     a,(x)           add     a,(y)
                 add     a,*dir          addi    a,#
@@ -19026,16 +20203,16 @@
 
 
 
-        ASST6 ASSEMBLER                                        PAGE BD-3
+        ASST6 ASSEMBLER                                        PAGE BE-3
         ST6 INSTRUCTION SET
 
 
-        BD.2.6  Call to Subroutine and Jump Instructions 
+        BE.2.6  Call to Subroutine and Jump Instructions 
 
                 call    ext             jmp     ext
 
 
-        BD.2.7  Load and Store Instructions 
+        BE.2.7  Load and Store Instructions 
 
                 ld      a,x             ld      a,y
                 ld      a,v             ld      a,w
@@ -19063,7 +20240,7 @@
 
 
 
-                                   APPENDIX BE
+                                   APPENDIX BF
 
                                  ASST7 ASSEMBLER
 
@@ -19071,7 +20248,7 @@
 
 
 
-        BE.1  ST7 REGISTER SET 
+        BF.1  ST7 REGISTER SET 
 
         The following is a list of the ST7 registers used by ASST7:  
 
@@ -19081,7 +20258,7 @@
                 s       -       16-bit stack pointer
 
 
-        BE.2  ST7 INSTRUCTION SET 
+        BF.2  ST7 INSTRUCTION SET 
 
 
              The following list specifies the format for each addressing
@@ -19100,7 +20277,7 @@
                 (x)             register indirect addressing
 
 
-        ASST7 ASSEMBLER                                        PAGE BE-2
+        ASST7 ASSEMBLER                                        PAGE BF-2
         ST7 INSTRUCTION SET
 
 
@@ -19154,7 +20331,7 @@
                                 but will report an error.
 
 
-        ASST7 ASSEMBLER                                        PAGE BE-3
+        ASST7 ASSEMBLER                                        PAGE BF-3
         ST7 INSTRUCTION SET
 
 
@@ -19201,11 +20378,11 @@
 
 
 
-        ASST7 ASSEMBLER                                        PAGE BE-4
+        ASST7 ASSEMBLER                                        PAGE BF-4
         ST7 INSTRUCTION SET
 
 
-        BE.2.1  Inherent Instructions 
+        BF.2.1  Inherent Instructions 
 
                 nop                     trap
                 wfi                     halt
@@ -19215,7 +20392,7 @@
                 rsp
 
 
-        BE.2.2  Conditional Branch Instructions 
+        BF.2.2  Conditional Branch Instructions 
 
                 jra     label
                 jrt     label           jrf     label
@@ -19240,7 +20417,7 @@
                 jrugt   [saddr]         jrule   [saddr]
 
 
-        BE.2.3  Bit Test and Branch Instructions 
+        BF.2.3  Bit Test and Branch Instructions 
 
                 btjt    saddr,#,label
                 btjf    saddr,#,label
@@ -19250,11 +20427,11 @@
 
 
 
-        ASST7 ASSEMBLER                                        PAGE BE-5
+        ASST7 ASSEMBLER                                        PAGE BF-5
         ST7 INSTRUCTION SET
 
 
-        BE.2.4  Bit Manipulation Instructions 
+        BF.2.4  Bit Manipulation Instructions 
 
                 bset    saddr,#
                 bres    saddr,#
@@ -19262,7 +20439,7 @@
                 bres    [saddr],#
 
 
-        BE.2.5  Single Operand Instructions 
+        BF.2.5  Single Operand Instructions 
 
                 neg     []              cpl     []
                 srl     []              rrc     []
@@ -19275,7 +20452,7 @@
                 pop     reg             push    reg
 
 
-        BE.2.6  Double Operand Instructions 
+        BF.2.6  Double Operand Instructions 
 
                 add     a,[]            adc     a,[]
                 and     a,[]            bcp     a,[]
@@ -19289,7 +20466,7 @@
                 ld      [],[]
 
 
-        BE.2.7  Call to Subroutine and Jump Instructions 
+        BF.2.7  Call to Subroutine and Jump Instructions 
 
                 call    []              jp      []
         
@@ -19308,7 +20485,7 @@
 
 
 
-                                   APPENDIX BF
+                                   APPENDIX BG
 
                                  ASST8 ASSEMBLER
 
@@ -19316,7 +20493,7 @@
 
 
 
-        BF.1  ST8 REGISTER SET 
+        BG.1  ST8 REGISTER SET 
 
         The following is a list of the ST8 registers used by ASST8:  
 
@@ -19328,7 +20505,7 @@
                 cc      -       8-bit condition code register
 
 
-        BF.2  ST8 INSTRUCTION SET 
+        BG.2  ST8 INSTRUCTION SET 
 
 
              The following list specifies the format for each addressing
@@ -19351,7 +20528,7 @@
                 (x)             register indirect addressing
 
 
-        ASST8 ASSEMBLER                                        PAGE BF-2
+        ASST8 ASSEMBLER                                        PAGE BG-2
         ST8 INSTRUCTION SET
 
 
@@ -19409,7 +20586,7 @@
                                 else
 
 
-        ASST8 ASSEMBLER                                        PAGE BF-3
+        ASST8 ASSEMBLER                                        PAGE BG-3
         ST8 INSTRUCTION SET
 
 
@@ -19428,7 +20605,7 @@
                                 but will report an error.
 
 
-        ASST8 ASSEMBLER                                        PAGE BF-4
+        ASST8 ASSEMBLER                                        PAGE BG-4
         ST8 INSTRUCTION SET
 
 
@@ -19480,11 +20657,11 @@
         dressing mode argument.  
 
 
-        ASST8 ASSEMBLER                                        PAGE BF-5
+        ASST8 ASSEMBLER                                        PAGE BG-5
         ST8 INSTRUCTION SET
 
 
-        BF.2.1  Inherent Instructions 
+        BG.2.1  Inherent Instructions 
 
                 nop                     trap
                 wfi                     wfi
@@ -19495,7 +20672,7 @@
                 rvf                     ccf
 
 
-        BF.2.2  Conditional Branch Instructions 
+        BG.2.2  Conditional Branch Instructions 
 
                 jra     label
                 jrt     label           jrf     label
@@ -19512,13 +20689,13 @@
                 jril    label           jrih    label
 
 
-        BF.2.3  Bit Test and Branch Instructions 
+        BG.2.3  Bit Test and Branch Instructions 
 
                 btjt    laddr,#,label
                 btjf    laddr,#,label
 
 
-        BF.2.4  Bit Manipulation Instructions 
+        BG.2.4  Bit Manipulation Instructions 
 
                 bccm    laddr,#
                 bcpl    laddr,#
@@ -19526,11 +20703,11 @@
                 bres    laddr,#
 
 
-        ASST8 ASSEMBLER                                        PAGE BF-6
+        ASST8 ASSEMBLER                                        PAGE BG-6
         ST8 INSTRUCTION SET
 
 
-        BF.2.5  Single Operand Instructions 
+        BG.2.5  Single Operand Instructions 
 
                 neg     []              cpl     []
                 srl     []              rrc     []
@@ -19551,7 +20728,7 @@
                 pop     reg             push    reg
 
 
-        BF.2.6  Double Operand Instructions 
+        BG.2.6  Double Operand Instructions 
 
                 add     a,[]            adc     a,[]
                 and     a,[]            bcp     a,[]
@@ -19582,11 +20759,11 @@
                 mov     laddr,laddr     mov     laddr,#
 
 
-        ASST8 ASSEMBLER                                        PAGE BF-7
+        ASST8 ASSEMBLER                                        PAGE BG-7
         ST8 INSTRUCTION SET
 
 
-        BF.2.7  Call to Subroutine and Jump Instructions 
+        BG.2.7  Call to Subroutine and Jump Instructions 
 
                 call    []              jp      []
                 callf   eaddr           callf   [eaddr].e
@@ -19607,7 +20784,7 @@
 
 
 
-                                   APPENDIX BG
+                                   APPENDIX BH
 
                                  ASZ8 ASSEMBLER
 
@@ -19615,7 +20792,7 @@
 
 
 
-        BG.1  Z8 REGISTER SET 
+        BH.1  Z8 REGISTER SET 
 
         The following is a list of the Z8 registers used by ASZ8:  
 
@@ -19623,7 +20800,7 @@
                 rr0 ... rr15    -       16-bit accumulators
 
 
-        BG.2  Z8 INSTRUCTION SET 
+        BH.2  Z8 INSTRUCTION SET 
 
 
              The  following  tables  list all Z8 mnemonics recognized by
@@ -19653,7 +20830,7 @@
         The terms data, addr, and offset may all be expressions.  
 
 
-        ASZ8 ASSEMBLER                                         PAGE BG-2
+        ASZ8 ASSEMBLER                                         PAGE BH-2
         Z8 INSTRUCTION SET
 
 
@@ -19689,14 +20866,14 @@
         tion, refer to the Z8 technical data for valid modes.  
 
 
-        BG.2.1  Load Instructions 
+        BH.2.1  Load Instructions 
 
                 clr     []
                 ld      [],[]           ldc     [],[]
                 pop     []              push    []
 
 
-        BG.2.2  Arithmetic Instructions 
+        BH.2.2  Arithmetic Instructions 
 
                 adc     [],[]           add     [],[]
                 cp      [],[]           da      []
@@ -19707,43 +20884,43 @@
 
 
 
-        ASZ8 ASSEMBLER                                         PAGE BG-3
+        ASZ8 ASSEMBLER                                         PAGE BH-3
         Z8 INSTRUCTION SET
 
 
-        BG.2.3  Logical Instructions 
+        BH.2.3  Logical Instructions 
 
                 and     [],[]           com     []
                 or      [],[]           xor     [],[]
 
 
-        BG.2.4  Program Control Instructions 
+        BH.2.4  Program Control Instructions 
 
                 call    []              djnz    [],[]
                 iret                    jp      CC,[]
                 jr      CC,[]           ret
 
 
-        BG.2.5  Bit Manipulation Instructions 
+        BH.2.5  Bit Manipulation Instructions 
 
                 tcm     [],[]           tm      [],[]
                 and     [],[]           or      [],[]
                 xor     [],[]
 
 
-        BG.2.6  Block Transfer Instructions 
+        BH.2.6  Block Transfer Instructions 
 
                 ldci    [],[]
 
 
-        BG.2.7  Rotate and Shift Instructions 
+        BH.2.7  Rotate and Shift Instructions 
 
                 rl      []              rlc     []
                 rr      []              rrc     []
                 sra     []              swap    []
 
 
-        BG.2.8  Cpu Control Instructions 
+        BH.2.8  Cpu Control Instructions 
 
                 ccf
                 di                      ei
@@ -19765,7 +20942,7 @@
 
 
 
-                                   APPENDIX BH
+                                   APPENDIX BI
 
                                  ASZ80 ASSEMBLER
 
@@ -19773,7 +20950,7 @@
 
 
 
-        BH.1  .z80 DIRECTIVE 
+        BI.1  .z80 DIRECTIVE 
 
         Format:  
 
@@ -19787,7 +20964,7 @@
         count to be output.  
 
 
-        BH.2  .hd64 DIRECTIVE 
+        BI.2  .hd64 DIRECTIVE 
 
         Format:  
 
@@ -19804,11 +20981,11 @@
 
 
 
-        ASZ80 ASSEMBLER                                        PAGE BH-2
+        ASZ80 ASSEMBLER                                        PAGE BI-2
         THE .__.CPU.  VARIABLE
 
 
-        BH.3  THE .__.CPU.  VARIABLE 
+        BI.3  THE .__.CPU.  VARIABLE 
 
 
              The  value of the pre-defined symbol '.__.CPU.' corresponds
@@ -19837,7 +21014,7 @@
         multiple non equal definitions.  
 
 
-        BH.4  Z80 REGISTER SET AND CONDITIONS 
+        BI.4  Z80 REGISTER SET AND CONDITIONS 
 
 
              The  following  is a complete list of register designations
@@ -19859,11 +21036,11 @@
 
 
 
-        ASZ80 ASSEMBLER                                        PAGE BH-3
+        ASZ80 ASSEMBLER                                        PAGE BI-3
         Z80 INSTRUCTION SET
 
 
-        BH.5  Z80 INSTRUCTION SET 
+        BI.5  Z80 INSTRUCTION SET 
 
 
              The following list specifies the format for each addressing
@@ -19901,11 +21078,11 @@
         a required addressing mode argument.  
 
 
-        ASZ80 ASSEMBLER                                        PAGE BH-4
+        ASZ80 ASSEMBLER                                        PAGE BI-4
         Z80 INSTRUCTION SET
 
 
-        BH.5.1  Inherent Instructions 
+        BI.5.1  Inherent Instructions 
 
                 ccf             cpd
                 cpdr            cpi
@@ -19920,7 +21097,7 @@
                 rrd             scf
 
 
-        BH.5.2  Implicit Operand Instructions 
+        BI.5.2  Implicit Operand Instructions 
 
                 adc     a,[]            adc     []
                 add     a,[]            add     []
@@ -19941,11 +21118,11 @@
                 xor     a,[]            xor     []
 
 
-        ASZ80 ASSEMBLER                                        PAGE BH-5
+        ASZ80 ASSEMBLER                                        PAGE BI-5
         Z80 INSTRUCTION SET
 
 
-        BH.5.3  Load Instruction 
+        BI.5.3  Load Instruction 
 
                 ld      rg,[]           ld      [],rg
                 ld      (bc),a          ld      a,(bc)
@@ -19961,7 +21138,7 @@
                 ldi                     ldir
 
 
-        BH.5.4  Call/Return Instructions 
+        BI.5.4  Call/Return Instructions 
 
                 call    C,label         ret     C
                 call    M,label         ret     M
@@ -19974,7 +21151,7 @@
                 call    label           ret
 
 
-        BH.5.5  Jump and Jump to Subroutine Instructions 
+        BI.5.5  Jump and Jump to Subroutine Instructions 
 
                 jp      C,label         jp      M,label
                 jp      NC,label        jp      NZ,label
@@ -19991,18 +21168,18 @@
                 jr      label
 
 
-        ASZ80 ASSEMBLER                                        PAGE BH-6
+        ASZ80 ASSEMBLER                                        PAGE BI-6
         Z80 INSTRUCTION SET
 
 
-        BH.5.6  Bit Manipulation Instructions 
+        BI.5.6  Bit Manipulation Instructions 
 
                 bit     n,[]
                 res     n,[]
                 set     n,[]
 
 
-        BH.5.7  Interrupt Mode and Reset Instructions 
+        BI.5.7  Interrupt Mode and Reset Instructions 
 
                 im      n
                 im      n
@@ -20010,7 +21187,7 @@
                 rst     n
 
 
-        BH.5.8  Input and Output Instructions 
+        BI.5.8  Input and Output Instructions 
 
                 in      a,(n)           in      rg,(c)
                 ind                     indr
@@ -20021,7 +21198,7 @@
                 outi                    otir
 
 
-        BH.5.9  Register Pair Instructions 
+        BI.5.9  Register Pair Instructions 
 
                 add     hl,rp           add     ix,rp
                 add     iy,rp
@@ -20036,11 +21213,11 @@
                 push    rp              pop     rp
 
 
-        ASZ80 ASSEMBLER                                        PAGE BH-7
+        ASZ80 ASSEMBLER                                        PAGE BI-7
         Z80 INSTRUCTION SET
 
 
-        BH.5.10  HD64180/Z180 Specific Instructions 
+        BI.5.10  HD64180/Z180 Specific Instructions 
 
                 in0     rg,(n)
                 out0    (n),rg
@@ -20073,7 +21250,7 @@
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: October 2010</B></P></H6>
+<H6><P><B>Last Updated: August 2012</B></P></H6>
 </BODY>
 </HTML>
 

@@ -1,7 +1,7 @@
 /* picmch.c */
 
 /*
- *  Copyright (C) 2001-2009  Alan R. Baldwin
+ *  Copyright (C) 2001-2012  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -335,7 +335,7 @@ struct mne *mp;
 
 	case X_PGOTO:
 		if (more()) {
-			pic_goto = absexpr();
+			pic_goto = (int) absexpr();
 		} else {
 			pic_goto = 1;
 		}

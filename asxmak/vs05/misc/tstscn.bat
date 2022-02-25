@@ -93,6 +93,10 @@ del ..\..\..\asxtst\asmt2bhi.lst
 ..\exe\asf2mc8.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 
+del ..\..\..\asxtst\asmt2bhi.lst
+..\exe\asf8.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+
 del ..\..\..\asxtst\asmt2blo.lst
 ..\exe\asgb.exe -glacxff ..\..\..\asxtst\asmt2blo.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
@@ -305,6 +309,18 @@ del ..\..\..\asf2mc8\tf2mc8.rst
 ..\exe\asxscn.exe ..\..\..\asf2mc8\tf2mc8.lst
 ..\exe\aslink.exe -nxu -g dirx=0 -g extx=0 -g offx=0 -g vx=0 -g bx=0 -g v22x=0 -g v5678x=0 ..\..\..\asf2mc8\tf2mc8.rel
 ..\exe\asxscn.exe -i ..\..\..\asf2mc8\tf2mc8.rst
+
+del ..\..\..\asf8\tf8seq.rel
+del ..\..\..\asf8\tf8seq.lst
+del ..\..\..\asf8\tf8seq.rst
+del ..\..\..\asf8\tf8ext.rel
+del ..\..\..\asf8\tf8ext.lst
+del ..\..\..\asf8\tf8ext.rst
+..\exe\asf8.exe -gloacxff ..\..\..\asf8\tf8seq.asm
+..\exe\asf8.exe -gloacxff ..\..\..\asf8\tf8ext.asm
+..\exe\asxscn.exe ..\..\..\asf8\tf8seq.lst
+..\exe\aslink.exe -nxu ..\..\..\asf8\tf8seq ..\..\..\asf8\tf8seq.rel ..\..\..\asf8\tf8ext.rel
+..\exe\asxscn.exe -i ..\..\..\asf8\tf2mc8.rst
 
 del ..\..\..\asgb\tgb.lst
 ..\exe\asgb.exe -glacxff ..\..\..\asgb\tgb.asm

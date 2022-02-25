@@ -24,6 +24,7 @@ make asgb
 make asrab
 make as8xcxxx
 make asf2mc8
+make asf8
 make ash8
 make asavr
 make aspic

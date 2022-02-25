@@ -1277,7 +1277,7 @@ valu_aerr(e, n)
 struct expr *e;
 int n;
 {
-	int v;
+	a_uint v;
 
 	if (is_abs(e)) {
 		v = e->e_addr;

@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#   25 October 2010			Created for LINUX     / make /
+#   6 July 2012			Created for LINUX     / make /
 #
 ######################################################################
 
@@ -31,6 +31,7 @@ all:	as1802		\
 	asavr		\
 	asez80		\
 	asf2mc8		\
+	asf8		\
 	asgb		\
 	ash8		\
 	asm8c		\
@@ -76,6 +77,7 @@ clean:
 	rm -f $(SRCCHECK)*.o
 	rm -f $(SRCEZ80)*.o
 	rm -f $(SRCF2MC8)*.o
+	rm -f $(SRCF8)*.o
 	rm -f $(SRCGB)*.o
 	rm -f $(SRCH8)*.o
 	rm -f $(SRCM8C)*.o
@@ -109,6 +111,7 @@ clean:
 	rm -f asavr
 	rm -f asez80
 	rm -f asf2mc8
+	rm -f asf8
 	rm -f asgb
 	rm -f ash8
 	rm -f asm8c
@@ -155,6 +158,7 @@ prep:
 	rm -f $(SRCCHECK)*.o
 	rm -f $(SRCEZ80)*.o
 	rm -f $(SRCF2MC8)*.o
+	rm -f $(SRCF8)*.o
 	rm -f $(SRCGB)*.o
 	rm -f $(SRCH8)*.o
 	rm -f $(SRCM8C)*.o
@@ -188,6 +192,7 @@ prep:
 	rm -f asavr
 	rm -f asez80
 	rm -f asf2mc8
+	rm -f asf8
 	rm -f asgb
 	rm -f ash8
 	rm -f asm8c
@@ -246,6 +251,7 @@ SRCAVR=		$(ASXBAS)asavr/
 SRCCHECK=	$(ASXBAS)ascheck/
 SRCEZ80=	$(ASXBAS)asez80/
 SRCF2MC8=	$(ASXBAS)asf2mc8/
+SRCF8=		$(ASXBAS)asf8/
 SRCGB=		$(ASXBAS)asgb/
 SRCH8=		$(ASXBAS)ash8/
 SRCM8C=		$(ASXBAS)asm8c/
@@ -287,7 +293,7 @@ as1802:	$(ASXXSRC) $(AS1802SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS1802SRC) -o as1802
 	cp as1802 -T $(DSTEXE)as1802
 	strip $(DSTEXE)as1802
-	chmod 777 $(DSTEXE)as1802
+	chmod 755 $(DSTEXE)as1802
 
 
 ####################################################################
@@ -304,7 +310,7 @@ as2650:	$(ASXXSRC) $(AS2650SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS2650SRC) -o as2650
 	cp as2650 $(DSTEXE)as2650
 	strip $(DSTEXE)as2650
-	chmod 777 $(DSTEXE)as2650
+	chmod 755 $(DSTEXE)as2650
 
 
 ####################################################################
@@ -321,7 +327,7 @@ as430:	$(ASXXSRC) $(AS430SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS430SRC) -o as430
 	cp as430 $(DSTEXE)as430
 	strip $(DSTEXE)as430
-	chmod 777 $(DSTEXE)as430
+	chmod 755 $(DSTEXE)as430
 
 ####################################################################
 # AS61860
@@ -337,7 +343,7 @@ as61860:	$(ASXXSRC) $(AS61860SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS61860SRC) -o as61860
 	cp as61860 $(DSTEXE)as61860
 	strip $(DSTEXE)as61860
-	chmod 777 $(DSTEXE)as61860
+	chmod 755 $(DSTEXE)as61860
 
 
 ####################################################################
@@ -354,7 +360,7 @@ as6500:	$(ASXXSRC) $(AS6500SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6500SRC) -o as6500
 	cp as6500 $(DSTEXE)as6500
 	strip $(DSTEXE)as6500
-	chmod 777 $(DSTEXE)as6500
+	chmod 755 $(DSTEXE)as6500
 
 
 ####################################################################
@@ -371,7 +377,7 @@ as6800:	$(ASXXSRC) $(AS6800SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6800SRC) -o as6800
 	cp as6800 $(DSTEXE)as6800
 	strip $(DSTEXE)as6800
-	chmod 777 $(DSTEXE)as6800
+	chmod 755 $(DSTEXE)as6800
 
 
 ####################################################################
@@ -388,7 +394,7 @@ as6801:	$(ASXXSRC) $(AS6801SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6801SRC) -o as6801
 	cp as6801 $(DSTEXE)as6801
 	strip $(DSTEXE)as6801
-	chmod 777 $(DSTEXE)as6801
+	chmod 755 $(DSTEXE)as6801
 
 
 ####################################################################
@@ -405,7 +411,7 @@ as6804:	$(ASXXSRC) $(AS6804SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6804SRC) -o as6804
 	cp as6804 $(DSTEXE)as6804
 	strip $(DSTEXE)as6804
-	chmod 777 $(DSTEXE)as6804
+	chmod 755 $(DSTEXE)as6804
 
 
 ####################################################################
@@ -422,7 +428,7 @@ as6805:	$(ASXXSRC) $(AS6805SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6805SRC) -o as6805
 	cp as6805 $(DSTEXE)as6805
 	strip $(DSTEXE)as6805
-	chmod 777 $(DSTEXE)as6805
+	chmod 755 $(DSTEXE)as6805
 
 
 ####################################################################
@@ -439,7 +445,7 @@ as6808:	$(ASXXSRC) $(AS6808SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6808SRC) -o as6808
 	cp as6808 $(DSTEXE)as6808
 	strip $(DSTEXE)as6808
-	chmod 777 $(DSTEXE)as6808
+	chmod 755 $(DSTEXE)as6808
 
 
 ####################################################################
@@ -456,7 +462,7 @@ as6809:	$(ASXXSRC) $(AS6809SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6809SRC) -o as6809
 	cp as6809 $(DSTEXE)as6809
 	strip $(DSTEXE)as6809
-	chmod 777 $(DSTEXE)as6809
+	chmod 755 $(DSTEXE)as6809
 
 
 ####################################################################
@@ -473,7 +479,7 @@ as6811:	$(ASXXSRC) $(AS6811SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6811SRC) -o as6811
 	cp as6811 $(DSTEXE)as6811
 	strip $(DSTEXE)as6811
-	chmod 777 $(DSTEXE)as6811
+	chmod 755 $(DSTEXE)as6811
 
 
 ####################################################################
@@ -490,7 +496,7 @@ as6812:	$(ASXXSRC) $(AS6812SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6812SRC) -o as6812
 	cp as6812 $(DSTEXE)as6812
 	strip $(DSTEXE)as6812
-	chmod 777 $(DSTEXE)as6812
+	chmod 755 $(DSTEXE)as6812
 
 
 ####################################################################
@@ -507,7 +513,7 @@ as6816:	$(ASXXSRC) $(AS6816SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6816SRC) -o as6816
 	cp as6816 $(DSTEXE)as6816
 	strip $(DSTEXE)as6816
-	chmod 777 $(DSTEXE)as6816
+	chmod 755 $(DSTEXE)as6816
 
 
 ####################################################################
@@ -524,7 +530,7 @@ as740:	$(ASXXSRC) $(AS740SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS740SRC) -o as740
 	cp as740 $(DSTEXE)as740
 	strip $(DSTEXE)as740
-	chmod 777 $(DSTEXE)as740
+	chmod 755 $(DSTEXE)as740
 
 
 ####################################################################
@@ -541,7 +547,7 @@ as8048:	$(ASXXSRC) $(AS8048SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8048SRC) -o as8048
 	cp as8048 $(DSTEXE)as8048
 	strip $(DSTEXE)as8048
-	chmod 777 $(DSTEXE)as8048
+	chmod 755 $(DSTEXE)as8048
 
 
 ####################################################################
@@ -558,7 +564,7 @@ as8051:	$(ASXXSRC) $(AS8051SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8051SRC) -o as8051
 	cp as8051 $(DSTEXE)as8051
 	strip $(DSTEXE)as8051
-	chmod 777 $(DSTEXE)as8051
+	chmod 755 $(DSTEXE)as8051
 
 
 ####################################################################
@@ -575,7 +581,7 @@ as8085:	$(ASXXSRC) $(AS8085SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8085SRC) -o as8085
 	cp as8085 $(DSTEXE)as8085
 	strip $(DSTEXE)as8085
-	chmod 777 $(DSTEXE)as8085
+	chmod 755 $(DSTEXE)as8085
 
 
 ####################################################################
@@ -592,7 +598,7 @@ as8xcxxx:	$(ASXXSRC) $(AS8XCXXXSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS8XCXXXSRC) -o as8xcxxx
 	cp as8xcxxx $(DSTEXE)as8xcxxx
 	strip $(DSTEXE)as8xcxxx
-	chmod 777 $(DSTEXE)as8xcxxx
+	chmod 755 $(DSTEXE)as8xcxxx
 
 
 ####################################################################
@@ -609,7 +615,7 @@ asavr:	$(ASXXSRC) $(ASAVRSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASAVRSRC) -o asavr
 	cp asavr $(DSTEXE)asavr
 	strip $(DSTEXE)asavr
-	chmod 777 $(DSTEXE)asavr
+	chmod 755 $(DSTEXE)asavr
 
 
 ####################################################################
@@ -626,7 +632,7 @@ ascheck:	$(ASXXSRC) $(ASCHECKSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASCHECKSRC) -o ascheck
 	cp ascheck $(DSTEXE)ascheck
 	strip $(DSTEXE)ascheck
-	chmod 777 $(DSTEXE)ascheck
+	chmod 755 $(DSTEXE)ascheck
 
 
 ####################################################################
@@ -643,14 +649,14 @@ asez80:	$(ASXXSRC) $(ASEZ80SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASEZ80SRC) -o asez80
 	cp asez80 $(DSTEXE)asez80
 	strip $(DSTEXE)asez80
-	chmod 777 $(DSTEXE)asez80
+	chmod 755 $(DSTEXE)asez80
 
 
 ####################################################################
 # ASF2MC8
 ####################################################################
 
-ASF2MC8 =	f8adr.o f8mch.o f8pst.o
+ASF2MC8 =	f2mc8adr.o f2mc8mch.o f2mc8pst.o
 
 ASF2MC8SRC =	$(addprefix $(SRCF2MC8),$(ASF2MC8))
 
@@ -660,7 +666,24 @@ asf2mc8:	$(ASXXSRC) $(ASF2MC8SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASF2MC8SRC) -o asf2mc8
 	cp asf2mc8 $(DSTEXE)asf2mc8
 	strip $(DSTEXE)asf2mc8
-	chmod 777 $(DSTEXE)asf2mc8
+	chmod 755 $(DSTEXE)asf2mc8
+
+
+####################################################################
+# ASF8
+####################################################################
+
+ASF8 =		f8adr.o f8mch.o f8pst.o
+
+ASF8SRC =	$(addprefix $(SRCF8),$(ASF8))
+
+$(ASF8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCF8)f8.h
+
+asf8:	$(ASXXSRC) $(ASF8SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASF8SRC) -o asf8
+	cp asf8 $(DSTEXE)asf8
+	strip $(DSTEXE)asf8
+	chmod 755 $(DSTEXE)asf8
 
 
 ####################################################################
@@ -677,7 +700,7 @@ asgb:	$(ASXXSRC) $(ASGBSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASGBSRC) -o asgb
 	cp asgb $(DSTEXE)asgb
 	strip $(DSTEXE)asgb
-	chmod 777 $(DSTEXE)asgb
+	chmod 755 $(DSTEXE)asgb
 
 
 ####################################################################
@@ -694,7 +717,7 @@ ash8:	$(ASXXSRC) $(ASH8SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASH8SRC) -o ash8
 	cp ash8 $(DSTEXE)ash8
 	strip $(DSTEXE)ash8
-	chmod 777 $(DSTEXE)ash8
+	chmod 755 $(DSTEXE)ash8
 
 
 ####################################################################
@@ -711,7 +734,7 @@ asm8c:	$(ASXXSRC) $(ASM8CSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASM8CSRC) -o asm8c
 	cp asm8c $(DSTEXE)asm8c
 	strip $(DSTEXE)asm8c
-	chmod 777 $(DSTEXE)asm8c
+	chmod 755 $(DSTEXE)asm8c
 
 
 ####################################################################
@@ -728,7 +751,7 @@ aspic:	$(ASXXSRC) $(ASPICSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASPICSRC) -o aspic
 	cp aspic $(DSTEXE)aspic
 	strip $(DSTEXE)aspic
-	chmod 777 $(DSTEXE)aspic
+	chmod 755 $(DSTEXE)aspic
 
 
 ####################################################################
@@ -745,7 +768,7 @@ asrab:	$(ASXXSRC) $(ASRABSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASRABSRC) -o asrab
 	cp asrab $(DSTEXE)asrab
 	strip $(DSTEXE)asrab
-	chmod 777 $(DSTEXE)asrab
+	chmod 755 $(DSTEXE)asrab
 
 
 ####################################################################
@@ -762,7 +785,7 @@ asscmp:	$(ASXXSRC) $(ASSCMPSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASSCMPSRC) -o asscmp
 	cp asscmp $(DSTEXE)asscmp
 	strip $(DSTEXE)asscmp
-	chmod 777 $(DSTEXE)asscmp
+	chmod 755 $(DSTEXE)asscmp
 
 
 ####################################################################
@@ -779,7 +802,7 @@ asst6:	$(ASXXSRC) $(ASST6SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASST6SRC) -o asst6
 	cp asst6 $(DSTEXE)asst6
 	strip $(DSTEXE)asst6
-	chmod 777 $(DSTEXE)asst6
+	chmod 755 $(DSTEXE)asst6
 
 
 ####################################################################
@@ -796,7 +819,7 @@ asst7:	$(ASXXSRC) $(ASST7SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASST7SRC) -o asst7
 	cp asst7 $(DSTEXE)asst7
 	strip $(DSTEXE)asst7
-	chmod 777 $(DSTEXE)asst7
+	chmod 755 $(DSTEXE)asst7
 
 
 ####################################################################
@@ -813,7 +836,7 @@ asst8:	$(ASXXSRC) $(ASST8SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASST8SRC) -o asst8
 	cp asst8 $(DSTEXE)asst8
 	strip $(DSTEXE)asst8
-	chmod 777 $(DSTEXE)asst8
+	chmod 755 $(DSTEXE)asst8
 
 
 ####################################################################
@@ -830,7 +853,7 @@ asz8:	$(ASXXSRC) $(ASZ8SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASZ8SRC) -o asz8
 	cp asz8 $(DSTEXE)asz8
 	strip $(DSTEXE)asz8
-	chmod 777 $(DSTEXE)asz8
+	chmod 755 $(DSTEXE)asz8
 
 
 ####################################################################
@@ -847,7 +870,7 @@ asz80:	$(ASXXSRC) $(ASZ80SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASZ80SRC) -o asz80
 	cp asz80 $(DSTEXE)asz80
 	strip $(DSTEXE)asz80
-	chmod 777 $(DSTEXE)asz80
+	chmod 755 $(DSTEXE)asz80
 
 
 ####################################################################
@@ -867,7 +890,7 @@ aslink:	$(ASLINKSRC)
 	$(LD) $(LDFLAGS) $(ASLINKSRC) -o aslink
 	cp aslink $(DSTEXE)aslink
 	strip $(DSTEXE)aslink
-	chmod 777 $(DSTEXE)aslink
+	chmod 755 $(DSTEXE)aslink
 
 
 ####################################################################
@@ -879,7 +902,7 @@ asxcnv:	$(SRCMISC)asxxconv.o
 	$(LD) $(LDFLAGS) $(SRCMISC)asxxconv.o -o asxcnv
 	cp asxcnv $(DSTEXE)asxcnv
 	strip $(DSTEXE)asxcnv
-	chmod 777 $(DSTEXE)asxcnv
+	chmod 755 $(DSTEXE)asxcnv
 
 
 ####################################################################
@@ -891,7 +914,7 @@ asxscn:	$(SRCMISC)asxxscan.o
 	$(LD) $(LDFLAGS) $(SRCMISC)asxxscan.o -o asxscn
 	cp asxscn $(DSTEXE)asxscn
 	strip $(DSTEXE)asxscn
-	chmod 777 $(DSTEXE)asxscn
+	chmod 755 $(DSTEXE)asxscn
 
 
 ####################################################################
@@ -903,7 +926,7 @@ s19os9:	$(SRCS19OS9)s19os9.o
 	$(LD) $(LDFLAGS) $(SRCS19OS9)s19os9.o -o s19os9
 	cp s19os9 $(DSTEXE)s19os9
 	strip $(DSTEXE)s19os9
-	chmod 777 $(DSTEXE)s19os9
+	chmod 755 $(DSTEXE)s19os9
 
 
 ### end ############################################################

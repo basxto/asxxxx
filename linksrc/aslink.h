@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- *  Copyright (C) 1989-2010  Alan R. Baldwin
+ *  Copyright (C) 1989-2012  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,8 @@
  * Local Definitions
  */
 
-#define	VERSION	"V05.03"
+#define	VERSION "V05.05"
+#define	COPYRIGHT "2012"
 
 /*
  * To include NoICE Debugging set non-zero

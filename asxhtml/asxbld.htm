@@ -22,8 +22,10 @@
     <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#SYMANTEC">Building ASxxxx and ASlink with Symantec C/C++ 7.2</A>
     <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#TURBOC">Building ASxxxx and ASlink with Turbo C++ 3.0</A>
     <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#VC6">Building ASxxxx and ASlink with VC6</A>
-    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#VS05">Building ASxxxx and ASlink with VS05</A>
+    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#VS05">Building ASxxxx and ASlink with VS2005</A>
+    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#VS10">Building ASxxxx and ASlink with VS2010</A>
     <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#WATCOM">Building ASxxxx and ASlink with Open Watcom</A>
+    <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "#BUILD">Maintenance Files _prep.bat and _clean.bat</A>
     <IMG SRC = "yellow.gif" ALT = "-">... <A HREF = "asxdoc.htm#TOP">Go to Documentation Index</A>
 
 </PRE></H4>
@@ -239,9 +241,6 @@ to invoke the Symantec command line compiler.  The  _makeall.bat
 file calls the _setpath.bat file to set the path to the compiler
 directories in the environment variable PATH  and  then  invokes
 'make all'.  
-
-   The  command  file  _clean.bat may be used to remove all com-
-piled .obj files and linked .exe executables.
   
 </PRE></B></H4>
 
@@ -314,9 +313,6 @@ file calls the _setpath.bat file to set the path to the compiler
 directories in the environment variable PATH  and  then  invokes
 'make all'.  
 
-   The  command  file  _clean.bat may be used to remove all com-
-piled .obj files and linked .exe executables.  
-
 </PRE></B></H4>
 <H5><A HREF= #Index> =&gt; Section Index</A></H5>
 
@@ -381,7 +377,7 @@ of anything does a complete rebuild of the program.
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
 <A NAME = "VS05"> </A>
 <H3><B>
-<IMG SRC = "green.gif" ALT = "-">... Building ASxxxx and ASlink with VS05</A>
+<IMG SRC = "green.gif" ALT = "-">... Building ASxxxx and ASlink with VS2005</A>
 </B></H3>
 
 <H4><B><PRE>
@@ -389,10 +385,10 @@ of anything does a complete rebuild of the program.
 Graphical User Interface 
 
 
-   Each  ASxxxx Assembler has a VS05 project file (*.vcproj) lo-
-cated in a subdirectory of \asxv5pxx\asxmak\vs05\build.   Simply
-enter  this project filename into the VS05 IDE and build/rebuild
-the assembler.  
+   Each  ASxxxx  Assembler  has a VS2005 project file (*.vcproj)
+located in a subdirectory of \asxv5pxx\asxmak\vs05\build.   Sim-
+ply  enter  this  project  filename  into  the  VS2005  IDE  and
+build/rebuild the assembler.  
 
 
 Command Line Interface 
@@ -400,7 +396,7 @@ Command Line Interface
 
    Open      a      command     prompt     window     in     the
 \asxv5pxx\asxmak\vs05\build directory.  The file make.bat  found
-in  the  directory  can  be used to invoke the VS05 command line
+in  the  directory can be used to invoke the VS2005 command line
 compiler.  The make.bat file assumes that the  Visual  C++  com-
 piler  has  been  installed in the default location.  If this is
 not the case then the line 
@@ -427,8 +423,66 @@ sembler, linker, or utility you wish to build:
         make aslink
 
 
-The  VS05 command line compiler uses the information in the cor-
-responding .vcproj file to compile and link the programs.  
+The  VS2005  command  line  compiler uses the information in the
+corresponding .vcproj file to compile and link the programs.  
+
+   The  command  'make clean' is not required or valid as a make
+of anything does a complete rebuild of the program.  
+
+</PRE></B></H4>
+<H5><A HREF= #Index> =&gt; Section Index</A></H5>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<A NAME = "VS10"> </A>
+<H3><B>
+<IMG SRC = "green.gif" ALT = "-">... Building ASxxxx and ASlink with VS2010</A>
+</B></H3>
+
+<H4><B><PRE>
+
+Graphical User Interface 
+
+
+   Each  ASxxxx  Assembler has a VS2010 project file (*.vcxproj)
+located in a subdirectory of \asxv5pxx\asxmak\vs10\build.   Sim-
+ply  enter  this  project  filename  into  the  VS2010  IDE  and
+build/rebuild the assembler.  
+
+
+Command Line Interface 
+
+
+   Open      a      command     prompt     window     in     the
+\asxv5pxx\asxmak\vs10\build directory.  The file make.bat  found
+in  the  directory can be used to invoke the VS2010 command line
+compiler.  The make.bat file assumes that the  Visual  C++  com-
+piler  has  been  installed in the default location.  If this is
+not the case then the line 
+
+call "c:\Program Files (x86)\Microsoft Visual Studio 10.0\
+                 VC\bin\vcvars32.bat"
+
+must  be changed to match your environment.  The compiled object
+code      modules      will      be      placed      in      the
+\asxv5pxx\asxmak\vs10\build\as----\release directory and the ex-
+ecutable files will be placed in  the  \asxv5pxx\asxmak\vs10\exe
+directory.  
+
+
+   The command 
+
+        make all
+
+will compile and link all the ASxxxx assemblers, the ASlink pro-
+gram, and the utility programs asxscn and asxcnv.  The make file
+can make a single program by invoking make with the specific as-
+sembler, linker, or utility you wish to build:  
+
+        make aslink
+
+
+The  VS2010  command  line  compiler uses the information in the
+corresponding .vcxproj file to compile and link the programs.  
 
    The  command  'make clean' is not required or valid as a make
 of anything does a complete rebuild of the program.  
@@ -500,6 +554,24 @@ of anything does a complete rebuild of the program.
 <H5><A HREF= #Index> =&gt; Section Index</A></H5>
 
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
+<A NAME = "BUILD"> </A>
+<H3><B>
+<IMG SRC = "green.gif" ALT = "-">... Maintenace Files _prep.bat and _clean.bat</A>
+</B></H3>
+
+<H4><B><PRE>
+
+   Each  of  the  build  directories have two maintenance files:
+_prep.bat and _clean.bat.  The command file  _prep.bat  prepares
+the particular compiler directories for distribution by removing
+all exteraneous files but keeping  the  final  compiled  execut-
+ables.   The  _clean.bat command file performs the same function
+as _prep.bat and removes the compiled executables.  
+  
+</PRE></B></H4>
+<H5><A HREF= #Index> =&gt; Section Index</A></H5>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
 
 <H4>
 <P><A HREF="asxxxx.htm#JUMP">
@@ -511,6 +583,6 @@ of anything does a complete rebuild of the program.
 <B>...  Home Page</B></P>
 </H4>
 
-<H6><P><B>Last Updated: April 2009</B></P></H6>
+<H6><P><B>Last Updated: August 2012</B></P></H6>
 </BODY> 
 </HTML>

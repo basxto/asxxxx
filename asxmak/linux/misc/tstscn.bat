@@ -93,6 +93,10 @@ rm -f ../../../asxtst/asmt2bhi.lst
 ../exe/asf2mc8 -glacxff ../../../asxtst/asmt2bhi.asm
 ../exe/asxscn ../../../asxtst/asmt2bhi.lst
 
+rm -f ../../../asxtst/asmt2bhi.lst
+../exe/asf8.exe -glacxff ../../../asxtst/asmt2bhi.asm
+../exe/asxscn.exe ../../../asxtst/asmt2bhi.lst
+
 rm -f ../../../asxtst/asmt2blo.lst
 ../exe/asgb -glacxff ../../../asxtst/asmt2blo.asm
 ../exe/asxscn ../../../asxtst/asmt2blo.lst
@@ -305,6 +309,18 @@ rm -f ../../../asf2mc8/tf2mc8.rst
 ../exe/asxscn ../../../asf2mc8/tf2mc8.lst
 ../exe/aslink -nxu -g dirx=0 -g extx=0 -g offx=0 -g vx=0 -g bx=0 -g v22x=0 -g v5678x=0 ../../../asf2mc8/tf2mc8.rel
 ../exe/asxscn -i ../../../asf2mc8/tf2mc8.rst
+
+rm -f ../../../asf8/tf8seq.rel
+rm -f ../../../asf8/tf8seq.lst
+rm -f ../../../asf8/tf8seq.rst
+rm -f ../../../asf8/tf8ext.rel
+rm -f ../../../asf8/tf8ext.lst
+rm -f ../../../asf8/tf8ext.rst
+../exe/asf8.exe -gloacxff ../../../asf8/tf8seq.asm
+../exe/asf8.exe -gloacxff ../../../asf8/tf8ext.asm
+../exe/asxscn.exe ../../../asf8/tf8seq.lst
+../exe/aslink.exe -nxu ../../../asf8/tf8seq ../../../asf8/tf8seq.rel ../../../asf8/tf8ext.rel
+../exe/asxscn.exe -i ../../../asf8/tf2mc8.rst
 
 rm -f ../../../asgb/tgb.lst
 ../exe/asgb -glacxff ../../../asgb/tgb.asm
