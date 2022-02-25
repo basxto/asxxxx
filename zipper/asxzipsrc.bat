@@ -1,53 +1,59 @@
 rem  Zip File Created  with Info-Zip   Zip v2.31
 rem  Zip File Verified with Info-Zip UnZip v5.52
 rem
-rem  Remove Old Zipped Files and asxv5pxx.txt
+rem Remove Old Versions
 rem
-del as*.zip
-del as*.txt
+del asxs*.*
 rem
 rem  Zip The asxv5pxx Directory and Subdirectories
 rem
 cd ..\..\
-asxv5pxx\zipper\zip.exe -r .\asxv5pxx\zipper\asxv5pxx.zip asxv5pxx\*.*
+asxv5pxx\zipper\zip.exe -r .\asxv5pxx\zipper\asxs5pxx.zip asxv5pxx\*.*
 cd asxv5pxx\zipper
-zip -T asxv5pxx.zip
+zip -T asxs5pxx.zip
+rem
+rem  Remove Zipped Files and the Zip/Unzip Utilities
+rem
+zip -d asxs5pxx.zip asxv5pxx\zipper\*.exe asxv5pxx\zipper\*.txt asxv5pxx\zipper\*.zip
+zip -T asxs5pxx.zip
 rem
 rem  Remove Non-Distribution Directories
 rem
-zip -d asxv5pxx.zip asxv5pxx\asxdoc\* asxv5pxx\asxhtmw\*
-zip -d asxv5pxx.zip asxv5pxx\updater\* asxv5pxx\test\*
+zip -d asxs5pxx.zip asxv5pxx\update\*
+zip -d asxs5pxx.zip asxv5pxx\asxdoc\asxrno\* asxv5pxx\asxhtmw\*
+zip -d asxs5pxx.zip asxv5pxx\updater\* asxv5pxx\test\*
 rem
-zip -d asxv5pxx.zip asxv5pxx\asxmak\cygwin\exe\* asxv5pxx\asxmak\djgpp\exe\*
-zip -d asxv5pxx.zip asxv5pxx\asxmak\linux\exe\* asxv5pxx\asxmak\symantec\exe\*
-zip -d asxv5pxx.zip asxv5pxx\asxmak\turboc30\exe\* asxv5pxx\asxmak\vc6\exe\*
-zip -d asxv5pxx.zip asxv5pxx\asxmak\vs05\exe\* asxv5pxx\asxmak\vs10\exe\*
-zip -d asxv5pxx.zip asxv5pxx\asxmak\watcom\exe\*
-zip -T asxv5pxx.zip
-rem
-rem  Remove Zip and Unzip Utilities
-rem
-zip -d asxv5pxx.zip asxv5pxx\zipper\*.exe
-zip -T asxv5pxx.zip
+zip -d asxs5pxx.zip asxv5pxx\asxmak\cygwin\exe\*.exe
+zip -d asxs5pxx.zip asxv5pxx\asxmak\djgpp\exe\*.exe
+zip -d asxs5pxx.zip asxv5pxx\asxmak\linux\exe\as*
+zip -d asxs5pxx.zip asxv5pxx\asxmak\linux\exe\s*
+zip -d asxs5pxx.zip asxv5pxx\asxmak\turboc30\exe\*.EXE
+zip -d asxs5pxx.zip asxv5pxx\asxmak\vc6\exe\*.exe
+zip -d asxs5pxx.zip asxv5pxx\asxmak\vs05\exe\*.exe
+zip -d asxs5pxx.zip asxv5pxx\asxmak\vs10\exe\*.exe
+zip -d asxs5pxx.zip asxv5pxx\asxmak\vs13\exe\*.exe
+zip -d asxs5pxx.zip asxv5pxx\asxmak\watcom\exe\*.exe
+zip -d asxs5pxx.zip asxv5pxx\asxmak\symantec\exe\*.EXE
+zip -T asxs5pxx.zip
 rem
 rem  Remove Pad File
 rem
-zip -d asxv5pxx.zip asxv5pxx\asxv5p00.xml
-zip -T asxv5pxx.zip
+zip -d asxs5pxx.zip asxv5pxx\asxv*.xml
+zip -d asxv5pxx.zip asxv5pxx\asxdoc\asxv*.xml
+zip -T asxs5pxx.zip
 rem
 rem  Copy Current readme.txt File To asxv5pxx.txt
 rem  And Add To The Zip Archive
 rem
-copy ..\readme.txt asxv5pxx.txt
-zip -g  asxv5pxx.zip asxv5pxx.txt
-zip -T asxv5pxx.zip
+copy ..\readme.txt asxs%1.txt
+zip -g asxs5pxx.zip asxs%1.txt
+zip -T asxs5pxx.zip
 rem
 rem  Change Name To Current Version
 rem
-ren asxv5pxx.txt asxv5p05.txt
-ren asxv5pxx.zip asxv5p05.zip
+ren asxs5pxx.zip asxs%1.zip
 rem
 rem  Final File Verification
 rem
-unzip -t asxv5p05.zip
+unzip -t asxs%1.zip
 

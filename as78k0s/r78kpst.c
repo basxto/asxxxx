@@ -1,7 +1,7 @@
-/* f8pst.c */
+/* R78KPST.C */
 
 /*
- *  Copyright (C) 2005-2009  Alan R. Baldwin
+ *  Copyright (C) 2014  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  */
 
 #include "asxxxx.h"
-#include "f2mc8.h"
+#include "r78k0s.h"
 
 /*
  * Coding Banks
@@ -57,16 +57,34 @@ char	mode0[32] = {	/* R_NORM */
 /*
  * Additional Relocation Mode Definitions
  *
- * Specification for the 3-bit CALLV addressing mode:
+ *	#define		R_5BIT	0100		No Bit Positioning
  */
-char	mode1[32] = {	/* R_3BIT */
-	'\200',	'\201',	'\202',	'\003',	'\004',	'\005',	'\006',	'\007',
-	'\015',	'\016',	'\017',	'\013',	'\014',	'\015',	'\016',	'\017',
+char	mode1[32] = {	/* R_5BIT */
+	'\000',	'\201',	'\202',	'\203',	'\204',	'\205',	'\006',	'\007',
+	'\010',	'\011',	'\012',	'\013',	'\014',	'\015',	'\016',	'\017',
 	'\020',	'\021',	'\022',	'\023',	'\024',	'\025',	'\026',	'\027',
 	'\030',	'\031',	'\032',	'\033',	'\034',	'\035',	'\036',	'\037'
 };
 
-/* None Required */
+/*
+ *	#define		R_3BITL	0200		Bit Positioning Required
+ */
+char	mode2[32] = {	/* R_3BITL */
+	'\201',	'\202',	'\203',	'\003',	'\004',	'\005',	'\006',	'\007',
+	'\010',	'\011',	'\012',	'\013',	'\014',	'\015',	'\016',	'\017',
+	'\020',	'\021',	'\022',	'\023',	'\024',	'\025',	'\026',	'\027',
+	'\030',	'\031',	'\032',	'\033',	'\034',	'\035',	'\036',	'\037'
+};
+
+/*
+ *	#define		R_3BITU	0300		Bit Positioning Required
+ */
+char	mode3[32] = {	/* R_3BITU */
+	'\204',	'\205',	'\206',	'\003',	'\004',	'\005',	'\006',	'\007',
+	'\010',	'\011',	'\012',	'\013',	'\014',	'\015',	'\016',	'\017',
+	'\020',	'\021',	'\022',	'\023',	'\024',	'\025',	'\026',	'\027',
+	'\030',	'\031',	'\032',	'\033',	'\034',	'\035',	'\036',	'\037'
+};
 
 /*
  *     *m_def is a pointer to the bit relocation definition.
@@ -82,16 +100,18 @@ char	mode1[32] = {	/* R_3BIT */
  *		a_uint	m_sbits;	Source Bit Mask
  *	};
  */
-struct	mode	mode[2] = {
-    {	&mode0[0],	0,	0x0000FFFF,	0x0000FFFF	},
-    {	&mode1[0],	0,	0x00000007,	0x00000007	}
+struct	mode	mode[4] = {
+    {	&mode0[0],	0,	0x0000FFFF,	0x0000FFFF	},	/* R_NORM  */
+    {	&mode1[0],	0,	0x0000003E,	0x0000003E	},	/* R_5BIT  */
+    {	&mode2[0],	1,	0x0000000E,	0x00000007	},	/* R_3BITL */
+    {	&mode3[0],	1,	0x00000070,	0x00000007	}	/* R_3BITU */
 };
 
 /*
- * Array of Pointers to MODE Structures
+ * Array of Pointers to mode Structures
  */
 struct	mode	*modep[16] = {
-	&mode[0],	&mode[1],	NULL,		NULL,
+	&mode[0],	&mode[1],	&mode[2],	&mode[3],
 	NULL,		NULL,		NULL,		NULL,
 	NULL,		NULL,		NULL,		NULL,
 	NULL,		NULL,		NULL,		NULL
@@ -107,7 +127,7 @@ struct	mne	mne[] = {
     {	NULL,	"CSEG",		S_ATYP,		0,	A_CSEG|A_1BYTE	},
     {	NULL,	"DSEG",		S_ATYP,		0,	A_DSEG|A_1BYTE	},
 
-    {	NULL,	".setdp",	S_SDP,		0,	0	},
+/*    {	NULL,	".setdp",	S_SDP,		0,	0	},	*/
 
 	/* system */
 
@@ -233,81 +253,67 @@ struct	mne	mne[] = {
 
     {	NULL,	".mdelete",	S_MACRO,	0,	O_MDEL	},
 
-	/* Machines */
+	/* 78K0S */
 
-    {	NULL,	".f2mc8l",	S_CPU,		0,	X_8L	},
-    {	NULL,	".f2mc8fx",	S_CPU,		0,	X_8FX	},
+    {	NULL,	"cmp",		S_ACC,		0,	0x11	},
+    {	NULL,	"xor",		S_ACC,		0,	0x41	},
+    {	NULL,	"and",		S_ACC,		0,	0x61	},
+    {	NULL,	"or",		S_ACC,		0,	0x71	},
+    {	NULL,	"add",		S_ACC,		0,	0x81	},
+    {	NULL,	"sub",		S_ACC,		0,	0x91	},
+    {	NULL,	"addc",		S_ACC,		0,	0xA1	},
+    {	NULL,	"subc",		S_ACC,		0,	0xB1	},
 
-	/* F2MC8L / F2MC8FX */
+    {	NULL,	"subw",		S_ACCW,		0,	0xC2	},
+    {	NULL,	"addw",		S_ACCW,		0,	0xD2	},
+    {	NULL,	"cmpw",		S_ACCW,		0,	0xE2	},
 
-    {	NULL,	"mulu",		S_AOP,		0,	0x01	},
-    {	NULL,	"divu",		S_AOP,		0,	0x11	},
-    {	NULL,	"rolc",		S_AOP,		0,	0x02	},
-    {	NULL,	"rorc",		S_AOP,		0,	0x03	},
+    {	NULL,	"ror",		S_ROT,		0,	0x00	},
+    {	NULL,	"rorc",		S_ROT,		0,	0x02	},
+    {	NULL,	"rol",		S_ROT,		0,	0x10	},
+    {	NULL,	"rolc",		S_ROT,		0,	0x12	},
+
+    {	NULL,	"inc",		S_INC,		0,	0xC5	},
+    {	NULL,	"dec",		S_DEC,		0,	0xD5	},
+    {	NULL,	"incw",		S_INCW,		0,	0x80	},
+    {	NULL,	"decw",		S_DECW,		0,	0x90	},
+
+    {	NULL,	"xch",		S_XCH,		0,	0x00	},
+    {	NULL,	"xchw",		S_XCHW,		0,	0xC0	},
 
     {	NULL,	"mov",		S_MOV,		0,	0x00	},
     {	NULL,	"movw",		S_MOVW,		0,	0x00	},
 
-    {	NULL,	"cmp",		S_OP,		0,	0x12	},
-    {	NULL,	"addc",		S_OP,		0,	0x22	},
-    {	NULL,	"subc",		S_OP,		0,	0x32	},
-    {	NULL,	"xor",		S_OP,		0,	0x52	},
-    {	NULL,	"and",		S_OP,		0,	0x62	},
-    {	NULL,	"or",		S_OP,		0,	0x72	},
+    {	NULL,	"clr1",		S_CLR,		0,	0x80	},
+    {	NULL,	"set1",		S_SET,		0,	0x00	},
+    {	NULL,	"not1",		S_NOT,		0,	0x06	},
 
-    {	NULL,	"cmpw",		S_OP,		1,	0x12	},
-    {	NULL,	"addcw",	S_OP,		1,	0x22	},
-    {	NULL,	"subcw",	S_OP,		1,	0x32	},
-    {	NULL,	"xorw",		S_OP,		1,	0x52	},
-    {	NULL,	"andw",		S_OP,		1,	0x62	},
-    {	NULL,	"orw",		S_OP,		1,	0x72	},
+    {	NULL,	"bf",		S_BTF,		0,	0x00	},
+    {	NULL,	"bt",		S_BTF,		0,	0x80	},
 
-    {	NULL,	"jmp",		S_JMP,		0,	0x21	},
-    {	NULL,	"call",		S_CALL,		0,	0x31	},
-    {	NULL,	"callv",	S_CALLV,	0,	0xE8	},
+    {	NULL,	"br",		S_BR,		0,	0x30	},
 
-    {	NULL,	"pushw",	S_PUSH,		0,	0x40	},
-    {	NULL,	"popw",		S_PUSH,		0,	0x50	},
+    {	NULL,	"bc",		S_BRCZ,		0,	0x38	},
+    {	NULL,	"bnc",		S_BRCZ,		0,	0x3A	},
+    {	NULL,	"bz",		S_BRCZ,		0,	0x3C	},
+    {	NULL,	"bnz",		S_BRCZ,		0,	0x3E	},
 
-    {	NULL,	"xch",		S_XCH,		0,	0x42	},
-    {	NULL,	"xchw",		S_XCHW,		0,	0x43	},
+    {	NULL,	"dbnz",		S_DBNZ,		0,	0x30	},
 
-    {	NULL,	"clrb",		S_BIT,		0,	0xA0	},
-    {	NULL,	"setb",		S_BIT,		0,	0xA8	},
+    {	NULL,	"call",		S_CALL,		0,	0x22	},
+    {	NULL,	"callt",	S_CALLT,	0,	0x40	},
 
-    {	NULL,	"bbc",		S_BRAB,		0,	0xB0	},
-    {	NULL,	"bbs",		S_BRAB,		0,	0xB8	},
+    {	NULL,	"pop",		S_POP,		0,	0xA0	},
+    {	NULL,	"push",		S_POP,		0,	0xA2	},
 
-    {	NULL,	"decw",		S_DECW,		0,	0xD0	},
-    {	NULL,	"incw",		S_DECW,		0,	0xC0	},
+    {	NULL,	"nop",		S_INH,		0,	0x08	},
+    {	NULL,	"halt",		S_INH,		0,	0x0C	},
+    {	NULL,	"stop",		S_INH,		0,	0x0E	},
 
-    {	NULL,	"dec",		S_DEC,		0,	0xD8	},
-    {	NULL,	"inc",		S_DEC,		0,	0xC8	},
-
-    {	NULL,	"bnc",		S_BRA,		0,	0xF8	},
-    {	NULL,	"bc",		S_BRA,		0,	0xF9	},
-    {	NULL,	"bp",		S_BRA,		0,	0xFA	},
-    {	NULL,	"bn",		S_BRA,		0,	0xFB	},
-    {	NULL,	"bnz",		S_BRA,		0,	0xFC	},
-    {	NULL,	"bz",		S_BRA,		0,	0xFD	},
-    {	NULL,	"bge",		S_BRA,		0,	0xFE	},
-    {	NULL,	"blt",		S_BRA,		0,	0xFF	},
-
-    {	NULL,	"bhs",		S_BRA,		0,	0xF8	},
-    {	NULL,	"blo",		S_BRA,		0,	0xF9	},
-    {	NULL,	"bne",		S_BRA,		0,	0xFC	},
-    {	NULL,	"beq",		S_BRA,		0,	0xFD	},
-
-    {	NULL,	"nop",		S_INH,		0,	0x00	},
-    {	NULL,	"swap",		S_INH,		0,	0x10	},
     {	NULL,	"ret",		S_INH,		0,	0x20	},
-    {	NULL,	"reti",		S_INH,		0,	0x30	},
-    {	NULL,	"clri",		S_INH,		0,	0x80	},
-    {	NULL,	"clrc",		S_INH,		0,	0x81	},
-    {	NULL,	"daa",		S_INH,		0,	0x84	},
-    {	NULL,	"seti",		S_INH,		0,	0x90	},
-    {	NULL,	"setc",		S_INH,		0,	0x91	},
-    {	NULL,	"das",		S_INH,		S_EOL,	0x94	}
-};
+    {	NULL,	"reti",		S_INH,		0,	0x24	},
 
+    {	NULL,	"ei",		S_INHP,		0,	0x1E7A	},
+    {	NULL,	"di",		S_INHP,		S_EOL,	0x1EFA	}
+};
 
