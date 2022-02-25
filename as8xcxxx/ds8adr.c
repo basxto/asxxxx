@@ -137,6 +137,7 @@ register struct expr *esp;
 			}
 		} else {
 			/* Must be an expression */
+			esp->e_addr = 0;		/* Vasiliy Petrov */
 			expr(esp, 0);
 			if ((!esp->e_flag)
 				&& (esp->e_base.e_ap==NULL)
