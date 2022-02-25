@@ -1,6 +1,6 @@
 
 
-        ASxxxx Cross Assemblers, Version 5.05, August 2012 
+        ASxxxx Cross Assemblers, Version 5.06, May 2013
 
         Submitted by Alan R.  Baldwin, 
         Kent State University, Kent, Ohio 

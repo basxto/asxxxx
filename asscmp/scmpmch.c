@@ -1,7 +1,7 @@
 /* scmpmch.c */
 
 /*
- *  Copyright (C) 2009  Alan R. Baldwin
+ *  Copyright (C) 2009-2013  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,6 +41,8 @@ char	*dsft	= "asm";
 
 /*
  * SC/MP Cycle Count
+ * Source: National Semiconductor Publication 42000948
+ *         SC/MP Programming and Assembly Manual
  *
  *	opcycles = scmpcyc[opcode]
  */
@@ -50,19 +52,19 @@ char scmpcyc[256] = {
 /*00*/   8, 7, 5, 5, 6, 6, 5, 6, 5,UN,UN,UN,UN,UN,UN,UN,
 /*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN, 5,UN,UN, 5, 5, 5, 5,
 /*20*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
-/*30*/   8, 8, 8, 8, 8, 8, 8, 8,UN,UN,UN,UN, 8, 8, 8, 8,
+/*30*/   8, 8, 8, 8, 8, 8, 8, 8,UN,UN,UN,UN, 7, 7, 7, 7,
 /*40*/   6,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
 /*50*/   6,UN,UN,UN,UN,UN,UN,UN, 6,UN,UN,UN,UN,UN,UN,UN,
 /*60*/   6,UN,UN,UN,UN,UN,UN,UN,11,UN,UN,UN,UN,UN,UN,UN,
 /*70*/   7,UN,UN,UN,UN,UN,UN,UN, 8,UN,UN,UN,UN,UN,UN,UN,
-/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN, 0,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,13,
 /*90*/  11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
 /*A0*/  UN,UN,UN,UN,UN,UN,UN,UN,22,22,22,22,UN,UN,UN,UN,
 /*B0*/  UN,UN,UN,UN,UN,UN,UN,UN,22,22,22,22,UN,UN,UN,UN,
-/*C0*/  18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,
-/*D0*/  18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,
-/*E0*/  18,18,18,18,18,18,18,18,23,23,23,23,23,23,23,23,
-/*F0*/  19,19,19,19,19,19,19,19,20,20,20,20,20,20,20,20
+/*C0*/  18,18,18,18,10,10,10,10,18,18,18,18,18,18,18,18,
+/*D0*/  18,18,18,18,10,10,10,10,18,18,18,18,10,10,10,10,
+/*E0*/  18,18,18,18,10,10,10,10,23,23,23,23,23,23,23,23,
+/*F0*/  19,19,19,19,10,10,10,10,20,20,20,20,12,12,12,12
 };
 
 /*
@@ -80,6 +82,12 @@ struct mne *mp;
 	op = (int) mp->m_valu;
 	switch (mp->m_type) {
 
+	case S_MID:
+		/*
+		 * ild @DISP[ptr]
+		 * dld @DISP[ptr]
+		 */
+
 	case S_MRI:
 		/*
 		 * ld  @DISP[ptr]
@@ -93,36 +101,51 @@ struct mne *mp;
 		 */
 		t1 = addr(&e1);
 		a1 = aindx;
-		if (t1 == S_EXT) {			/* PC Relative Addressing */
+		/*
+		 * PC Relative Addressing
+		 */
+		if (t1 == S_EXT) {
 			outab(op);
 			if (mchpcr(&e1)) {
 				v1 = (int) (e1.e_addr - dot.s_addr);
-				/* Valid Range is -127 >> 0 >> +127 */
-				if ((v1 < -127) || (v1 > 127))
+				/* Valid Range is -128 >> 0 >> +127 */
+				if ((v1 < -128) || (v1 > 127))
 					aerr();
 				outab(v1);
 			} else {
-				/* A PC offset of -128 will not be flagged */
 				outrb(&e1, R_PCR0);
 			}
 			if (e1.e_mode != S_USER)
 				rerr();
 		} else
-		if (t1 == S_IDX) {			/* Indexed Addressing - @DISP, @[ptr], @DISP[ptr] */
-			outab(op | (aindx & 0x07));
+		/*
+		 * Indexed Addressing - @DISP[ptr]
+		 */
+		if (t1 == S_IDX) {
+			outab(op | (a1 & 0x07));
+			/*
+			 * PC Offset Addressing - @DISP[P0]
+			 */
+			if ((a1 & 0x03) == 0) {
+				e1.e_addr -= 1;
+			}
 			outrb(&e1, 0);
 			if (e1.e_mode != S_USER)
 				rerr();
 		} else
-		if ((t1 == S_IMM) && (op != 0xC8)) {	/* Immediated Addressing */
+		/*
+		 * Immediated Addressing
+		 */
+		if ((t1 == S_IMM) && (op != 0xC8)) {
 			outab(op | 0x04);
 			outrb(&e1, 0);
-		} else {
-			outab(op | (aindx & 0x07));
+		} else
+		/*
+		 * Error Default
+		 */
+		{
+			outab(op | (a1 & 0x07));
 			outrb(&e1, 0);
-			aerr();
-		}
-		if ((aindx & 0x07) == 0x04) {	/* S_II instructions */
 			aerr();
 		}
 		break;
@@ -143,6 +166,7 @@ struct mne *mp;
 		 * cai #DATA8
 		 */
 		t1 = addr(&e1);
+		a1 = aindx;
 		outab(op);
 		outrb(&e1, 0);
 		if ((t1 != S_IMM) && (t1 != S_EXT)) {
@@ -150,12 +174,6 @@ struct mne *mp;
 		}
 		break;
 		 
-	case S_MID:
-		/*
-		 * ild DISP[ptr]
-		 * dld DISP[ptr]
-		 */
-
 	case S_JMP:
 		/*
 		 * jmp DISP[ptr]
@@ -165,33 +183,47 @@ struct mne *mp;
 		 */
 		t1 = addr(&e1);
 		a1 = aindx;
-		if (aindx & 0x04) {		/* @ not allowed */
-			aerr();
-		}
+		/*
+		 * PC Relative Addressing
+		 */
 		if (t1 == S_EXT) {
 			outab(op);
 			if (mchpcr(&e1)) {
-				v1 = (int) (e1.e_addr - dot.s_addr);
-				/* Valid Range is -127 >> 0 >> +127 */
-				if ((v1 < -127) || (v1 > 127))
+				v1 = (int) (e1.e_addr - dot.s_addr - 1);
+				/* Valid Range is -128 >> 0 >> +127 */
+				if ((v1 < -128) || (v1 > 127))
 					aerr();
 				outab(v1);
 			} else {
-				/* A PC offset of -128 will not be flagged */
-				outrb(&e1, R_PCR0);
+				outrb(&e1, R_PCR1);
 			}
 			if (e1.e_mode != S_USER)
 				rerr();
 		} else
+		/*
+		 * Indexed Addressing - DISP[ptr]
+		 */
 		if (t1 == S_IDX) {
-			outab(op | (aindx & 0x03));
+			outab(op | (a1 & 0x03));
+			/*
+			 * PC Offset Addressing - DISP[P0]
+			 */
+			if ((a1 & 0x03) == 0) {
+				e1.e_addr -= 2;
+			}
 			outrb(&e1, 0);
 			if (e1.e_mode != S_USER)
 				rerr();
-		} else {
-			/* j__ . */
-			outab(op);
-			outab(0xFF);
+		} else
+		/*
+		 * Error Default
+		 */
+		{
+			outab(op | (a1 & 0x03));
+			outrb(&e1, 0);
+			aerr();
+		}
+		if (a1 & 0x04) {		/* @ not allowed */
 			aerr();
 		}
 		break;
@@ -204,6 +236,9 @@ struct mne *mp;
 		 */
 		t1 = addr(&e1);
 		a1 = aindx;	
+		if (a1 & 0x04) {
+			aerr();
+		}
 		outab(op | (0x03 & a1));
 		if (t1 != S_PTR) {
 			aerr();

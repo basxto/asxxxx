@@ -1,4 +1,4 @@
-ASxxxx and ASlink V5.05 August 2012
+ASxxxx and ASlink V5.06 May 2013
 
    The  ASxxxx  assemblers are a series of microprocessor assem-
 blers written in the C programming  language.   This  collection
@@ -22,17 +22,17 @@ BUFFALO 2.5 for the 6811) are included  as  working examples  of
 use of these assemblers.  
 
 asxv5p00.zip	ASxxxx and ASlink V5.00 Zipped
-u05500.zip	ASxxxx and ASlink Update to V05.05 Zipped
+u06500.zip	ASxxxx and ASlink Update to V05.06 Zipped
 
 	MS-DOS:
 	Windows:	unzip asxv5p00.zip
-			unzip u05500.zip	or
+			unzip u06500.zip	or
 			pkunzip -d asxv5p00.zip
-			pkunzup -d u05500.zip
+			pkunzup -d u06500.zip
 			unzips and restores directory structure
 
 	Linux:		unzip -L -a asxv5p00.zip
-			unzip -L -a u05500.zip
+			unzip -L -a u06500.zip
 			unzips to lower-case names and converts ascii
 			files to \n from \r\n form.
 
@@ -90,7 +90,7 @@ The Make or Build Exectutable directories are:
 
 
 /*
- *  Copyright (C) 1989-2012  Alan R. Baldwin
+ *  Copyright (C) 1989-2013  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

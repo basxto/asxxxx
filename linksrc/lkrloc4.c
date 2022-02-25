@@ -542,7 +542,7 @@ relr4()
 			case R4_PCR0:
 			case R4_PCR:
 				if (((relv & m) != m) && ((relv & m) != 0)) {
-					error = 2 + argm;
+					error = 3 + argm;
 				}
 				break;
 			case R4_PAG0:
@@ -693,7 +693,7 @@ relr4()
 			case R4_PCR0:
 			case R4_PCR:
 				if (((relv & m) != m) && ((relv & m) != 0)) {
-					error = 2 + argm;
+					error = 3 + argm;
 				}
 				break;
 			case R4_PAG0:

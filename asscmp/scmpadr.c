@@ -34,6 +34,12 @@ struct expr *esp;
 	int c, d, mode;
 
 	aindx = 0;
+	c = getnb();
+	if (c == '@') {
+		aindx |= 0x04;			/* auto-increment/decrement */
+	} else {
+		unget(c);
+	}
 	if ((d = admode(ptr)) != 0) {		/* ptr */
 		aindx |= d;
 		return (S_PTR);
@@ -42,10 +48,6 @@ struct expr *esp;
 	if (c == '#') {				/* # DATA */
 		expr(esp, 0);
 		return (S_IMM);
-	}
-	if (c == '@') {
-		aindx = 0x04;			/* auto-increment */
-		c = getnb();
 	}
 	if (c == '[') {
 		if ((d = admode(ptr)) != 0) {	/* _[ptr] ==>> _0[ptr] */
