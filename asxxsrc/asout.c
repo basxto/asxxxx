@@ -623,6 +623,7 @@ int r;
 					r |= R_AREA;
 					if ((r & (R_PAGE | R_PCR)) != R_PAGN) {
 						fprintf(stderr, "?ASxxxx-OUTRXB-NULL-POINTER error.\n\n");
+						aserr++;
 					}
 				} else
 				if (esp->e_flag) {
@@ -861,6 +862,7 @@ a_uint v;
 					r |= R_AREA;
 					if ((r & (R_PAGE | R_PCR)) != R_PAGN) {
 						fprintf(stderr, "?ASxxxx-OUTRXBM-NULL-POINTER error.\n\n");
+						aserr++;
 					}
 				} else
 				if (esp->e_flag) {
@@ -996,6 +998,7 @@ int r;
 				n = area[1].a_ref;
 				r |= R_AREA;
 				fprintf(stderr, "?ASxxxx-OUTDP-NULL-POINTER error.\n\n");
+				aserr++;
 			} else
 			if (esp->e_flag) {
 				n = esp->e_base.e_sp->s_ref;

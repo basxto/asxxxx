@@ -445,7 +445,7 @@ rm -f ../../../ascop4/tcop4.lst
 rm -f ../../../ascop4/tcop4.hlr
 rm -f ../../../ascop4/tcop4.rst
 ../exe/ascop4 -gloacxff ../../../ascop4/tcop4.asm
-../exe/asxscne ../../../ascop4/tcop4.lst
+../exe/asxscn ../../../ascop4/tcop4.lst
 ../exe/aslink -nxu -b COP4A=0x0000 -b COP4B=0x0040 -g x$=0x0000 ../../../ascop4/tcop4.rel
 ../exe/asxscn -i ../../../ascop4/tcop4.rst
 

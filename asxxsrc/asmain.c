@@ -194,6 +194,11 @@ char *argv[];
 	struct area *ap;
 	struct def *dp;
 
+	if (argc == 1) {
+		usage();
+		exit(ER_NONE);
+	}
+
 	if (intsiz() < 4) {
 		fprintf(stderr, "?ASxxxx-Error-Size of INT32 is not 32 bits or larger.\n\n");
 		exit(ER_FATAL);
@@ -208,19 +213,19 @@ char *argv[];
 		if (*p == '-') {
 			if (asmp != NULL) {
 				usage();
+				fprintf(stderr, "?ASxxxx-Error-Options come first.\n");
 				asexit(ER_FATAL);
 			}
 			++p;
 			while ((c = *p++) != 0) {
 				switch(c) {
 				/*
-				 * -h   or NO ARGUMENTS  Show this help list
+				 * -h   Show the help list
 				 */
 				case 'h':
 				case 'H':
-				default:
-					++hflag;
 					usage();
+					exit(ER_NONE);
 					break;
 
 				/*
@@ -383,6 +388,13 @@ char *argv[];
 				case 'T':
 					++tflag;
 					break;
+
+				/*
+				 * Unknown Options:
+				 */
+				default:
+					fprintf(stderr, "?ASxxxx-Warning-Unkown option -%c ignored\n", c);
+					break;
 				}
 			}
 		} else {
@@ -401,6 +413,7 @@ char *argv[];
 						p = argv[i];
 						if (*p == '-') {
 							usage();
+							fprintf(stderr, "?ASxxxx-Error-Options come first.\n");
 							asexit(ER_FATAL);
 						}
 					}
@@ -438,10 +451,9 @@ char *argv[];
 		}
 	}
 	if (asmp == NULL) {
-		if (!hflag) {
-			usage();
-		}
-		asexit(ER_WARNING);
+		usage();
+		fprintf(stderr, "?ASxxxx-Error-Missing input file(s)\n");
+		asexit(ER_FATAL);
 	}
 	if (lflag)
 		lfp = afile(q, "lst", 1);
@@ -633,17 +645,25 @@ int i;
  *	files and then terminates the program.
  *
  *	local variables:
- *		int	j		loop counter
  *
  *	global variables:
  *		asmf *	asm 		pointer to current assembler file structure
+ *		asmf *	asmc		pointer to first include file structure
  *		asmf *	asmp		pointer to first assembler file structure
  *		FILE *	lfp		list output file handle
+ *		FILE *	hfp		rel helper file handle
  *		FILE *	ofp		relocation output file handle
  *		FILE *	tfp		symbol table output file handle
+ *		FILE *	stdout		standard output handle
+ *		int	maxinc		maximum include file level
+ *		int	maxmcr		maximum macro expansion level
+ *		int	asmblk		assembler allocation in 1K blocks
+ *		int	mcrblk		macro allocation in 1K blocks
  *
  *	functions called:
+ *		VOID	asfree()	asmcro.c
  *		int	fclose()	c_library
+ *		int	fprintf()	c_library
  *		VOID	exit()		c_library
  *		VOID	old()		assym.c
  *
@@ -678,10 +698,10 @@ int i;
 	asfree();
 
 	if (tflag) {
-		fprintf(stderr, "maxinc(include file level)    = %3d\n", maxinc);
-		fprintf(stderr, "maxmcr(macro expansion level) = %3d\n", maxmcr);
-		fprintf(stderr, "asmblk(1K Byte Allocations)   = %3d\n", asmblk);
-		fprintf(stderr, "mcrblk(1K Byte Allocations)   = %3d\n", mcrblk);
+		fprintf(stderr, "?ASxxxx-Info-maxinc(include file level)    = %3d\n", maxinc);
+		fprintf(stderr, "?ASxxxx-Info-maxmcr(macro expansion level) = %3d\n", maxmcr);
+		fprintf(stderr, "?ASxxxx-Info-asmblk(1K Byte Allocations)   = %3d\n", asmblk);
+		fprintf(stderr, "?ASxxxx-Info-mcrblk(1K Byte Allocations)   = %3d\n", mcrblk);
 		fprintf(stderr, "\n");
 	}
 
@@ -2928,11 +2948,11 @@ usage()
 {
 	char   **dp;
 
-	fprintf(stderr, "\nASxxxx Assembler %s  (%s)", VERSION, cpu);
-	fprintf(stderr, "\nCopyright (C) %s  Alan R. Baldwin", COPYRIGHT);
-	fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
+	fprintf(stdout, "\nASxxxx Assembler %s  (%s)", VERSION, cpu);
+	fprintf(stdout, "\nCopyright (C) %s  Alan R. Baldwin", COPYRIGHT);
+	fprintf(stdout, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++) {
-		fprintf(stderr, "%s\n", *dp);
+		fprintf(stdout, "%s\n", *dp);
 	}
 }
 

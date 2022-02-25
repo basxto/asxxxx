@@ -107,7 +107,7 @@ newbank()
 	struct bank **hblp;
 
 	if (headp == NULL) {
-		fprintf(stderr, "No header defined\n");
+		fprintf(stderr, "?ASlink-Error-No header defined\n");
 		lkexit(ER_FATAL);
 	}
 	/*
@@ -129,7 +129,7 @@ newbank()
 				bp->b_base = v;
 			} else {
 				if (v && (bp->b_base != v)) {
-					fprintf(stderr, "Conflicting address in bank %s\n", id);
+					fprintf(stderr, "?ASlink-Error-Conflicting address in bank %s\n", id);
 					lkerr++;
 				}
 			}
@@ -143,7 +143,7 @@ newbank()
 				bp->b_size = v;
 			} else {
 				if (v && (bp->b_size != v)) {
-					fprintf(stderr, "Conflicting size in bank %s\n", id);
+					fprintf(stderr, "?ASlink-Error-Conflicting size in bank %s\n", id);
 					lkerr++;
 				}
 			}
@@ -157,7 +157,7 @@ newbank()
 				bp->b_map = v;
 			} else {
 				if (v && (bp->b_map != v)) {
-					fprintf(stderr, "Conflicting mapping in bank %s\n", id);
+					fprintf(stderr, "?ASlink-Error-Conflicting mapping in bank %s\n", id);
 					lkerr++;
 				}
 			}
@@ -171,7 +171,7 @@ newbank()
 				bp->b_flag = i;
 			} else {
 				if (i && (bp->b_flag != i)) {
-					fprintf(stderr, "Conflicting flags in bank %s\n", id);
+					fprintf(stderr, "?ASlink-Error-Conflicting flags in bank %s\n", id);
 					lkerr++;
 				}
 			}
@@ -186,7 +186,7 @@ newbank()
 					bp->b_fsfx = strsto(id);
 				} else {
 					if (!symeq(bp->b_fsfx, id, 1)) {
-						fprintf(stderr, "Conflicting fsfx in bank %s\n", id);
+						fprintf(stderr, "?ASlink-Error-Conflicting fsfx in bank %s\n", id);
 						lkerr++;
 					}
 				}
@@ -204,7 +204,7 @@ newbank()
 			return;
 		}
 	}
-	fprintf(stderr, "Header bank list overflow\n");
+	fprintf(stderr, "?ASlink-Error-Header bank list overflow\n");
 	lkexit(ER_FATAL);
 }
 

@@ -50,7 +50,7 @@
  * Local Definitions
  */
 
-#define	VERSION	"V05.41"
+#define	VERSION	"V05.42"
 #define	COPYRIGHT "2021"
 
 /*
@@ -142,7 +142,7 @@
  */
 #define	ER_NONE		0	/* No error */
 #define	ER_WARNING	1	/* Warning */
-#define	ER_ERROR	2	/* Assembly error */
+#define	ER_ERROR	2	/* Assembly/Linker error */
 #define	ER_FATAL	3	/* Fatal error */
 
 /*
@@ -1014,8 +1014,6 @@ extern	int	cflag;		/*	-c, disable cycle counts in listing flag
 extern	int	fflag;		/*	-f(f), relocations flagged flag
 				 */
 extern	int	gflag;		/*	-g, make undefined symbols global flag
-				 */
-extern	int	hflag;		/*	-h, usage help listed
 				 */
 extern	int	iflag;		/*	-i, insert command line string flag
 				 */

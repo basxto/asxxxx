@@ -1,7 +1,7 @@
 /* lkmain.c */
 
 /*
- *  Copyright (C) 1989-2017  Alan R. Baldwin
+ *  Copyright (C) 1989-2021  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -151,6 +151,11 @@ char *argv[];
 {
 	int c, i, j, k;
 
+	if (argc == 1) {
+		usage();
+		exit(ER_NONE);
+	}
+
 	if (intsiz() < 4) {
 		fprintf(stderr, "?ASlink-Error-Size of INT32 is not 32 bits or larger.\n\n");
 		exit(ER_FATAL);
@@ -166,6 +171,11 @@ char *argv[];
 	for(i=1; i<argc; i++) {
 		ip = ib;
 		if(argv[i][0] == '-') {
+			if (linkp != NULL) {
+				usage();
+				fprintf(stderr, "?ASlink-Error-Options come first\n");
+				lkexit(ER_FATAL);
+			}
 			j = i;
 			k = 1;
 			while((c = argv[j][k]) != '\0') {
@@ -218,6 +228,12 @@ char *argv[];
 				/*
 				 * Preprocess these commands
 				 */
+				case 'h':
+				case 'H':
+					usage();
+					lkexit(ER_NONE);
+					break;
+
 				case 'n':
 				case 'N':
 					pflag = 0;
@@ -248,7 +264,7 @@ char *argv[];
 	}
 
 	if (linkp == NULL) {
-		usage();
+		fprintf(stderr, "?ASlink-Error-Missing input file(s)\n");
 		lkexit(ER_FATAL);
 	}
 
@@ -683,6 +699,7 @@ map()
 	 */
 	mfp = afile(linkp->f_idp, "map", 1);
 	if (mfp == NULL) {
+		fprintf(stderr, "?ASlink-Error-Failed to create map file\n");
 		lkexit(ER_FATAL);
 	}
 
@@ -831,7 +848,6 @@ parse()
 
 				case 'h':
 				case 'H':
-					usage();
 					break;
 
 				case 'c':
@@ -848,7 +864,7 @@ parse()
 						return(0);
 					unget(getnb());
 					if (*ip == 0) {
-						usage();
+						fprintf(stderr, "?ASlink-Error-Missing -f argument\n");
 						lkexit(ER_FATAL);
 					}
 					sv_type = startp->f_type;
@@ -983,8 +999,7 @@ parse()
 					break;
 
 				default:
-					fprintf(stderr,
-					    "Unkown option -%c ignored\n", c);
+					fprintf(stderr, "?ASlink-Warning-Unkown option -%c ignored\n", c);
 					break;
 				}
 			}
@@ -1028,7 +1043,7 @@ parse()
 			lfp->f_idx = fndidx(p);
 			lfp->f_obj = objflg;
 		} else {
-			fprintf(stderr, "Invalid input");
+			fprintf(stderr, "?ASlink-Error-Invalid input character\n");
 			lkexit(ER_FATAL);
 		}
 	}
@@ -1232,12 +1247,12 @@ setgbl()
 			sp = lkpsym(id, 0);
 			if (sp == NULL) {
 				fprintf(stderr,
-				"No definition of symbol %s\n", id);
+				"?ASlink-Error-No definition of symbol %s\n", id);
 				lkerr++;
 			} else {
 				if (sp->s_type & S_DEF) {
 					fprintf(stderr,
-					"Redefinition of symbol %s\n", id);
+					"?ASlink-Error-Redefinition of symbol %s\n", id);
 					lkerr++;
 					sp->s_axp = NULL;
 				}
@@ -1245,7 +1260,7 @@ setgbl()
 				sp->s_type |= S_DEF;
 			}
 		} else {
-			fprintf(stderr, "No '=' in global expression");
+			fprintf(stderr, "?ASlink-Error-No '=' in global expression");
 			lkerr++;
 		}
 		gsp = gsp->g_globl;
@@ -1523,10 +1538,10 @@ usage()
 {
 	char	**dp;
 
-	fprintf(stderr, "\nASxxxx Linker %s", VERSION);
-	fprintf(stderr, "\nCopyright (C) %s  Alan R. Baldwin", COPYRIGHT);
-	fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
+	fprintf(stdout, "\nASxxxx Linker %s", VERSION);
+	fprintf(stdout, "\nCopyright (C) %s  Alan R. Baldwin", COPYRIGHT);
+	fprintf(stdout, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++) {
-		fprintf(stderr, "%s\n", *dp);
+		fprintf(stdout, "%s\n", *dp);
 	}
 }

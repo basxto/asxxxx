@@ -1,7 +1,5 @@
 	.title	National Semiconductor COP8 Instruction Test
 
-	.include ".\regdef\cop888gw.def"
-
 	; Error Testing Parameters
 	.ifndef	Err
 	  Err = 0	; Test Instruction Errors: 0 = NO, 1 = YES

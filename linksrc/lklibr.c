@@ -391,7 +391,7 @@ char *name;
 
 /*1*/	for (lbnh=lbnhead; lbnh; lbnh=lbnh->next) {
 		if ((libfp = fopen(lbnh->libspc, "r")) == NULL) {
-			fprintf(stderr, "Cannot open library file %s\n",
+			fprintf(stderr, "?ASlink-Error-Cannot open library file %s\n",
 				lbnh->libspc);
 			lkexit(ER_FATAL);
 		}

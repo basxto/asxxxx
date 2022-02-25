@@ -114,7 +114,7 @@ int c;
 		break;
 
 	default:
-		fprintf(stderr, "Undefined Relocation Operation\n");
+		fprintf(stderr, "?ASlink-Error-Undefined Relocation Operation\n");
 		lkerr++;
 		break;
 
@@ -313,7 +313,7 @@ relr4()
 	 * Verify Area Mode
 	 */
 	if (eval() != R4_AREA || eval()) {
-		fprintf(stderr, "R input error\n");
+		fprintf(stderr, "?ASlink-Error-R input error\n");
 		lkerr++;
 		return;
 	}
@@ -323,7 +323,7 @@ relr4()
 	 */
 	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
-		fprintf(stderr, "R area error\n");
+		fprintf(stderr, "?ASlink-Error-R area error\n");
 		lkerr++;
 		return;
 	}
@@ -398,7 +398,7 @@ relr4()
 		 */
 		if (mode & R4_SYM) {
 			if (rindex >= hp->h_nsym) {
-				fprintf(stderr, "R symbol error\n");
+				fprintf(stderr, "?ASlink-Error-R symbol error\n");
 				lkerr++;
 				return;
 			}
@@ -408,7 +408,7 @@ fprintf(stdout, "relr4-sym:  reli = %X, rindex = %d\n", reli, rindex);
 #endif
 		} else {
 			if (rindex >= hp->h_narea) {
-				fprintf(stderr, "R area error\n");
+				fprintf(stderr, "?ASlink-Error-R area error\n");
 				lkerr++;
 				return;
 			}
@@ -925,7 +925,7 @@ relp4()
 	 * Verify Area Mode
 	 */
 	if ((eval() != R4_AREA) || eval()) {
-		fprintf(stderr, "P input error\n");
+		fprintf(stderr, "?ASlink-Error-P input error\n");
 		lkerr++;
 	}
 
@@ -934,7 +934,7 @@ relp4()
 	 */
 	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
-		fprintf(stderr, "P area error\n");
+		fprintf(stderr, "?ASlink-Error-P area error\n");
 		lkerr++;
 		return;
 	}
@@ -955,14 +955,14 @@ fprintf(stdout, "relp4-relocation-area: aindex = %4X\n", aindex);
 		 */
 		if (mode & R4_SYM) {
 			if (rindex >= hp->h_nsym) {
-				fprintf(stderr, "P symbol error\n");
+				fprintf(stderr, "?ASlink-Error-P symbol error\n");
 				lkerr++;
 				return;
 			}
 			relv = symval(s[rindex]);
 		} else {
 			if (rindex >= hp->h_narea) {
-				fprintf(stderr, "P area error\n");
+				fprintf(stderr, "?ASlink-Error-P area error\n");
 				lkerr++;
 				return;
 			}
@@ -976,7 +976,7 @@ fprintf(stdout, "relp4-relocation-area: aindex = %4X\n", aindex);
 	 */
 	aindex = (int) adb_xb(0,a_bytes);
 	if (aindex >= hp->h_narea) {
-		fprintf(stderr, "P area error\n");
+		fprintf(stderr, "?ASlink-Error-P area error\n");
 		lkerr++;
 		return;
 	}
@@ -1286,7 +1286,7 @@ a_uint base;
 	a_uint m;
 
 	if ((mp = hp->m_list[r]) == NULL) {
-		fprintf(stderr, "undefined G mode\n");
+		fprintf(stderr, "?ASlink-Error-undefined G mode\n");
 		lkexit(ER_FATAL);
 	}
 

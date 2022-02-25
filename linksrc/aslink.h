@@ -39,7 +39,7 @@
  * Local Definitions
  */
 
-#define	VERSION "V05.41"
+#define	VERSION "V05.42"
 #define	COPYRIGHT "2021"
 
 /*
@@ -188,7 +188,7 @@
  */
 #define	ER_NONE		0	/* No error */
 #define	ER_WARNING	1	/* Warning */
-#define	ER_ERROR	2	/* Assembly error */
+#define	ER_ERROR	2	/* Assembly/Linker error */
 #define	ER_FATAL	3	/* Fatal error */
 
 /*

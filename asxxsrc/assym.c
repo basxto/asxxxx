@@ -677,7 +677,7 @@ unsigned int n;
 	VOID *p;
 
 	if ((lnk = (struct memlnk *) malloc (sizeof(struct memlnk))) == NULL) {
-		fprintf(stderr, "Out of space!\n");
+		fprintf(stderr, "?ASxxxx-Error-Out of space!\n");
 		asexit(ER_FATAL);
 	}
 	lnk->next = (asxmem == NULL) ? NULL : asxmem;
@@ -685,7 +685,7 @@ unsigned int n;
 	asxmem = lnk;
 
 	if ((p = (VOID *) malloc (n)) == NULL) {
-		fprintf(stderr, "Out of space!\n");
+		fprintf(stderr, "?ASxxxx-Error-Out of space!\n");
 		asexit(ER_FATAL);
 	}
 	asxmem->ptr = p;

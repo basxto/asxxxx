@@ -476,10 +476,11 @@ loop:	if (cfp && cfp->f_type == F_STD)
 				gline = 1;
 				hline = 1;
 			} else {
-				fprintf(stderr, "Invalid file type\n");
+				fprintf(stderr, "?ASlink-Error-Internal nxtline(ftype) error\n");
 				lkexit(ER_FATAL);
 			}
 			if (sfp == NULL) {
+				fprintf(stderr, "?ASlink-Error-Internal nxtline(sfp) error\n");
 				lkexit(ER_FATAL);
 			}
 			goto loop;

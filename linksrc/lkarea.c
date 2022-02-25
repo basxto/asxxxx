@@ -124,7 +124,7 @@ newarea()
 	char opt[NCPS];
 
 	if (headp == NULL) {
-		fprintf(stderr, "No header defined\n");
+		fprintf(stderr, "?ASlink-Error-No header defined\n");
 		lkexit(ER_FATAL);
 	}
 	/*
@@ -162,7 +162,7 @@ newarea()
 				if (iflags) {
 			 		if (aflags & A4_OVR) {
 						if (iflags != (aflags & A4_OVR)) {
-							fprintf(stderr, "Conflicting CON/OVR flags in area %s\n", id);
+							fprintf(stderr, "?ASlink-Error-Conflicting CON/OVR flags in area %s\n", id);
 							lkerr++;
 						}
 					} else {
@@ -173,7 +173,7 @@ newarea()
 				if (iflags) {
 			 		if (aflags & A4_ABS) {
 						if (iflags != (aflags & A4_ABS)) {
-							fprintf(stderr, "Conflicting REL/ABS flags in area %s\n", id);
+							fprintf(stderr, "?ASlink-Error-Conflicting REL/ABS flags in area %s\n", id);
 							lkerr++;
 						}
 					} else {
@@ -184,7 +184,7 @@ newarea()
 				if (iflags) {
 			 		if (aflags & A4_PAG) {
 						if (iflags != (aflags & A4_PAG)) {
-							fprintf(stderr, "Conflicting NOPAG/PAG flags in area %s\n", id);
+							fprintf(stderr, "?ASlink-Error-Conflicting NOPAG/PAG flags in area %s\n", id);
 							lkerr++;
 						}
 					} else {
@@ -195,7 +195,7 @@ newarea()
 					iflags = (int) (i & (A4_DSEG | A4_WLMSK));
 				 	if (aflags & A4_DSEG) {
 						if (iflags != (aflags & (A4_DSEG | A4_WLMSK))) {
-							fprintf(stderr, "Conflicting CSEG/DSEG flags in area %s\n", id);
+							fprintf(stderr, "?ASlink-Error-Conflicting CSEG/DSEG flags in area %s\n", id);
 							lkerr++;
 						}
 					} else {
@@ -216,20 +216,20 @@ newarea()
 		if (symeq("bank", opt, 1)) {
 			hblp = hp->b_list;
 			if (hblp == NULL) {
-				fprintf(stderr, "No banks defined\n");
+				fprintf(stderr, "?ASlink-Error-No banks defined\n");
 				lkexit(ER_FATAL);
 			}
 			if (i >= (unsigned) hp->h_nbank) {
-				fprintf(stderr, "Invalid bank number\n");
+				fprintf(stderr, "?ASlink-Error-Invalid bank number\n");
 				lkexit(ER_FATAL);
 			}
 			if (hblp[(int) i] == NULL) {
-				fprintf(stderr, "Bank not defined\n");
+				fprintf(stderr, "?ASlink-Error-Bank not defined\n");
 				lkexit(ER_FATAL);
 			}
 			if (ap->a_bp != NULL) {
 				if (ap->a_bp != hblp[(int) i]) {
-					fprintf(stderr, "Multiple Bank assignments for area %s ( %s / %s )\n",
+					fprintf(stderr, "?ASlink-Error-Multiple Bank assignments for area %s ( %s / %s )\n",
 						id, ap->a_bp->b_id, hblp[(int) i]->b_id);
 					lkerr++;
 				}
@@ -260,7 +260,7 @@ newarea()
 			return;
 		}
 	}
-	fprintf(stderr, "Header area list overflow\n");
+	fprintf(stderr, "?ASlink-Error-Header area list overflow\n");
 	lkexit(ER_FATAL);
 }
 
@@ -524,8 +524,7 @@ struct area *tap;
 	size = 0;
 	addr = tap->a_addr;
 	if (((tap->a_flag & A4_PAG) == A4_PAG) && (addr & 0xFF)) {
-	    fprintf(stderr,
-		"\n?ASlink-Warning-Paged Area %s Boundary Error\n",
+	    fprintf(stderr, "?ASlink-Error-Paged Area %s Boundary Error\n",
 		tap->a_id);
 	    lkerr++;
 	}
@@ -577,8 +576,7 @@ struct area *tap;
 	}
 	tap->a_size = size;
 	if (((tap->a_flag & A4_PAG) == A4_PAG) && (size > 256)) {
-	    fprintf(stderr,
-		"\n?ASlink-Warning-Paged Area %s Length Error\n",
+	    fprintf(stderr, "?ASlink-Error-Paged Area %s Length Error\n",
 		tap->a_id);
 	    lkerr++;
 	}
@@ -636,15 +634,14 @@ setarea()
 					break;
 			}
 			if (ap == NULL) {
-				fprintf(stderr,
-				"No definition of area %s\n", id);
+				fprintf(stderr,	"?ASlink-Error-No definition of area %s\n", id);
 				lkerr++;
 			} else {
 				ap->a_addr = v;
 				ap->a_bset = 1;
 			}
 		} else {
-			fprintf(stderr, "No '=' in base expression");
+			fprintf(stderr, "?ASlink-Error-No '=' in base expression");
 			lkerr++;
 		}
 		bsp = bsp->b_base;
