@@ -293,7 +293,8 @@ setbank()
 
 	/*
 	 * For each bank structure with a defined base address value
-	 * scan the area structures for the first area in the bank.
+	 * scan the area structures for the first relocatable area
+	 * in the bank and all absolute areas in the bank.
 	 * Load the base address value into the area address if the
 	 * bank base address has not been overridden by a -b option.
 	 * The bank base address is always expressed in 'bytes'.
@@ -307,12 +308,16 @@ setbank()
 			if ((ap->a_flag & A4_BNK) != A4_BNK)
 				continue;
 			if (ap->a_bset)
-				break;
+				continue;
 			bytes = 1 + (ap->a_flag & A4_WLMSK);
 			base = bp->b_base;
 			ap->a_addr = (base/bytes) + ((base % bytes) ? 1 : 0);
 			ap->a_bset = 1;
-			break;
+			if ((ap->a_flag & A4_ABS) == A4_ABS) {
+				continue;
+			} else {
+				break;
+			}
 		}
 	}
 
