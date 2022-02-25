@@ -165,9 +165,9 @@
 #define	LIST_LIN	0x0020	/* Line Numbers */
 #define	LIST_SRC	0x0040	/* Assembler Source Code */
 
-#define	LIST_NLST	0x0080	/* For HLR file only */
+#define	HLR_NLST	0x0080	/* For HLR file only */
 
-#define	LIST_NONE	0x0000	/* NLIST Flags Mask */
+#define	HLR_NONE	0x0000	/* NLIST Flags Mask */
 
 /*
  * Global symbol types.
@@ -1060,7 +1060,9 @@ extern	int	listing;	/*	Assembled line listing bits
 				 */
 extern	int	lmode;		/*	Assembled line listing mode
 				 */
-extern	int	bytcnt;		/*	Assenbled bytes for this line
+extern	int	bytcnt;		/*	Assembled bytes for this line
+				 */
+extern	int	bgncnt;		/*	Assembled bytes for this line
 				 */
 extern	char	eqt_id[128];	/*	Area name for this ELIST line
 				 */
@@ -1176,11 +1178,14 @@ extern	VOID		newpag(FILE *fp);
 extern	VOID		slew(struct area *xp, struct bank *yp);
 extern	VOID		lstarea(struct area *xp, struct bank *yp);
 extern	VOID		lkulist(int i);
+extern	VOID		lklist(a_uint cpc, int v, int err);
 extern	VOID		lkalist(a_uint cpc);
+extern	VOID		hlrlist(a_uint cpc, int v, int err);
 extern	VOID		hlralist(a_uint cpc);
-extern	VOID		lkglist(a_uint cpc, int v, int err);
-extern	VOID		hlrglist(a_uint cpc, int v, int err);
-extern	int		hlrelist(void);
+extern	VOID		hlrelist(void);
+extern	VOID		hlrclist(a_uint cpc, int v);
+extern	VOID		setgh(void);
+extern	VOID		lsterr(int err);
 
 /* lknoice.c */
 extern	VOID		NoICEfopen(void);
@@ -1347,15 +1352,18 @@ extern	a_uint		term();
 
 /* lklist.c */
 extern	int		dgt();
-extern	VOID		gethlr();
-extern	VOID		getlst();
+extern	int		gethlr();
+extern	int		getlst();
 extern	VOID		newpag();
 extern	VOID		slew();
 extern	VOID		lstarea();
 extern	VOID		lkulist();
 extern	VOID		lkalist();
 extern	VOID		lkglist();
-extern	int		hlrelist();
+extern	VOID		hlrelist();
+extern	VOID		hlrclist();
+extern	VOID		setgh();
+extern	VOID		lsterr();
 
 /* lknoice.c */
 extern	VOID		NoICEfopen();

@@ -567,6 +567,22 @@ int r;
 			   ((n & esp->e_addr) != 0))
 				err('d');
 
+			/*
+			 * R_MSB Option
+			 */
+			if (i == 1) {
+				r |= esp->e_rlcf;
+				if ((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_MSB) {
+					switch(as_msb) {
+					default:
+					case 0:	esp->e_addr = lobyte(esp->e_addr);	break;
+					case 1:	esp->e_addr = hibyte(esp->e_addr);	break;
+					case 2:	esp->e_addr = thrdbyte(esp->e_addr);	break;
+					case 3:	esp->e_addr = frthbyte(esp->e_addr);	break;
+					}
+				}
+			}
+
 			out_lxb(i,esp->e_addr,0);
 			if (oflag) {
 				outchk(i,0);
@@ -787,6 +803,24 @@ a_uint v;
 				if (~mp->m_sbits & esp->e_addr)
 					err('d');
 			}
+
+			/*
+			 * R_MSB Option
+			 */
+			if (i == 1) {
+				r |= esp->e_rlcf;
+				if ((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_MSB) {
+					switch(as_msb) {
+					default:
+					case 0:	esp->e_addr = lobyte(esp->e_addr);	break;
+					case 1:	esp->e_addr = hibyte(esp->e_addr);	break;
+					case 2:	esp->e_addr = thrdbyte(esp->e_addr);	break;
+					case 3:	esp->e_addr = frthbyte(esp->e_addr);	break;
+					}
+					esprv = outmerge(esp->e_addr, r, v);
+				}
+			}
+
 			out_lxb(i,esprv,0);
 			if (oflag) {
 				outchk(i,0);

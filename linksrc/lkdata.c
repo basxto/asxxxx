@@ -161,6 +161,8 @@ int	lmode;		/*	Assembled line listing mode
 			 */
 int	bytcnt;		/*	Assenbled bytes for this line
 			 */
+int	bgncnt;		/*	Assembled bytes for this line
+			 */
 char	eqt_id[128];	/*	Area name for this ELIST line
 			 */
 

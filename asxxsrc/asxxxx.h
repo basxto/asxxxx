@@ -50,8 +50,8 @@
  * Local Definitions
  */
 
-#define	VERSION	"V05.20"
-#define	COPYRIGHT "2017"
+#define	VERSION	"V05.30"
+#define	COPYRIGHT "2019"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -201,9 +201,10 @@
 
 #define	LIST_TORF	0x8000	/* IF-ENDIF Conditional Overide Flag */
 
-#define	T_ASM	0		/* Assembler Source File */
-#define	T_INCL	1		/* Assembler Include File */
-#define	T_MACRO	2		/* Assembler Macro */
+#define	T_INSERT	0	/* Command Line Insert */
+#define	T_ASM		1	/* Assembler Source File */
+#define	T_INCL		2	/* Assembler Include File */
+#define	T_MACRO		3	/* Assembler Macro */
 
 /*
  * Opcode Cycle definitions (Must Be The Same In ASxxxx / ASLink)
@@ -759,7 +760,7 @@ struct	mode
  *		plus or minus a constant, mode = S_USER,
  *		flag = 0, addr contains the constant, and
  *		base = pointer to area symbol.
- *	(3)	The expression evaluates to a external
+ *	(3)	The expression evaluates to an external
  *		global symbol plus or minus a constant,
  *		mode = S_NEW, flag = 1, addr contains the
  *		constant, and base = pointer to symbol.
@@ -921,11 +922,14 @@ extern	int	aserr;		/*	ASxxxx error counter
 extern	jmp_buf	jump_env;	/*	compiler dependent structure
 				 *	used by setjmp() and longjmp()
 				 */
-extern	struct	asmf	*asmp;	/*	The pointer to the first assembler
-				 *	source file structure of a linked list
-				 */
 extern	struct	asmf	*asmc;	/*	Pointer to the current
 				 *	source input structure
+				 */
+extern	struct	asmf	*asmo;	/*	The pointer to the first
+				 *	command line insert structure
+				 */
+extern	struct	asmf	*asmp;	/*	The pointer to the first assembler
+				 *	source file structure of a linked list
 				 */
 extern	struct	asmf	*asmi;	/*	Queued pointer to an include file
 				 *	source input structure
@@ -1010,6 +1014,8 @@ extern	int	fflag;		/*	-f(f), relocations flagged flag
 extern	int	gflag;		/*	-g, make undefined symbols global flag
 				 */
 extern	int	hflag;		/*	-h, usage help listed
+				 */
+extern	int	iflag;		/*	-i, insert command line string flag
 				 */
 
 #if NOICE
@@ -1187,6 +1193,7 @@ extern	VOID		boundary(a_uint n);
 extern	VOID		equate(char *id,struct expr *e1,a_uint equtype);
 extern	int		fndidx(char *str);
 extern	int		intsiz(void);
+extern	VOID		insline(char *str, int i);
 /*
 extern	int		main(int argc, char *argv[]);
 */
@@ -1369,6 +1376,7 @@ extern	VOID		boundary);
 extern	VOID		equate();
 extern	int		fndidx();
 extern	int		intsiz();
+extern	VOID		insline();
 extern	int		main();
 extern	VOID		newdot();
 extern	VOID		phase();

@@ -1553,8 +1553,8 @@ A''B''C:  .byte	0x08		; 00 08
 	 .byte	''I,''I - '0	M'J'K'L
 	.endm
 
-	.macro	irpcm2	I	J,K
-	 .asciz	"'I"			K'J
+	.macro	irpcm2	I	J,K,L
+	 .asciz	"'I"			L'J'K
 	.endm
 
 	.irpc	sym	0123456789abcdef
@@ -1563,7 +1563,7 @@ A''B''C:  .byte	0x08		; 00 08
 	  .if	le,''sym - '9
 	   irpcm1	sym	\''sym, ^! 00 0!, \(''sym-'0), ^!; 00 !
 	  .else
-	   irpcm2	sym	\''sym, ^!; 00 !
+	   irpcm2	sym	\''sym, ^! 00 00!, ^!; 00 !
 	  .endif
 	 .endif
 	.endm
