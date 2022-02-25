@@ -583,11 +583,19 @@ int r;
 			if (oflag) {
 				outchk(a_bytes,4);
 				out_txb(a_bytes,esp->e_addr);
+				if (esp->e_base.e_ap == NULL) {
+					n = area[1].a_ref;
+					r |= R_AREA;
+					if ((r & (R_PAGE | R_PCR)) != R_PAGN) {
+						fprintf(stderr, "?ASxxxx-OUTRXB-NULL-POINTER error.\n\n");
+					}
+				} else
 				if (esp->e_flag) {
 					n = esp->e_base.e_sp->s_ref;
 					r |= R_SYM;
 				} else {
 					n = esp->e_base.e_ap->a_ref;
+					r |= R_AREA;
 				}
 				*relp++ = r;
 				*relp++ = ((r & 0x0F00) >> 4) | (txtp - txt - a_bytes);
@@ -795,11 +803,19 @@ a_uint v;
 			if (oflag) {
 				outchk(2*a_bytes,4);
 				out_txb(a_bytes,esp->e_addr);
+				if (esp->e_base.e_ap == NULL) {
+					n = area[1].a_ref;
+					r |= R_AREA;
+					if ((r & (R_PAGE | R_PCR)) != R_PAGN) {
+						fprintf(stderr, "?ASxxxx-OUTRXBM-NULL-POINTER error.\n\n");
+					}
+				} else
 				if (esp->e_flag) {
 					n = esp->e_base.e_sp->s_ref;
 					r |= R_SYM;
 				} else {
 					n = esp->e_base.e_ap->a_ref;
+					r |= R_AREA;
 				}
 				*relp++ = r;
 				*relp++ = ((r & 0x0F00) >> 4) | (txtp - txt - a_bytes);
@@ -923,6 +939,11 @@ int r;
 		out_txb(a_bytes,carea->a_ref);
 		out_txb(a_bytes,esp->e_addr);
 		if (esp->e_flag || esp->e_base.e_ap!=NULL) {
+			if (esp->e_base.e_ap == NULL) {
+				n = area[1].a_ref;
+				r |= R_AREA;
+				fprintf(stderr, "?ASxxxx-OUTDP-NULL-POINTER error.\n\n");
+			} else
 			if (esp->e_flag) {
 				n = esp->e_base.e_sp->s_ref;
 				r |= R_SYM;
