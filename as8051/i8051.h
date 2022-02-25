@@ -1,7 +1,7 @@
 /* i8051.h */
 
 /*
- * (C) Copyright 1998-2002
+ * (C) Copyright 1998-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,7 +10,8 @@
  *
  *   This Assember Ported by
  *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *	jhartman at compuserve dot com
+ *	noice at noicedebugger dot com
  *
  */
 
@@ -26,6 +27,7 @@
 		I51ADR.C
 		I51PST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C
@@ -111,6 +113,12 @@ struct PreDef
    int  value;
 };
 extern struct PreDef preDef[];
+
+/*
+ * Extended Addressing Modes
+ */
+#define	R_J11	0x0100		/* 11-Bit Addressing Mode */
+
 
 	/* machine dependent functions */
 

@@ -10,7 +10,7 @@ DEBUG		= 0
 NDEBUG		= 1
 !ENDIF
 
-PROJ		= AS6812
+PROJ		= as6812
 APPTYPE		= DOSX EXE
 PROJTYPE	= EXE
 
@@ -24,8 +24,8 @@ DISASM		= OBJ2ASM
 LNK		= LINK
 DLLS		= 
 
-HEADERS		= F:\SC\INCLUDE\stdio.h F:\SC\INCLUDE\setjmp.h ..\..\..\asxxsrc\asxxxx.h  \
-		..\..\..\AS6812\m6812.h F:\SC\INCLUDE\string.h F:\SC\INCLUDE\alloc.h F:\SC\INCLUDE\stdlib.h 
+HEADERS		= C:\SC\INCLUDE\stdio.h C:\SC\INCLUDE\setjmp.h ..\..\..\asxxsrc\asxxxx.h  \
+		..\..\..\AS6812\m6812.h C:\SC\INCLUDE\string.h C:\SC\INCLUDE\alloc.h C:\SC\INCLUDE\stdlib.h 
 
 DEFFILE		= as6812.DEF
 
@@ -41,14 +41,14 @@ CFLAGS		=  -mx -C -S -3 -a4 -c -g -gd
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
-OUTPUTDIR	= c:\asxxxx\asxmak\symantec\build
-!IF EXIST (c:\asxxxx\asxmak\symantec\build)
+OUTPUTDIR	= r:\asxv4pxx\asxmak\symantec\build
+!IF EXIST (r:\asxv4pxx\asxmak\symantec\build)
 CREATEOUTPUTDIR	=
 !ELSE
 CREATEOUTPUTDIR	= if not exist $(OUTPUTDIR)\*.* md $(OUTPUTDIR)
 !ENDIF
-TARGETDIR	= c:\asxxxx\asxmak\symantec\exe
-!IF EXIST (c:\asxxxx\asxmak\symantec\exe)
+TARGETDIR	= r:\asxv4pxx\asxmak\symantec\exe
+!IF EXIST (r:\asxv4pxx\asxmak\symantec\exe)
 CREATETARGETDIR	=
 !ELSE
 CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
@@ -57,7 +57,7 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 LIBS		= 
 
 CFLAGS		=  -A -r -J -mx -o+time -3 -a4 -c 
-LFLAGS		=  /DE /PACKF /XN
+LFLAGS		=  /NOI /DE /PACKF /XN
 DEFINES		= 
 !ENDIF
 
@@ -75,14 +75,14 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -Ic:\asxxxx\asxxsrc
+INCLUDES	= -Ir:\asxv4pxx\asxxsrc
 
 INCLUDEDOBJS	= 
 
-OBJS		=  $(OUTPUTDIR)\ASDATA.OBJ  $(OUTPUTDIR)\ASEXPR.OBJ  $(OUTPUTDIR)\ASLEX.OBJ  \
-		 $(OUTPUTDIR)\ASLIST.OBJ  $(OUTPUTDIR)\ASMAIN.OBJ  $(OUTPUTDIR)\ASOUT.OBJ  $(OUTPUTDIR)\ASSUBR.OBJ  \
-		 $(OUTPUTDIR)\ASSYM.OBJ  $(OUTPUTDIR)\M12ADR.OBJ  $(OUTPUTDIR)\M12EXT.OBJ  $(OUTPUTDIR)\M12MCH.OBJ  \
-		 $(OUTPUTDIR)\M12PST.OBJ 
+OBJS		=  $(OUTPUTDIR)\asdata.OBJ  $(OUTPUTDIR)\asdbg.OBJ  $(OUTPUTDIR)\asexpr.OBJ  \
+		 $(OUTPUTDIR)\aslex.OBJ  $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asout.OBJ  \
+		 $(OUTPUTDIR)\assubr.OBJ  $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\m12adr.OBJ  $(OUTPUTDIR)\m12ext.OBJ  \
+		 $(OUTPUTDIR)\m12mch.OBJ  $(OUTPUTDIR)\m12pst.OBJ 
 
 RCFILES		= 
 
@@ -186,7 +186,7 @@ clean:
 		-del $(TARGETDIR)\$$SCW$$.$(PROJTYPE)
 		-del $(TARGETDIR)\$(PROJ).CLE
 		-del $(OUTPUTDIR)\SCPH.SYM
-		-del AS6812.dpd
+		-del as6812.dpd
 		-del $(OBJS)
 
 cleanres:
@@ -202,69 +202,74 @@ link:
 
 
 
-!IF EXIST (AS6812.dpd)
-!INCLUDE AS6812.dpd
+!IF EXIST (as6812.dpd)
+!INCLUDE as6812.dpd
 !ENDIF
 
 
 
-$(OUTPUTDIR)\ASDATA.OBJ:	..\..\..\ASXXSRC\ASDATA.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\ASDATA.obj ..\..\..\ASXXSRC\ASDATA.C
+$(OUTPUTDIR)\asdata.OBJ:	..\..\..\ASXXSRC\asdata.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asdata.obj ..\..\..\ASXXSRC\asdata.c
 
 
 
-$(OUTPUTDIR)\ASEXPR.OBJ:	..\..\..\ASXXSRC\ASEXPR.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\ASEXPR.obj ..\..\..\ASXXSRC\ASEXPR.C
+$(OUTPUTDIR)\asdbg.OBJ:	..\..\..\ASXXSRC\asdbg.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asdbg.obj ..\..\..\ASXXSRC\asdbg.c
 
 
 
-$(OUTPUTDIR)\ASLEX.OBJ:	..\..\..\ASXXSRC\ASLEX.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\ASLEX.obj ..\..\..\ASXXSRC\ASLEX.C
+$(OUTPUTDIR)\asexpr.OBJ:	..\..\..\ASXXSRC\asexpr.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asexpr.obj ..\..\..\ASXXSRC\asexpr.c
 
 
 
-$(OUTPUTDIR)\ASLIST.OBJ:	..\..\..\ASXXSRC\ASLIST.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\ASLIST.obj ..\..\..\ASXXSRC\ASLIST.C
+$(OUTPUTDIR)\aslex.OBJ:	..\..\..\ASXXSRC\aslex.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\aslex.obj ..\..\..\ASXXSRC\aslex.c
 
 
 
-$(OUTPUTDIR)\ASMAIN.OBJ:	..\..\..\ASXXSRC\ASMAIN.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\ASMAIN.obj ..\..\..\ASXXSRC\ASMAIN.C
+$(OUTPUTDIR)\aslist.OBJ:	..\..\..\ASXXSRC\aslist.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\aslist.obj ..\..\..\ASXXSRC\aslist.c
 
 
 
-$(OUTPUTDIR)\ASOUT.OBJ:	..\..\..\ASXXSRC\ASOUT.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\ASOUT.obj ..\..\..\ASXXSRC\ASOUT.C
+$(OUTPUTDIR)\asmain.OBJ:	..\..\..\ASXXSRC\asmain.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asmain.obj ..\..\..\ASXXSRC\asmain.c
 
 
 
-$(OUTPUTDIR)\ASSUBR.OBJ:	..\..\..\ASXXSRC\ASSUBR.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\ASSUBR.obj ..\..\..\ASXXSRC\ASSUBR.C
+$(OUTPUTDIR)\asout.OBJ:	..\..\..\ASXXSRC\asout.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asout.obj ..\..\..\ASXXSRC\asout.c
 
 
 
-$(OUTPUTDIR)\ASSYM.OBJ:	..\..\..\ASXXSRC\ASSYM.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\ASSYM.obj ..\..\..\ASXXSRC\ASSYM.C
+$(OUTPUTDIR)\assubr.OBJ:	..\..\..\ASXXSRC\assubr.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\assubr.obj ..\..\..\ASXXSRC\assubr.c
 
 
 
-$(OUTPUTDIR)\M12ADR.OBJ:	..\..\..\AS6812\M12ADR.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\M12ADR.obj ..\..\..\AS6812\M12ADR.C
+$(OUTPUTDIR)\assym.OBJ:	..\..\..\ASXXSRC\assym.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\assym.obj ..\..\..\ASXXSRC\assym.c
 
 
 
-$(OUTPUTDIR)\M12EXT.OBJ:	..\..\..\AS6812\M12EXT.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\M12EXT.obj ..\..\..\AS6812\M12EXT.C
+$(OUTPUTDIR)\m12adr.OBJ:	..\..\..\AS6812\m12adr.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\m12adr.obj ..\..\..\AS6812\m12adr.c
 
 
 
-$(OUTPUTDIR)\M12MCH.OBJ:	..\..\..\AS6812\M12MCH.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\M12MCH.obj ..\..\..\AS6812\M12MCH.C
+$(OUTPUTDIR)\m12ext.OBJ:	..\..\..\AS6812\m12ext.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\m12ext.obj ..\..\..\AS6812\m12ext.c
 
 
 
-$(OUTPUTDIR)\M12PST.OBJ:	..\..\..\AS6812\M12PST.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\M12PST.obj ..\..\..\AS6812\M12PST.C
+$(OUTPUTDIR)\m12mch.OBJ:	..\..\..\AS6812\m12mch.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\m12mch.obj ..\..\..\AS6812\m12mch.c
+
+
+
+$(OUTPUTDIR)\m12pst.OBJ:	..\..\..\AS6812\m12pst.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\m12pst.obj ..\..\..\AS6812\m12pst.c
 
 
 

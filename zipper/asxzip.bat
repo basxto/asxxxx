@@ -2,9 +2,9 @@ del as*.zip
 del as*.exe
 cd ..
 cd ..
-.\asxxxx\zipper\pkzip.exe -rP .\asxxxx\zipper\asx.zip asxxxx\*.*
-.\asxxxx\zipper\pkzip.exe -a  .\asxxxx\zipper\asx.zip asxxxx\readme.txt
-cd asxxxx
+.\asxv4pxx\zipper\pkzip.exe -rP .\asxv4pxx\zipper\asxv4pxx.zip asxv4pxx\*.*
+.\asxv4pxx\zipper\pkzip.exe -a  .\asxv4pxx\zipper\asxv4pxx.zip asxv4pxx\readme.txt
+cd asxv4pxx
 cd zipper
-zip2exe.exe asx.zip
+zip2exe.exe asxv4pxx.zip
 

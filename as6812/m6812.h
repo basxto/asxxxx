@@ -1,7 +1,7 @@
 /* m6812.h */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,6 +21,7 @@
 		M12ADR.C
 		M12PST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C
@@ -108,6 +109,12 @@ struct adsym
 	char	a_str[4];	/* addressing string */
 	int	a_val;		/* addressing mode value */
 };
+
+/*
+ * Extended Addressing Modes
+ */
+#define	M_XBRA	0x0100		/* 9-Bit Addressing Mode */
+
 
 extern struct adsym abd[];
 extern struct adsym xysp[];

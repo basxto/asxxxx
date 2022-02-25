@@ -1,7 +1,7 @@
 /* m01mch.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -55,9 +55,9 @@ struct mne *mp;
 			}
 		}
 		if (espa) {
-			outdp(espa, &e1);
+			outdp(espa, &e1, 0);
 		} else {
-			outdp(dot.s_area, &e1);
+			outdp(dot.s_area, &e1, 0);
 		}
 		lmode = SLIST;
 		break;

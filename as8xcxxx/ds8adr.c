@@ -3,9 +3,9 @@
 /*
  * Modified from i51adr.c
  * Bill McKinnon
- * w_mckinnon@conknet.com
+ * w_mckinnon at conknet dot com
  *
- * (C) Copyright 1998-2002
+ * (C) Copyright 1998-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,8 +13,8 @@
  * Kent, Ohio  44240
  *
  *	This Assember Ported by
- *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *	jhartman at compuserve dot com
+ *	noice at noicedebugger dot com
  *
  */
 

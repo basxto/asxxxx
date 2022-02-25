@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -11,12 +11,31 @@
  *   With enhancements from
  *	John L. Hartman	(JLH)
  *	jhartman@compuserve.com
- *
- *	Bill McKinnon
- *	w_mckinnon@conknet.com
  */
 
-#define	VERSION	"V03.11"
+#define	VERSION	"V04.00"
+
+/*
+ * To include NoICE Debugging set non-zero
+ */
+#define	NOICE	1
+
+/*
+ * To include SDCC Debugging set non-zero
+ */
+#define	SDCDB	1
+
+
+/*
+ * The assembler requires certain variables to have
+ * at least 32 bits to allow correct address processing.
+ *
+ * The type INT32 is defined so that compiler dependent
+ * variable sizes may be specified in one place.
+ */
+
+#define		INT32	int
+
 
 /*)Module	aslink.h
  *
@@ -32,15 +51,16 @@
 		LKMAIN.C
 		LKLEX.C
 		LKAREA.C
+		LKBANK.C
 		LKHEAD.C
 		LKSYM.C
 		LKEVAL.C
 		LKDATA.C
 		LKLIST.C
+		LKNOICE.C
 		LKRLOC.C
 		LKLIBR.C
-		LKS19.C
-		LKIHX.C
+		LKOUT.C
 	}
 	$(STACK) = 2000
 */
@@ -71,6 +91,24 @@
 #endif
 
 /*
+ *	Common Definitions
+ */
+
+/*
+ * Global symbol types.
+ */
+#define	S_REF	1		/* referenced */
+#define	S_DEF	2		/* defined */
+
+/*
+ * File types
+ */
+#define	F_OUT	0		/* File.ixx / File.sxx */
+#define	F_STD	1		/* stdin */
+#define	F_LNK	2		/* File.lnk */
+#define	F_REL	3		/* File.rel */
+
+/*
  * Error definitions
  */
 #define	ER_NONE		0	/* No error */
@@ -83,18 +121,56 @@
  * relocatable binary file.
  */
 
-#define NCPS	80		/* characters per symbol */
-#define	NDATA	16		/* actual data */
-#define	NINPUT	200		/* Input buffer size */
-#define	NHASH	64		/* Buckets in hash table */
-#define	HMASK	077		/* Hash mask */
-#define	NLPP	60		/* Lines per page */
-#define	NTXT	16		/* T values */
-#define	NMAX	78		/* Maximum S19/IHX line length */
-#define	FILSPC	80		/* File spec length */
+#define NCPS		80	/* characters per symbol */
+#define	NINPUT		512	/* Input buffer size */
+#define	NHASH	     (1 << 6)	/* Buckets in hash table */
+#define	HMASK	    (NHASH - 1)	/* Hash mask */
+#define	NLPP		60	/* Lines per page */
+#define	NMAX		78	/* Maximum S19/IHX line length */
+#define	FILSPC		80	/* File spec length */
 
 /*
- *	The "R_" relocation constants define values used in
+ * NTXT must be defined to have the same value in
+ * the ASxxxx assemblers and ASLink.
+ *
+ * The R Line coding allows only 4-bits for coding
+ * the T Line index.  The MAXIMUM value for NTXT
+ * is 16.  It should not be changed.
+ */
+#define	NTXT		16	/* T values */
+
+/*
+ * Internal ASxxxx Version Variable
+ */
+extern	int	ASxxxx_VERSION;
+
+
+/*
+ *	ASLINK - Version 3 Definitions
+ */
+
+/*
+ *	The "A3_" area constants define values used in
+ *	generating the assembler area output data.
+ *
+ * Area flags
+ *
+ *	   7     6     5     4     3     2     1     0
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ *	|     |     |     | PAG | ABS | OVR |     |     |
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ */
+
+#define	A3_CON		000		/* concatenate */
+#define	A3_OVR		004		/* overlay */
+#define	A3_REL		000		/* relocatable */
+#define	A3_ABS		010		/* absolute */
+#define	A3_NOPAG	000		/* non-paged */
+#define	A3_PAG		020		/* paged */
+
+
+/*
+ *	The "R3_" relocation constants define values used in
  *	generating the assembler relocation output data for
  *	areas, symbols, and code.
  *
@@ -107,33 +183,33 @@
  *	    +-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define	R_WORD	0000		/* 16 bit */
-#define	R_BYTE	0001		/*  8 bit */
+#define	R3_WORD		0000		/* 16 bit */
+#define	R3_BYTE		0001		/*  8 bit */
 
-#define	R_AREA	0000		/* Base type */
-#define	R_SYM	0002
+#define	R3_AREA		0000		/* Base type */
+#define	R3_SYM		0002
 
-#define	R_NORM	0000		/* PC adjust */
-#define	R_PCR	0004
+#define	R3_NORM		0000		/* PC adjust */
+#define	R3_PCR		0004
 
-#define	R_BYT1	0000		/* Byte count for R_BYTE = 1 */
-#define	R_BYTX	0010		/* Byte count for R_BYTE = X */
+#define	R3_BYT1		0000		/* Byte count for R_BYTE = 1 */
+#define	R3_BYTX		0010		/* Byte count for R_BYTE = X */
 
-#define	R_SGND	0000		/* Signed value */
-#define	R_USGN	0020		/* Unsigned value */
+#define	R3_SGND		0000		/* Signed value */
+#define	R3_USGN		0020		/* Unsigned value */
 
-#define	R_NOPAG	0000		/* Page Mode */
-#define	R_PAG0	0040		/* Page '0' */
-#define	R_PAG	0100		/* Page 'nnn' */
+#define	R3_NOPAG	0000		/* Page Mode */
+#define	R3_PAG0		0040		/* Page '0' */
+#define	R3_PAG		0100		/* Page 'nnn' */
 
-#define	R_LSB	0000		/* output low byte */
-#define	R_MSB	0200		/* output high byte */
+#define	R3_LSB		0000		/* output low byte */
+#define	R3_MSB		0200		/* output high byte */
 
 /*
- *	Additional "R_" functionality is required to support
+ *	Additional "R3_" functionality is required to support
  *	some microprocesssor architectures.   The 'illegal'
- *	"R_" mode of R_WORD | R_BYTX is used as a designator
- *	of the extended R_ modes.  The extended modes replace
+ *	"R3_" mode of R3_WORD | R3_BYTX is used as a designator
+ *	of the extended R3_ modes.  The extended modes replace
  *	the PAGING modes and are being added in an adhoc manner
  *	as follows:
  *
@@ -145,82 +221,270 @@
  *	+-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define	R_ECHEK	0011		/* Extended Mode Check Bits */
-#define	R_EXTND	0010		/* Extended Mode Code */
-#define	R_EMASK	0151		/* Extended Mode Mask */
+#define	R3_ECHEK	0011		/* Extended Mode Check Bits */
+#define	R3_EXTND	0010		/* Extended Mode Code */
+#define	R3_EMASK	0151		/* Extended Mode Mask */
 
-/* #define R_AREA 0000 */	/* Base type */
-/* #define R_SYM  0002 */
+/* #define R3_AREA	0000 */		/* Base type */
+/* #define R3_SYM	0002 */
 
-/* #define R_NORM 0000 */	/* PC adjust */
-/* #define R_PCR  0004 */
+/* #define R3_NORM	0000 */		/* PC adjust */
+/* #define R3_PCR	0004 */
 
-/* #define R_SGND 0000 */	/* Signed value */
-/* #define R_USGN 0020 */	/* Unsigned value */
+/* #define R3_SGND	0000 */		/* Signed value */
+/* #define R3_USGN	0020 */		/* Unsigned value */
 
-/* #define R_LSB  0000 */	/* output low byte */
-/* #define R_MSB  0200 */	/* output high byte */
+/* #define R3_LSB	0000 */		/* output low byte */
+/* #define R3_MSB	0200 */		/* output high byte */
 
-#define	R_J11	0010		/* JLH: 11 bit JMP and CALL (8051) */
-#define R_J19   0050		/* BM:	19 bit JMP and CALL (DS80C390) */
-#define R_3BYTE	0110		/* 	24 bit */
-#define R_4BYTE	0150		/* 	32 bit */
+#define	R3_J11		0010		/* JLH: 11 bit JMP and CALL (8051) */
+#define R3_J19		0050		/* BM:	19 bit JMP and CALL (DS80C390) */
+#define R3_3BYTE	0110		/* 	24 bit */
+#define R3_4BYTE	0150		/* 	32 bit */
 
-/*
- * Global symbol types.
- */
-#define	S_REF	1		/* referenced */
-#define	S_DEF	2		/* defined */
 
 /*
- * Area types
+ *	ASLINK - Version 4 Definitions
  */
-#define	A_CON	000		/* concatenate */
-#define	A_OVR	004		/* overlay */
-#define	A_REL	000		/* relocatable */
-#define	A_ABS	010		/* absolute */
-#define	A_NOPAG	000		/* non-paged */
-#define	A_PAG	020		/* paged */
 
 /*
- * File types
+ *	The "A4_" area constants define values used in
+ *	generating the assembler area output data.
+ *
+ * Area flags
+ *
+ *	   7     6     5     4     3     2     1     0
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ *	| BNK | SEG |     | PAG | ABS | OVR | WL1 | WL0 |
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
  */
-#define	F_STD	1		/* stdin */
-#define	F_LNK	2		/* File.lnk */
-#define	F_REL	3		/* File.rel */
+
+#define	A4_BYTE		0x0000		/*  8 bit */
+#define	A4_WORD		0x0001		/* 16 bit */
+
+#define A4_1BYTE	0x0000		/* 1 Byte Word Length */
+#define A4_2BYTE	0x0001		/* 2 Byte Word Length */
+#define A4_3BYTE	0x0002		/* 3 Byte Word Length */
+#define A4_4BYTE	0x0003		/* 4 Byte Word Length */
+#define	A4_WLMSK	0x0003		/* Word Length Mask */
+
+#define	A4_CON		0x0400		/* Concatenating */
+#define	A4_OVR		0x0404		/* Overlaying */
+#define	A4_REL		0x0800		/* Relocatable */
+#define	A4_ABS		0x0808		/* absolute */
+#define	A4_NOPAG	0x1000		/* Non-Paged */
+#define	A4_PAG		0x1010		/* Paged */
+
+#define	A4_CSEG		0x4000		/* CSEG */
+#define	A4_DSEG		0x4040		/* DSEG */
+#define A4_NOBNK	0x8000		/* Non-Banked */
+#define A4_BNK		0x8080		/* Banked */
+
+/*
+ *	The "R4_" relocation constants define values used in
+ *	generating the assembler relocation output data for
+ *	areas, symbols, and code.
+ *
+ * Note:  The PAGE modes, PCR modes, Signed, Unsigned,
+ *        and MSB codes are mutually exclusive !!!
+ *
+ *
+ * Relocation flags
+ *
+ *	   7     6     5     4     3     2     1     0
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ *	| SYM | PCR | PAGn| PAG0| USGN| SGND| BYT1| BYT0|
+ *	+-----+-----+-----+-----+-----+-----+-----+-----+
+ */
+
+#define	R4_BYTE		0x0000		/*  8 bit */
+#define	R4_WORD		0x0001		/* 16 bit */
+
+#define R4_1BYTE	0x0000		/* 1 Byte */
+#define R4_2BYTE	0x0001		/* 2 Byte */
+#define R4_3BYTE	0x0002		/* 3 Byte */
+#define R4_4BYTE	0x0003		/* 4 Byte */
+#define	R4_BYTES	0x0003		/* Data Size */
+
+#define	R4_SGND		0x0004		/* Signed */
+#define	R4_USGN		0x0008		/* Unsigned */
+#define	R4_OVRF		0x0008		/* Overflow */
+
+#define	R4_MBRS		0x0004		/* Merge Bit Range Signed */
+					/* An alias for Signed */
+#define	R4_MBRU		0x0008		/* Merge Bit Range Unsigned */
+					/* An alias for Unsigned */
+#define	R4_MBRO		0x0008		/* Merge Bit Range Overflow */
+					/* An alias for Unsigned */
+
+#define	R4_MSB		0x000C		/* MSB */
+					/* Mutually exclusive with Signed / Unsigned */
+
+#define	R4_AREA		0x0000		/* Base type */
+#define	R4_SYM		0x0080
+
+/*
+ * Paging Modes:
+ */
+
+#define	R4_NOPAG	0x0000		/* Page Mode */
+#define	R4_PBITS	0x003C		/* Paging Bits */
+#define	R4_PAGE		0x0030		/* Paged Addressing */
+#define	R4_PAG0		0x0010		/* Page '0'    .setdp */
+#define	R4_PAGN		0x0020		/* Page 'nnn'  .setdp */
+#define	R4_PAGX		0x0030		/* Page 'x', Extended Relocation Mode */
+#define	R4_PAGX0	0x0030		/* Page 'x', pc + 0 */
+#define	R4_PAGX1	0x0034		/* Page 'x', pc + 1 */
+#define	R4_PAGX2	0x0038		/* Page 'x', pc + 2 */
+#define	R4_PAGX3	0x003C		/* Page 'x', pc + 3 */
+
+/*
+ * PCR Modes:
+ */
+
+#define	R4_PCR		0x0040		/* PC adjust (default)    */
+#define	R4_PCRN		0x0050		/* PC adjust (default) no range check */
+
+#define	R4_PCR0		0x0054		/* PC adjust (offset = 0) */
+#define	R4_PCR1		0x0060		/* PC adjust (offset = 1) */
+#define	R4_PCR2		0x0064		/* PC adjust (offset = 2) */
+#define	R4_PCR3		0x0068		/* PC adjust (offset = 3) */
+#define	R4_PCR4		0x006C		/* PC adjust (offset = 4) */
+
+#define	R4_PCR0N	0x0058		/* PC adjust (offset = 0) no range check */
+#define	R4_PCR1N	0x0070		/* PC adjust (offset = 1) no range check */
+#define	R4_PCR2N	0x0074		/* PC adjust (offset = 2) no range check */
+#define	R4_PCR3N	0x0078		/* PC adjust (offset = 3) no range check */
+#define	R4_PCR4N	0x007C		/* PC adjust (offset = 4) no range check */
+
+/*
+ * Basic Relocation Modes
+ */
+
+#define	R4_NORM		0x0000		/* No Bit Positioning */
+
 
 /*
  *	General assembler address type
  */
-typedef unsigned int a_uint;
+typedef unsigned INT32 a_uint;
 
 /*
- *	The structures of head, area, areax, and sym are created
- *	as the REL files are read during the first pass of the
- *	linker.  The struct head is created upon encountering a
- *	H directive in the REL file.  The structure contains a
- *	link to a link file structure (struct lfile) which describes
- *	the file containing the H directive, the number of data/code
- *	areas contained in this header segment, the number of
+ *	The structures of head, mode, bank, area, areax, and sym
+ *	are created as the REL files are read during the first
+ *	pass of the linker.  The struct head is created upon
+ *	encountering a H directive in the REL file.  The
+ *	structure contains a link to a link file structure
+ *	(struct lfile) which describes the file containing the H
+ *	directive, a pointer to an array of merge mode
+ *	definition pointers, the number of data/code areas
+ *	contained in this header segment, the number of
  *	symbols referenced/defined in this header segment, a pointer
  *	to an array of pointers to areax structures (struct areax)
- *	created as each A directive is read, and a pointer to an
+ *	created as each A directive is read, a pointer to an
  *	array of pointers to symbol structures (struct sym) for
- *	all referenced/defined symbols.  As H directives are read
+ *	all referenced/defined symbols and a pointer to an array
+ *	of pointers to bank structures (struct bank) referenced
+ *	by this module.  As H directives are read
  *	from the REL files a linked list of head structures is
  *	created by placing a link to the new head structure
  *	in the previous head structure.
  */
 struct	head
 {
-	struct	head   *h_hp;	/* Header link */
-	struct	lfile  *h_lfile;/* Associated file */
+	struct	head  *h_hp;	/* Header link */
+	struct	lfile *h_lfile;	/* Associated file */
 	int	h_narea;	/* # of areas */
 	struct	areax **a_list;	/* Area list */
-	int	h_nglob;	/* # of global symbols */
-	struct	sym   **s_list;	/* Globle symbol list */
+	int	h_nsym;		/* # of symbols */
+	struct	sym   **s_list;	/* Symbol list */
+	int	h_nbank;	/* # of banks */
+	struct	bank  **b_list;	/* Bank list */
+	int	h_nmode;	/* # of modes */
+	struct	mode  **m_list;	/* Mode list */
 	char *	m_id;		/* Module name */
 };
+
+/*
+ *	The MODE structure contains the specification of one of the
+ *	assemblers' relocation modes.  Each assembler must specify
+ *	at least one relocation mode.  The relocation specification
+ *	allows arbitrarily defined active bits and bit positions.
+ *	The 32 element arrays are indexed from 0 to 31.
+ *	Index 0 corresponds to bit 0, ..., and 31 corresponds to bit 31
+ *	of a normal integer value.
+ *
+ *	The value an array element defines if the normal integer bit is
+ *	active (bit <7> is set, 0x80) and what destination bit
+ *	(bits <4:0>, 0 - 31) should be loaded with this normal
+ *	integer bit.
+ *
+ *	The specification for a 32-bit integer:
+ *
+ *	char mode_[32] = {
+ *		0x80,	0x81,	0x82,	0x83,	0x84,	0x85,	0x86,	0x87,
+ *		0x88,	0x89,	0x8A,	0x8B,	0x8C,	0x8D,	0x8E,	0x8F,
+ *		0x90,	0x91,	0x92,	0x93,	0x94,	0x95,	0x96,	0x97,
+ *		0x98,	0x99,	0x9A,	0x9B,	0x9C,	0x9D,	0x9E,	0x9F
+ *	};
+ *
+ *
+ *	The specification for the 11-bit 8051 addressing mode:
+ *
+ *	char mode_[32] = {
+ *		0x80,	0x81,	0x82,	0x83,	0x84,	0x85,	0x86,	0x87,
+ *		0x8D,	0x8E,	0x8F,	0x0B,	0x0C,	0x0D,	0x0E,	0x0F,
+ *		0x10,	0x11,	0x12,	0x13,	0x14,	0x15,	0x16,	0x17,
+ *		0x18,	0x19,	0x1A,	0x1B,	0x1C,	0x1D,	0x1E,	0x1F
+ *	};
+ *
+ *
+ *	m_def is the bit relocation definition array.
+ *	m_flag indicates that bit position swapping is required.
+ *	m_mask contains the active bit positions for the output.
+ *	m_page contains the page range.
+ */
+struct	mode
+{
+	char 	m_def[32];	/* Bit Relocation Definition */
+	int	m_flag;		/* Bit Swapping Flag */
+	a_uint	m_mask;		/* Bit Mask */
+	a_uint	m_page;		/* Page Bits */
+};
+
+/*
+ *	The bank structure contains the parameter values for a
+ *	specific program or data bank.  The bank structure
+ *	is a linked list of banks.  The initial default bank
+ *	is unnamed and is defined in lkdata.c, the next bank structure
+ *	will be linked to this structure through the structure
+ *	element 'struct bank *b_bp'.  The structure contains the
+ *	bank name, the bank base address (default = 0), the bank size
+ *	(default = 0, whole addressing space), the bank mapping,
+ *	and the file name suffix. (default is none)  These optional
+ *	parameters are from  the .bank assembler directive.
+ *	The bank structure also contains the bank data output
+ *	file specification, file handle pointer and the
+ *	bank first output flag.
+ */
+struct	bank
+{
+	struct	bank *b_bp;	/* Bank link */
+	char *	b_id;		/* Bank Name */
+	char *	b_fsfx;		/* Bank File Suffix / File Specification */
+	a_uint	b_base;		/* Bank base address */
+	a_uint	b_size;		/* Bank size */
+	a_uint	b_map;		/* Bank mapping */
+	int	b_flag;		/* Bank flags */
+	char *	b_fspec;	/* Bank File Specification */
+	FILE *	b_ofp;		/* Bank File Handle */
+	int	b_rtaflg;	/* Bank First Output flag */
+};
+
+#define B_BASE	0001		/* 'base' address specified */
+#define B_SIZE	0002		/* 'size' of bank specified */
+#define	B_FSFX	0004		/* File suffix specified */
+#define	B_MAP	0010		/* Mapped Bank Flag */
 
 /*
  *	A structure area is created for each 'unique' data/code
@@ -230,6 +494,9 @@ struct	head
  *	the area base address set flag byte (-b option), and the
  *	area base address and total size which will be filled
  *	in at the end of the first pass through the REL files.
+ *	The area structure also contains a link to the bank
+ *	this area is a part of and a data output file handle
+ *	pointer which is loaded from from the bank structure.
  *	As A directives are read from the REL files a linked
  *	list of unique area structures is created by placing a
  *	link to the new area structure in the previous area structure.
@@ -238,10 +505,12 @@ struct	area
 {
 	struct	area	*a_ap;	/* Area link */
 	struct	areax	*a_axp;	/* Area extension link */
+	struct	bank	*a_bp;	/* Bank link */
+	FILE *	a_ofp;		/* Area File Handle */
 	a_uint	a_addr;		/* Beginning address of area */
 	a_uint	a_size;		/* Total size of the area */
-	char	a_bset;		/* Area base address set */
-	char	a_flag;		/* Flag byte */
+	int	a_bset;		/* Area base address set */
+	int	a_flag;		/* Flag */
 	char *	a_id;		/* Name */
 };
 
@@ -490,12 +759,12 @@ extern	struct	lfile	*filep;	/*	The pointers (lfile *) filep,
 				 *	(lfile *) cfp, and (FILE *) sfp
 				 *	are used in conjunction with
 				 *	the routine getline() to read
-				 *	asmlnk commands from
+				 *	aslink commands from
 				 *	(1) the standard input or
 				 *	(2) or a command file
 				 *	and to read the REL files
 				 *	sequentially as defined by the
-				 *	asmlnk input commands.
+				 *	aslink input commands.
 				 *
 				 *	The pointer *filep points to the
 				 *	beginning of a linked list of
@@ -504,7 +773,7 @@ extern	struct	lfile	*filep;	/*	The pointers (lfile *) filep,
 extern	struct	lfile	*cfp;	/*	The pointer *cfp points to the
 				 *	current lfile structure
 				 */
-extern	struct	lfile	*startp;/*	asmlnk startup file structure
+extern	struct	lfile	*startp;/*	aslink startup file structure
 				 */
 extern	struct	lfile	*linkp;	/*	pointer to first lfile structure
 				 *	containing an input REL file
@@ -518,6 +787,12 @@ extern	struct	head	*headp;	/*	The pointer to the first
 				 */
 extern	struct	head	*hp;	/*	Pointer to the current
 				 *	head structure
+				 */
+extern	struct	bank	*bankp;	/*	The pointer to the first
+				 *	bank structure of a linked list
+				 */
+extern	struct	bank	*bp;	/*	Pointer to the current
+				 *	bank structure
 				 */
 extern	struct	area	*areap;	/*	The pointer to the first
 				 *	area structure of a linked list
@@ -548,8 +823,17 @@ extern	struct	sdp	sdp;	/*	Base Paged structure
 extern	struct	rerr	rerr;	/*	Structure containing the
 				 *	linker error information
 				 */
+extern	FILE	*nbofp;		/*	Non Banked Linker Output
+				 *	File Handle
+				 */
 extern	FILE	*ofp;		/*	Linker Output file handle
 				 */
+
+#if NOICE
+extern	FILE	*jfp;		/*	NoICE output file handle
+				 */
+#endif
+
 extern	FILE	*mfp;		/*	Map output file handle
 				 */
 extern	FILE	*rfp;		/*	File handle for output
@@ -562,14 +846,32 @@ extern	FILE	*sfp;		/*	The file handle sfp points to the
 extern	FILE	*tfp;		/*	File handle for input
 				 *	ASxxxx listing file
 				 */
+
+#if SDCDB
+extern	FILE	*yfp;		/*	SDCDB output file handle
+				 */
+#endif
+
 extern	int	oflag;		/*	Output file type flag
 				 */
 extern	int	objflg;		/*	Linked file/library object output flag
 				 */
+
+#if NOICE
+extern	int	jflag;		/*	-j, enable NoICE Debug output
+				 */
+#endif
+
 extern	int	mflag;		/*	Map output flag
 				 */
 extern	int	xflag;		/*	Map file radix type flag
 				 */
+
+#if SDCDB
+extern	int	yflag;		/*	-y, enable SDCC Debug output
+				 */
+#endif
+
 extern	int	pflag;		/*	print linker command file flag
 				 */
 extern	int	uflag;		/*	Listing relocation flag
@@ -590,6 +892,10 @@ extern	int	lop;		/*	current line number on page
 				 */
 extern	int	pass;		/*	linker pass number
 				 */
+extern	a_uint	pc;		/*	current relocation address
+				 */
+extern	int	pcb;		/*	current bytes per pc word
+				 */
 extern	int	rtcnt;		/*	count of elements in the
 				 *	rtval[] and rtflg[] arrays
 				 */
@@ -598,7 +904,12 @@ extern	a_uint	rtval[];	/*	data associated with relocation
 extern	int	rtflg[];	/*	indicates if rtval[] value is
 				 *	to be sent to the output file.
 				 */
+extern	int	rterr[];	/*	indicates if rtval[] value should
+				 *	be flagged as a relocation error.
+				 */
 extern	char	rtbuf[];	/*	S19/IHX output buffer
+				 */
+extern	struct	bank *rtabnk;	/*	rtbuf[] processing
 				 */
 extern	int	rtaflg;		/*	rtbuf[] processing
 				 */
@@ -646,6 +957,7 @@ extern	int		fprintf();
 extern	VOID		free();
 extern	VOID *		malloc();
 extern	char		putc();
+extern	char *		sprintf();
 extern	char *		strcpy();
 extern	int		strlen();
 extern	char *		strncpy();
@@ -656,10 +968,14 @@ extern	char *		strrchr();
 
 #ifdef	OTHERSYSTEM
 
+/* C Library */
+extern	VOID		exit(int n);
+
 /* lkmain.c */
 extern	FILE *		afile(char *fn, char *ft, int wf);
 extern	VOID		bassav(void);
 extern	int		fndidx(char *str);
+extern	int		fndext(char *str);
 extern	VOID		gblsav(void);
 extern	VOID		link(void);
 extern	VOID		lkexit(int i);
@@ -667,11 +983,12 @@ extern	int		main(int argc, char *argv[]);
 extern	VOID		map(void);
 extern	int		parse(void);
 extern	VOID		doparse(void);
-extern	VOID		setbas(void);
+extern	VOID		setarea(void);
 extern	VOID		setgbl(void);
 extern	VOID		usage(int n);
 
 /* lklex.c */
+extern	VOID		chopcrlf(char *str);
 extern	char		endline(void);
 extern	int		get(void);
 extern	VOID		getfid(char *str, int c);
@@ -687,11 +1004,21 @@ extern	VOID		unget(int c);
 extern	VOID		lkparea(char *id);
 extern	VOID		lnkarea(void);
 extern	VOID		lnksect(struct area *tap);
+extern	VOID		lnkserr(char *frmt, char *str);
 extern	VOID		newarea(void);
+
+/* lkbank.c */
+extern	VOID		chkbank(void);
+extern	VOID		lkfclose(void);
+extern	VOID		lkfopen(void);
+extern	VOID		lkpbank(char * id);
+extern	VOID		newbank(void);
+extern	VOID		setbank(void);
 
 /* lkhead.c */
 extern	VOID		module(void);
 extern	VOID		newhead(void);
+extern	VOID		newmode(void);
 
 /* lksym.c */
 extern	int		hash(char *p, int cflag);
@@ -715,11 +1042,29 @@ extern	a_uint		term(void);
 /* lklist.c */
 extern	int		dgt(int rdx, char *str, int n);
 extern	VOID		newpag(FILE *fp);
-extern	VOID		slew(struct area *xp);
-extern	VOID		lstarea(struct area *xp);
+extern	VOID		slew(struct area *xp, struct bank *yp);
+extern	VOID		lstarea(struct area *xp, struct bank *yp);
 extern	VOID		lkulist(int i);
-extern	VOID		lkalist(a_uint pc);
-extern	VOID		lkglist(a_uint pc, int v);
+extern	VOID		lkalist(a_uint cpc);
+extern	VOID		lkglist(a_uint cpc, int v, int err);
+
+/* lknoice.c */
+extern	VOID		NoICEfopen(void);
+extern	VOID		NoICEmagic(void);
+extern	VOID		DefineNoICE(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineGlobal(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineScoped(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineFile(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineFunction(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineStaticFunction(char *name, a_uint value, struct bank *yp);
+extern	VOID		DefineEndFunction(a_uint value, struct bank *yp);
+extern	VOID		DefineLine(char *lineString, a_uint value, struct bank *yp);
+extern	VOID		PagedAddress(a_uint value, struct bank *yp);
+
+/* lkcdb.c */
+extern	VOID		SDCDBfopen(void);
+extern	VOID		SDCDBcopy(char * str);
+extern	VOID		DefineSDCDB(char *name, a_uint value);
 
 /* lkrloc.c */
 extern	a_uint		adb_1b(a_uint v, int i);
@@ -727,21 +1072,48 @@ extern	a_uint		adb_2b(a_uint v, int i);
 extern	a_uint		adb_3b(a_uint v, int i);
 extern	a_uint		adb_4b(a_uint v, int i);
 extern	a_uint		adb_xb(a_uint v, int i);
-extern	a_uint		adb_hi(a_uint v, int i);
-extern	a_uint		adb_lo(a_uint v, int i);
 extern	a_uint		adw_xb(int x, a_uint v, int i);
 extern	a_uint		evword(void);
-extern	VOID		rele(void);
-extern	VOID		reloc(int c);
-extern	VOID		relt(void);
-extern	VOID		relr(void);
-extern	VOID		relp(void);
-extern	VOID		relerr(char *str);
-extern	char *		errmsg[];
-extern	VOID		errdmp(FILE *fptr, char *str);
-extern	VOID		relerp(char *str);
-extern	VOID		erpdmp(FILE *fptr, char *str);
 extern	VOID		prntval(FILE *fptr, a_uint v);
+extern	VOID		reloc(int c);
+
+/* lkrloc3.c */
+extern	a_uint		adb_hi(a_uint v, int i);
+extern	a_uint		adb_lo(a_uint v, int i);
+extern	char *		errmsg3[];
+extern	VOID		errdmp3(FILE *fptr, char *str);
+extern	VOID		erpdmp3(FILE *fptr, char *str);
+extern	VOID		rele3(void);
+extern	VOID		reloc3(int c);
+extern	VOID		relt3(void);
+extern	VOID		relr3(void);
+extern	VOID		relp3(void);
+extern	VOID		relerr3(char *str);
+extern	VOID		relerp3(char *str);
+
+/* lkrloc4.c */
+extern	a_uint		adb_byte(int p, a_uint v, int i);
+extern	char *		errmsg4[];
+extern	VOID		errdmp4(FILE *fptr, char *str);
+extern	VOID		erpdmp4(FILE *fptr, char *str);
+extern	a_uint		gtb_1b(int i);
+extern	a_uint		gtb_2b(int i);
+extern	a_uint		gtb_3b(int i);
+extern	a_uint		gtb_4b(int i);
+extern	a_uint		gtb_xb(int i);
+extern	int		lkmerge(int esp, int r, int v);
+extern	a_uint		ptb_1b(a_uint v, int i);
+extern	a_uint		ptb_2b(a_uint v, int i);
+extern	a_uint		ptb_3b(a_uint v, int i);
+extern	a_uint		ptb_4b(a_uint v, int i);
+extern	a_uint		ptb_xb(a_uint v, int i);
+extern	VOID		rele4(void);
+extern	VOID		reloc4(int c);
+extern	VOID		relt4(void);
+extern	VOID		relr4(void);
+extern	VOID		relp4(void);
+extern	VOID		relerr4(char *str);
+extern	VOID		relerp4(char *str);
 
 /* lklibr.c */
 extern	VOID		addfile(char *path, char *libfil);
@@ -754,6 +1126,7 @@ extern	VOID		search(void);
 
 /* lkout.c */
 extern	VOID		lkout(int i);
+extern	VOID		lkflush(void);
 extern	VOID		ixx(int i);
 extern	VOID		iflush(void);
 extern	VOID		sxx(int i);
@@ -761,9 +1134,13 @@ extern	VOID		sflush(void);
 
 #else
 
+/* C Library */
+extern	VOID		exit();
+
 /* lkmain.c */
 extern	FILE *		afile();
 extern	VOID		bassav();
+extern	int		fndext();
 extern	int		fndidx();
 extern	VOID		gblsav();
 extern	VOID		link();
@@ -772,11 +1149,14 @@ extern	int		main();
 extern	VOID		map();
 extern	int		parse();
 extern	VOID		doparse();
-extern	VOID		setbas();
+extern	VOID		setarea();
+extern	VOID		setbank();
+extern	VOID		chkbank();
 extern	VOID		setgbl();
 extern	VOID		usage();
 
 /* lklex.c */
+extern	VOID		chopcrlf();
 extern	char		endline();
 extern	int		get();
 extern	VOID		getfid();
@@ -792,11 +1172,23 @@ extern	VOID		unget();
 extern	VOID		lkparea();
 extern	VOID		lnkarea();
 extern	VOID		lnksect();
+extern	VOID		lnkserr();
 extern	VOID		newarea();
+
+/* lkbank.c */
+extern	VOID		chkbank();
+extern	VOID		lkfclose();
+extern	VOID		lkfopen();
+extern	VOID		lkpbank();
+extern	VOID		newbank();
+extern	VOID		setbank();
 
 /* lkhead.c */
 extern	VOID		module();
 extern	VOID		newhead();
+extern	VOID		newbank();
+extern	VOID		newmode();
+extern	VOID		lkpbank();
 
 /* lksym.c */
 extern	int		hash();
@@ -826,27 +1218,72 @@ extern	VOID		lkulist();
 extern	VOID		lkalist();
 extern	VOID		lkglist();
 
+/* lknoice.c */
+extern	VOID		NoICEfopen();
+extern	VOID		NoICEmagic();
+extern	VOID		DefineNoICE();
+extern	VOID		DefineGlobal();
+extern	VOID		DefineScoped();
+extern	VOID		DefineFile();
+extern	VOID		DefineFunction();
+extern	VOID		DefineStaticFunction();
+extern	VOID		DefineEndFunction();
+extern	VOID		DefineLine();
+extern	VOID		PagedAddress();
+
+/* lksdcdb.c */
+extern	VOID		SDCDBfopen();
+extern	VOID		SDCDBcopy();
+extern	VOID		DefineSDCDB();
+
 /* lkrloc.c */
 extern	a_uint		adb_1b();
 extern	a_uint		adb_2b();
 extern	a_uint		adb_3b();
 extern	a_uint		adb_4b();
 extern	a_uint		adb_xb();
-extern	a_uint		adb_hi();
-extern	a_uint		adb_lo();
 extern	a_uint		adw_xb();
 extern	a_uint		evword();
-extern	VOID		rele();
-extern	VOID		reloc();
-extern	VOID		relt();
-extern	VOID		relr();
-extern	VOID		relp();
-extern	VOID		relerr();
-extern	char *		errmsg[];
-extern	VOID		errdmp();
-extern	VOID		relerp();
-extern	VOID		erpdmp();
 extern	VOID		prntval();
+extern	VOID		reloc();
+
+/* lkrloc3.c */
+extern	a_uint		adb_hi();
+extern	a_uint		adb_lo();
+extern	char *		errmsg3[];
+extern	VOID		errdmp3();
+extern	VOID		erpdmp3();
+extern	VOID		rele3();
+extern	VOID		reloc3();
+extern	VOID		relt3();
+extern	VOID		relr3();
+extern	VOID		relp3();
+extern	VOID		relerr3();
+extern	VOID		relerp3(c);
+
+/* lkrloc4.c */
+extern	a_uint		adb_byte();
+extern	char *		errmsg4[];
+extern	VOID		errdmp4();
+extern	VOID		erpdmp4();
+extern	a_uint		gtb_1b();
+extern	a_uint		gtb_2b();
+extern	a_uint		gtb_3b();
+extern	a_uint		gtb_4b();
+extern	a_uint		gtb_xb();
+extern	int		lkmerge();
+extern	a_uint		ptb_1b();
+extern	a_uint		ptb_2b();
+extern	a_uint		ptb_3b();
+extern	a_uint		ptb_4b();
+extern	a_uint		ptb_xb();
+extern	VOID		rele4();
+extern	VOID		reloc4();
+extern	VOID		relt4(v);
+extern	VOID		relr4();
+extern	VOID		relp4();
+extern	VOID		relerr4();
+extern	VOID		relerp4();
 
 /* lklibr.c */
 extern	VOID		addfile();
@@ -859,6 +1296,7 @@ extern	VOID		search();
 
 /* lkout.c */
 extern	VOID		lkout();
+extern	VOID		lkflush();
 extern	VOID		ixx();
 extern	VOID		iflush();
 extern	VOID		sxx();

@@ -1,37 +1,64 @@
-..\exe\as6500.exe -glaxff ..\..\..\asxtst\asmtl.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmtl.lst
-..\exe\as6800.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as6801.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as6804.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as6805.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as6808.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as6809.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as6811.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as6812.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as6816.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as8085.exe -glaxff ..\..\..\asxtst\asmtl.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmtl.lst
-..\exe\as8051.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as8xcxxx.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
-..\exe\as8xcxxx.exe -glaxff ..\..\..\asxtst\asmt3h.asm
-..\exe\asxscn.exe -x3 ..\..\..\asxtst\asmt3h.lst
-..\exe\asz80.exe -glaxff ..\..\..\asxtst\asmtl.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmtl.lst
-..\exe\asgb.exe -glaxff ..\..\..\asxtst\asmtl.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmtl.lst
-..\exe\ash8.exe -glaxff ..\..\..\asxtst\asmth.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmth.lst
+..\exe\as430.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
+..\exe\as740.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
+..\exe\as1802.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as6500.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
+..\exe\as6800.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as6801.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as6804.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as6805.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as6808.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as6809.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as6811.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as6812.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as6816.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as61860.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as8085.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
+..\exe\as8051.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\asz80.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
+..\exe\asgb.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
+..\exe\asrab.exe -glaxff ..\..\..\asxtst\asmt2blo.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
+..\exe\as8xcxxx.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as8xcxxx.exe -glaxff ..\..\..\asxtst\asmt3bhi.asm
+..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3bhi.lst
+..\exe\ash8.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\asavr.exe -glaxff ..\..\..\asxtst\asmt4blo.asm
+..\exe\asxscn.exe -4 ..\..\..\asxtst\asmt4blo.lst
+..\exe\aspic.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+..\exe\aspic.exe -glaxff ..\..\..\asxtst\asmt4bhi.asm
+..\exe\asxscn.exe -4 ..\..\..\asxtst\asmt4bhi.lst
+..\exe\ascheck.exe -glaxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+
+..\exe\as430.exe -gloaxff ..\..\..\as430\t430.asm
+..\exe\asxscn.exe ..\..\..\as430\t430.lst
+..\exe\aslink.exe -nxu ..\..\..\as430\t430
+..\exe\asxscn.exe -i ..\..\..\as430\t430.rst
+..\exe\as740.exe -glaxff ..\..\..\as740\t740s.asm
+..\exe\asxscn.exe ..\..\..\as740\t740s.lst
+..\exe\as1802.exe -glaxff ..\..\..\as1802\t1802.asm
+..\exe\asxscn.exe ..\..\..\as1802\t1802.lst
 ..\exe\as6500.exe -glaxff ..\..\..\as6500\t6500.asm
 ..\exe\asxscn.exe ..\..\..\as6500\t6500.lst
 ..\exe\as6500.exe -glaxff ..\..\..\as6500\t6500s.asm
@@ -64,16 +91,42 @@
 ..\exe\asxscn.exe ..\..\..\as6812\t6812b.lst
 ..\exe\as6816.exe -glaxff ..\..\..\as6816\t6816.asm
 ..\exe\asxscn.exe ..\..\..\as6816\t6816.lst
+..\exe\as61860.exe -glaxff ..\..\..\as61860\t61860.asm
+..\exe\asxscn.exe ..\..\..\as61860\t61860.lst
+..\exe\as61860.exe -gloaxff ..\..\..\as61860\t61860s.asm
+..\exe\asxscn.exe ..\..\..\as61860\t61860s.lst
+..\exe\aslink.exe -nxmu -g addr=0 -g reg=0 -g extrn=0 ..\..\..\as61860\t61860s
+..\exe\asxscn.exe -i ..\..\..\as61860\t61860s.rst
 ..\exe\as8085.exe -glaxff ..\..\..\as8085\t8085.asm
 ..\exe\asxscn.exe ..\..\..\as8085\t8085.lst
 ..\exe\as8051.exe -glaxff ..\..\..\as8051\t8051.asm
 ..\exe\asxscn.exe ..\..\..\as8051\t8051.lst
-..\exe\as8xcxxx.exe -glaxff ..\..\..\as8xcxxx\t80c390.asm
-..\exe\asxscn.exe -x3 ..\..\..\as8xcxxx\t80c390.lst
 ..\exe\asz80.exe -glaxff ..\..\..\asz80\tz80.asm
 ..\exe\asxscn.exe ..\..\..\asz80\tz80.lst
-..\exe\asgb.exe -glaxff ..\..\..\asz80gb\tgb.asm
+..\exe\asgb.exe -glaxff ..\..\..\asgb\tgb.asm
 ..\exe\asxscn.exe ..\..\..\asgb\tgb.lst
+..\exe\asrab.exe -gloabxff ..\..\..\asrab\trabl.asm
+..\exe\aslink.exe -nxu ..\..\..\asrab\trabl
+..\exe\asxscn.exe ..\..\..\asrab\trabl.lst
+..\exe\asxscn.exe ..\..\..\asrab\trabl.rst
+..\exe\asrab.exe -gloabxff ..\..\..\asrab\trabg.asm
+..\exe\aslink.exe -nxu -g offset=0x33 -g n=0x20 -g mn=0x0584 ..\..\..\asrab\trabg
+..\exe\asxscn.exe ..\..\..\asrab\trabg.rst
+..\exe\as8xcxxx.exe -glaxff ..\..\..\as8xcxxx\t80c390.asm
+..\exe\asxscn.exe -3 ..\..\..\as8xcxxx\t80c390.lst
 ..\exe\ash8.exe -glaxff ..\..\..\ash8\th8.asm
 ..\exe\asxscn.exe ..\..\..\ash8\th8.lst
+..\exe\asavr.exe -gloaxff ..\..\..\asavr\tavr.asm
+..\exe\aslink.exe -nxmu -g zero=0 -g blbl=s_bra -g rlbl=s_rjmp ..\..\..\asavr\tavr
+..\exe\asxscn.exe -4i ..\..\..\asavr\tavr.rst
+..\exe\aspic.exe -glaxff ..\..\..\aspic\p12c5xx\tp12c5xx
+..\exe\asxscn.exe ..\..\..\aspic\p12c5xx\tp12c5xx.lst
+..\exe\aspic.exe -glaxff ..\..\..\aspic\p12c67x\tp12c67x
+..\exe\asxscn.exe ..\..\..\aspic\p12c67x\tp12c67x.lst
+..\exe\aspic.exe -glaxff ..\..\..\aspic\p16cxxx\tpic16cx
+..\exe\asxscn.exe ..\..\..\aspic\p16cxxx\tpic16cx.lst
+..\exe\aspic.exe -glaxff ..\..\..\aspic\p17cxxx\tpic17cx
+..\exe\asxscn.exe ..\..\..\aspic\p17cxxx\tpic17cx.lst
+..\exe\aspic.exe -glaxff ..\..\..\aspic\p18cxxx\tpic18cx
+..\exe\asxscn.exe -4 ..\..\..\aspic\p18cxxx\tpic18cx.lst
 

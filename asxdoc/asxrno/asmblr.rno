@@ -185,7 +185,7 @@ The p code is generated because the symbols location is changing on each
 pass through the source file.
 
 The label must not start with the characters 0-9, as this designates a
-local symbol with special attributes described in a later section.
+reusable symbol with special attributes described in a later section.
 
 The label must not start with the sequence $$, as this represents the
 temporary radix 16 for constants.
@@ -256,9 +256,9 @@ The following characters are legal in ASxxxx source programs:
 .list 1
 .list element
 The letters A through Z.  Both upper- and lower-case letters
-are acceptable.  The assemblers, by default, are not case sensitive, i.e.
-ABCD and abcd are the same symbols. (The assemblers can be made
-case sensitive by using the -z command line option.)
+are acceptable.  The assemblers, by default, are case sensitive, i.e.
+ABCD and abcd are not the same symbols. (The assemblers can be made
+case insensitive by using the -z command line option.)
 .list element
 The digits 0 through 9
 .list element
@@ -287,11 +287,11 @@ Label Terminator; defines the label as a global label.
 _=###Equal#sign##########
 Direct assignment operator.
 .skip;.indent -24
-_=_=##Double#equal########
-Direct assignment operator;
-.indent -24
-####sign################
-defines the symbol as a global symbol.
+_=_=##Global#equal########
+Direct assignment operator; defines the symbol as a global symbol.
+.skip;.indent -24
+_=_:##Local#equal#########
+Direct assignment operator; defines the symbol as a local symbol.
 .left margin -32
 .skip
 ----------------------------------------------------------------
@@ -472,7 +472,7 @@ Symbols can be composed of alphanumeric characters,
 dollar signs (_$), periods (_.), and underscores (__) only.
 .list element
 The first character of a symbol must not be a number
-(except in the case of local symbols).
+(except in the case of reusable symbols).
 .list element
 The first 79 characters of a symbol must be unique.
 A symbol can be written with more than 79 legal characters,
@@ -482,45 +482,45 @@ Spaces and Tabs must not be embedded within a symbol.
 .end list
 
 
-.header level 2;Local Symbols
+.header level 2;Reusable Symbols
 
-Local symbols are specially formatted symbols used as labels within a
-block of coding that has been delimited as a local symbol block.
-Local symbols are of the form n$, where n is a decimal integer from
-0 to 255, inclusive.  Examples of local symbols are:
+Reusable symbols are specially formatted symbols used as labels within a
+block of coding that has been delimited as a reusable symbol block.
+Reusable symbols are of the form n$, where n is a decimal integer from
+0 to 65535, inclusive.  Examples of reusable symbols are:
 .skip
 .indent 6;1$
 .indent 6;27$
 .indent 6;138$
 .indent 6;244$
 
-The range of a local symbol block consists of those statements
+The range of a reusable symbol block consists of those statements
 between two normally constructed symbolic labels. Note that a
 statement of the form:
 .skip
 .indent 6;ALPHA = EXPRESSION
 .skip
 is a direct assignment statement but does not create a label and thus
-does not delimit the range of a local symbol block.
+does not delimit the range of a reusable symbol block.
 
-Note that the range of a local symbol block may extend across
+Note that the range of a reusable symbol block may extend across
 program areas.
 
-Local symbols provide a convenient means of generating labels for branch
-instructions and other such references within local symbol blocks.
-Using local symbols reduces the possibility of symbols with multiple
-definitions appearing within a user program. In addition, the use of local
-symbols differentiates entry-point labels from local labels, since
-local labels cannot be referenced from outside their respective
-local symbol blocks.  Thus, local symbols of the same name can appear
-in other local symbol blocks without conflict. Local symbols require
+Reusable symbols provide a convenient means of generating labels for branch
+instructions and other such references within reusable symbol blocks.
+Using reusable symbols reduces the possibility of symbols with multiple
+definitions appearing within a user program. In addition, the use of reusable
+symbols differentiates entry-point labels from other labels, since
+reusable labels cannot be referenced from outside their respective
+symbol blocks.  Thus, reusable symbols of the same name can appear
+in other symbol blocks without conflict. Reusable symbols require
 less symbol table space than normal symbols. Their use is recommended.
 
-The use of the same local symbol within a local symbol block will
+The use of the same reusable symbol within a symbol block will
 generate one or both of the m or p errors.
 .test page 15
 .skip
-Example of local symbols:
+Example of reusable symbols:
 .skip;.literal
 	a:	ldx	#atable	;get table address
 		lda	#0d48	;table length
@@ -808,6 +808,21 @@ appear on the new page. The .page source line will not appear in the
 file listing. Paging may be disabled by invoking the -p directive.
 
 
+.header level 2;_.msg Directive
+Format:
+.skip;.indent 8
+_.msg text
+.skip;.left margin +16
+.indent -16
+where:##text####represents a delimited string.  The string is
+printed to the console during the final assembly pass.
+.left margin -16
+.skip
+
+The _.msg directive is useful to report assembly status or
+other information during the assembly process.
+
+
 .header level 2;_.error Directive
 Format:
 .skip;.indent 8
@@ -827,16 +842,16 @@ function to the _.assume directive, just perhaps more
 descriptive.)
 
 
-.header level 2;_.byte and _.db Directives
+.header level 2;_.byte, _.db, and _.fcb Directives
 Format:
 .skip;.literal
 	.byte	exp		;Stores the binary value
 	.db	exp		;of the expression in the
-				;next byte.
+	.fcb	exp		;next byte.
 
 	.byte	exp1,exp2,expn	;Stores the binary values
 	.db	exp1,exp2,expn	;of the list of expressions
-				;in successive bytes.
+	.fcb	exp1,exp2,expn	;in successive bytes.
 
 where:	exp,	represent expressions that will be
 	exp1,	truncated to 8-bits of data.
@@ -846,20 +861,20 @@ where:	exp,	represent expressions that will be
 	expn	separated by commas.
 .end literal
 
-The .byte or .db directives are used to generate successive bytes of
-binary data in the object module.
+The .byte, .db, or .fcb directives are used to generate successive
+bytes of binary data in the object module.
 
 
-.header level 2;_.word and _.dw Directives
+.header level 2;_.word, _.dw, and _.fdb Directives
 Format:
 .skip;.literal
 	.word	exp		;Stores the binary value
 	.dw	exp		;of the expression in
-				;the next word.
+	.fdb	exp		;the next word.
 
 	.word	exp1,exp2,expn	;Stores the binary values
 	.dw	exp1,exp2,expn	;of the list of expressions
-				;in successive words.
+	.fdb	exp1,exp2,expn	;in successive words.
 
 where:	exp,	represent expressions that will occupy two
 	exp1,	bytes of data. Each expression will be
@@ -868,19 +883,19 @@ where:	exp,	represent expressions that will occupy two
 	expn	separated by commas.
 .end literal
 
-The .word or .dw directives are used to generate successive words of
-binary data in the object module.
+The .word, .dw, or .fdb directives are used to generate successive
+words of binary data in the object module.
 
 
-.header level 2;_.3byte Directive
+.header level 2;_.3byte and _.triple Directives
 Format:
 .skip;.literal
 	.3byte	exp		;Stores the binary value
-				;of the expression in
+	.triple	exp		;of the expression in
 				;the next triple (3 bytes).
 
 	.3byte	exp1,exp2,expn	;Stores the binary values
-				;of the list of expressions
+	.triple	exp1,exp2,expn	;of the list of expressions
 				;in successive triples
 				;(3 bytes).
 
@@ -891,12 +906,12 @@ where:	exp,	represent expressions that will occupy three
 	expn	separated by commas.
 .end literal
 
-The .3byte directive is used to generate successive triples of
-binary data in the object module.  (This directive is only
-available in assemblers supporting 24-bit addressing.)
+The .3byte or .triple directive is used to generate successive
+triples of binary data in the object module.  (These directives
+are only available in assemblers supporting 24-bit addressing.)
 
 
-.header level 2;_.4byte or _.quad Directive
+.header level 2;_.4byte and _.quad Directive
 Format:
 .skip;.literal
 	.4byte	exp		;Stores the binary value
@@ -916,31 +931,45 @@ where:	exp,	represent expressions that will occupy three
 .end literal
 
 The .4byte or .quad directive is used to generate successive quads of
-binary data in the object module.  (This directive is only
+binary data in the object module.  (These directives are only
 available in assemblers supporting 32-bit addressing.)
 
 
-.header level 2;_.blkb, _.blkw, _.ds, _.blk3, and _.blk4 Directives
+.header level 2;_.blkb, _.ds, _,rmb, and _.rs Directives
 Format:
 .skip;.literal
 	.blkb	N	;reserve N bytes of space
-	.blkw	N	;reserve N words of space
 	.ds	N	;reserve N bytes of space
+	.rmb	N	;reserve N bytes of space
+	.rs	N	;reserve N bytes of space
+.end literal
+
+The .blkb, .ds, .rmb, and .rs directives reserve byte blocks in the
+object module;
+
+
+.header level 2;_.blkw, _.blk3, and _.blk4 Directives
+Format:
+.skip;.literal
+	.blkw	N	;reserve N words of space
 	.blk3	N	;reserve N triples of space
 	.blk4	N	;reserve N quads of space
 .end literal
 
-The .blkb and .ds directives reserve byte blocks in the object module;
-the .blkw directive reserves word blocks; the .blk3 reserves
-3 byte blocks(available in assembles supporting 24-bit addressing);
+The .blkw directive reserves word blocks; the .blk3 reserves
+3 byte blocks(available in assemblers supporting 24-bit addressing);
 the .blk4 reserves 4 byte blocks (available in assemblers supporting
 32-bit addressing).
 
 
-.header level 2;_.ascii Directive
+.header level 2;_.ascii, _.str, and _.fcc Directives
 Format:
 .skip;.indent 8
 _.ascii	/string/
+.skip;.indent 8
+_.fcc	/string/
+.skip;.indent 8
+_.str	/string/
 .skip;.left margin +16
 .indent -16
 where:##string##is a string of printable ascii characters.
@@ -952,14 +981,16 @@ If the delimiting characters do not match, the .ascii
 directive will give the (q) error.
 .left margin -16
 .skip
-The .ascii directive places one binary byte of data for each character
-in the string into the object module.
+The .ascii, .fcc, and .str directives place one binary byte of data
+for each character in the string into the object module.
 
 
-.header level 2;_.ascis Directive
+.header level 2;_.ascis and _.strs Directives
 Format:
 .skip;.indent 8
 _.ascis	/string/
+.skip;.indent 8
+_.strs	/string/
 .skip;.left margin +16
 .indent -16
 where:##string##is a string of printable ascii characters.
@@ -968,18 +999,20 @@ where:##string##is a string of printable ascii characters.
 may be any paired printing characters, as long as the
 characters are not contained within the string itself.
 If the delimiting characters do not match, the .ascis
-directive will give the (q) error.
+and .strs directives will give the (q) error.
 .left margin -16
-.skip
-The .ascis directive places one binary byte of data for each character
-in the string into the object module. The last character in the string
-will have the high order bit set.
+.skip;
+The .ascis and .strs directives place one binary byte of data for 
+each character in the string into the object module. The last
+character in the string will have the high order bit set.
 
 
-.header level 2;_.asciz Directive
+.header level 2;_.asciz and _.strz Directives
 Format:
 .skip;.indent 8
 _.asciz	/string/
+.skip;.indent 8
+_.strz	/string/
 .skip;.left margin +16
 .indent -16
 where:##string##is a string of printable ascii characters.
@@ -988,12 +1021,13 @@ where:##string##is a string of printable ascii characters.
 may be any paired printing characters, as long as the
 characters are not contained within the string itself.
 If the delimiting characters do not match, the .asciz
-directive will give the (q) error.
+and .strz directive will give the (q) error.
 .left margin -16
-.skip
-The .asciz directive places one binary byte of data for each character
-in the string into the object module. Following all the character
-data a zero byte is inserted to terminate the character string.
+.skip;
+The .asciz and .strz  directives place one binary byte of data for
+each character in the string into the object module. Following all
+the character data a zero byte is inserted to terminate the
+character string.
 
 
 .header level 2;_.assume Directive
@@ -1064,15 +1098,23 @@ _.area	name	[(options)]
 .indent -16
 where:##name####represents the symbolic name of the program section.
 This name may be the same as any user-defined symbol
-as the area names are independent of all symbols and
-labels.
+or bank as the area names are independent of all symbols,
+labels, and banks.
 .skip;.indent -16
 ########options#specify the type of program or data area:
 .break;ABS	absolute (automatically invokes OVR)
 .break;REL	relocatable
 .break;OVR	overlay
 .break;CON	concatenate
+.break;NOPAG	non-paged area
 .break;PAG	paged area
+.skip;.indent -16
+########options#specify a code or data segment:
+.break;CSEG	Code segment
+.break;DSEG	Data segment
+.skip;.indent -16
+########option##specifies the data area bank:
+.break;BANK	Named collection of areas
 .left margin -16
 .skip
 
@@ -1115,6 +1157,31 @@ The OVR and CON options indicate if program sections of the same name
 will overlay each other (start at the same location) or be concatenated
 with each other (appended to each other).
 
+The area can be specified as either a code segment, CSEG, or a
+data segment, DSEG.  The CSEG and DSEG descriptors are
+useful when the microprocessor code and data unit allocations
+are unequal: e.g. the executable code uses an allocation
+of 2 bytes for each instruction and is addressed at an increment
+of 1 for every instruction, and the data uses an allocation of
+1 byte for each element and is addressed at an increment of 1
+for each data byte.  The allocation units are defined by the
+architecture of the particular microprocessor.
+
+The .area directive also provides a means of specifying the bank
+this area is associated with.  All areas associated with a particular
+bank are combined at link time into a block of code/data.
+
+The CSEG, DSEG, and BANK options are specified within the parenthesis
+as shown in the following examples:
+.skip;.literal
+	.area	C_SEG	(CSEG,BANK=C1)
+				;This is a code section
+				;and is included in bank C1
+	.area	D_SEG	(DSEG,BANK=D1)
+				;This is a data section
+				;and is included in bank D1.
+.end literal
+
 Multiple invocations of the .area directive with the same name must
 specify the same options or leave the options field blank, this defaults
 to the previously specified options for this program area.
@@ -1123,12 +1190,12 @@ to the previously specified options for this program area.
 .tp 10
 The ASxxxx assemblers automatically provide two program sections:
 .skip;.left margin +24
-.indent -16
-'_.##_.ABS_.'######This dumby section contains all absolute
-symbols and their values.
 .skip;.indent -16
-'__CODE'#########This is the default program/data area.
-This program area is of type (REL,CON).
+'__CODE'#########This is the default code/data area.
+This program area is of type (REL,CON,CSEG).
+.skip;.indent -16
+'__DATA'#########This is the default optional data area.
+This program area is of type (REL,CON,DSEG).
 .left margin -24
 
 .skip
@@ -1145,6 +1212,64 @@ program area:
 
 .skip
 The .area names and options are never case sensitive.
+
+
+.header level 2;_.bank Directive
+Format:
+.skip;.indent 8
+_.bank	name	[(options)]
+.skip;.left margin +16
+.indent -16
+where:##name####represents the symbolic name of the bank section.
+This name may be the same as any user-defined symbol or
+area as the bank names are independent of all symbols,
+labels, and areas.  The name may be from 1 to 79 characters in length.
+.skip;.indent -16
+########options#specify the parameters of the bank:
+.break;BASE	base address of bank
+.break;SIZE	maximum size of bank
+.break;FSFX	file suffix for this bank
+.break;MAP	NOICE mapping
+.left margin -16
+.skip
+
+The .bank directive allows an arbitrary grouping of program
+and/or data areas to be communicated to the linker.  The bank
+parameters are all optional and are described as follows:
+
+.list 1
+.list element
+BASE,#the starting address of the bank (default is 0) may
+be defined.  This address can be overridden by using the linker
+-b option for the first area within the bank.  The bank
+address is always specified in 'byte' addressing.  A first
+area which is not 'byte' addressed (e.g. a processor
+addressed by a 'word' of 2 or more bytes) has the area address
+scaled to begin at the 'byte' address.
+.list element
+SIZE,#the maximum length of the bank specified in bytes.
+The size is always specified in terms of bytes.
+.list element
+FSFX,#the file suffix to be used by the linker for
+this bank.  The suffix may not contain embedded white
+space.
+.list element
+MAP,##NOICE mapping parameter for this bank of code/data.
+.end list
+
+The options are specified within parenthesis and separated by commas
+as shown in the following example:
+.skip;.literal
+	.BANK  C1  (BASE=0x0100,SIZE=0x1000,FSFX=_C1)
+				;This bank starts at 0x0100,
+				;has a maximum size of 0x1000,
+				;and is to be placed into
+				;a file with a suffix of _C1
+.end literal
+
+The parameters must be absolute (external symbols are not
+allowed.)
+
 
 .header level 2;_.org Directive
 Format:
@@ -1167,7 +1292,7 @@ Format:
 .skip;.indent 8
 _.globl	sym1,sym2,...,symn
 .skip;.literal
-where:	sym1,		represent legal symbolic names. When
+where:	sym1,		represent legal symbolic names.
 	sym2,...	When multiple symbols are specified,
 	symn		they are separated by commas.
 .end literal
@@ -1186,6 +1311,48 @@ vital to a program. All internal symbols appearing within a given program
 must be defined at the end of pass 1 or they will be considered undefined.
 The assembly directive (-g) can be be invoked to make all undefined
 symbols global at the end of pass 1.
+
+
+.header level 2;_.local Directive
+Format:
+.skip;.indent 8
+_.local	sym1,sym2,...,symn
+.skip;.literal
+where:	sym1,		represent legal symbolic names.
+	sym2,...	When multiple symbols are specified,
+	symn		they are separated by commas.
+.end literal
+
+A .local directive may also have a label field and/or a comment field.
+
+The .local directive is provided to define symbols that are local
+to the current assembly process.  Local symbols are not effected
+by the assembler option -a (make all symbols global).  In
+defining local symbols the directive .local J is similar to:
+.skip
+.indent 6;J _=_: expression
+
+The .local directive and the =: construct are useful in defining
+symbols and constants within a header or definition file that
+contains many symbols specific to the current assembly process
+that should not be exported into the .rel output file.  A typical
+usage is in the definition of SFRs (Special Function Registers)
+for a microprocessor.
+
+The .local directive and =: construct can be overridden by the
+_.globl directive.
+
+
+.header	level 2;_.equ, _.gblequ, and _.lclequ Directives
+Format:
+.skip;.literal
+	sym1	.equ	expr	; equivalent to sym1  = expr
+	sym2	.gblequ	expr	; equivalent to sym2 == expr
+	sym3	.lclequ	expr	; equivalent to sym3 =: expr
+.end literal
+
+These alternate forms of equivalence are provided for user
+convenience.
 
 
 .header level 2;_.if, _.else, and _.endif Directives
@@ -1248,6 +1415,94 @@ source program with out the need to use the comment delimiter (;):
 .end literal
 
 
+.header level 2;_.ifdef, _.else, and _.endif Directives
+Format:
+.skip;.literal
+	.ifdef	sym
+	.			;}
+	.			;} range of true condition
+	.			;}
+	.else
+	.			;}
+	.			;} range of false condition
+	.			;}
+	.endif
+.end literal
+
+The conditional assembly directives allow you to include or exclude
+blocks of source code during the assembly process, based on the
+evaluation of the condition test.
+
+The range of true condition will be processed if the symbol 'sym'
+is defined (i.e. true) and the range of false condition will be
+processed if the symbol 'sym' is not defined (i.e false). The range of
+true condition is optional as is the .else directive and the range
+of false condition.  The following are all valid .ifdef/.else/.endif
+constructions:
+.skip;.literal
+	.ifdef	sym$1		;lookup symbol sym$1
+	.byte	1,2		;insert bytes if sym$1 is
+	.endif			;defined
+
+	.ifdef	sym$2		;lookup symbol sym$2
+	.else
+	.byte	3,4		;insert bytes if sym$1
+	.endif			;is not defined
+
+	.ifdef	sym$3		;lookup symbol sym$3
+	.byte	12		;insert this byte if sym$3
+	.else			;is defined
+	.byte	13		;insert this byte if sym$3
+	.endif			;is not defined
+.end literal
+.skip 2
+The .ifdef/.else/.endif directives may be nested upto 10 levels.
+
+
+.header level 2;_.ifndef, _.else, and _.endif Directives
+Format:
+.skip;.literal
+	.ifndef	sym
+	.			;}
+	.			;} range of true condition
+	.			;}
+	.else
+	.			;}
+	.			;} range of false condition
+	.			;}
+	.endif
+.end literal
+
+The conditional assembly directives allow you to include or exclude
+blocks of source code during the assembly process, based on the
+evaluation of the condition test.
+
+The range of true condition will be processed if the symbol 'sym'
+is not defined (i.e. true) and the range of false condition will be
+processed if the symbol 'sym' is defined (i.e false). The range of
+true condition is optional as is the .else directive and the range
+of false condition.  The following are all valid .ifndef/.else/.endif
+constructions:
+.skip;.literal
+	.ifndef	sym$1		;lookup symbol sym$1
+	.byte	1,2		;insert bytes if sym$1 is
+	.endif			;not defined
+
+	.ifndef	sym$2		;lookup symbol sym$2
+	.else
+	.byte	3,4		;insert bytes if sym$1
+	.endif			;is defined
+
+	.ifndef	sym$3		;lookup symbol sym$3
+	.byte	12		;insert this byte if sym$3
+	.else			;is not defined
+	.byte	13		;insert this byte if sym$3
+	.endif			;is defined
+.end literal
+.skip 2
+The .ifndef/.else/.endif directives may be nested upto 10 levels.
+
+
 .header level 2;_.include Directive
 Format:
 .skip;.indent 8
@@ -1275,6 +1530,38 @@ current source file, D:_\proj_\file1.asm, includes a file specified
 as "include1" then the file D:_\proj_\include1.asm is opened.
 
 
+.header level 2;_.define and _.undefine Directives
+Format:
+.skip;.indent 8
+_.define########keyword	string
+.skip;.indent 8
+_.undefine######keyword
+.skip;.left margin +16
+.indent -16
+where:##keyword##is the substitutable string which must
+start with a letter and may contain any combination of
+digits and letters.
+.skip
+.indent -16
+where:##string###represents a delimited string that is
+substituted for the keyword.  The string may contain
+any sequence of characters including white space.
+.left margin -16
+
+The .define directive specifies a user defined string
+which is substituted for the keyword.  The substitution
+string may itself contain other keywords that are
+substitutable.  The assembler resumes the parse of the
+line at the point the keyword was found.  Care must be
+excersized to avoid any circular references within
+_.define directives, otherwise the assembler may enter
+a 'recursion runaway' resulting in an 's' error.
+
+The .undefine directive removes the keyword as a
+substitutable string.  No error is returned if
+the keyword was not defined.
+
+
 .header level 2;_.\s\e\t\d\p Directive
 
 .break
@@ -1283,7 +1570,7 @@ Format:
 _.setdp [base [,area]]
 .skip
 The set direct page directive has a common format in all the
-AS68xx assemblers.
+assemblers supporting a paged mode.
 The .setdp directive is used to inform the assembler of the current
 direct page region and the offset address within the selected area.
 The normal invocation methods are:
@@ -1393,8 +1680,29 @@ Format:
 
 The _.16bit, _.24bit, and _.32bit directives are special
 directives for assembler configuration when default values are
-not used. (Currently only the as8xCxxx assembler can use the
-_.16bit and _.24bit directives in special mode.)
+not used. (Currently only the as8xCxxx and aspic assemblers can
+use the _.16bit, _.24bit, or _.32bit directives in special mode.)
+
+
+.header level 2;_.end Directive
+Format:
+.skip;.indent 8
+_.end
+.skip;.indent 8
+_.end	exp
+.skip;.left margin +16
+.indent -16
+where:##exp#####represents any expression, including
+constants, symbols, or labels.
+.left margin -16
+.skip
+
+The _.end directive is used to specify a code entry point
+to be included in the linker output file.  Review the I86
+and S record formats described in the linker section
+for details.
+
+The _.end directive without an expression is ignored.
 
 
 .tp 35
@@ -1404,40 +1712,47 @@ The  ASxxxx  assemblers are command line oriented.  Most
 sytems require the option(s) and file(s) arguments to
 follow the ASxxxx assembler name:
 .skip
-as6809  [-dqxgalopswzff] file1 [file2 file3 ...  file6]
+as6809  [-Options] file1 [file2 file3 ...]
 .skip 2
 Some systems may request the arguments after the assembler is
 started at a system specific prompt:
 .skip
 as6809
 .br
-argv:   [-dqxgalopswzff] file1 [file2 file3 ...  file6]
+argv:   [-Options] file1 [file2 file3 ...]
 .skip 2
 The options are:
 .skip;.literal
-	d	decimal	listing
-	q	octal	listing
-	x	hex	listing (default)
+	-d	decimal	listing
+	-q	octal	listing
+	-x	hex	listing (default)
 
 		The listing radix affects the
 		.lst, .rel, and .sym files.
 
-	g	undefined symbols made global
-	a	all user symbols made global
+	-g	undefined symbols made global
+	-a	all user symbols made global
 
-	l	create list   output file1.lst
-	o	create object output file1.rel
-	s	create symbol output file1.sym
+	-b	display .define substitutions in listing
+	-bb	and display without .define substitutions
 
-	p	disable listing pagination
-	w	wide listing format for symbol table
+	-j	enable NOICE debug symbols
+	-y	enable SDCC debug symbols
 
-	z	enable case sensitivity for symbols
+	-l	create list   output file1.lst
+	-o	create object output file1.rel
+	-s	create symbol output file1.sym
+
+	-p	disable listing pagination
+	-u	disable .list/.nlist processing
+	-w	wide listing format for symbol table
+
+	-z	disable case sensitivity for symbols
 
 		relocatable reference flagging:
 
-	f	by  `   in the listing file
-	ff	by mode in the listing file
+	-f	by  `   in the listing file
+	-ff	by mode in the listing file
 .end literal
 
 The file name for the .lst, .rel, and .sym files is the first file name
@@ -1502,7 +1817,8 @@ an .if/.endif mismatch.
 (m)###
 Multiple definitions of the same label,
 multiple .module directives, or multiple
-conflicting attributes in an .area directive.
+conflicting attributes in an .area or .bank
+directive.
 .skip;.indent -6
 (o)###
 Directive or mnemonic error or the use
@@ -1521,6 +1837,9 @@ Relocation error: logic operation attempted on
 a relocatable term, addition of two relocatable terms,
 subtraction of two relocatable terms not within the
 same programming area or external symbols.
+.skip;.indent -6
+(s)###
+String Substitution / recursion error.
 .skip;.indent -6
 (u)###
 Undefined symbol encountered during assembly.
@@ -1547,7 +1866,7 @@ contains a five line header:
 Each succeeding line contains five fields:
 .skip
 .list 1
-.list element;Error field (first three characters of line)
+.list element;Error field (first two characters of line)
 .list element;Current location counter
 .list element;Generated code in byte format
 .list element;Source text line number
@@ -1568,15 +1887,13 @@ one field of data is generated from the assembly of a single line of
 source code, then the data field is repeated on successive lines.
 
 The source text line number is printed in decimal and is followed by
-the source text.
+the source text.  A Source line with a .page directive is never listed.
 
-Two special cases will disable the listing of a line of source text:
-
-.list 1
-.list element;Source line with a .page directive is never listed.
-.list element;Source line with a .include file directive is not listed
-unless the .include file cannot be opened.
-.end list
+Two additional options are available for printing the source
+line text.  If the -b option is specified then the listed
+source line contains all the .define substitutions.  If the -bb
+option is specified then the original source line is printed before
+the source line with substitutions.
 
 Two data field options are available to flag those bytes which will
 be relocated by the linker. If the -f option is specified then
@@ -1671,6 +1988,8 @@ designators:
 
 	H	Header 
 	M	Module
+	G	Merge Mode
+	B	Bank
 	A	Area
 	S	Symbol
 	T	Object code

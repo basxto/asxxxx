@@ -1,7 +1,7 @@
 /* m6809.h */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,6 +21,7 @@
 		M09ADR.C
 		M09PST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C

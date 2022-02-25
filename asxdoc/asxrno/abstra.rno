@@ -4,7 +4,7 @@
 .autoparagraph
 
 .page
-ASxxxx Cross Assemblers, Version 3.11, January 2002
+ASxxxx Cross Assemblers, Version 4.00, November 2003
 .skip
 Submitted by Alan R. Baldwin,
 .break
@@ -12,7 +12,7 @@ Kent State University, Kent, Ohio
 .skip
 Operating  System: MS-DOS, Windows, Linux
 .break
-or other supporting K_&R C.
+or other supporting ANSII C.
 .skip
 Source Langauge: C
 .skip
@@ -20,9 +20,11 @@ Abstract:
 .p
 The ASxxxx assemblers are a series of microprocessor
 assemblers written in the C programming language.
-This collection contains cross assemblers for the 6800(6802/6808),
-6801(hd6303), 6804, 6805, 68HC08, 6809, 68HC11, 68HC12, 68HC16, 8051,
-8085(8080), z80(hd64180), GameBoy(Z80), H8/3xx, DS8xCxxx and 6500
+This collection contains cross assemblers for the AVR, PIC,
+Rabbit 2000/3000, DS8xCxxx, z80(hd64180), GameBoy(Z80),
+MPS430, H8/3xx, 6800(6802/6808), 6801(hd6303), 6804,
+6805, 68HC08, 6809, 68HC11, 68HC12, 68HC16, 8051,
+8085(8080), 6500, 1802, 740, and 61860
 series microprocessors.  Each assembler has a device specific
 section which includes: (1) device description, byte order, and file
 extension information, (2) a table of assembler general directives,
@@ -53,7 +55,7 @@ at link time, (8) produce Intel Hex or Motorola S record output file,
 assembler listing files with the absolute linked addresses and data.
 .p
 The assemblers and linker have been tested using Linux, DJGPP,
-Cygwin-1.3.x, Sun Solaris (GCC), Symantec C/C++ V6.1/V7.2,
+Cygwin, Symantec C/C++ V6.1/V7.2,
 and VC6 with MS-DOS/Windows 3.x/9x/NT/2000/XP.
 Complete source code and
 documentation for the assemblers and linker is included with the

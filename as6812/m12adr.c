@@ -1,7 +1,7 @@
-/* M12ADR:C */
+/* m12adr.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin

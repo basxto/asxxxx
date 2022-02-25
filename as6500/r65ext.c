@@ -1,7 +1,7 @@
 /* r65ext.c */
 
 /*
- * (C) Copyright 1995-2002
+ * (C) Copyright 1995-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,8 +16,8 @@
  * Sillitie 10 A
  * 01480 Vantaa
  * Finland
- * Internet: Marko.Makela@Helsinki.Fi
- * EARN/BitNet: msmakela@finuh
+ * Internet: Marko dot Makela at Helsinki dot Fi
+ * EARN/BitNet: msmakela at finuh
  */
 
 #include <stdio.h>

@@ -1,2 +1,2 @@
-path=c:\dos;c:\asxxxx\asxmak\djgpp\exe;c:\winedit
+path=r:\asxv4pxx\asxmak\djgpp\exe
 

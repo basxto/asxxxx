@@ -38,9 +38,7 @@ and condition mnemonics:
 
 .header level 1;Z80 Instruction Set
 
-The following tables list all Z80/HD64180 mnemonics recognized by the
-ASZ80 assembler. The designation [] refers to a required addressing mode
-argument. The following list specifies the format for
+The following list specifies the format for
 each addressing mode supported by ASZ80:
 
 .skip
@@ -68,12 +66,14 @@ each addressing mode supported by ASZ80:
 .end literal
 
 .skip
-The terms data, dir, offset, and ext may all be expressions. The terms
-dir and offset are not allowed to be external references.
+The terms data, n, label, and offset may all be expressions.
 
 Note that not all addressing modes are valid with every instruction,
 refer to the Z80/HD64180 technical data for valid modes.
 
+The following tables list all Z80/HD64180 mnemonics recognized by the
+ASZ80 assembler. The designation [] refers to a required addressing mode
+argument.
 
 .test page 18
 .header level 2;Inherent Instructions

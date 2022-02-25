@@ -6,27 +6,29 @@
 --------------------Configuration: as6811 - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\WINDOWS\TEMP\RSP32D4.TMP" with contents
+Creating temporary file "C:\DOCUME~1\HOMENET\LOCALS~1\Temp\RSP12A.tmp" with contents
 [
-/nologo /ML /W3 /GX /O2 /I "c:\asxxxx\asxxsrc" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Release/as6811.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
-"C:\ASXXXX\asxxsrc\asdata.c"
-"C:\ASXXXX\asxxsrc\asexpr.c"
-"C:\ASXXXX\asxxsrc\aslex.c"
-"C:\ASXXXX\asxxsrc\aslist.c"
-"C:\ASXXXX\asxxsrc\asmain.c"
-"C:\ASXXXX\asxxsrc\asout.c"
-"C:\ASXXXX\asxxsrc\assubr.c"
-"C:\ASXXXX\asxxsrc\assym.c"
-"C:\ASXXXX\as6811\m11adr.c"
-"C:\ASXXXX\as6811\m11ext.c"
-"C:\ASXXXX\as6811\m11mch.c"
-"C:\ASXXXX\as6811\m11pst.c"
+/nologo /ML /W3 /GX /O2 /I "..\..\..\..\asxxsrc" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Release/as6811.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"R:\ASXV4PXX\asxxsrc\asdata.c"
+"R:\ASXV4PXX\asxxsrc\asdbg.c"
+"R:\ASXV4PXX\asxxsrc\asexpr.c"
+"R:\ASXV4PXX\asxxsrc\aslex.c"
+"R:\ASXV4PXX\asxxsrc\aslist.c"
+"R:\ASXV4PXX\asxxsrc\asmain.c"
+"R:\ASXV4PXX\asxxsrc\asout.c"
+"R:\ASXV4PXX\asxxsrc\assubr.c"
+"R:\ASXV4PXX\asxxsrc\assym.c"
+"R:\ASXV4PXX\as6811\m11adr.c"
+"R:\ASXV4PXX\as6811\m11ext.c"
+"R:\ASXV4PXX\as6811\m11mch.c"
+"R:\ASXV4PXX\as6811\m11pst.c"
 ]
-Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP32D4.TMP" 
-Creating temporary file "C:\WINDOWS\TEMP\RSP32D5.TMP" with contents
+Creating command line "cl.exe @C:\DOCUME~1\HOMENET\LOCALS~1\Temp\RSP12A.tmp" 
+Creating temporary file "C:\DOCUME~1\HOMENET\LOCALS~1\Temp\RSP12B.tmp" with contents
 [
 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/as6811.pdb" /machine:I386 /out:"..\..\exe\as6811.exe" 
 .\Release\asdata.obj
+.\Release\asdbg.obj
 .\Release\asexpr.obj
 .\Release\aslex.obj
 .\Release\aslist.obj
@@ -39,10 +41,11 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 .\Release\m11mch.obj
 .\Release\m11pst.obj
 ]
-Creating command line "link.exe @C:\WINDOWS\TEMP\RSP32D5.TMP"
+Creating command line "link.exe @C:\DOCUME~1\HOMENET\LOCALS~1\Temp\RSP12B.tmp"
 <h3>Output Window</h3>
 Compiling...
 asdata.c
+asdbg.c
 asexpr.c
 aslex.c
 aslist.c

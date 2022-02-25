@@ -1,7 +1,7 @@
 /* z80.h */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,6 +21,7 @@
 		Z80ADR.C
 		Z80PST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C
@@ -154,7 +155,6 @@ extern	struct	adsym	CND[];
 	/* z80adr.c */
 extern	int		addr(struct expr *esp);
 extern	int		admode(struct adsym *sp);
-extern	int		any(int c, char *str);
 extern	int		srch(char *str);
 
 	/* z80mch.c */
@@ -170,7 +170,6 @@ extern	VOID		minit(void);
 	/* z80adr.c */
 extern	int		addr();
 extern	int		admode();
-extern	int		any();
 extern	int		srch();
 
 	/* z80mch.c */

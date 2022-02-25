@@ -7,20 +7,52 @@
 ;		 and complete Assembler Codes added
 ;
 ;  Assemble:
-;	as80c390 -glaxff t80c390
+;	as8xcxxx -gloaxff t80c390
 ;
 
+;
+;  Alternate methods to define the processor
+;
+Alternate = 1
+
+.if Alternate-1
+.else
 	.DS80C390
+	.include	"ds8xcxxx.sfr"
+.sbttl	/* DS8xCxx.SFR */
+
+.endif
+
+.if Alternate-2
+.else
+	.cpu	"DS80C390"
+	.24bit
+	.include	"ds8xcxxx.sfr"
+.endif
+
+.if Alternate-3
+.else
+	.DS80C390
+	.include	"t80c390.sfr"
+.endif
+
 
 ;  EQUATES FOR ADDRESS MODES
 	.area	DATA
 	.ds 0x12
 NN:	.ds 0x34-0x12
 MM:	.ds 1
+
 	.area	XDATA (REL,CON)
 	.ds 0x1234
 NNNN:	.ds 1
+	.ds 0x0D95
+MMMM:	.ds 1
+
 	.area	CODE1 (REL,CON)
+	.amode	0		; 16-Bit CALL/JMP Addressing Mode
+;
+bgncode1::
 ;
 text8051.func.var::
 	nop			; 00
@@ -36,7 +68,7 @@ text8051.func..FN::
 	nop			; 00
 text8051.static::
 ALLLL:	NOP			; 00
-	AJMP	ARN		;s01r0C
+	AJMP	ARN		;n01*0C
 	LJMP	ALLLL		; 02s00r06
 ARN:	RR	A		; 03
 	INC	A		; 04
@@ -53,7 +85,7 @@ ARN:	RR	A		; 03
 	INC	R7		; 0F
 ACNNNN:
 	JBC	NN,ALLLL	; 10*12 E9
-	ACALL	ALLLL + 0x000	;s11r06
+	ACALL	ALLLL + 0x000	;n11*06
 	LCALL	ALLLL		; 12s00r06
 	RRC	A		; 13
 	DEC	A		; 14
@@ -69,7 +101,7 @@ ACNNNN:
 	DEC	R6		; 1E
 	DEC	R7		; 1F
 	JB	NN,ALLLL	; 20*12 D3
-	AJMP	ALLLL + 0x100	;s21r06
+	AJMP	ALLLL + 0x100	;n21*06
 	RET			; 22
 	RL	A		; 23
 	ADD	A,#NN		; 24r12
@@ -85,7 +117,7 @@ ACNNNN:
 	ADD	A,R6		; 2E
 	ADD	A,R7		; 2F
 	JNB	NN,ALLLL	; 30*12 BE
-	ACALL	ALLLL + 0x100	;s31r06
+	ACALL	ALLLL + 0x100	;n31*06
 	RETI			; 32
 	RLC	A		; 33
 	ADDC	A,#NN		; 34r12
@@ -101,7 +133,7 @@ ACNNNN:
 	ADDC	A,R6		; 3E
 	ADDC	A,R7		; 3F
 	JC	ALLLL		; 40 AA
-	AJMP	ALLLL + 0x200	;s41r06
+	AJMP	ALLLL + 0x200	;n41*06
 	ORL	NN,A		; 42*12
 	ORL	NN,#MM		; 43*12r34
 	ORL	A,#NN		; 44r12
@@ -117,7 +149,7 @@ ACNNNN:
 	ORL	A,R6		; 4E
 	ORL	A,R7		; 4F
 	JNC	ALLL2		; 50 12
-	ACALL	ALLLL + 0x200	;s51r06
+	ACALL	ALLLL + 0x200	;n51*06
 	ANL	NN,A		; 52*12
 	ANL	NN,#MM		; 53*12r34
 	ANL	A,#NN		; 54r12
@@ -133,7 +165,7 @@ ALLL2:	ANL	A,R5		; 5D
 	ANL	A,R6		; 5E
 	ANL	A,R7		; 5F
 	JZ	ALLL2		; 60 FB
-	AJMP	ALLLL + 0x300	;s61r06
+	AJMP	ALLLL + 0x300	;n61*06
 	XRL	NN,A		; 62*12
 	XRL	NN,#MM		; 63*12r34
 	XRL	A,#NN		; 64r12
@@ -149,7 +181,7 @@ ALLL2:	ANL	A,R5		; 5D
 	XRL	A,R6		; 6E
 	XRL	A,R7		; 6F
 	JNZ	ALLL2		; 70 E4
-	ACALL	ALLLL + 0x300	;s71r06
+	ACALL	ALLLL + 0x300	;n71*06
 	ORL	C,NN		; 72*12
 	JMP	@A+DPTR		; 73
 	MOV	A,#NN		; 74r12
@@ -165,7 +197,7 @@ ALLL2:	ANL	A,R5		; 5D
 	MOV	R6,#NN		; 7Er12
 	MOV	R7,#NN		; 7Fr12
 	SJMP	ALLL2		; 80 C4
-	AJMP	ALLLL + 0x400	;s81r06
+	AJMP	ALLLL + 0x400	;n81*06
 	ANL	C,NN		; 82*12
 	MOVC	A,@A+PC		; 83
 	DIV	AB		; 84
@@ -181,7 +213,7 @@ ALLL2:	ANL	A,R5		; 5D
 	MOV	NN,R6		; 8E*12
 	MOV	NN,R7		; 8F*12
 	MOV	DPTR,#NNNN	; 90s12r34
-	ACALL	ALLLL + 0x400	;s91r06
+	ACALL	ALLLL + 0x400	;n91*06
 	MOV	NN,C		; 92*12
 	MOVC	A,@A+DPTR	; 93
 	SUBB	A,#NN		; 94r12
@@ -197,7 +229,7 @@ ALLL2:	ANL	A,R5		; 5D
 	SUBB	A,R6		; 9E
 	SUBB	A,R7		; 9F
 	ORL	C,/NN		; A0*12
-	AJMP	ALLLL + 0x500	;sA1r06
+	AJMP	ALLLL + 0x500	;nA1*06
 	MOV	C,NN		; A2*12
 	INC	DPTR		; A3
 	MUL	AB		; A4
@@ -213,7 +245,7 @@ ALLL2:	ANL	A,R5		; 5D
 	MOV	R6,NN		; AE*12
 	MOV	R7,NN		; AF*12
 ALLL3:	ANL	C,/NN		; B0*12
-	ACALL	ALLLL + 0x500	;sB1r06
+	ACALL	ALLLL + 0x500	;nB1*06
 	CPL	NN		; B2*12
 	CPL	C		; B3
 	CJNE	A,#NN,ALLL3	; B4r12 F6
@@ -229,8 +261,7 @@ ALLL3:	ANL	C,/NN		; B0*12
 	CJNE	R6,#NN,ALLL3	; BEr12 D8
 	CJNE	R7,#NN,ALLL3	; BFr12 D5
 	PUSH	NN		; C0*12
-;;/* This will cause a LINKER paging error */;;
-	AJMP	ALLLL + 0x600	;sC1r06
+	AJMP	ALLLL + 0x600	;nC1*06
 	CLR	NN		; C2*12
 	CLR	C		; C3
 	SWAP	A		; C4
@@ -246,8 +277,7 @@ ALLL3:	ANL	C,/NN		; B0*12
 	XCH	A,R6		; CE
 	XCH	A,R7		; CF
 	POP	NN		; D0*12
-;;/* This will cause a LINKER paging error */;;
-	ACALL	ALLLL + 0x600	;sD1r06
+	ACALL	ALLLL + 0x600	;nD1*06
 	SETB	NN		; D2*12
 	SETB	C		; D3
 	DA	A		; D4
@@ -263,8 +293,7 @@ ALLL3:	ANL	C,/NN		; B0*12
 	DJNZ	R6,ALLL3	; DE A6
 	DJNZ	R7,ALLL3	; DF A4
 	MOVX	A,@DPTR		; E0
-;;/* This will cause a LINKER paging error */;;
-	AJMP	ALLLL + 0x700	;sE1r06
+	AJMP	ALLLL + 0x700	;nE1*06
 	MOVX	A,@R0		; E2
 	MOVX	A,@R1		; E3
 	CLR	A		; E4
@@ -280,8 +309,7 @@ ALLL3:	ANL	C,/NN		; B0*12
 	MOV	A,R6		; EE
 	MOV	A,R7		; EF
 	MOVX	@DPTR,A		; F0
-;;/* This will cause a LINKER paging error */;;
-	ACALL	ALLLL + 0x700	;sF1r06
+	ACALL	ALLLL + 0x700	;nF1*06
 	MOVX	@R0,A		; F2
 	MOVX	@R1,A		; F3
 	CPL	A		; F4
@@ -612,9 +640,14 @@ ALLL4:	INC	*NN		; 05*12
 	DJNZ	*NN,ALLL4	; D5*12 8C
 	MOV	A,*NN		; E5*12
 	MOV	*NN,A		; F5*12
+
+	.blkb	0x1000 - (. - bgncode1)
+
 	.area	CODE2 (REL,CON)
+	.amode	2		; 24-Bit CALL/JMP Addressing Mode
 ;
-	.amode	2		; 24-Bit Mode
+bgncode2::
+;
 text8051_func_var::
 	nop			; 00
 text8051_func_varsilly_::
@@ -629,7 +662,7 @@ text8051_func__FN::
 	nop			; 00
 text8051_static::
 BLLLL:	NOP			; 00
-	AJMP	BRN		;R01s00r0E
+	AJMP	BRN		;M01n00*0E
 	LJMP	BLLLL		; 02R00s00r06
 BRN:	RR	A		; 03
 	INC	A		; 04
@@ -646,7 +679,7 @@ BRN:	RR	A		; 03
 	INC	R7		; 0F
 BCNNNN:
 	JBC	NN,BLLLL	; 10*12 E7
-	ACALL	BLLLL + 0x000	;R11s00r06
+	ACALL	BLLLL + 0x000	;M11n00*06
 	LCALL	BLLLL		; 12R00s00r06
 	RRC	A		; 13
 	DEC	A		; 14
@@ -662,7 +695,7 @@ BCNNNN:
 	DEC	R6		; 1E
 	DEC	R7		; 1F
 	JB	NN,BLLLL	; 20*12 CF
-	AJMP	BLLLL + 0x100	;R01s01r06
+	AJMP	BLLLL + 0x100	;M01n01*06
 	RET			; 22
 	RL	A		; 23
 	ADD	A,#NN		; 24r12
@@ -678,7 +711,7 @@ BCNNNN:
 	ADD	A,R6		; 2E
 	ADD	A,R7		; 2F
 	JNB	NN,BLLLL	; 30*12 B9
-	ACALL	BLLLL + 0x100	;R11s01r06
+	ACALL	BLLLL + 0x100	;M11n01*06
 	RETI			; 32
 	RLC	A		; 33
 	ADDC	A,#NN		; 34r12
@@ -694,7 +727,7 @@ BCNNNN:
 	ADDC	A,R6		; 3E
 	ADDC	A,R7		; 3F
 	JC	BLLLL		; 40 A4
-	AJMP	BLLLL + 0x200	;R01s02r06
+	AJMP	BLLLL + 0x200	;M01n02*06
 	ORL	NN,A		; 42*12
 	ORL	NN,#MM		; 43*12r34
 	ORL	A,#NN		; 44r12
@@ -710,7 +743,7 @@ BCNNNN:
 	ORL	A,R6		; 4E
 	ORL	A,R7		; 4F
 	JNC	BLLL2		; 50 13
-	ACALL	BLLLL + 0x200	;R11s02r06
+	ACALL	BLLLL + 0x200	;M11n02*06
 	ANL	NN,A		; 52*12
 	ANL	NN,#MM		; 53*12r34
 	ANL	A,#NN		; 54r12
@@ -726,7 +759,7 @@ BLLL2:	ANL	A,R5		; 5D
 	ANL	A,R6		; 5E
 	ANL	A,R7		; 5F
 	JZ	BLLL2		; 60 FB
-	AJMP	BLLLL + 0x300	;R01s03r06
+	AJMP	BLLLL + 0x300	;M01n03*06
 	XRL	NN,A		; 62*12
 	XRL	NN,#MM		; 63*12r34
 	XRL	A,#NN		; 64r12
@@ -742,7 +775,7 @@ BLLL2:	ANL	A,R5		; 5D
 	XRL	A,R6		; 6E
 	XRL	A,R7		; 6F
 	JNZ	BLLL2		; 70 E3
-	ACALL	BLLLL + 0x300	;R11s03r06
+	ACALL	BLLLL + 0x300	;M11n03*06
 	ORL	C,NN		; 72*12
 	JMP	@A+DPTR		; 73
 	MOV	A,#NN		; 74r12
@@ -758,7 +791,7 @@ BLLL2:	ANL	A,R5		; 5D
 	MOV	R6,#NN		; 7Er12
 	MOV	R7,#NN		; 7Fr12
 	SJMP	BLLL2		; 80 C2
-	AJMP	BLLLL + 0x400	;R01s04r06
+	AJMP	BLLLL + 0x400	;M01n04*06
 	ANL	C,NN		; 82*12
 	MOVC	A,@A+PC		; 83
 	DIV	AB		; 84
@@ -774,7 +807,7 @@ BLLL2:	ANL	A,R5		; 5D
 	MOV	NN,R6		; 8E*12
 	MOV	NN,R7		; 8F*12
 	MOV	DPTR,#NNNN	; 90R00s12r34
-	ACALL	BLLLL + 0x400	;R11s04r06
+	ACALL	BLLLL + 0x400	;M11n04*06
 	MOV	NN,C		; 92*12
 	MOVC	A,@A+DPTR	; 93
 	SUBB	A,#NN		; 94r12
@@ -790,7 +823,7 @@ BLLL2:	ANL	A,R5		; 5D
 	SUBB	A,R6		; 9E
 	SUBB	A,R7		; 9F
 	ORL	C,/NN		; A0*12
-	AJMP	BLLLL + 0x500	;R01s05r06
+	AJMP	BLLLL + 0x500	;M01n05*06
 	MOV	C,NN		; A2*12
 	INC	DPTR		; A3
 	MUL	AB		; A4
@@ -806,7 +839,7 @@ BLLL2:	ANL	A,R5		; 5D
 	MOV	R6,NN		; AE*12
 	MOV	R7,NN		; AF*12
 BLLL3:	ANL	C,/NN		; B0*12
-	ACALL	BLLLL + 0x500	;R11s05r06
+	ACALL	BLLLL + 0x500	;M11n05*06
 	CPL	NN		; B2*12
 	CPL	C		; B3
 	CJNE	A,#NN,BLLL3	; B4r12 F5
@@ -822,8 +855,7 @@ BLLL3:	ANL	C,/NN		; B0*12
 	CJNE	R6,#NN,BLLL3	; BEr12 D7
 	CJNE	R7,#NN,BLLL3	; BFr12 D4
 	PUSH	NN		; C0*12
-;;/* This will cause a LINKER paging error */;;
-	AJMP	BLLLL + 0x600	;R01s06r06
+	AJMP	BLLLL + 0x600	;M01n06*06
 	CLR	NN		; C2*12
 	CLR	C		; C3
 	SWAP	A		; C4
@@ -839,8 +871,7 @@ BLLL3:	ANL	C,/NN		; B0*12
 	XCH	A,R6		; CE
 	XCH	A,R7		; CF
 	POP	NN		; D0*12
-;;/* This will cause a LINKER paging error */;;
-	ACALL	BLLLL + 0x600	;R11s06r06
+	ACALL	BLLLL + 0x600	;M11n06*06
 	SETB	NN		; D2*12
 	SETB	C		; D3
 	DA	A		; D4
@@ -856,8 +887,7 @@ BLLL3:	ANL	C,/NN		; B0*12
 	DJNZ	R6,BLLL3	; DE A3
 	DJNZ	R7,BLLL3	; DF A1
 	MOVX	A,@DPTR		; E0
-;;/* This will cause a LINKER paging error */;;
-	AJMP	BLLLL + 0x700	;R01s07r06
+	AJMP	BLLLL + 0x700	;M01n07*06
 	MOVX	A,@R0		; E2
 	MOVX	A,@R1		; E3
 	CLR	A		; E4
@@ -873,8 +903,7 @@ BLLL3:	ANL	C,/NN		; B0*12
 	MOV	A,R6		; EE
 	MOV	A,R7		; EF
 	MOVX	@DPTR,A		; F0
-;;/* This will cause a LINKER paging error */;;
-	ACALL	BLLLL + 0x700	;R11s07r06
+	ACALL	BLLLL + 0x700	;M11n07*06
 	MOVX	@R0,A		; F2
 	MOVX	@R1,A		; F3
 	CPL	A		; F4
@@ -1205,4 +1234,6 @@ BLLL4:	INC	*NN		; 05*12
 	DJNZ	*NN,BLLL4	; D5*12 8C
 	MOV	A,*NN		; E5*12
 	MOV	*NN,A		; F5*12
+
+	.blkb	0x1000 - (. - bgncode2)
 

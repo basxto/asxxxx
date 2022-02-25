@@ -10,7 +10,7 @@ DEBUG		= 0
 NDEBUG		= 1
 !ENDIF
 
-PROJ		= AS8XCXXX
+PROJ		= as8xcxxx
 APPTYPE		= DOSX EXE
 PROJTYPE	= EXE
 
@@ -24,8 +24,8 @@ DISASM		= OBJ2ASM
 LNK		= LINK
 DLLS		= 
 
-HEADERS		= F:\SC\INCLUDE\stdio.h F:\SC\INCLUDE\setjmp.h ..\..\..\asxxsrc\asxxxx.h  \
-		..\..\..\AS8XCXXX\ds8.h F:\SC\INCLUDE\string.h F:\SC\INCLUDE\alloc.h F:\SC\INCLUDE\stdlib.h 
+HEADERS		= C:\SC\INCLUDE\stdio.h C:\SC\INCLUDE\setjmp.h ..\..\..\asxxsrc\asxxxx.h  \
+		..\..\..\AS8XCXXX\ds8.h C:\SC\INCLUDE\string.h C:\SC\INCLUDE\alloc.h C:\SC\INCLUDE\stdlib.h 
 
 DEFFILE		= as8xcxxx.DEF
 
@@ -41,14 +41,14 @@ CFLAGS		=  -mx -C -S -3 -a4 -c -g -gd
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
-OUTPUTDIR	= c:\asxxxx\asxmak\symantec\build
-!IF EXIST (c:\asxxxx\asxmak\symantec\build)
+OUTPUTDIR	= r:\asxv4pxx\asxmak\symantec\build
+!IF EXIST (r:\asxv4pxx\asxmak\symantec\build)
 CREATEOUTPUTDIR	=
 !ELSE
 CREATEOUTPUTDIR	= if not exist $(OUTPUTDIR)\*.* md $(OUTPUTDIR)
 !ENDIF
-TARGETDIR	= c:\asxxxx\asxmak\symantec\exe
-!IF EXIST (c:\asxxxx\asxmak\symantec\exe)
+TARGETDIR	= r:\asxv4pxx\asxmak\symantec\exe
+!IF EXIST (r:\asxv4pxx\asxmak\symantec\exe)
 CREATETARGETDIR	=
 !ELSE
 CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
@@ -56,8 +56,8 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 
 LIBS		= 
 
-CFLAGS		=  -A -J -mx -o+time -3 -a4 -c 
-LFLAGS		=  /DE /PACKF /XN
+CFLAGS		=  -A -r -J -mx -o+time -3 -a4 -c 
+LFLAGS		=  /NOI /DE /PACKF /XN
 DEFINES		= 
 !ENDIF
 
@@ -75,14 +75,14 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -Ic:\asxxxx\asxxsrc
+INCLUDES	= -Ir:\asxv4pxx\asxxsrc
 
 INCLUDEDOBJS	= 
 
-OBJS		=  $(OUTPUTDIR)\asdata.OBJ  $(OUTPUTDIR)\asexpr.OBJ  $(OUTPUTDIR)\aslex.OBJ  \
-		 $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asout.OBJ  $(OUTPUTDIR)\assubr.OBJ  \
-		 $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\ds8adr.OBJ  $(OUTPUTDIR)\ds8ext.OBJ  $(OUTPUTDIR)\ds8mch.OBJ  \
-		 $(OUTPUTDIR)\ds8pst.OBJ 
+OBJS		=  $(OUTPUTDIR)\asdata.OBJ  $(OUTPUTDIR)\asdbg.OBJ  $(OUTPUTDIR)\asexpr.OBJ  \
+		 $(OUTPUTDIR)\aslex.OBJ  $(OUTPUTDIR)\aslist.OBJ  $(OUTPUTDIR)\asmain.OBJ  $(OUTPUTDIR)\asout.OBJ  \
+		 $(OUTPUTDIR)\assubr.OBJ  $(OUTPUTDIR)\assym.OBJ  $(OUTPUTDIR)\ds8adr.OBJ  $(OUTPUTDIR)\ds8ext.OBJ  \
+		 $(OUTPUTDIR)\ds8mch.OBJ  $(OUTPUTDIR)\ds8pst.OBJ 
 
 RCFILES		= 
 
@@ -186,7 +186,7 @@ clean:
 		-del $(TARGETDIR)\$$SCW$$.$(PROJTYPE)
 		-del $(TARGETDIR)\$(PROJ).CLE
 		-del $(OUTPUTDIR)\SCPH.SYM
-		-del AS8XCXXX.dpd
+		-del as8xcxxx.dpd
 		-del $(OBJS)
 
 cleanres:
@@ -202,14 +202,19 @@ link:
 
 
 
-!IF EXIST (AS8XCXXX.dpd)
-!INCLUDE AS8XCXXX.dpd
+!IF EXIST (as8xcxxx.dpd)
+!INCLUDE as8xcxxx.dpd
 !ENDIF
 
 
 
 $(OUTPUTDIR)\asdata.OBJ:	..\..\..\ASXXSRC\asdata.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asdata.obj ..\..\..\ASXXSRC\asdata.c
+
+
+
+$(OUTPUTDIR)\asdbg.OBJ:	..\..\..\ASXXSRC\asdbg.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asdbg.obj ..\..\..\ASXXSRC\asdbg.c
 
 
 

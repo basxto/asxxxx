@@ -1,7 +1,7 @@
 /* i51ext.c */
 
 /*
- * (C) Copyright 1998-2002
+ * (C) Copyright 1998-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,7 +10,8 @@
  *
  *   This Assember Ported by
  *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *	jhartman at compuserve dot com
+ *	noice at noicedebugger dot com
  *
  */
 

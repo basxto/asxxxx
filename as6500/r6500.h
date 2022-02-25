@@ -1,7 +1,7 @@
 /* r6500.h */
 
 /*
- * (C) Copyright 1995-2002
+ * (C) Copyright 1995-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,8 +16,8 @@
  * Sillitie 10 A
  * 01480 Vantaa
  * Finland
- * Internet: Marko.Makela@Helsinki.Fi
- * EARN/BitNet: msmakela@finuh
+ * Internet: Marko dot Makela at Helsinki dot Fi
+ * EARN/BitNet: msmakela at finuh
  */
 
 /*)BUILD
@@ -32,6 +32,7 @@
 		R65ADR.C
 		R65PST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C

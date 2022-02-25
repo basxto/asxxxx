@@ -3,9 +3,9 @@
 /*
  * Modified from i51mch.c
  * Bill McKinnon
- * w_mckinnon@conknet.com
+ * w_mckinnon at conknet dot com
  *
- * (C) Copyright 1998-2002
+ * (C) Copyright 1998-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,8 +13,8 @@
  * Kent, Ohio  44240
  *
  *   This Assember Ported by
- *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *	jhartman at compuserve dot com
+ *	noice at noicedebugger dot com
  *
  */
 
@@ -34,11 +34,11 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	char *str;
-	register int c, op, t, t1, v1;
-	struct expr e, e1;
-	struct PreDef *pd;
+	char *p, *str;
+	char pid[NINPUT], id[NINPUT];
+	register int c, d, op, t, t1, v1;
 	struct sym *sp;
+	struct expr e, e1;
 
 	clrexpr(&e);
 	clrexpr(&e1);
@@ -60,60 +60,46 @@ struct mne *mp;
 		case DS87C520: v1 = 2; str = "DS87C520"; break;
 		case DS87C530: v1 = 2; str = "DS87C530"; break;
 		case DS87C550: v1 = 2; str = "DS87C550"; break;
+		case DS______: v1 = 2; str = "DS______";
+			if (more()) {
+				str = p = pid;
+				d = getnb();
+				while ((c = get()) != d) {
+					if (p < &pid[sizeof(pid)-3]) {
+						*p++ = c;
+					} else {
+						break;
+					}
+				}
+				*p = 0;
+			}
+			break;
 		}
-		exprmasks(v1);
+		if (op != 0) {
+			exprmasks(v1);
+		}
+		ptype = op;
+
+		sprintf(id, "__%s", str);
+		sp = lookup(id);
+		if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
+			err('m');
+		}
+		sp->s_type = S_USER;
+		sp->s_addr = 1;
+		sp->s_flag |= S_ASG;
+
 		sprintf(buff, "%s %s", DS_CPU, str);
 		cpu = buff;
 		lmode = SLIST;
-
-		/*
-		 * Check if SFR_BITS are Enabled
-		 */
-		 if (more()) {
-			expr(&e, 0);
-			abscheck(&e);
-			if (e.e_addr != 0) {
-				op |= SFR_BITS;
-			}
-		}
-
-		/*
-		 * Make previous ptype invalid
-		 */
-		pd = preDef;
-		while (pd->id) {
-			if ( (((pd->ptype & SFR_BITS) == 0) && ((pd->ptype & ptype) != 0)) ||
-			     (((pd->ptype & SFR_BITS) != 0) && ((pd->ptype & ptype) == ptype)) ) {
-			 	sp = slookup(pd->id);
-			 	if (sp != NULL) {
-					sp->s_addr = ~0;
-				}
-			}
-			pd++;
-		}
-
-		/*
-		 * Load new ptype definitions
-		 */
-		ptype = op;
-		pd = preDef;
-		while (pd->id) {
-			if ( (((pd->ptype & SFR_BITS) == 0) && ((pd->ptype & ptype) != 0)) ||
-			     (((pd->ptype & SFR_BITS) != 0) && ((pd->ptype & ptype) == ptype)) ) {
-				sp = lookup(pd->id);
-				sp->s_addr = pd->value;
-				if (sp->s_type == S_NEW) {
-					sp->s_type = S_DIR;
-				}
-			}
-			pd++;
-		}
-
 		break;
 
 	case X_AMODE:
-		if ( ((ptype & DS80C390) != DS80C390) &&
-		     !((ptype == 0) && (a_bytes > 2)) ) {
+		if ((ptype != 0) && (ptype != DS80C390)) {
+			err('o');
+			break;
+		} else
+		if ((ptype == 0) && ((a_bytes < 2) || (a_bytes > 3))) {
 			err('o');
 			break;
 		}
@@ -154,24 +140,22 @@ struct mne *mp;
 		break;
 
 	case S_JMP11:
-		/*
-		 * 11 bit destination.
-		 * Top 3 bits become the MSBs of the op-code.
-		 */
 		expr(&e, 0);
-		if (amode == 2)
-			outr19(&e, op);
-		else
-			outr11(&e, op);
+		if (amode == 2) {
+			outr3bm(&e, R_PAGX3 | R_J19, op << 16);
+		} else {
+			outrwm(&e, R_PAGX2 | R_J11, op << 8);
+		}
 		break;
 
 	case S_JMP16:
 		expr(&e, 0);
 		outab(op);
-		if (amode == 2)
+		if (amode == 2) {
 			outr3b(&e, R_NORM);
-		else
+		} else {
 			outrw(&e, R_NORM);
+		}
 		break;
 
 	case S_ACC:

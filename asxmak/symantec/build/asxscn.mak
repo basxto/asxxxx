@@ -10,7 +10,7 @@ DEBUG		= 0
 NDEBUG		= 1
 !ENDIF
 
-PROJ		= ASXSCN
+PROJ		= asxscn
 APPTYPE		= DOSX EXE
 PROJTYPE	= EXE
 
@@ -24,8 +24,8 @@ DISASM		= OBJ2ASM
 LNK		= LINK
 DLLS		= 
 
-HEADERS		= F:\SC\INCLUDE\stdio.h F:\SC\INCLUDE\string.h F:\SC\INCLUDE\setjmp.h  \
-		F:\SC\INCLUDE\alloc.h F:\SC\INCLUDE\stdlib.h ..\..\..\asxxsrc\asxxxx.h 
+HEADERS		= ..\..\..\asxxsrc\asxxxx.h C:\SC\INCLUDE\stdio.h C:\SC\INCLUDE\string.h  \
+		C:\SC\INCLUDE\setjmp.h C:\SC\INCLUDE\alloc.h C:\SC\INCLUDE\stdlib.h 
 
 DEFFILE		= asxscn.DEF
 
@@ -41,14 +41,14 @@ CFLAGS		=  -mx -C -S -3 -a4 -c -g -gd
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
-OUTPUTDIR	= c:\asxxxx\asxmak\symantec\build
-!IF EXIST (c:\asxxxx\asxmak\symantec\build)
+OUTPUTDIR	= r:\asxv4pxx\asxmak\symantec\build
+!IF EXIST (r:\asxv4pxx\asxmak\symantec\build)
 CREATEOUTPUTDIR	=
 !ELSE
 CREATEOUTPUTDIR	= if not exist $(OUTPUTDIR)\*.* md $(OUTPUTDIR)
 !ENDIF
-TARGETDIR	= c:\asxxxx\asxmak\symantec\exe
-!IF EXIST (c:\asxxxx\asxmak\symantec\exe)
+TARGETDIR	= r:\asxv4pxx\asxmak\symantec\exe
+!IF EXIST (r:\asxv4pxx\asxmak\symantec\exe)
 CREATETARGETDIR	=
 !ELSE
 CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
@@ -57,7 +57,7 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 LIBS		= 
 
 CFLAGS		=  -A -r -J -mx -o+time -3 -a4 -c 
-LFLAGS		=  /DE /PACKF /XN
+LFLAGS		=  /NOI /DE /PACKF /XN
 DEFINES		= 
 !ENDIF
 
@@ -75,11 +75,11 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -Ic:\asxxxx\asxxsrc
+INCLUDES	= -Ir:\asxv4pxx\asxxsrc
 
 INCLUDEDOBJS	= 
 
-OBJS		=  $(OUTPUTDIR)\ASXSCN.OBJ 
+OBJS		=  $(OUTPUTDIR)\asxxscan.OBJ 
 
 RCFILES		= 
 
@@ -183,7 +183,7 @@ clean:
 		-del $(TARGETDIR)\$$SCW$$.$(PROJTYPE)
 		-del $(TARGETDIR)\$(PROJ).CLE
 		-del $(OUTPUTDIR)\SCPH.SYM
-		-del ASXSCN.dpd
+		-del asxscn.dpd
 		-del $(OBJS)
 
 cleanres:
@@ -199,14 +199,14 @@ link:
 
 
 
-!IF EXIST (ASXSCN.dpd)
-!INCLUDE ASXSCN.dpd
+!IF EXIST (asxscn.dpd)
+!INCLUDE asxscn.dpd
 !ENDIF
 
 
 
-$(OUTPUTDIR)\ASXSCN.OBJ:	..\..\..\ASXXMISC\ASXSCN.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\ASXSCN.obj ..\..\..\ASXXMISC\ASXSCN.C
+$(OUTPUTDIR)\asxxscan.OBJ:	..\..\..\ASXXMISC\asxxscan.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\asxxscan.obj ..\..\..\ASXXMISC\asxxscan.c
 
 
 

@@ -1,7 +1,7 @@
 /* asdata.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -54,6 +54,9 @@ int	flevel;		/*	IF-ELSE-ENDIF flag will be non
 			 */
 int	tlevel;		/*	current conditional level
 			 */
+int	nlevel;		/*	LIST-NLIST flag will be non
+			 *	zero for nolist
+			 */
 int	ifcnd[MAXIF+1];	/*	array of IF statement condition
 			 *	values (0 = FALSE) indexed by tlevel
 			 */
@@ -95,25 +98,33 @@ int	lop;		/*	current line number on page
 			 */
 int	pass;		/*	assembler pass number
 			 */
-int	lflag;		/*	-l, generate listing flag
+int	aflag;		/*	-a, make all symbols global flag
+			 */
+int	bflag;		/*	-b(b), listing modes flag
+			 */
+int	fflag;		/*	-f(f), relocations flagged flag
 			 */
 int	gflag;		/*	-g, make undefined symbols global flag
 			 */
-int	aflag;		/*	-a, make all symbols global flag
+int	jflag;		/*	-j, enable NoICE Debug Symbols
+			 */
+int	lflag;		/*	-l, generate listing flag
 			 */
 int	oflag;		/*	-o, generate relocatable output flag
 			 */
+int	pflag;		/*	-p, enable listing pagination
+			 */
 int	sflag;		/*	-s, generate symbol table flag
 			 */
-int	pflag;		/*	-p, enable listing pagination
+int	uflag;		/*	-u, disable .list/.nlist processing flag
 			 */
 int	wflag;		/*	-w, enable wide listing format
 			 */
-int	zflag;		/*	-z, enable symbol case sensitivity
-			 */
 int	xflag;		/*	-x, listing radix flag
 			 */
-int	fflag;		/*	-f(f), relocations flagged flag
+int	yflag;		/*	-y, enable SDCC Debug Symbols
+			 */
+int	zflag;		/*	-z, disable symbol case sensitivity
 			 */
 int	a_bytes;	/*	REL file T Line address length
 			 */
@@ -122,6 +133,12 @@ a_uint	a_mask;		/*	Address Mask
 a_uint	s_mask;		/*	Sign Mask
 			 */
 a_uint	v_mask;		/*	Value Mask
+			 */
+int	as_msb	;	/*	current MSB byte select
+			 *	0 == low byte
+			 *	1 == high byte
+			 *	2 == third byte
+			 *	3 == fourth byte
 			 */
 a_uint	laddr;		/*	address of current assembler line
 			 *	or value of .if argument
@@ -140,7 +157,12 @@ char	eb[NERR];	/*	array of generated error codes
 char	*ip;		/*	pointer into the assembler-source
 			 *	text line in ib[]
 			 */
-char	ib[NINPUT];	/*	assembler-source text line
+char	ib[NINPUT*2];	/*	assembler-source text line for processing
+			 */
+char	ic[NINPUT*2];	/*	assembler-source text line for listing
+			 */
+char	*il;		/*	pointer to the assembler-source
+			 *	text line to be listed
 			 */
 char	*cp;		/*	pointer to assembler output
 			 *	array cb[]
@@ -217,7 +239,7 @@ struct	mne	*mnehash[NHASH];
  */
 struct	sym	sym[] = {
     {	NULL,	NULL,	".",	    S_USER, 0,			NULL,0,0    },
-    {	NULL,	NULL,	".__.ABS.", S_USER, S_ASG|S_GBL|S_END,	NULL,0,0    }
+    {	NULL,	NULL,	".__.ABS.", S_USER, S_ASG|S_GBL|S_EOL,	NULL,0,0    }
 };
 
 struct	sym	*symp;		/*	pointer to a symbol structure
@@ -230,32 +252,88 @@ struct	sym *symhash[NHASH];	/*	array of pointers to NHASH
  *	The area structure contains the parameter values for a
  *	specific program or data section.  The area structure
  *	is a linked list of areas.  The initial default area
- *	is "_CODE" defined here, the next area structure
+ *	is "_CODE" defined in ___pst.c, the next area structure
  *	will be linked to this structure through the structure
- *	element 'struct area *a_ep'.  The structure contains the
+ *	element 'struct area *a_ap'.  The structure contains a
+ *	a pointer to an optional bank specification, the
  *	area name, area reference number ("_CODE" is 0) determined
  *	by the order of .area directives, area size determined
  *	from the total code and/or data in an area, area fuzz is
- *	an variable used to track pass to pass changes in the
+ *	a variable used to track pass to pass changes in the
  *	area size caused by variable length instruction formats,
  *	and area flags which specify the area's relocation type.
  *
  *	struct	area
  *	{
  *		struct	area *a_ap;	Area link
+ *		struct	bank *b_bp;	Bank link
  *		char *	a_id;		Area Name
  *		int	a_ref;		Reference number
  *		a_uint	a_size;		Area size
  *		a_uint	a_fuzz;		Area fuzz
  *		int	a_flag;		Area flags
  *	};
+ *
+ *
+ * Pointer to an area structure
  */
-struct	area	area[] = {
-    {	NULL,	"_CODE",	0,	0,	0,	A_CON|A_REL	}
-};
+struct	area	*areap = &area[1];
 
-struct	area	*areap;	/*	pointer to an area structure
-			 */
+/*
+ *	The bank structure contains the parameter values for a
+ *	specific collection of areas.  The bank structure
+ *	is a linked list of banks.  The initial default bank
+ *	is "_CODE" defined in ___pst.c, the next bank structure
+ *	will be linked to this structure through the structure
+ *	element 'struct bank *b_bp'.  The structure contains the
+ *	bank name, bank reference number ("_CODE" is 0) determined
+ *	by the order of .bank directives, the bank base address
+ *	(default = 0), bank size (default = 0, whole addressing space),
+ *	and output data file suffix (appended as a suffix to the
+ *	output file name) are optional parameters of the .bank
+ *	assembler directive which are passed to the linker as the
+ *	default link parameters, and the bank flags which specify
+ *	what options have been specified.
+ *
+ *	struct	bank
+ *	{
+ *		struct	bank *b_bp;	Bank link
+ *		char *	b_id;		Bank Name
+ *		char *	b_fsfx;		Bank File Suffix
+ *		int	b_ref;		Ref. number
+ *		a_uint	b_base;		Bank base address
+ *		a_uint	b_size;		Bank length
+ *		int	b_flag;		Bank flags
+ *	};
+ *
+ *	Pointer to a bank structure
+ */
+struct	bank	*bankp = &bank[1];
+
+/*
+ *	The def structure is used by the .define assembler
+ *	directive to define a substitution string for a
+ *	single word.  The def structure contains the
+ *	string being defined, the string to substitute
+ *	for the defined string, and a link to the next
+ *	def structure.  The defined string is a sequence
+ *	of characters not containing any white space
+ *	(i.e. NO SPACEs or TABs).  The substitution string
+ *	may contain SPACES and/or TABs.
+ *
+ *	struct def
+ *	{
+ *		struct def	*d_dp;		link to next define
+ *		char		*d_id;		defined string
+ *		char		*d_define;	string to substitute for defined string
+ *		int		d_dflag;	(1) .defined / (0) .undefined
+ *	};
+ *
+ *	Pointer to a def structure
+ */
+
+struct	def	*defp = NULL;
+
 
 FILE	*lfp;		/*	list output file handle
 			 */
@@ -267,10 +345,18 @@ FILE	*sfp[MAXFIL];	/*	array of assembler-source file handles
 			 */
 FILE	*ifp[MAXINC];	/*	array of include-file file handles
 			 */
+char	txt[NTXT];	/*	T Line Values
+			 */
+char	rel[NREL];	/*	R Line Values
+			 */
+char	*txtp = &txt[0];/*	Pointer to T Line Values
+			 */
+char	*relp = &rel[0];/*	Pointer to R Line Values
+			 */
 
 /*
- *	array of character types, one per
- *	ASCII character
+ *	an array of character types,
+ *	one per ASCII character
  */
 char	ctype[128] = {
 /*NUL*/	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,	ILL,

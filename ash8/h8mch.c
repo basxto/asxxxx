@@ -1,7 +1,7 @@
 /* h8mch.c */
 
 /*
- * (C) Copyright 1994-2002
+ * (C) Copyright 1994-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -66,10 +66,10 @@ struct mne *mp;
 			}
 		}
 		if (espa) {
-			outdp(espa, &e1);
+			outdp(espa, &e1, 0);
 		} else {
 			e1.e_addr = ~0x00FF;
-			outdp(dot.s_area, &e1);
+			outdp(dot.s_area, &e1, 0);
 		}
 		lmode = SLIST;
 		break;
@@ -241,7 +241,7 @@ struct mne *mp;
 					outrw(&e2, R_NORM);
 				} else {
 					outab(0x30 | v1);
-					outrb(&e2, R_PAG);
+					outrb(&e2, R_PAGN);
 					pagebyte(&e2);
 				}
 				break;
@@ -253,7 +253,7 @@ struct mne *mp;
 					outrw(&e2, R_NORM);
 				} else {
 					outab(0x30 | v1);
-					outrb(&e2, R_PAG);
+					outrb(&e2, R_PAGN);
 					pagebyte(&e2);
 				}
 				break;
@@ -304,7 +304,7 @@ struct mne *mp;
 					outrw(&e1, R_NORM);
 				} else {
 					outab(0x20 | v2);
-					outrb(&e1, R_PAG);
+					outrb(&e1, R_PAGN);
 					pagebyte(&e1);
 				}
 				break;
@@ -316,7 +316,7 @@ struct mne *mp;
 					outrw(&e1, R_NORM);
 				} else {
 					outab(0x20 | v2);
-					outrb(&e1, R_PAG);
+					outrb(&e1, R_PAGN);
 					pagebyte(&e1);
 				}
 				break;
@@ -628,7 +628,7 @@ struct mne *mp;
 			case S_EXT:	/* Rn(byte),@aa:16 */
 			case S_DIR:	/* Rn(byte),*@aa:8 */
 				outab(0x7F);
-				outrb(&e2, R_PAG);
+				outrb(&e2, R_PAGN);
 				pagebyte(&e2);
 				outaw(op | ((v1&0x000F) << 4));
 				break;
@@ -660,7 +660,7 @@ struct mne *mp;
 			case S_EXT:	/* #xx:3,@aa:16 */
 			case S_DIR:	/* #xx:3,*@aa:8 */
 				outab(0x7F);
-				outrb(&e2, R_PAG);
+				outrb(&e2, R_PAGN);
 				pagebyte(&e2);
 				outaw(op | ((v1&0x0007) << 4));
 				break;
@@ -711,7 +711,7 @@ struct mne *mp;
 				} else {
 					outab(0x7F);
 				}
-				outrb(&e2, R_PAG);
+				outrb(&e2, R_PAGN);
 				pagebyte(&e2);
 				outaw(op | ((v1&0x000F) << 4));
 				break;

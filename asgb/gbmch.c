@@ -1,7 +1,7 @@
-/* z80mch.c */
+/* gbmch.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,7 +9,7 @@
  * Kent, Ohio  44240
  */
 
-/* Gameboy mods by Roger Ivie (ivie@cc.usu.edu); see gb.h for more info 
+/* Gameboy mods by Roger Ivie (ivie at cc dot usu dot edu); see gb.h for more info 
  */
 
 #include <stdio.h>

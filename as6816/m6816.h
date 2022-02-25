@@ -1,7 +1,7 @@
 /* m6816.h */
 
 /*
- * (C) Copyright 1991-2002
+ * (C) Copyright 1991-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,6 +21,7 @@
 		M16ADR.C
 		M16PST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C

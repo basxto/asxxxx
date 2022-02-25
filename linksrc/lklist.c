@@ -1,7 +1,7 @@
 /* lklist.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -103,9 +103,10 @@ char *str;
 	return(1);
 }
 
-/*)Function	VOID	slew(xp)
+/*)Function	VOID	slew(xp, yp)
  *
  *		area *	xp		pointer to an area structure
+ *		bank *	yp		pointer to a  bank structure
  *
  *	The function slew() increments the page line counter.
  *	If the number of lines exceeds the maximum number of
@@ -122,6 +123,8 @@ char *str;
  *		char *	ptr		pointer to an id string
  *
  *	global variables:
+ *		int	a_bytes		T line address bytes
+ *		int	a_mask		addressing mask
  *		int	lop		current line number on page
  *		FILE	*mfp		Map output file handle
  *		int	wflag		Wide format listing
@@ -137,8 +140,9 @@ char *str;
  */
 
 VOID
-slew(xp)
+slew(xp,yp)
 register struct area *xp;
+register struct bank *yp;
 {
 	register int i, n;
 	register char *frmta, *frmtb, *ptr;
@@ -152,7 +156,12 @@ register struct area *xp;
 		case 1: frmta = "Octal"; break;
 		case 2: frmta = "Decimal"; break;
 		}
-		fprintf(mfp, "%s  [%d-Bits]\n\n", frmta, a_bytes*8);
+		fprintf(mfp, "%s  [%d-Bits]\n", frmta, a_bytes*8);
+		if (*yp->b_id) {
+			fprintf(mfp, "[ Bank == %s ]\n", yp->b_id);
+			lop += 1;
+		}
+		fprintf(mfp, "\n");
 		fprintf(mfp,
 			"Area                       Addr   ");
 		fprintf(mfp,
@@ -163,7 +172,7 @@ register struct area *xp;
 			"     ----        ------- ----- ------------\n");
 
 		ai = xp->a_addr & a_mask;
-		aj = xp->a_size & a_mask;
+		aj = ((1 + (A4_WLMSK & xp->a_flag)) * xp->a_size) & a_mask;
 
 		/*
 		 * Output Area Header
@@ -200,28 +209,33 @@ register struct area *xp;
 		fprintf(mfp, frmta, ai, aj);
 		fprintf(mfp, frmtb, aj);
 
-		if (xp->a_flag & A_ABS) {
+		if ((xp->a_flag & A4_ABS) == A4_ABS) {
 			fprintf(mfp, "(ABS");
 		} else {
 			fprintf(mfp, "(REL");
 		}
-		if (xp->a_flag & A_OVR) {
+		if ((xp->a_flag & A4_OVR) == A4_OVR) {
 			fprintf(mfp, ",OVR");
 		} else {
 			fprintf(mfp, ",CON");
 		}
-		if (xp->a_flag & A_PAG) {
+		if ((xp->a_flag & A4_PAG) == A4_PAG) {
 			fprintf(mfp, ",PAG");
+		}
+		if ((xp->a_flag & A4_DSEG) == A4_DSEG) {
+			fprintf(mfp, ",DSEG");
+		} else {
+			fprintf(mfp, ",CSEG");
 		}
 		fprintf(mfp, ")\n");
 
-		if (xp->a_flag & A_PAG) {
+		if ((xp->a_flag & A4_PAG) == A4_PAG) {
 			ai = (ai & 0xFF);
 			aj = (aj > 256);
 			if (ai || aj) { fprintf(mfp, "  "); lop += 1; }
-			if (ai)      { fprintf(mfp, " Boundary"); }
+			if (ai)       { fprintf(mfp, " Boundary"); }
 			if (ai & aj)  { fprintf(mfp, " /"); }
-			if (aj)      { fprintf(mfp, " Length"); }
+			if (aj)       { fprintf(mfp, " Length"); }
 			if (ai || aj) { fprintf(mfp, " Error\n"); }
 		}
 
@@ -259,9 +273,10 @@ register struct area *xp;
 	}
 }
 
-/*)Function	VOID	lstarea(xp)
+/*)Function	VOID	lstarea(xp, yp)
  *
  *		area *	xp		pointer to an area structure
+ *		bank *	yp		pointer to a  bank structure
  *
  *	The function lstarea() creates the linker map output for
  *	the area specified by pointer xp.  The generated output
@@ -305,8 +320,9 @@ register struct area *xp;
  */
 
 VOID
-lstarea(xp)
+lstarea(xp, yp)
 struct area *xp;
+struct bank *yp;
 {
 	register struct areax *oxp;
 	register int i, j, n;
@@ -315,9 +331,6 @@ struct area *xp;
 	a_uint a0, ai, aj;
 	struct sym *sp;
 	struct sym **p;
-
-	lop = NLPP;
-	slew(xp);
 
 	/*
 	 * Find number of symbols in area
@@ -335,6 +348,14 @@ struct area *xp;
 		}
 		oxp = oxp->a_axp;
 	}
+
+	if ((nmsym == 0) && (xp->a_size == 0)) {
+		return;
+	}
+
+	lop = NLPP;
+	slew(xp, yp);
+
 	if (nmsym == 0) {
 		return;
 	}
@@ -343,8 +364,7 @@ struct area *xp;
 	 * Allocate space for an array of pointers to symbols
 	 * and load array.
 	 */
-	if ( (p = (struct sym **) malloc(nmsym*sizeof(struct sym *)))
-		== NULL) {
+	if ( (p = (struct sym **) malloc (nmsym*sizeof(struct sym *))) == NULL) {
 		fprintf(mfp, "Insufficient space to build Map Segment.\n");
 		return;
 	}
@@ -399,7 +419,7 @@ struct area *xp;
 	i = 0;
 	while (i < nmsym) {
 		if (wflag) {
-			slew(xp);
+			slew(xp, yp);
 			switch(a_bytes) {
 			default:
 			case 2: frmt = "        "; break;
@@ -409,7 +429,7 @@ struct area *xp;
 			fprintf(mfp, frmt);
 		} else
 		if ((i % n) == 0) {
-			slew(xp);
+			slew(xp, yp);
 			switch(a_bytes) {
 			default:
 			case 2: frmt = "  "; break;
@@ -451,6 +471,21 @@ struct area *xp;
 		fprintf(mfp, frmt, aj);
 
 		ptr = &sp->s_id[0];
+
+#if NOICE
+		/*
+		 * NoICE output of symbol
+		 */
+		if (jflag) DefineNoICE(ptr, aj, yp);
+#endif
+
+#if SDCDB
+		/*
+		 * SDCDB output of symbol
+		 */
+		if (yflag) DefineSDCDB(ptr, aj);
+#endif
+
 		if (wflag) {
 			fprintf(mfp, "%-32.32s", ptr);
 			i++;
@@ -494,13 +529,15 @@ struct area *xp;
  *	output file.
  *
  *	local variables:
- *		a_uint	pc		current program counter address
+ *		a_uint	cpc		current program counter address in PC increments
+ *		int	cbytes		bytes so far in T line
  *
  *	global variables:
  *		int	a_bytes		T Line Address Bytes
  *		int	hilo		byte order
  *		int	gline		get a line from the LST file
  *					to translate for the RST file
+ *		a_uint	pc		current program counter address in bytes
  *		char	rb[]		read listing file text line
  *		FILE	*rfp		The file handle to the current
  *					output RST file
@@ -527,7 +564,8 @@ VOID
 lkulist(i)
 int i;
 {
-	a_uint pc;
+	a_uint cpc;
+	int cbytes;
 
 	/*
 	 * Exit if listing file is not open
@@ -540,11 +578,6 @@ int i;
 	 */
 	if (i) {
 		/*
-		 * Evaluate current code address
-		 */
-		pc = adb_xb(0, 0);
-
-		/*
 		 * Line with only address
 		 */	
 		if (rtcnt == a_bytes) {
@@ -554,9 +587,13 @@ int i;
 		 * Line with address and code
 		 */
 		} else {
+			cpc = pc;
+			cbytes = 0;
 			for (i=a_bytes; i < rtcnt; i++) {
 				if (rtflg[i]) {
-					lkglist(pc++, rtval[i] & 0xFF);
+					lkglist(cpc, rtval[i] & 0xFF, rterr[i]);
+					cbytes += 1;
+					cpc += (cbytes % pcb) ? 0 : 1;
 				}
 			}
 		}
@@ -577,9 +614,9 @@ int i;
 	}
 }
 
-/*)Function	VOID	lkalist(pc)
+/*)Function	VOID	lkalist(cpc)
  *
- *		int	pc		current program counter value
+ *		int	cpc		current program counter value
  *
  *	The function lkalist() performs the following functions:
  *
@@ -661,8 +698,8 @@ ee DDDDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(32)
 */
 
 VOID
-lkalist(pc)
-a_uint pc;
+lkalist(cpc)
+a_uint cpc;
 {
 	char str[16];
 	char *frmt;
@@ -671,7 +708,7 @@ a_uint pc;
 	/*
 	 * Truncate (int) to N-Bytes
 	 */
-	 pc &= a_mask;
+	cpc &= a_mask;
 
 	/*
 	 * Exit if listing file is not open
@@ -756,7 +793,7 @@ loop:	if (tfp == NULL)
 		fprintf(rfp, "%s", rb);
 		goto loop;
 	}
-	sprintf(str, frmt, pc);
+	sprintf(str, frmt, cpc);
 	strncpy(&rb[n], str, m);
 
 	/*
@@ -766,10 +803,11 @@ loop:	if (tfp == NULL)
 	gcntr = 0;
 }
 
-/*)Function	VOID	lkglist(pc,v)
+/*)Function	VOID	lkglist(cpc,v,err)
  *
- *		int	pc		current program counter value
+ *		int	cpc		current program counter value
  *		int 	v		value of byte at this address
+ *		int	err		error flag for this value
  *
  *	The function lkglist() performs the following functions:
  *
@@ -857,9 +895,10 @@ ee DDDDDDDDDD ddd ddd ddd ddd ddd LLLLL *********	DECIMAL(32)
 */
 
 VOID
-lkglist(pc,v)
-a_uint pc;
+lkglist(cpc,v,err)
+a_uint cpc;
 int v;
+int err;
 {
 	char str[16];
 	char *afrmt, *frmt;
@@ -868,7 +907,7 @@ int v;
 	/*
 	 * Truncate (int) to N-Bytes
 	 */
-	 pc &= a_mask;
+	 cpc &= a_mask;
 
  	/*
 	 * Exit if listing file is not open
@@ -979,8 +1018,25 @@ loop:	if (tfp == NULL)
 	 */
 	if (gcntr == 0) {
 		if (dgt(r, &rb[n], m)) {
-			sprintf(str, afrmt, pc);
+			sprintf(str, afrmt, cpc);
 			strncpy(&rb[n], str, m);
+		}
+	}
+	/*
+	 * Output an error line if required
+	 */
+	if (err) {
+		switch(ASxxxx_VERSION) {
+		case 3:
+			fprintf(rfp, "?ASlink-Warning-%s\n", errmsg3[err]);
+			break;
+
+		case 4:
+			fprintf(rfp, "?ASlink-Warning-%s\n", errmsg4[err]);
+			break;
+
+		default:
+			break;
 		}
 	}
 	/*

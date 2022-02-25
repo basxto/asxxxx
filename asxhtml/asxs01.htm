@@ -290,7 +290,7 @@ pressions.
 <H4><B><UL>
 <LI><A HREF= #Character>  Character Sets </A> 
 <LI><A HREF= #User>  User-Defined Symbols </A>
-<LI><A HREF= #Local>  Local Symbols </A>
+<LI><A HREF= #Reusable>  Reusable Symbols </A>
 <LI><A HREF= #Current>  Current Location Counter </A>
 <LI><A HREF= #Numbers>  Numbers </A>
 <LI><A HREF= #Terms>  Terms </A>
@@ -306,10 +306,10 @@ pressions.
    The following characters are legal in ASxxxx source programs: 
 
      1.  The  letters  A  through Z.  Both upper- and lower-case
-         letters are acceptable.  The assemblers  are  not  case
-         sensitive,  i.e.   ABCD  and abcd are the same symbols.
-         (The assemblers can be made case  sensitive  by  recom-
-         piling with the appropriate switches.) 
+         letters are acceptable.  The  assemblers,  by  default,
+         are  case  sensitive,  i.e.   ABCD and abcd are not the
+         same symbols.  (The assemblers can be made case  insen-
+         sitive by using the -z command line option.) 
 
      2.  The digits 0 through 9 
 
@@ -337,6 +337,10 @@ Table 1         Label Terminators and Assignment Operators
         ==  Double equal        Direct assignment operator;  
             sign                defines  the  symbol as a global
                                 symbol.  
+
+        =:  Local equal         Direct assignment operator;  de-
+                                fines the symbol as a local sym-
+                                bol.  
 
 ---------------------------------------------------------------- 
 
@@ -488,46 +492,48 @@ The following rules govern the creation of user-defined symbols:
 <H5><A HREF= #Symbols> =&gt; Section Index</A></H5>
 <HR SIZE=3 WIDTH=100% ALIGN=Center NOSHADE>
 <H4><B><PRE>
-<A NAME = "Local"></A><FONT COLOR="#FF0000">Local Symbols</FONT> 
+<A NAME = "Reusable"></A><FONT COLOR="#FF0000">Reusable Symbols</FONT> 
 
-   Local  symbols are specially formatted symbols used as labels
-within a block of coding that has been delimited as a local sym-
-bol  block.   Local  symbols  are  of  the form n$, where n is a
-decimal integer from 0 to 255,  inclusive.   Examples  of  local
-symbols are:  
+   Reusable  symbols are specially formatted symbols used as la-
+bels within a block of coding that has been delimited as a reus-
+able symbol block.  Reusable symbols are of the form n$, where n
+is a decimal integer from 0 to 65535,  inclusive.   Examples  of
+reusable symbols are:  
 
       1$ 
       27$ 
       138$ 
       244$ 
 
-   The  range  of  a local symbol block consists of those state-
+
+   The range of a reusable symbol block consists of those state-
 ments between two normally constructed  symbolic  labels.   Note
 that a statement of the form:  
 
       ALPHA = EXPRESSION 
 
 is a direct assignment statement but does not create a label and
-thus does not delimit the range of a local symbol block.  
+thus does not delimit the range of a reusable symbol block.  
 
-   Note that the range of a local symbol block may extend across
-program areas.  
+   Note  that  the  range  of a reusable symbol block may extend
+across program areas.  
 
-   Local symbols provide a convenient means of generating labels
-for branch instructions and other such references  within  local
-symbol  blocks.   Using local symbols reduces the possibility of
-symbols with multiple definitions appearing within a  user  pro-
-gram.   In  addition,  the  use  of local symbols differentiates
-entry-point labels from local labels, since local labels  cannot
-be referenced from outside their respective local symbol blocks.
-Thus, local symbols of the same name can appear in  other  local
-symbol blocks without conflict.  Local symbols require less sym-
-bol table space than normal symbols.  Their use is recommended. 
+   Reusable symbols provide a convenient means of generating la-
+bels for branch instructions and other  such  references  within
+reusable symbol blocks.  Using reusable symbols reduces the pos-
+sibility of symbols with multiple definitions appearing within a
+user  program.   In  addition,  the use of reusable symbols dif-
+ferentiates entry-point labels from other labels, since reusable
+labels cannot be referenced from outside their respective symbol
+blocks.  Thus, reusable symbols of the same name can  appear  in
+other  symbol blocks without conflict.  Reusable symbols require
+less symbol table space  than  normal  symbols.   Their  use  is
+recommended.  
 
-   The  use of the same local symbol within a local symbol block
+   The  use  of  the  same reusable symbol within a symbol block
 will generate one or both of the m or p errors.  
 
-Example of local symbols:  
+Example of reusable symbols:  
 
         a:      ldx     #atable ;get table address
                 lda     #0d48   ;table length

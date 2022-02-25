@@ -1,7 +1,7 @@
 /* asexpr.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -40,9 +40,11 @@
  *	asexpr.c contains the following functions:
  *		VOID	abscheck()
  *		a_uint	absexpr()
+ *		int	is_abs()
  *		VOID	clrexpr()
  *		int	digit()
  *		VOID	expr()
+ *		VOID	exprmasks()
  *		int	oprio()
  *		VOID	term()
  *
@@ -175,7 +177,7 @@ int n;
 			switch (c) {
 			/*
 			 * The (int) /, %, and >> operations
-			 * are truncated to 2-bytes.
+			 * are truncated to a_bytes.
 			 */
 			case '*':
 				ae *= ar;
@@ -380,24 +382,23 @@ register struct expr *esp;
 		expr(esp, 100);
 		if (is_abs (esp)) {
 			/*
-			 * evaluate msb/lsb directly
+			 * evaluate byte selection directly
 			 */
 			if (c == '>')
-				esp->e_addr >>= 8;
+				esp->e_addr >>= (8 * as_msb);
 			esp->e_addr &= 0377;
 			return;
 		} else {
 			/*
-			 * let linker perform msb/lsb, lsb is default
+			 * let linker perform byte selection
 			 */
-			esp->e_rlcf |= R_BYTX;
 			if (c == '>')
 				esp->e_rlcf |= R_MSB;
 			return;
 		}
 	}
 	/*
-	 * Evaluate digit sequences as local symbols
+	 * Evaluate digit sequences as reusable symbols
 	 * if followed by a '$' or as constants.
 	 */
 	if (ctype[c] & DIGIT) {
@@ -505,8 +506,8 @@ register struct expr *esp;
 	 * Evaluate symbols and labels
 	 */
 	if (ctype[c] & LETTER) {
-		esp->e_mode = S_USER;
 		getid(id, c);
+		esp->e_mode = S_USER;
 		sp = lookup(id);
 		if (sp->s_type == S_NEW) {
 			if (sp->s_flag&S_GBL) {
@@ -771,6 +772,7 @@ int n;
 		v_mask = 0x7FFFFFFF;
 		break;
 	}
+
 }
 
 

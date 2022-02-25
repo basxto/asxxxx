@@ -3,9 +3,9 @@
 /*
  * Modified from i8051.h
  * Bill McKinnon
- * w_mckinnon@conknet.com
+ * w_mckinnon at conknet dot com
  *
- * (C) Copyright 1998-2002
+ * (C) Copyright 1998-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -13,8 +13,8 @@
  * Kent, Ohio  44240
  *
  *   This Assember Ported by
- *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *	jhartman at compuserve dot com
+ *	noice at noicedebugger dot com
  *
  */
 
@@ -30,6 +30,7 @@
 		DS8ADR.C
 		DS80PST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C
@@ -124,8 +125,15 @@ struct PreDef
 extern struct PreDef preDef[];
 
 /*
+ * Extended Addressing Modes
+ */
+#define	R_J11	0x0100		/* 11-Bit Addressing Mode */
+#define	R_J19	0x0200		/* 19-Bit Addressing Mode */
+
+/*
  * Assembler Types
  */
+#define	DS______	(0x00000000)
 #define DS8xCxxx	(0x00000001)
 #define DS80C310	(0x00000002)
 #define DS80C320	(0x00000004)
@@ -137,17 +145,6 @@ extern struct PreDef preDef[];
 #define DS87C520	(0x00001000)
 #define DS87C530	(0x00002000)
 #define DS87C550	(0x00004000)
-
-#define	SFR_BITS	(0x80000000)
-
-#define	CXXX	DS8xCxxx
-#define	C310	DS80C310
-#define	C320	DS80C320
-#define	C323	DS80C323
-#define	C390	DS80C390
-#define	C520	DS83C520|DS87C520
-#define	C530	DS83C530|DS87C530
-#define	C550	DS83C550|DS87C550
 
 	/* machine dependent functions */
 

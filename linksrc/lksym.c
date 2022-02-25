@@ -1,7 +1,7 @@
 /* lksym.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -137,11 +137,18 @@ syminit()
 struct sym *
 newsym()
 {
-	register int c, i, nglob;
+	register int c, i, nsym;
 	struct sym *tsp;
 	struct sym **s;
 	char id[NCPS];
 
+	if (headp == NULL) {
+		fprintf(stderr, "No header defined\n");
+		lkexit(ER_FATAL);
+	}
+	/*
+	 * Create symbol entry
+	 */
 	getid(id, -1);
 	tsp = lkpsym(id, 1);
 	c = getnb();get();get();
@@ -176,13 +183,9 @@ newsym()
 	/*
 	 * Place pointer in header symbol list
 	 */
-	if (headp == NULL) {
-		fprintf(stderr, "No header defined\n");
-		lkexit(ER_FATAL);
-	}
-	nglob = hp->h_nglob;
+	nsym = hp->h_nsym;
 	s = hp->s_list;
-	for (i=0; i < nglob ;++i) {
+	for (i=0; i < nsym ;++i) {
 		if (s[i] == NULL) {
 			s[i] = tsp;
 			return(tsp);
@@ -369,7 +372,7 @@ struct sym *tsp;
 	if ((hp = headp) != NULL) {
 	    while(hp) {
 		p = hp->s_list;
-		for (i=0; i<hp->h_nglob; ++i) {
+		for (i=0; i<hp->h_nsym; ++i) {
 		    if (p[i] == tsp) {
 			fprintf(fp,
 				"\n?ASlink-Warning-Undefined Global %s ",
@@ -394,8 +397,8 @@ struct sym *tsp;
  *	The function symeq() compares the two name strings for a match.
  *	The return value is 1 for a match and 0 for no match.
  *
- *		cflag == 0	case insensitve compare
- *		cflag != 0	case sensitive compare
+ *		cflag == 0	case sensitve compare
+ *		cflag != 0	case insensitive compare
  *
  *	local variables:
  *		int	n		loop counter
@@ -422,18 +425,18 @@ int cflag;
 	n = strlen(p1) + 1;
 	if(cflag) {
 		/*
-		 * Case Sensitive Compare
-		 */
-		do {
-			if (*p1++ != *p2++)
-				return (0);
-		} while (--n);
-	} else {
-		/*
 		 * Case Insensitive Compare
 		 */
 		do {
 			if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])
+				return (0);
+		} while (--n);
+	} else {
+		/*
+		 * Case Sensitive Compare
+		 */
+		do {
+			if (*p1++ != *p2++)
 				return (0);
 		} while (--n);
 	}
@@ -448,8 +451,8 @@ int cflag;
  *	The function hash() computes a hash code using the sum
  *	of all characters mod table size algorithm.
  *
- *		cflag == 0	case insensitve hash
- *		cflag != 0	case sensitive hash
+ *		cflag == 0	case sensitve hash
+ *		cflag != 0	case insensitive hash
  *
  *	local variables:
  *		int	h		accumulated character sum
@@ -476,14 +479,14 @@ register int cflag;
 	while (*p) {
 		if(cflag) {
 			/*
-			 * Case Sensitive Hash
-			 */
-			h += *p++;
-		} else {
-			/*
 			 * Case Insensitive Hash
 			 */
 			h += ccase[*p++ & 0x007F];
+		} else {
+			/*
+			 * Case Sensitive Hash
+			 */
+			h += *p++;
 		}
 	}
 	return (h&HMASK);

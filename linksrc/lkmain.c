@@ -1,7 +1,7 @@
 /* lkmain.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -34,12 +34,12 @@
  *		VOID	gblsav()
  *		VOID	link()
  *		VOID	lkexit()
+ *		int	fndext()
  *		int	fndidx()
  *		int	main()
  *		VOID	map()
  *		int	parse()
  *		VOID	doparse()
- *		VOID	setbas()
  *		VOID	setgbl()
  *		VOID	usage()
  *
@@ -66,7 +66,7 @@
  *	and look for undefined symbols.  Following these routines a linker
  *	map file may be produced and the linker output files may be opened.
  *	The second pass through the .rel files will output the linked data
- *	in one of the four supported formats.
+ *	in one of the supported formats.
  *
  *	local variables:
  *		char *	frmt		temporary format specifier
@@ -105,24 +105,27 @@
  *		int	radix		current number conversion radix
  *		FILE	*sfp		The file handle sfp points to the
  *				 	currently open file
- *		lfile	*startp		asmlnk startup file structure
+ *		lfile	*startp		aslink startup file structure
  *		FILE *	stdout		c_library
  *
  *	functions called:
  *		FILE *	afile()		lkmain.c
+ *		VOID	chkbank()	lkbank.c
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
  *		int	getline()	lklex.c
  *		VOID	library()	lklibr.c
  *		VOID	link()		lkmain.c
  *		VOID	lkexit()	lkmain.c
+ *		VOID	lkfopen()	lkbank.c
  *		VOID	lnkarea()	lkarea.c
  *		VOID	map()		lkmain.c
  *		VOID	new()		lksym.c
  *		int	parse()		lkmain.c
  *		VOID	reloc()		lkreloc.c
  *		VOID	search()	lklibr.c
- *		VOID	setbas()	lkmain.c
+ *		VOID	setarea()	lkarea.c
+ *		VOID	setbank()	lkbank.c
  *		VOID	setgbl()	lkmain.c
  *		char *	sprintf()	c_library
  *		VOID	symdef()	lksym.c
@@ -141,7 +144,11 @@ int argc;
 char *argv[];
 {
 	register int c, i, j, k;
-	register char *frmt;
+
+	if (sizeof(a_mask) < 4) {
+		fprintf(stderr, "?ASxxxx-Error-Size of INT32 is not 32 bits or larger.\n\r\n");
+		exit(ER_FATAL);
+	}
 
 	fprintf(stdout, "\n");
 
@@ -216,11 +223,33 @@ char *argv[];
 	if (linkp == NULL)
 		usage(ER_FATAL);
 
+	/*
+	 * If no input file is specified
+	 * then assume a single file with
+	 * the same name as the output file.
+	 */
+	if (lfp == linkp) {
+		lfp->f_flp = (struct lfile *) new (sizeof (struct lfile));
+		lfp = lfp->f_flp;
+		lfp->f_idp = strsto(linkp->f_idp);
+		lfp->f_idx = fndidx(linkp->f_idp);
+		lfp->f_obj = objflg;
+		lfp->f_type = F_REL;
+	}
+
 	syminit();
+
+#if SDCDB
+	/*
+	 * Open SDCC Debug output file
+	 */
+	SDCDBfopen();
+#endif
+
 	for (pass=0; pass<2; ++pass) {
 		cfp = NULL;
 		sfp = NULL;
-		filep = linkp;
+		filep = linkp->f_flp;
 		hp = NULL;
 		radix = 10;
 
@@ -236,11 +265,19 @@ char *argv[];
 			/*
 			 * Set area base addresses.
 			 */
-			setbas();
+			setarea();
+			/*
+			 * Set bank base addresses.
+			 */
+			setbank();
 			/*
 			 * Link all area addresses.
 			 */
 			lnkarea();
+			/*
+			 * Check bank size limits.
+			 */
+			chkbank();
 			/*
 			 * Process global definitions.
 			 */
@@ -249,43 +286,28 @@ char *argv[];
 			 * Check for undefined globals.
 			 */
 			symdef(stderr);
+#if NOICE
+			/*
+			 * Open NoICE output file
+			 */
+			NoICEfopen();
+#endif
 			/*
 			 * Output Link Map.
 			 */
-			if (mflag)
-				map();
+			map();
 			/*
-			 * Open output file
+			 * Open output file(s)
 			 */
-			if (oflag == 1) {
-				switch(a_bytes) {
-				default:
-				case 2: frmt = "ihx"; break;
-				case 3:
-				case 4: frmt = "i86"; break;
-				}
-				ofp = afile(linkp->f_idp, frmt, 1);
-				if (ofp == NULL) {
-					lkexit(ER_FATAL);
-				}
-			} else
-			if (oflag == 2) {
-				switch(a_bytes) {
-				default:
-				case 2: frmt = "s19"; break;
-				case 3: frmt = "s28"; break;
-				case 4: frmt = "s37"; break;
-				}
-				ofp = afile(linkp->f_idp, frmt, 1);
-				if (ofp == NULL) {
-					lkexit(ER_FATAL);
-				}
-			}
+			lkfopen();
 		} else {
 			/*
 			 * Link in library files
 			 */
 			library();
+			/*
+			 * Complete Processing
+			 */
 			reloc('E');
 		}
 	}
@@ -304,8 +326,8 @@ char *argv[];
  *		none
  *
  *	global variables:
+ *		FILE *	jfp		file handle for .noi
  *		FILE *	mfp		file handle for .map
- *		FILE *	ofp		file handle for .ihx/.s19
  *		FILE *	rfp		file hanlde for .rst
  *		FILE *	sfp		file handle for .rel
  *		FILE *	tfp		file handle for .lst
@@ -313,6 +335,7 @@ char *argv[];
  *	functions called:
  *		int	fclose()	c_library
  *		VOID	exit()		c_library
+ *		VOID	lkfclose()	lkbank.c
  *
  *	side effects:
  *		All files closed. Program terminates.
@@ -322,11 +345,17 @@ VOID
 lkexit(i)
 int i;
 {
+	lkfclose();
+#if NOICE
+	if (jfp != NULL) fclose(jfp);
+#endif
 	if (mfp != NULL) fclose(mfp);
-	if (ofp != NULL) fclose(ofp);
 	if (rfp != NULL) fclose(rfp);
 	if (sfp != NULL) { if (sfp != stdin) fclose(sfp); }
 	if (tfp != NULL) fclose(tfp);
+#if SDCDB
+	if (yfp != NULL) fclose(yfp);
+#endif
 	exit(i);
 }
 
@@ -335,7 +364,7 @@ int i;
  *	The function link() evaluates the directives for each line of
  *	text read from the .rel file(s).  The valid directives processed
  *	are:
- *		X, D, Q, H, M, A, S, T, R, and P.
+ *		X, D, Q, H, G, B, M, A, S, T, R, and P.
  *
  *	local variables:
  *		int	c		first non blank character of a line
@@ -352,12 +381,12 @@ int i;
  *		int	radix		current number conversion radix
  *
  *	functions called:
- *		char	endline()	lklex.c
  *		int	get()		lklex.c
  *		VOID	module()	lkhead.c
  *		VOID	newarea()	lkarea.c
  *		VOID	newhead()	lkhead.c
  *		sym *	newsym()	lksym.c
+ *		VOID	NoICEmagic()	lknoice.c
  *		VOID	reloc()		lkreloc.c
  *
  *	side effects:
@@ -370,68 +399,17 @@ link()
 {
 	register int c;
 
-	if ((c=endline()) == 0) { return; }
+	c = getnb();
 	switch (c) {
 
 	case 'X':
-		radix = 16;
-		break;
-
 	case 'D':
-		radix = 10;
-		break;
-
 	case 'Q':
-		radix = 8;
-		break;
+		ASxxxx_VERSION = 3;
+		if (c == 'X') { radix = 16; } else
+		if (c == 'D') { radix = 10; } else
+		if (c == 'Q') { radix = 8;  }
 
-	case 'H':
-		if (pass == 0) {
-			newhead();
-		} else {
-			if (hp == 0) {
-				hp = headp;
-			} else {
-				hp = hp->h_hp;
-			}
-		}
-		sdp.s_area = NULL;
-		sdp.s_areax = NULL;
-		sdp.s_addr = 0;
-		break;
-
-	case 'M':
-		if (pass == 0)
-			module();
-		break;
-
-	case 'A':
-		if (pass == 0)
-			newarea();
-		if (sdp.s_area == NULL) {
-			sdp.s_area = areap;
-			sdp.s_areax = areap->a_axp;
-			sdp.s_addr = 0;
-		}
-		break;
-
-	case 'S':
-		if (pass == 0)
-			newsym();
-		break;
-
-	case 'T':
-	case 'R':
-	case 'P':
-		if (pass == 0)
-			break;
-		reloc(c);
-		break;
-
-	default:
-		break;
-	}
-	if (c == 'X' || c == 'D' || c == 'Q') {
 		while ((c = get()) != 0) {
 			switch(c) {
 			case 'H':
@@ -479,6 +457,72 @@ link()
 			v_mask = 0x7FFFFFFF;
 			break;
 		}
+		break;
+
+	case 'H':
+		if (pass == 0) {
+			newhead();
+		} else {
+			if (hp == 0) {
+				hp = headp;
+			} else {
+				hp = hp->h_hp;
+			}
+		}
+		sdp.s_area = NULL;
+		sdp.s_areax = NULL;
+		sdp.s_addr = 0;
+		break;
+
+	case 'G':
+		ASxxxx_VERSION = 4;
+		if (pass == 0)
+			newmode();
+		break;
+
+	case 'B':
+		ASxxxx_VERSION = 4;
+		if (pass == 0)
+			newbank();
+		break;
+
+	case 'M':
+		if (pass == 0)
+			module();
+		break;
+
+	case 'A':
+		if (pass == 0)
+			newarea();
+		if (sdp.s_area == NULL) {
+			sdp.s_area = areap;
+			sdp.s_areax = areap->a_axp;
+			sdp.s_addr = 0;
+		}
+		break;
+
+	case 'S':
+		if (pass == 0)
+			newsym();
+		break;
+
+	case 'T':
+	case 'R':
+	case 'P':
+		if (pass == 0)
+			break;
+		reloc(c);
+		break;
+
+#if NOICE
+	case ';':
+		unget(c);
+		NoICEmagic();
+		break;
+#endif
+
+	default:
+		break;
 	}
 }
 
@@ -522,6 +566,7 @@ link()
  *				 	containing an input REL file
  *				 	specification
  *		int	lop		current line number on page
+ *		int	mflag		Map output flag
  *		FILE	*mfp		Map output file handle
  *		int	page		current page number
  *
@@ -544,6 +589,8 @@ map()
 	register struct head *hdp;
 	register struct lbfile *lbfh;
 
+	if (mflag == 0) return;
+
 	/*
 	 * Open Map File
 	 */
@@ -553,15 +600,16 @@ map()
 	}
 
 	/*
-	 * Output Map Area Lists
+	 * Output Map Bank/Area Lists
 	 */
 	page = 0;
-	lop  = NLPP;
-	ap = areap;
-	while (ap) {
-		lstarea(ap);
-		ap = ap->a_ap;
+	for (bp = bankp; bp != NULL; bp = bp->b_bp) {
+		for (ap = areap; ap != NULL; ap = ap->a_ap) {
+			if (ap->a_bp == bp)
+				lstarea(ap, bp);
+		}
 	}
+
 	/*
 	 * List Linked Files
 	 */
@@ -569,7 +617,7 @@ map()
 	fprintf(mfp,
 "\nFiles Linked                              [ module(s) ]\n\n");
 	hdp = headp;
-	filep = linkp;
+	filep = linkp->f_flp;
 	while (filep) {
 		fprintf(mfp, "%-40.40s  [ ", filep->f_idp);
 		i = 0;
@@ -704,7 +752,7 @@ parse()
 					if (*ip == 0)
 						usage(ER_FATAL);
 					sv_type = startp->f_type;
-					startp->f_idp = ip;
+					startp->f_idp = strsto(ip);
 					startp->f_idx = fndidx(ip);
 					startp->f_type = F_LNK;
 					doparse();
@@ -738,8 +786,15 @@ parse()
 
 				case 'm':
 				case 'M':
-					++mflag;
+					mflag = 1;
 					break;
+
+#if NOICE
+				case 'j':
+				case 'J':
+					jflag = 1;
+					break;
+#endif
 
 				case 'u':
 				case 'U':
@@ -797,12 +852,19 @@ parse()
 
 				case 'w':
 				case 'W':
-					++wflag;
+					wflag = 1;
 					break;
+
+#if SDCDB
+				case 'y':
+				case 'Y':
+					yflag = 1;
+					break;
+#endif
 
 				case 'z':
 				case 'Z':
-					++zflag;
+					zflag = 1;
 					break;
 
 				default:
@@ -817,10 +879,12 @@ parse()
 				linkp = (struct lfile *)
 						new (sizeof (struct lfile));
 				lfp = linkp;
+				lfp->f_type = F_OUT;
 			} else {
 				lfp->f_flp = (struct lfile *)
 						new (sizeof (struct lfile));
 				lfp = lfp->f_flp;
+				lfp->f_type = F_REL;
 			}
 			/*
 			 * Copy Path from .LNK file
@@ -828,11 +892,11 @@ parse()
 			idx = startp->f_idx;
 			strncpy(fid, startp->f_idp, idx);
 			/*
-			 * Concatenate the .REL file spec
+			 * Concatenate the file spec
 			 */
 			getfid(fid + idx, c);
 			/*
-			 * If .REL file spec has a path
+			 * If file spec has a path
 			 * 	use it
 			 * else
 			 *	use path of .LNK file
@@ -843,11 +907,10 @@ parse()
 				p = fid;
 			}
 			/*
-			 * Save .REL file specification
+			 * Save file specification
 			 */
 			lfp->f_idp = strsto(p);
 			lfp->f_idx = fndidx(p);
-			lfp->f_type = F_REL;
 			lfp->f_obj = objflg;
 		} else {
 			fprintf(stderr, "Invalid input");
@@ -908,7 +971,7 @@ doparse()
 		if (*ip == 0 || parse())
 			break;
 	}
-	if(sfp != stdin) {
+	if((sfp != NULL) && (sfp != stdin)) {
 		fclose(sfp);
 	}
 	sfp = NULL;
@@ -961,71 +1024,6 @@ bassav()
 	strcpy(bsp->b_strp, ip);
 }
 
-/*)Function	VOID	setbas()
- *
- *	The function setbas() scans the base address lines in hte
- *	basep structure, evaluates the arguments, and sets beginning
- *	address of the specified areas.
- *
- *	local variables:
- *		int	v		expression value
- *		char	id[]		base id string
- *
- *	global variables:
- *		area	*ap		Pointer to the current
- *				 	area structure
- *		area	*areap		The pointer to the first
- *				 	area structure of a linked list
- *		base	*basep		The pointer to the first
- *				 	base structure
- *		base	*bsp		Pointer to the current
- *				 	base structure
- *		char	*ip		pointer into the REL file
- *				 	text line in ib[]
- *		int	lkerr		error flag
- *
- *	 functions called:
- *		a_uint	expr()		lkeval.c
- *		int	fprintf()	c_library
- *		VOID	getid()		lklex.c
- *		int	getnb()		lklex.c
- *		int	symeq()		lksym.c
- *
- *	side effects:
- *		The base address of an area is set.
- */
-
-VOID
-setbas()
-{
-	register int v;
-	char id[NCPS];
-
-	bsp = basep;
-	while (bsp) {
-		ip = bsp->b_strp;
-		getid(id, -1);
-		if (getnb() == '=') {
-			v = expr(0);
-			for (ap = areap; ap != NULL; ap = ap->a_ap) {
-				if (symeq(id, ap->a_id, 0))
-					break;
-			}
-			if (ap == NULL) {
-				fprintf(stderr,
-				"No definition of area %s\n", id);
-				lkerr++;
-			} else {
-				ap->a_addr = v;
-				ap->a_bset = 1;
-			}
-		} else {
-			fprintf(stderr, "No '=' in base expression");
-			lkerr++;
-		}
-		bsp = bsp->b_base;
-	}
-}
 
 /*)Function	VOID	gblsav()
  *
@@ -1071,6 +1069,7 @@ gblsav()
 	gsp->g_strp = (char *) new (strlen(ip)+1);
 	strcpy(gsp->g_strp, ip);
 }
+
 
 /*)Function	VOID	setgbl()
  *
@@ -1278,8 +1277,47 @@ char *str;
 	return(p1 - str);
 }
 
+/*)Function	int	fndext(str)
+ *
+ *		char *	str		file specification string
+ *
+ *	The function fndext() scans the file specification string
+ *	to find the file.ext seperater.
+ *
+ *	fndext() returns the index to FSEPX or the end of the string.
+ *
+ *	local variables:
+ *		char *	p1		temporary pointer
+ *		char *	p2		temporary pointer
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		char *	strrchr()	c_library
+ *
+ *	side effects:
+ *		none
+ */
+
+int
+fndext(str)
+char * str;
+{
+	register char *p1, *p2;
+
+	/*
+	 * Find the file seperator
+	 */
+	p1 = str + strlen(str);
+	if ((p2 = strrchr(str,  FSEPX)) != NULL) { p1 = p2; }
+
+	return(p1 - str);
+}
+
+
 char *usetxt[] = {
-	"Usage: [-Options] [-Option with arg] file [file ...]",
+	"Usage: [-Options] [-Option with arg] outfile file [file ...]",
 	"  -p   Echo commands to stdout (default)",
 	"  -n   No echo of commands to stdout",
 	"Alternates to Command Line Input:",
@@ -1292,20 +1330,26 @@ char *usetxt[] = {
 	"  -b   area base address=expression",
 	"  -g   global symbol=expression",
 	"Map format:",
-	"  -m   Map output generated as file[.map]",
+	"  -m   Map output generated as outfile[.map]",
 	"  -w   Wide listing format for map file",
 	"  -x   Hexidecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
-	"  -i   Intel Hex as file[.i--]",
-	"  -s   Motorola S Record as file[.s--]",
+	"  -i   Intel Hex as outfile[.i--]",
+	"  -s   Motorola S Record as outfile[.s--]",
+#if NOICE
+	"  -j   NoICE Debug output as outfile[.noi]",
+#endif
+#if SDCDB
+	"  -y   SDCDB Debug output as outfile[.cdb]",
+#endif
 	"  -o   Linked file/library object output enable (default)",
 	"  -v   Linked file/library object output disable",
 	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
 	"Case Sensitivity:",
-	"  -z   Enable Case Sensitivity for Symbols",
+	"  -z   Disable Case Sensitivity for Symbols",
 	"End:",
 	"  -e   or null line terminates input",
 	"",

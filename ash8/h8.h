@@ -1,7 +1,7 @@
 /* h8.h */
 
 /*
- * (C) Copyright 1994-2002
+ * (C) Copyright 1994-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,6 +21,7 @@
 		H8ADR.C
 		H8PST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C

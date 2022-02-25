@@ -24,12 +24,20 @@
 
 <H4><B><PRE>
 
+   The  assemblers  and  linker  have  been  tested using Linux,
+DJGPP,  Cygwin,  Symantec  C/C++   V6.1/V7.2,   and   VC6   with
+MS-DOS/Windows  3.x/9x/NT/2000/XP.  Complete source code and do-
+cumentation for the assemblers and linker is included  with  the
+distribution.   Additionally,  test  code for each assembler and
+several microprocessor monitors ( ASSIST05 for the 6805,  MONDEB
+and  ASSIST09  for  the  6809, and BUFFALO 2.5 for the 6811) are
+included as working examples of use of these assemblers.
+  
    The assemblers and linker have been successfully compiled us-
-ing GCC 2.7.2 with Linux, Symantec C/C++ V6.1/V7.2,  DJGPP  (GCC
-2.8.2)  and  VC6  with  MS-DOS  and  Windows 3.x/95/98.  A Linux
-makefile, DJGPP makefile, Symantec project files, and  VC6  pro-
-ject  files  are  available  to build all the assemblers and the
-linker.  
+ing Linux, Cygwin, DJGPP (GCC 2.8.2), Symantec C/C++  V6.1/V7.2,
+and VC6.  A Linux makefile,  Cygwin makefile,  DJGPP makefile,
+Symantec project files, and VC6  project  files  are  available
+to build all the assemblers and the linker.  
 
 </PRE></B></H4>
 <IMG width=576 height=5 border=0 SRC="rnbow.gif">
@@ -49,13 +57,14 @@ quires the following files:
      5.  m09pst.c 
      6.  asxxxx.h 
      7.  asmain.c 
-     8.  aslex.c 
-     9.  assym.c 
-    10.  assubr.c 
-    11.  asexpr.c 
-    12.  asdata.c 
-    13.  aslist.c 
-    14.  asout.c 
+     8.  asdbg.c 
+     9.  aslex.c 
+    10.  assym.c 
+    11.  assubr.c 
+    12.  asexpr.c 
+    13.  asdata.c 
+    14.  aslist.c 
+    15.  asout.c 
 
 
    The  first  five  files are the 6809 processor dependent sec-
@@ -98,15 +107,19 @@ assembler directive processing.
      2.  lkmain.c 
      3.  lklex.c 
      4.  lkarea.c 
-     5.  lkhead.c 
-     6.  lksym.c 
-     7.  lkeval.c 
-     8.  lkdata.c 
-     9.  lklist.c 
-    10.  lkrloc.c 
-    11.  lklibr.c 
-    12.  lks19.c 
-    13.  lkihx.c 
+     5.  lkbank.c 
+     6.  lkhead.c 
+     7.  lksym.c 
+     8.  lkeval.c 
+     9.  lkdata.c 
+    10.  lklist.c 
+    11.  lkrloc.c 
+    12.  lkrloc3.c 
+    13.  lkrloc4.c 
+    14.  lklibr.c 
+    15.  lknoice.c 
+    16.  lksdcdb.c 
+    17.  lkout.c 
 
 </PRE></B></H4>
 <H5><A HREF= #Index> =&gt; Section Index</A></H5>

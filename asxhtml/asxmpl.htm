@@ -17,7 +17,13 @@
   This section describes the assembly and linking of a moderately
 complex program.  (The project is a multi-channel high voltage
 control system for the stabilization of nuclear radiation detection
-equipment.)
+equipment.)  The files may be found in the '/project/phs_4' directory.
+
+  The project includes an 'optional' module that can be downloaded
+by the main project.  The 'optional' module is assembled from an
+independent file but must be linked with the main project files
+to resolve references external to the 'optional' module.
+
 
 </PRE></B></H4>
 
@@ -37,7 +43,7 @@ equipment.)
 </B></H3>
 
 <H4><B><PRE>
-  the project files included eleven .asm modules and
+  the project files included twelve .asm modules and
 four .def include files:
 
         phs.asm                 system.def
@@ -51,28 +57,29 @@ four .def include files:
         help.asm
         aiconv.asm
         phsmon.asm
+        phsopt.asm
 
   Each of the modules was assembled individually.  This was done
 by creating a command file containing the assembly command lines:
 
-        as6809 -gloaxzsff phs
-        as6809 -gloaxzsff acia
-        as6809 -gloaxzsff acq
-        as6809 -gloaxzsff hvctrl
-        as6809 -gloaxzsff termio
-        as6809 -gloaxzsff select
-        as6809 -gloaxzsff status
-        as6809 -gloaxzsff histos
-        as6809 -gloaxzsff help
-        as6809 -gloaxzsff aiconv
-        as6809 -gloaxzsff phsmon
+        as6809 -gloaxsff phs
+        as6809 -gloaxsff acia
+        as6809 -gloaxsff acq
+        as6809 -gloaxsff hvctrl
+        as6809 -gloaxsff termio
+        as6809 -gloaxsff select
+        as6809 -gloaxsff status
+        as6809 -gloaxsff histos
+        as6809 -gloaxsff help
+        as6809 -gloaxsff aiconv
+        as6809 -gloaxsff phsmon
+        as6809 -gloaxsff phsopt
 
 the assembly process produced an object (.rel) file (-s), a listing
 (.lst) file (-l), and a symbol (.sym) file (-s) for each individual
 .asm file.  the assembly process made all undefined labels
 global (-g), all internal labels global (-a), the output in HEX
 format (-x), and the listing files to have relocations flagged (-ff).
-This project required the case sensitive option, -z.
 
 </PRE></B></H4>
 <H5><A HREF= #Index> =&gt; Section Index</A></H5>
@@ -84,26 +91,27 @@ This project required the case sensitive option, -z.
 </B></H3>
 
 <H4><B><PRE>
-  The program was linked using a file (PHS.LNK) containing the following
-command lines:
+  The main program was linked using a file (PHS.LNK) containing the
+following command lines:
 
-        -mxsuz
-        phs
-        acia
-        acq
-        hvctrl
-        termio
-        select
-        status
-        histos
-        help
-        aiconv
-        phsmon
-        -b WORKPG = 0x0F00
-        -b BUFSAV = bufsav
-        -b PGMSAV = pgmsav
-        -b IRQVEC = irqvec
-        -e
+        -mxsu                          ; linker options
+        phs                            ; output file name
+        phs                            ; input file
+        acia                           ; .
+        acq                            ; .
+        hvctrl                         ; .
+        termio                         ; .
+        select                         ; .
+        status                         ; .
+        histos                         ; .
+        help                           ; .
+        aiconv                         ; .
+        phsmon                         ; input file
+        -b WORKPG = 0x0F00             ; value definition
+        -b BUFSAV = bufsav             ; .
+        -b PGMSAV = pgmsav             ; .
+        -b IRQVEC = irqvec             ; value definition
+        -e                             ; end of file
 
 and was invoked by the command line:
 
@@ -113,6 +121,40 @@ The linking process produced a map (.map) file (-m) in HEX format (-x)
 and a Motorola (.s19) loader file (-s).  The -b options specify the
 memory addresses for certain program sections as defined in the
 assembled modules.  The file input was terminated by the -e option.
+
+  The 'optional' loadable program was linked using a file (PHSOPT.LNK)
+containing the following command lines:
+
+        -mxsu                          ; linker options
+        phsopt                         ; output file name
+        -v                             ; suppress linker output
+        phs                            ; input file
+        acia                           ; .
+        acq                            ; .
+        hvctrl                         ; .
+        termio                         ; .
+        select                         ; .
+        status                         ; .
+        histos                         ; .
+        help                           ; .
+        aiconv                         ; .
+        phsmon                         ; input file
+        -o                             ; enable linker output
+        phsopt                         ; input file
+        -b WORKPG = 0x0F00             ; value definition
+        -b BUFSAV = bufsav             ; .
+        -b PGMSAV = pgmsav             ; .
+        -b IRQVEC = irqvec             ; value definition
+        -e                             ; end of file
+
+and was invoked by the command line:
+
+        aslink -f phsopt
+
+The linking process creates an overlay output file from the
+PHSOPT code using all the global symbols defined in the PHS
+files.  The order of the main project files MUST be identical
+to that in the main project .lnk file.
 
 </PRE></B></H4>
 <H5><A HREF= #Index> =&gt; Section Index</A></H5>

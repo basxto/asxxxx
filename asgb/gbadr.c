@@ -1,7 +1,7 @@
-/* z80adr.c */
+/* gbadr.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,7 +9,7 @@
  * Kent, Ohio  44240
  */
 
-/* Mods for Gameboy by Roger Ivie (ivie@cc.usu.edu). See gb.h for more info. */
+/* Mods for Gameboy by Roger Ivie (ivie at cc dot usu dot edu). See gb.h for more info. */
 
 #include <stdio.h>
 #include <setjmp.h>

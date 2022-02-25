@@ -1,7 +1,7 @@
-/* z80.h */
+/* gb.h */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -9,7 +9,7 @@
  * Kent, Ohio  44240
  */
 
-/* Gameboy mods by Roger Ivie (ivie@cc.usu.edu) 
+/* Gameboy mods by Roger Ivie (ivie at cc dot usu dot edu) 
  *
  * The Gameboy mods are based on 
  * http://www.komkon.org/fms/GameBoy/Tech/Software.html
@@ -71,6 +71,7 @@
 		GBADR.C
 		GBPST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C

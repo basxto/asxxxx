@@ -1,0 +1,43 @@
+# Symantec SC++ generated .dpd file. V: 7200
+r:\asxv4pxx\asxmak\symantec\build\asdata.OBJ: \
+	..\..\..\asxxsrc\asdata.c \
+	..\..\..\ASXXSRC\asxxxx.h 
+r:\asxv4pxx\asxmak\symantec\build\asdbg.OBJ: \
+	..\..\..\asxxsrc\asdbg.c \
+	..\..\..\ASXXSRC\asxxxx.h 
+r:\asxv4pxx\asxmak\symantec\build\asexpr.OBJ: \
+	..\..\..\asxxsrc\asexpr.c \
+	..\..\..\ASXXSRC\asxxxx.h 
+r:\asxv4pxx\asxmak\symantec\build\aslex.OBJ: \
+	..\..\..\asxxsrc\aslex.c \
+	..\..\..\ASXXSRC\asxxxx.h 
+r:\asxv4pxx\asxmak\symantec\build\aslist.OBJ: \
+	..\..\..\asxxsrc\aslist.c \
+	..\..\..\ASXXSRC\asxxxx.h 
+r:\asxv4pxx\asxmak\symantec\build\asmain.OBJ: \
+	..\..\..\asxxsrc\asmain.c \
+	..\..\..\ASXXSRC\asxxxx.h 
+r:\asxv4pxx\asxmak\symantec\build\asout.OBJ: \
+	..\..\..\asxxsrc\asout.c \
+	..\..\..\ASXXSRC\asxxxx.h 
+r:\asxv4pxx\asxmak\symantec\build\assubr.OBJ: \
+	..\..\..\asxxsrc\assubr.c \
+	..\..\..\ASXXSRC\asxxxx.h 
+r:\asxv4pxx\asxmak\symantec\build\assym.OBJ: \
+	..\..\..\asxxsrc\assym.c \
+	..\..\..\ASXXSRC\asxxxx.h 
+r:\asxv4pxx\asxmak\symantec\build\m430adr.OBJ: \
+	..\..\..\as430\m430adr.c \
+	..\..\..\asxxsrc\asxxxx.h \
+	..\..\..\AS430\m430.h 
+r:\asxv4pxx\asxmak\symantec\build\m430ext.OBJ: \
+	..\..\..\as430\m430ext.c \
+	..\..\..\asxxsrc\asxxxx.h 
+r:\asxv4pxx\asxmak\symantec\build\m430mch.OBJ: \
+	..\..\..\as430\m430mch.c \
+	..\..\..\asxxsrc\asxxxx.h \
+	..\..\..\AS430\m430.h 
+r:\asxv4pxx\asxmak\symantec\build\m430pst.OBJ: \
+	..\..\..\as430\m430pst.c \
+	..\..\..\asxxsrc\asxxxx.h \
+	..\..\..\AS430\m430.h 

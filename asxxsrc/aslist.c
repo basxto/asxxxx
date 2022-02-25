@@ -1,7 +1,7 @@
 /* aslist.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -57,21 +57,29 @@
  *		int	l_addr		laddr (int) truncated to 2-bytes
  *
  *	global variables:
+ *		int	a_bytes		T line addressing size
  *		int	cb[]		array of assembler output values
  *		int	cbt[]		array of assembler relocation types
  *					describing the data in cb[]
+ *		int	cfile		current input file number
  *		int *	cp		pointer to assembler output array cb[]
  *		int *	cpt		pointer to assembler relocation type
  *					output array cbt[]
  *		char	eb[]		array of generated error codes
  *		char *	ep		pointer into error list
  *					array eb[]
- *		char	ib[]		assembler-source text line
+ *		char *	il		pointer to assembler-source listing line
+ *		int	incfil		include file number
+ *		int	incline[]	include file line number
  *		a_uint	laddr		address of current assembler line,
  *				 	equate, or value of .if argument
  *		FILE *	lfp		list output file handle
  *		int	line		current assembler source line number
  *		int	lmode		listing mode
+ *		int	nlevel		LIST-NLIST flag will be non
+ *				 	zero for nolist
+ *		int	srcline[]	source file line number
+ *		int	uflag		-u, disable .list/.nlist processing
  *		int	xflag		-x, listing radix flag
  *
  *	functions called:
@@ -127,7 +135,7 @@ list()
 	register int n, nb;
 	register int l_addr;
 
-	if (lfp == NULL || lmode == NLIST)
+	if (lfp == NULL || lmode == NLIST || (nlevel && (uflag == 0)))
 		return;
 
 	/*
@@ -168,7 +176,7 @@ list()
 		case 3:
 		case 4: frmt = "%32s%5u %s\n"; break;
 		}
-		fprintf(lfp, frmt, "", line, ib);
+		fprintf(lfp, frmt, "", line, il);
 		return;
 	}
 	if (lmode == ALIST) {
@@ -195,7 +203,7 @@ list()
 			case 4: frmt = "%23s%08X"; break;
 			}
 			fprintf(lfp, frmt, "", l_addr);
-			fprintf(lfp, " %5u %s\n", line, ib);
+			fprintf(lfp, " %5u %s\n", line, il);
 			return;
 		}
 
@@ -216,7 +224,7 @@ list()
 			case 3:
 			case 4: frmt = "%22s%5u %s\n"; break;
 			}
-			fprintf(lfp, frmt, "", line, ib);
+			fprintf(lfp, frmt, "", line, il);
 			outdot();
 			return;
 		}
@@ -238,7 +246,7 @@ list()
 		 * First line of output for this source line with data.
 		 */
 		list1(wp, wpt, nb, n, 1);
-		fprintf(lfp, " %5u %s\n", line, ib);
+		fprintf(lfp, " %5u %s\n", line, il);
 
 		/*
 		 * Subsequent lines of output if more data.
@@ -268,7 +276,7 @@ list()
 			case 4: frmt = "%20s%011o"; break;
 			}
 			fprintf(lfp, frmt, "", l_addr);
-			fprintf(lfp, " %5u %s\n", line, ib);
+			fprintf(lfp, " %5u %s\n", line, il);
 			return;
 		}
 
@@ -289,7 +297,7 @@ list()
 			case 3:
 			case 4: frmt = "%21s%5u %s\n"; break;
 			}
-			fprintf(lfp, frmt, "", line, ib);
+			fprintf(lfp, frmt, "", line, il);
 			outdot();
 			return;
 		}
@@ -311,7 +319,7 @@ list()
 		 * First line of output for this source line with data.
 		 */
 		list1(wp, wpt, nb, n, 1);
-		fprintf(lfp, " %5u %s\n", line, ib);
+		fprintf(lfp, " %5u %s\n", line, il);
 
 		/*
 		 * Subsequent lines of output if more data.
@@ -341,7 +349,7 @@ list()
 			case 4: frmt = "%21s%010u"; break;
 			}
 			fprintf(lfp, frmt, "", l_addr);
-			fprintf(lfp, " %5u %s\n", line, ib);
+			fprintf(lfp, " %5u %s\n", line, il);
 			return;
 		}
 
@@ -362,7 +370,7 @@ list()
 			case 3:
 			case 4: frmt = "%21s%5u %s\n"; break;
 			}
-			fprintf(lfp, frmt, "", line, ib);
+			fprintf(lfp, frmt, "", line, il);
 			outdot();
 			return;
 		}
@@ -384,7 +392,7 @@ list()
 		 * First line of output for this source line with data.
 		 */
 		list1(wp, wpt, nb, n, 1);
-		fprintf(lfp, " %5u %s\n", line, ib);
+		fprintf(lfp, " %5u %s\n", line, il);
 
 		/*
 		 * Subsequent lines of output if more data.
@@ -552,24 +560,32 @@ register int t;
 	} else
 	/*
 	 * Designate a relocatable word by its mode:
-	 *	page0 or paged		*
-	 *	unsigned		u (v) (U) (V)
+	 *	paged			* (n) (M) (N)
+	 *	unsigned/bit range	u (v) (U) (V)
 	 *	operand offset		p (q) (P) (Q)
 	 *	relocatable symbol	r (s) (R) (S)
 	 */
 	if (fflag >= 2) {
 		if (t & R_RELOC) {
-			if ((t & (R_PAG0|R_PAG)) && ((t & R_ECHEK) != R_EXTND)) {
-				c = '*';
-			} else if (t & R_USGN) {
-				c = 'u';
-			} else if (t & R_PCR) {
+			if (t & R_PCR) {
 				c = 'p';
+			} else
+			if (t & R_PAGE) {
+				c = '*';
+			} else
+			if ((t & (R_SGND | R_USGN)) == R_USGN) {
+				c = 'u';
 			} else {
 				c = 'r';
 			}
-			if (t & R_HIGH || t & R_BYT4) c += 1;
-			if (t & R_BYT3 || t & R_BYT4) c &= ~0x20;
+			if (c == '*') {
+				if (t & R_HIGH) c = 'n';
+				if (t & R_BYT3) c = 'M';
+				if (t & R_BYT4) c = 'N';
+			} else {
+				if (t & R_HIGH || t & R_BYT4) c += 1;
+				if (t & R_BYT3 || t & R_BYT4) c &= ~0x20;
+			}
 		}
 	}
 
@@ -679,12 +695,13 @@ VOID
 lstsym(fp)
 FILE *fp;
 {
-	register int c, i, j, k;
+	register int c, i, j, k, n;
 	register char *frmt, *ptr;
-	int nmsym, narea;
+	int nmsym, narea, nbank;
 	struct sym *sp;
 	struct sym **p;
 	struct area *ap;
+	struct bank *bp;
 
 	/*
 	 * Symbol Table Header
@@ -884,63 +901,76 @@ atable:
 	/*
 	 * Area Table Output
 	 */
-	narea = 0;
-	ap = areap;
-	while (ap) {
-		++narea;
-		ap = ap->a_ap;
-	}
-	for (i=0; i<narea; ++i) {
-		ap = areap;
-		for (j=i+1; j<narea; ++j)
-			ap = ap->a_ap;
-		j = ap->a_ref;
-		switch(xflag) {
-		default:
-		case 0:	frmt = "  %2X "; break;
-		case 1:	frmt = " %3o "; break;
-		case 2:	frmt = " %3u "; break;
-		}
-		fprintf(fp, frmt, j);
+	narea = areap->a_ref + 1;
+	nbank = bankp->b_ref + 1;
 
-		ptr = &ap->a_id[0];
-		if (wflag) {
-			fprintf(fp, "%-35.35s", ptr );
-		} else {
-			fprintf(fp, "%-14.14s", ptr);
+	for (n=0; n<nbank; ++n) {
+		bp = bankp;
+		for (j=n+1; j<nbank; ++j)
+			bp = bp->b_bp;
+		if (nbank > 1) {
+			fprintf(fp, "[%.79s]\n", bp->b_id );
+			slew(fp, 1);
 		}
-
-		j = ap->a_size & 0xFFFF;
-		k = ap->a_flag;
-		switch(a_bytes) {
-		default:
-		case 2:
+	 	for (i=0; i<narea; ++i) {
+			ap = areap;
+			for (j=i+1; j<narea; ++j)
+				ap = ap->a_ap;
+			j = ap->a_ref;
+			if ((n == 0) && (ap->b_bp == NULL)) {
+				;
+			} else
+			if (ap->b_bp != bp) {
+				continue;
+			}
 			switch(xflag) {
 			default:
-			case 0:	frmt = "   size %4X   flags %3X\n"; break;
-			case 1:	frmt = "   size %6o   flags %3o\n"; break;
-			case 2:	frmt = "   size %5u   flags %3u\n"; break;
+			case 0:	frmt = "  %2X "; break;
+			case 1:	frmt = " %3o "; break;
+			case 2:	frmt = " %3u "; break;
 			}
-			break;
+			fprintf(fp, frmt, j);
 
-		case 3:
-			switch(xflag) {
-			default:
-			case 0:	frmt = "   size %6X   flags %3X\n"; break;
-			case 1:	frmt = "   size %8o   flags %3o\n"; break;
-			case 2:	frmt = "   size %8u   flags %3u\n"; break;
+			ptr = &ap->a_id[0];
+			if (wflag) {
+				fprintf(fp, "%-35.35s", ptr );
+			} else {
+				fprintf(fp, "%-14.14s", ptr);
 			}
-			break;
 
-		case 4:
-			switch(xflag) {
+			j = ap->a_size & a_mask;
+			k = ap->a_flag;
+			switch(a_bytes) {
 			default:
-			case 0:	frmt = "   size %8X   flags %3X\n"; break;
-			case 1:	frmt = "   size %11o   flags %3o\n"; break;
-			case 2:	frmt = "   size %10u   flags %3u\n"; break;
+			case 2:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "   size %4X   flags %4X\n"; break;
+				case 1:	frmt = "   size %6o   flags %6o\n"; break;
+				case 2:	frmt = "   size %5u   flags %6u\n"; break;
+				}
+				break;
+
+			case 3:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "   size %6X   flags %4X\n"; break;
+				case 1:	frmt = "   size %8o   flags %6o\n"; break;
+				case 2:	frmt = "   size %8u   flags %6u\n"; break;
+				}
+				break;
+
+			case 4:
+				switch(xflag) {
+				default:
+				case 0:	frmt = "   size %8X   flags %4X\n"; break;
+				case 1:	frmt = "   size %11o   flags %6o\n"; break;
+				case 2:	frmt = "   size %10u   flags %6u\n"; break;
+				}
+				break;
 			}
-			break;
+			fprintf(fp, frmt, j, k);
+			slew(fp, 0);
 		}
-		fprintf(fp, frmt, j, k);
 	}		
 }

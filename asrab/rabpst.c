@@ -1,0 +1,299 @@
+/* rabpst.c */
+
+/*
+ * (C) Copyright 1989-2003
+ * All Rights Reserved
+ *
+ * Alan R. Baldwin
+ * 721 Berkeley St.
+ * Kent, Ohio  44240
+ * 
+ * ported to the Rabbit2000 by
+ * Ulrich Raich and Razaq Ijoduola
+ * PS Division
+ * CERN
+ * CH-1211 Geneva-23
+ * email: Ulrich.Raich@cern.ch
+ */
+
+#include <stdio.h>
+#include <setjmp.h>
+#include "asxxxx.h"
+#include "rab.h"
+
+/*
+ * Coding Banks
+ */
+struct	bank	bank[2] = {
+    /*	The '_CODE' area/bank has a NULL default file suffix.	*/
+    {	NULL,		"_CSEG",	NULL,		0,	0,	0,	0,	0	},
+    {	&bank[0],	"_DSEG",	"_DS",		1,	0,	0,	0,	B_FSFX	}
+};
+
+/*
+ * Coding Areas
+ */
+struct	area	area[2] = {
+    {	NULL,		&bank[0],	"_CODE",	0,	0,	0,	A_1BYTE|A_BNK|A_CSEG	},
+    {	&area[0],	&bank[1],	"_DATA",	1,	0,	0,	A_1BYTE|A_BNK|A_DSEG	}
+};
+
+/*
+ * Basic Relocation Mode Definition
+ *
+ *	#define		R_NORM	0000		No Bit Positioning
+ */
+char	mode0[32] = {	/* R_NORM */
+	'\200',	'\201',	'\202',	'\203',	'\204',	'\205',	'\206',	'\207',
+	'\210',	'\211',	'\212',	'\213',	'\214',	'\215',	'\216',	'\217',
+	'\220',	'\221',	'\222',	'\223',	'\224',	'\225',	'\226',	'\227',
+	'\230',	'\231',	'\232',	'\233',	'\234',	'\235',	'\236',	'\237'
+};
+
+/*
+ * Additional Relocation Mode Definitions
+ */
+
+/* None Required */
+
+
+/*
+ *     *m_def is a pointer to the bit relocation definition.
+ *	m_flag indicates that bit position swapping is required.
+ *	m_mask contains the active bit positions for the output.
+ *	m_mbro contains the active bit positions for the input.
+ *
+ *	struct	vsd
+ *	{
+ *		char *	m_def;		Bit Relocation Definition
+ *		int	m_flag;		Bit Swapping Flag
+ *		int	m_mask;		Bit Mask
+ *		int	m_mbro;		Bit Range Overflow Mask
+ *	};
+ */
+struct	mode	mode[1] = {
+    {	&mode0[0],	0,	0x0000FFFF,	0x0000FFFF	}
+};
+
+/*
+ * Array of Pointers to VSD Structures
+ */
+struct	mode	*modep[16] = {
+	&mode[0],	NULL,		NULL,		NULL,
+	NULL,		NULL,		NULL,		NULL,
+	NULL,		NULL,		NULL,		NULL,
+	NULL,		NULL,		NULL,		NULL
+};
+
+/*
+ * Mnemonic Structure
+ */
+struct	mne	mne[] = {
+
+	/* machine */
+
+    {	NULL,	"CSEG",		S_ATYP,		0,	A_CSEG|A_1BYTE	},
+    {	NULL,	"DSEG",		S_ATYP,		0,	A_DSEG|A_1BYTE	},
+
+	/* system */
+
+    {	NULL,	"BANK",		S_ATYP,		0,	A_BNK	},
+    {	NULL,	"CON",		S_ATYP,		0,	A_CON	},
+    {	NULL,	"OVR",		S_ATYP,		0,	A_OVR	},
+    {	NULL,	"REL",		S_ATYP,		0,	A_REL	},
+    {	NULL,	"ABS",		S_ATYP,		0,	A_ABS	},
+    {	NULL,	"NOPAG",	S_ATYP,		0,	A_NOPAG	},
+    {	NULL,	"PAG",		S_ATYP,		0,	A_PAG	},
+
+    {	NULL,	"BASE",		S_BTYP,		0,	B_BASE	},
+    {	NULL,	"SIZE",		S_BTYP,		0,	B_SIZE	},
+    {	NULL,	"FSFX",		S_BTYP,		0,	B_FSFX	},
+    {	NULL,	"MAP",		S_BTYP,		0,	B_MAP	},
+
+    {	NULL,	".page",	S_PAGE,		0,	0	},
+    {	NULL,	".title",	S_HEADER,	0,	O_TITLE	},
+    {	NULL,	".sbttl",	S_HEADER,	0,	O_SBTTL	},
+    {	NULL,	".module",	S_MODUL,	0,	0	},
+    {	NULL,	".include",	S_INCL,		0,	0	},
+    {	NULL,	".area",	S_AREA,		0,	0	},
+    {	NULL,	".bank",	S_BANK,		0,	0	},
+    {	NULL,	".org",		S_ORG,		0,	0	},
+    {	NULL,	".radix",	S_RADIX,	0,	0	},
+    {	NULL,	".globl",	S_GLOBL,	0,	0	},
+    {	NULL,	".local",	S_LOCAL,	0,	0	},
+    {	NULL,	".if",		S_CONDITIONAL,	0,	O_IF	},
+    {	NULL,	".else",	S_CONDITIONAL,	0,	O_ELSE	},
+    {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
+    {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
+    {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
+    {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
+    {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
+    {	NULL,	".equ",		S_EQU,		0,	O_EQU	},
+    {	NULL,	".gblequ",	S_EQU,		0,	O_GBLEQU},
+    {	NULL,	".lclequ",	S_EQU,		0,	O_LCLEQU},
+    {	NULL,	".byte",	S_DATA,		0,	O_1BYTE	},
+    {	NULL,	".db",		S_DATA,		0,	O_1BYTE	},
+    {	NULL,	".fcb",		S_DATA,		0,	O_1BYTE	},
+    {	NULL,	".word",	S_DATA,		0,	O_2BYTE	},
+    {	NULL,	".dw",		S_DATA,		0,	O_2BYTE	},
+    {	NULL,	".fdb",		S_DATA,		0,	O_2BYTE	},
+/*    {	NULL,	".3byte",	S_DATA,		0,	O_3BYTE	},	*/
+/*    {	NULL,	".triple",	S_DATA,		0,	O_3BYTE	},	*/
+/*    {	NULL,	".4byte",	S_DATA,		0,	O_4BYTE	},	*/
+/*    {	NULL,	".quad",	S_DATA,		0,	O_4BYTE	},	*/
+    {	NULL,	".blkb",	S_BLK,		0,	O_1BYTE	},
+    {	NULL,	".ds",		S_BLK,		0,	O_1BYTE	},
+    {	NULL,	".rmb",		S_BLK,		0,	O_1BYTE	},
+    {	NULL,	".rs",		S_BLK,		0,	O_1BYTE	},
+    {	NULL,	".blkw",	S_BLK,		0,	O_2BYTE	},
+/*    {	NULL,	".blk3",	S_BLK,		0,	O_3BYTE	},	*/
+/*    {	NULL,	".blk4",	S_BLK,		0,	O_4BYTE	},	*/
+    {	NULL,	".ascii",	S_ASCIX,	0,	O_ASCII	},
+    {	NULL,	".ascis",	S_ASCIX,	0,	O_ASCIS	},
+    {	NULL,	".asciz",	S_ASCIX,	0,	O_ASCIZ	},
+    {	NULL,	".str",		S_ASCIX,	0,	O_ASCII	},
+    {	NULL,	".strs",	S_ASCIX,	0,	O_ASCIS	},
+    {	NULL,	".strz",	S_ASCIX,	0,	O_ASCIZ	},
+    {	NULL,	".fcc",		S_ASCIX,	0,	O_ASCII	},
+    {	NULL,	".define",	S_DEFINE,	0,	O_DEF	},
+    {	NULL,	".undefine",	S_DEFINE,	0,	O_UNDEF	},
+    {	NULL,	".even",	S_BOUNDARY,	0,	O_EVEN	},
+    {	NULL,	".odd",		S_BOUNDARY,	0,	O_ODD	},
+    {	NULL,	".msg"	,	S_MSG,		0,	0	},
+    {	NULL,	".assume",	S_ERROR,	0,	O_ASSUME},
+    {	NULL,	".error",	S_ERROR,	0,	O_ERROR	},
+/*    {	NULL,	".msb",		S_MSB,		0,	0	},	*/
+/*    {	NULL,	".8bit",	S_BITS,		0,	O_1BYTE	},	*/
+/*    {	NULL,	".16bit",	S_BITS,		0,	O_2BYTE	},	*/
+/*    {	NULL,	".24bit",	S_BITS,		0,	O_3BYTE	},	*/
+/*    {	NULL,	".32bit",	S_BITS,		0,	O_4BYTE	},	*/
+    {	NULL,	".end",		S_END,		0,	0	},
+
+	/* Machines */
+
+    {	NULL,	".r3k",		X_R2K,		0,	0	},
+    {	NULL,	".r2k",		X_R2K,		0,	0	},
+    {	NULL,	".hd64",	X_HD64,		0,	0	},
+    {	NULL,	".z180",	X_HD64,		0,	0	},
+    {	NULL,	".z80",		X_Z80,		0,	0	},
+
+	/* Z80 */
+
+    {	NULL,	"ld",		S_LD, P_ALTD|P_IO,	0x40	},
+
+    {	NULL,	"call",		S_CALL,		0,	0xC4	},
+    {	NULL,	"jp",		S_JP,		0,	0xC2	},
+    {	NULL,	"jr",		S_JR,		0,	0x18	},
+    {	NULL,	"djnz",		S_DJNZ,	   P_ALTD,	0x10	},
+    {	NULL,	"ret",		S_RET,		0,	0xC0	},
+
+    {	NULL,	"bit",		S_BIT,P_ALTD|P_IO,	0x40	},
+    {	NULL,	"res",		S_BIT,P_ALTD|P_IO,	0x80	},
+    {	NULL,	"set",		S_BIT,P_ALTD|P_IO,	0xC0	},
+
+    {	NULL,	"inc",		S_INC,P_ALTD|P_IO,      0x04	},
+    {	NULL,	"dec",		S_DEC,P_ALTD|P_IO,	0x05	},
+
+    {	NULL,	"add",		S_ADD,P_ALTD|P_IO,	0x80	},
+    {	NULL,	"adc",		S_ADC,P_ALTD|P_IO,	0x88	},
+    {	NULL,	"sbc",		S_SBC,P_ALTD|P_IO,	0x98	},
+
+    {	NULL,	"and",		S_AND,P_ALTD|P_IO,	0xA0	},
+    {	NULL,	"or",		S_OR, P_ALTD|P_IO,	0xB0	},
+    {	NULL,	"sub",		S_SUB,P_ALTD|P_IO,	0x90	},
+    {	NULL,	"xor",		S_SUB,P_ALTD|P_IO,	0xA8	},
+    {	NULL,	"cp",		S_SUB,P_ALTD|P_IO,	0xB8	},
+
+    {	NULL,	"ex",		S_EX,	   P_ALTD,	0xE3	},
+
+    {	NULL,	"push",		S_PUSH,		0,	0xC5	},
+    {	NULL,	"pop",		S_PUSH,	   P_ALTD,	0xC1	},
+
+    {	NULL,	"in",		S_IN,		0,	0xDB	},
+    {	NULL,	"out",		S_OUT,		0,	0xD3	},
+
+    {	NULL,	"rl",		S_RL, P_ALTD|P_IO,	0x10	},
+    {	NULL,	"rlc",		S_RL, P_ALTD|P_IO,	0x00	},
+    {	NULL,	"rr",		S_RL, P_ALTD|P_IO,	0x18	},
+    {	NULL,	"rrc",		S_RL, P_ALTD|P_IO,	0x08	},
+    {	NULL,	"sla",		S_RL, P_ALTD|P_IO,	0x20	},
+    {	NULL,	"sra",		S_RL, P_ALTD|P_IO,	0x28	},
+    {	NULL,	"srl",		S_RL, P_ALTD|P_IO,	0x38	},
+
+    {	NULL,	"rst",		S_RST,		0,	0xC7	},
+
+    {	NULL,	"im",		S_IM,		0,	0xED	},
+
+    {	NULL,	"ccf",		S_INH1,	   P_ALTD,	0x3F	},
+    {	NULL,	"cpl",		S_INH1,	   P_ALTD,	0x2F	},
+    {	NULL,	"daa",		S_INH1X,	0,	0x27	},
+    {	NULL,	"di",		S_INH1X,	0,	0xF3	},
+    {	NULL,	"ei",		S_INH1X,	0,	0xFB	},
+    {	NULL,	"exx",		S_INH1,		0,	0xD9	},
+    {	NULL,	"nop",		S_INH1,		0,	0x00	},
+    {	NULL,	"halt",		S_INH1X,	0,	0x76	},
+    {	NULL,	"rla",		S_INH1,	   P_ALTD,	0x17	},
+    {	NULL,	"rlca",		S_INH1,	   P_ALTD,	0x07	},
+    {	NULL,	"rra",		S_INH1,	   P_ALTD,	0x1F	},
+    {	NULL,	"rrca",		S_INH1,	   P_ALTD,	0x0F	},
+    {	NULL,	"scf",		S_INH1,	   P_ALTD,	0x37	},
+
+    {	NULL,	"cpd",		S_INH2X,	0,	0xA9	},
+    {	NULL,	"cpdr",		S_INH2X,	0,	0xB9	},
+    {	NULL,	"cpi",		S_INH2X,	0,	0xA1	},
+    {	NULL,	"cpir",		S_INH2X,	0,	0xB1	},
+    {	NULL,	"ind",		S_INH2X,	0,	0xAA	},
+    {	NULL,	"indr",		S_INH2X,	0,	0xBA	},
+    {	NULL,	"ini",		S_INH2X,	0,	0xA2	},
+    {	NULL,	"inir",		S_INH2X,	0,	0xB2	},
+    {	NULL,	"ldd",		S_INH2,	     P_IO,	0xA8	},
+    {	NULL,	"lddr",		S_INH2,	     P_IO,	0xB8	},
+    {	NULL,	"ldi",		S_INH2,	     P_IO,	0xA0	},
+    {	NULL,	"ldir",		S_INH2,	     P_IO,	0xB0	},
+    {	NULL,	"neg",		S_INH2,	   P_ALTD,	0x44	},
+    {	NULL,	"otdr",		S_INH2X,	0,	0xBB	},
+    {	NULL,	"otir",		S_INH2X,	0,	0xB3	},
+    {	NULL,	"outd",		S_INH2X,	0,	0xAB	},
+    {	NULL,	"outi",		S_INH2X,	0,	0xA3	},
+    {	NULL,	"reti",		S_INH2,		0,	0x4D	},
+    {	NULL,	"retn",		S_INH2X,	0,	0x45	},
+    {	NULL,	"rld",		S_INH2X,	0,	0x6F	},
+    {	NULL,	"rrd",		S_INH2X,	0,	0x67	},
+
+	/* 64180 specific instructions */
+
+    {	NULL,	"otdm",		HD_INH2,	0,	0x8B	},
+    {	NULL,	"otdmr",	HD_INH2,	0,	0x9B	},
+    {	NULL,	"otim",		HD_INH2,	0,	0x83	},
+    {	NULL,	"otimr",	HD_INH2,	0,	0x93	},
+    {	NULL,	"slp",		HD_INH2,	0,	0x76	},
+
+    {	NULL,	"in0",		HD_IN,		0,	0x00	},
+    {	NULL,	"out0",		HD_OUT,		0,	0x01	},
+
+    {	NULL,	"mlt",		HD_MLT,		0,	0x4C	},
+
+    {	NULL,	"tst",		HD_TST,		0,	0x04	},
+    {	NULL,	"tstio",	HD_TSTIO,	0,	0x74	},
+
+	/* rabbit 2000 specific instructions */
+    
+    {	NULL,	"mul",	        S_INH1R,	0,	0xF7	},
+
+    {	NULL,	"ipres",	S_INH2R,	0,	0x5D	},
+    {   NULL,   "lret",         S_INH2R,	0,	0x45    },
+    
+    {	NULL,	"ipset",	RB_IPSET,	0,	0x46	},
+
+    {	NULL,	"altd",		RB_PRE,		0,	0x76	},
+    {	NULL,	"ioe",		RB_PRE,		0,	0xDB	},
+    {	NULL,	"ioi",		RB_PRE,		0,	0xD3	},
+
+    {   NULL,   "bool",         RB_BOOL,   P_ALTD,	0xCC    },
+
+    {   NULL,   "ldp",          RB_LDP,		0,	0x64    },
+
+    {   NULL,   "lcall",        RB_LCALL,	0,	0xCF    },
+    {   NULL,   "ljp",          RB_LCALL,	S_END,	0xC7    }
+
+};

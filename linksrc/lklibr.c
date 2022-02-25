@@ -1,7 +1,7 @@
 /* lklibr.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -223,7 +223,7 @@ char *libfil;
  *
  *	After a symbol is found and imported by the function
  *	fndsym() the symbol tables are again searched.  The
- *	symbol tables are search until no more symbols can be
+ *	symbol tables are searched until no more symbols can be
  *	resolved within the library files.  This ensures that
  *	back references from one library module to another are
  *	also resolved.
@@ -332,6 +332,7 @@ search()
  *		int	obj_flag	linked file/library object output flag
  *
  *	 functions called:
+ *		VOID	chopcrlf()	lklex.c
  *		int	fclose()	c_library
  *		int	fgets()		c_library
  *		FILE	*fopen()	c_library
@@ -389,7 +390,7 @@ char *name;
 
 /*2*/		while (fgets(relfil, NINPUT, libfp) != NULL) {
 		    relfil[NINPUT+1] = '\0';
-		    relfil[strlen(relfil) - 1] = '\0';
+		    chopcrlf(relfil);
 		    if (path != NULL) {
 			str = (char *) malloc (strlen(path)+strlen(relfil)+5);
 			strcpy(str,path);
@@ -427,7 +428,7 @@ char *name;
 /*4*/			while (fgets(buf, NINPUT, fp) != NULL) {
 
 			buf[NINPUT+1] = '\0';
-			buf[strlen(buf) - 1] = '\0';
+			chopcrlf(buf);
 
 			/*
 			 * When a 'T line' is found terminate file scan.
@@ -469,6 +470,11 @@ char *name;
 			fclose(fp);
 			fclose(libfp);
 			obj_flag = lbfh->f_obj;
+
+#if SDCDB
+			SDCDBcopy(str);
+#endif
+
 			loadfile(str);
 			return (1);
 
@@ -529,11 +535,11 @@ library()
  *		char	*ip		pointer to linker input string
  *
  *	 functions called:
+ *		VOID	chopcrlf()	lklex.c
  *		int	fclose()	c_library
  *		int	fgets()		c_library
  *		FILE *	fopen()		c_library
  *		VOID	link()		lkmain.c
- *		int	strlen()	c_library
  *
  *	side effects:
  *		If file exists it is linked.
@@ -544,15 +550,11 @@ loadfile(filspc)
 char *filspc;
 {
 	FILE *fp;
-	char str[NINPUT+2];
-	int i;
+	char str[NINPUT];
 
 	if ((fp = fopen(filspc,"r")) != NULL) {
-		while (fgets(str, NINPUT, fp) != NULL) {
-			str[NINPUT+1] = '\0';
-			i = strlen(str) - 1;
-			if (str[i] == '\n')
-				str[i] = '\0';
+		while (fgets(str, sizeof(str), fp) != NULL) {
+			chopcrlf(str);
 			ip = str;
 			link();
 		}

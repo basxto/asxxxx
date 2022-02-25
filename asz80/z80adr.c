@@ -1,7 +1,7 @@
 /* z80adr.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -62,8 +62,15 @@ register struct expr *esp;
 			esp->e_mode = mode + (indx&0xFF);
 			esp->e_base.e_ap = NULL;
 		}
-		if ((c = getnb()) != RTIND)
-			qerr();
+		if ((c = getnb()) != RTIND) {
+			unget(c);
+			if (indx && ((indx&0xFF)==IX || (indx&0xFF)==IY)) {
+				expr(esp, 0);
+				esp->e_mode = S_INDR + (indx&0xFF);
+			}
+			if ((c = getnb()) != RTIND)
+				qerr();
+		}
 	} else {
 		unget(c);
 		if ((indx = admode(R8)) != 0) {
@@ -152,24 +159,10 @@ register char *str;
 	}
 
 	if (!*str)
-		if (any(*ptr," \t\n,);")) {
+		if (!(ctype[*ptr & 0x007F] & LTR16)) {
 			ip = ptr;
 			return(1);
 		}
-	return(0);
-}
-
-/*
- *      any --- does str contain c?
- */
-int
-any(c,str)
-int c;
-char *str;
-{
-	while (*str)
-		if(*str++ == c)
-			return(1);
 	return(0);
 }
 
@@ -205,8 +198,8 @@ struct	adsym	R16[] = {
 };
 
 struct	adsym	R16X[] = {
+    {	"af'",	AF|0400	},	/* af' must be first !!! */
     {	"af",	AF|0400	},
-    {	"af'",	AF|0400	},
     {	"",	0000	}
 };
 

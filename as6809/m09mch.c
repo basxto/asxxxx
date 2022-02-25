@@ -1,7 +1,7 @@
 /* M09MCH:C */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -58,9 +58,9 @@ struct mne *mp;
 			}
 		}
 		if (espa) {
-			outdp(espa, &e1);
+			outdp(espa, &e1, 0);
 		} else {
-			outdp(dot.s_area, &e1);
+			outdp(dot.s_area, &e1, 0);
 		}
 		lmode = SLIST;
 		break;
@@ -239,7 +239,7 @@ register struct expr *esp;
 		} else {
 			outab(op|0x10);
 		}
-		outrb(esp, R_PAG);
+		outrb(esp, R_PAGN);
 		break;
 
 	case S_EXT:

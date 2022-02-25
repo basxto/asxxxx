@@ -1,7 +1,7 @@
 /* assubr.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -198,6 +198,7 @@ char *errors[] = {
 	"<p> phase error: label location changing between passes 2 and 3",
 	"<q> missing or improper operators, terminators, or delimiters",
 	"<r> relocation error",
+	"<s> string substitution / recursion error",
 	"<u> undefined symbol encountered during assembly",
 	"<z> divide by zero or mod of zero error",
 	NULL

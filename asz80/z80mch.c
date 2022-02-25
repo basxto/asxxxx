@@ -1,7 +1,7 @@
 /* z80mch.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -126,11 +126,15 @@ struct mne *mp;
 	case S_SUB:
 		t1 = 0;
 		t2 = addr(&e2);
+		if (t2 == S_USER)
+			t2 = e2.e_mode = S_IMMED;
 		if (more()) {
 			if ((t2 != S_R8) || (e2.e_addr != A))
 				++t1;
 			comma();
 			t2 = addr(&e2);
+			if (t2 == S_USER)
+				t2 = e2.e_mode = S_IMMED;
 		}
 		if (genop(0, op, &e2, 1) || t1)
 			aerr();
@@ -144,8 +148,12 @@ struct mne *mp;
 		if (more()) {
 			comma();
 			t2 = addr(&e2);
+			if (t2 == S_USER)
+				t2 = e2.e_mode = S_IMMED;
 		}
 		if (t2 == 0) {
+			if (t1 == S_USER)
+				t1 = e1.e_mode = S_IMMED;
 			if (genop(0, op, &e1, 1))
 				aerr();
 			break;
@@ -196,6 +204,8 @@ struct mne *mp;
 		t1 = addr(&e1);
 		comma();
 		t2 = addr(&e2);
+		if (t2 == S_USER)
+			t2 = e2.e_mode = S_IMMED;
 		if (t1 == S_R8) {
 			v1 = op | e1.e_addr<<3;
 			if (genop(0, v1, &e2, 0) == 0)
@@ -474,6 +484,8 @@ struct mne *mp;
 
 	case X_TST:
 		t1 = addr(&e1);
+		if (t1 == S_USER)
+			t1 = e1.e_mode = S_IMMED;
 		if (t1 == S_R8) {
 			outab(0xED);
 			outab(op | e1.e_addr<<3);
@@ -495,6 +507,8 @@ struct mne *mp;
 
 	case X_TSTIO:
 		t1 = addr(&e1);
+		if (t1 == S_USER)
+			t1 = e1.e_mode = S_IMMED;
 		if (t1 == S_IMMED) {
 			outab(0xED);
 			outab(op);

@@ -1,4 +1,4 @@
-	.title	Test of Z80 / HD64180 assembler
+	.title	Test of GB assembler
 
 	offset	=	0x55		;arbitrary constants
 	n	=	0x20

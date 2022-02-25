@@ -1,7 +1,7 @@
 /* r65mch.c */
 
 /*
- * (C) Copyright 1995-2002
+ * (C) Copyright 1995-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -16,8 +16,8 @@
  * Sillitie 10 A
  * 01480 Vantaa
  * Finland
- * Internet: Marko.Makela@Helsinki.Fi
- * EARN/BitNet: msmakela@finuh
+ * Internet: Marko dot Makela at Helsinki dot Fi
+ * EARN/BitNet: msmakela at finuh
  */
 
 #include <stdio.h>
@@ -68,9 +68,9 @@ struct mne *mp;
 			}
 		}
 		if (espa) {
-			outdp(espa, &e1);
+			outdp(espa, &e1, 0);
 		} else {
-			outdp(dot.s_area, &e1);
+			outdp(dot.s_area, &e1, 0);
 		}
 		lmode = SLIST;
 		break;

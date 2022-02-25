@@ -37,7 +37,7 @@ text8051.func..FN::
 text8051.static::
 
 LLLL:	NOP			; 00
-	AJMP	RN		;s01r0C
+	AJMP	RN		;n01*0C
 	LJMP	LLLL		; 02s00r06
 RN:	RR	A		; 03
 	INC	A		; 04
@@ -55,7 +55,7 @@ RN:	RR	A		; 03
 CNNNN:
 
 	JBC	NN,LLLL		; 10*12 E9
-	ACALL	LLLL + 0x000	;s11r06
+	ACALL	LLLL + 0x000	;n11*06
 	LCALL	LLLL		; 12s00r06
 	RRC	A		; 13
 	DEC	A		; 14
@@ -72,7 +72,7 @@ CNNNN:
 	DEC	R7		; 1F
 
 	JB	NN,LLLL		; 20*12 D3
-	AJMP	LLLL + 0x100	;s21r06
+	AJMP	LLLL + 0x100	;n21*06
 	RET			; 22
 	RL	A		; 23
 	ADD	A,#NN		; 24r12
@@ -89,7 +89,7 @@ CNNNN:
 	ADD	A,R7		; 2F
 
 	JNB	NN,LLLL		; 30*12 BE
-	ACALL	LLLL + 0x100	;s31r06
+	ACALL	LLLL + 0x100	;n31*06
 	RETI			; 32
 	RLC	A		; 33
 	ADDC	A,#NN		; 34r12
@@ -106,7 +106,7 @@ CNNNN:
 	ADDC	A,R7		; 3F
 
 	JC	LLLL		; 40 AA
-	AJMP	LLLL + 0x200	;s41r06
+	AJMP	LLLL + 0x200	;n41*06
 	ORL	NN,A		; 42*12
 	ORL	NN,#MM		; 43*12r34
 	ORL	A,#NN		; 44r12
@@ -123,7 +123,7 @@ CNNNN:
 	ORL	A,R7		; 4F
 
 	JNC	LLL2		; 50 12
-	ACALL	LLLL + 0x200	;s51r06
+	ACALL	LLLL + 0x200	;n51*06
 	ANL	NN,A		; 52*12
 	ANL	NN,#MM		; 53*12r34
 	ANL	A,#NN		; 54r12
@@ -140,7 +140,7 @@ LLL2:	ANL	A,R5		; 5D
 	ANL	A,R7		; 5F
 
 	JZ	LLL2		; 60 FB
-	AJMP	LLLL + 0x300	;s61r06
+	AJMP	LLLL + 0x300	;n61*06
 	XRL	NN,A		; 62*12
 	XRL	NN,#MM		; 63*12r34
 	XRL	A,#NN		; 64r12
@@ -157,7 +157,7 @@ LLL2:	ANL	A,R5		; 5D
 	XRL	A,R7		; 6F
 
 	JNZ	LLL2		; 70 E4
-	ACALL	LLLL + 0x300	;s71r06
+	ACALL	LLLL + 0x300	;n71*06
 	ORL	C,NN		; 72*12
 	JMP	@A+DPTR		; 73
 	MOV	A,#NN		; 74r12
@@ -174,7 +174,7 @@ LLL2:	ANL	A,R5		; 5D
 	MOV	R7,#NN		; 7Fr12
 
 	SJMP	LLL2		; 80 C4
-	AJMP	LLLL + 0x400	;s81r06
+	AJMP	LLLL + 0x400	;n81*06
 	ANL	C,NN		; 82*12
 	MOVC	A,@A+PC		; 83
 	DIV	AB		; 84
@@ -191,7 +191,7 @@ LLL2:	ANL	A,R5		; 5D
 	MOV	NN,R7		; 8F*12
 
 	MOV	DPTR,#NNNN	; 90s12r34
-	ACALL	LLLL + 0x400	;s91r06
+	ACALL	LLLL + 0x400	;n91*06
 	MOV	NN,C		; 92*12
 	MOVC	A,@A+DPTR	; 93
 	SUBB	A,#NN		; 94r12
@@ -208,7 +208,7 @@ LLL2:	ANL	A,R5		; 5D
 	SUBB	A,R7		; 9F
 
 	ORL	C,/NN		; A0*12
-	AJMP	LLLL + 0x500	;sA1r06
+	AJMP	LLLL + 0x500	;nA1*06
 	MOV	C,NN		; A2*12
 	INC	DPTR		; A3
 	MUL	AB		; A4
@@ -225,7 +225,7 @@ LLL2:	ANL	A,R5		; 5D
 	MOV	R7,NN		; AF*12
 
 LLL3:	ANL	C,/NN		; B0*12
-	ACALL	LLLL + 0x500	;sB1r06
+	ACALL	LLLL + 0x500	;nB1*06
 	CPL	NN		; B2*12
 	CPL	C		; B3
 	CJNE	A,#NN,LLL3	; B4r12 F6
@@ -243,7 +243,7 @@ LLL3:	ANL	C,/NN		; B0*12
 
 	PUSH	NN		; C0*12
 ;;/* This will cause a LINKER paging error */;;
-	AJMP	LLLL + 0x600	;sC1r06
+	AJMP	LLLL + 0x600	;nC1*06
 	CLR	NN		; C2*12
 	CLR	C		; C3
 	SWAP	A		; C4
@@ -261,7 +261,7 @@ LLL3:	ANL	C,/NN		; B0*12
 
 	POP	NN		; D0*12
 ;;/* This will cause a LINKER paging error */;;
-	ACALL	LLLL + 0x600	;sD1r06
+	ACALL	LLLL + 0x600	;nD1*06
 	SETB	NN		; D2*12
 	SETB	C		; D3
 	DA	A		; D4
@@ -279,7 +279,7 @@ LLL3:	ANL	C,/NN		; B0*12
 
 	MOVX	A,@DPTR		; E0
 ;;/* This will cause a LINKER paging error */;;
-	AJMP	LLLL + 0x700	;sE1r06
+	AJMP	LLLL + 0x700	;nE1*06
 	MOVX	A,@R0		; E2
 	MOVX	A,@R1		; E3
 	CLR	A		; E4
@@ -297,7 +297,7 @@ LLL3:	ANL	C,/NN		; B0*12
 
 	MOVX	@DPTR,A		; F0
 ;;/* This will cause a LINKER paging error */;;
-	ACALL	LLLL + 0x700	;sF1r06
+	ACALL	LLLL + 0x700	;nF1*06
 	MOVX	@R0,A		; F2
 	MOVX	@R1,A		; F3
 	CPL	A		; F4
@@ -648,3 +648,4 @@ LLL4:	INC	*NN		; 05*12
 	DJNZ	*NN,LLL4	; D5*12 8C
 	MOV	A,*NN		; E5*12
 	MOV	*NN,A		; F5*12
+

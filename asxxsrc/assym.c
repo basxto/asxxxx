@@ -1,7 +1,7 @@
 /* assym.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -34,6 +34,8 @@
  *	assym.c contains the following functions:
  *		VOID	allglob()
  *		area *	alookup()
+ *		bank *	blookup()
+ *		def *	dlookup()
  *		int	hash()
  *		sym *	lookup()
  *		mne *	mlookup()
@@ -56,8 +58,7 @@
  *	to set up the hashtables.  First all buckets in a
  *	table are cleared.  Then a pass is made through
  *	the respective symbol lists, linking them into
- *	their hash buckets.  Finally the base area pointer
- *	is set to 'dca'.
+ *	their hash buckets.
  *
  *	local variables:
  *		int	h		computed hash value
@@ -69,8 +70,6 @@
  *					sym structure pointers
  *
  *	global variables:
- *		area	area[]		single elememt area array
- *		area	dca		defined as area[0]
  *		mne * mnehash[]		array of pointers to NHASH
  *					linked mnemonic/directive lists
  *		sym * symhash[]		array of pointers to NHASH
@@ -86,7 +85,6 @@
  *			initialized with the assembler directives
  *			and mnemonics found in the machine dependent
  *			file ___pst.c.
- *		(3)	The area pointer is initialized to dca (area[0]).
  */
 
 VOID
@@ -103,10 +101,10 @@ syminit()
 		*mpp++ = NULL;
 	mp = &mne[0];
 	for (;;) {
-		h = hash(mp->m_id, 0);
+		h = hash(mp->m_id, 1);
 		mp->m_mp = mnehash[h];
 		mnehash[h] = mp;
-		if (mp->m_flag&S_END)
+		if (mp->m_flag&S_EOL)
 			break;
 		++mp;
 	}
@@ -119,12 +117,10 @@ syminit()
 		h = hash(sp->s_id, zflag);
 		sp->s_sp = symhash[h];
 		symhash[h] = sp;
-		if (sp->s_flag&S_END)
+		if (sp->s_flag&S_EOL)
 			break;
 		++sp;
 	}
-
-	areap = &dca;
 }
 
 /*)Function	area *	alookup(id)
@@ -159,11 +155,87 @@ char *id;
 		/*
 		 * JLH: case insensitive lookup always
 		 */
-		if(symeq(id, ap->a_id, 0))
+		if(symeq(id, ap->a_id, 1))
 			return (ap);
 		ap = ap->a_ap;
 	}
 	return(NULL);
+}
+
+/*)Function	bank *	blookup(id)
+ *
+ *		char *	id		bank name string
+ *
+ *	The function blookup() searches the bank list for a
+ *	match with id.  If the bank is defined then a pointer
+ *	to this bank is returned else a NULL is returned.
+ *
+ *	local variables:
+ *		bank *	bp		pointer to bank structure
+ *
+ *	global variables:
+ *		bank *	bankp		pointer to a bank structure
+ *
+ *	functions called:
+ *		int	()		assym.c
+ *
+ *	side effects:
+ *		none
+ */
+
+struct bank *
+blookup(id)
+char *id;
+{
+	register struct bank *bp;
+
+	bp = bankp;
+	while (bp) {
+		/*
+		 * JLH: case insensitive lookup always
+		 */
+		if(symeq(id, bp->b_id, 1))
+			return (bp);
+		bp = bp->b_bp;
+	}
+	return(NULL);
+}
+
+/*)Function	def *	dlookup(id)
+ *
+ *		char *	id		definition name string
+ *
+ *	The function dlookup() searches the definition list for a
+ *	match with id.  If the definition is defined then a pointer
+ *	to this definition is returned else a NULL is returned.
+ *
+ *	local variables:
+ *		def *	dp		pointer to a def structure
+ *
+ *	global variables:
+ *		def *	defp		pointer to a def structure
+ *
+ *	functions called:
+ *		int	symeq()		assym.c
+ *
+ *	side effects:
+ *		none
+ */
+
+struct def *
+dlookup(id)
+char *id;
+{
+	register struct def *dp;
+
+	dp = defp;
+	while (dp) {
+		if (symeq(id, dp->d_id, zflag)) {
+			break;
+		}
+		dp = dp->d_dp;
+	}
+	return(dp);
 }
 
 /*)Function	mne *	mlookup(id)
@@ -199,10 +271,10 @@ char *id;
 	/*
 	 * JLH: case insensitive lookup always
 	 */
-	h = hash(id, 0);
+	h = hash(id, 1);
 	mp = mnehash[h];
 	while (mp) {
-		if(symeq(id, mp->m_id, 0))
+		if(symeq(id, mp->m_id, 1))
 			return (mp);
 		mp = mp->m_mp;
 	}
@@ -213,9 +285,9 @@ char *id;
  *
  *		char *	id		symbol name string
  *
- *	The function lookup() searches the symbol hash tables for
+ *	The function slookup() searches the symbol hash tables for
  *	a symbol name match returning a pointer to the sym structure
- *	eles it returns a NULL.
+ *	else it returns a NULL.
  *
  *	local variables:
  *		int	h		computed hash value
@@ -224,7 +296,7 @@ char *id;
  *	global varaibles:
  *		sym *	symhash[]	array of pointers to NHASH
  *					linked symbol lists
- *		int	zflag		enable symbol case sensitivity
+ *		int	zflag		disable symbol case sensitivity
  *
  *	functions called:
  *		int	hash()		assym.c
@@ -268,7 +340,7 @@ char *id;
  *	global varaibles:
  *		sym *	symhash[]	array of pointers to NHASH
  *					linked symbol lists
- *		int	zflag		enable symbol case sensitivity
+ *		int	zflag		disable symbol case sensitivity
  *
  *	functions called:
  *		int	hash()		assym.c
@@ -382,17 +454,17 @@ allglob()
 	}
 }
 
-/*)Function	int	symeq(p1, p2, cflag)
+/*)Function	int	symeq(p1, p2, flag)
  *
- *		int	cflag		case sensitive flag
+ *		int	flag		case sensitive flag
  *		char *	p1		name string
  *		char *	p2		name string
  *
  *	The function symeq() compares the two name strings for a match.
  *	The return value is 1 for a match and 0 for no match.
  *
- *		cflag == 0	case insensitve compare
- *		cflag != 0	case sensitive compare
+ *		flag == 0	case sensitive compare
+ *		flag != 0	case insensitive compare
  *
  *	local variables:
  *		int	n		loop counter
@@ -410,22 +482,14 @@ allglob()
  */
 
 int
-symeq(p1, p2, cflag)
+symeq(p1, p2, flag)
 register char *p1, *p2;
-int cflag;
+int flag;
 {
 	register int n;
 
 	n = strlen(p1) + 1;
-	if(cflag) {
-		/*
-		 * Case Sensitive Compare
-		 */
-		do {
-			if (*p1++ != *p2++)
-				return (0);
-		} while (--n);
-	} else {
+	if(flag) {
 		/*
 		 * Case Insensitive Compare
 		 */
@@ -433,20 +497,28 @@ int cflag;
 			if (ccase[*p1++ & 0x007F] != ccase[*p2++ & 0x007F])
 				return (0);
 		} while (--n);
+	} else {
+		/*
+		 * Case Sensitive Compare
+		 */
+		do {
+			if (*p1++ != *p2++)
+				return (0);
+		} while (--n);
 	}
 	return (1);
 }
 
-/*)Function	int	hash(p, cflag)
+/*)Function	int	hash(p, flag)
  *
  *		char *	p		pointer to string to hash
- *		int	cflag		case sensitive flag
+ *		int	flag		case sensitive flag
  *
  *	The function hash() computes a hash code using the sum
  *	of all characters mod table size algorithm.
  *
- *		cflag == 0	case insensitve hash
- *		cflag != 0	case sensitive hash
+ *		flag == 0	case insensitve hash
+ *		flag != 0	case sensitive hash
  *
  *	local variables:
  *		int	h		accumulated character sum
@@ -463,24 +535,24 @@ int cflag;
  */
  
 int
-hash(p, cflag)
+hash(p, flag)
 register char *p;
-register int cflag;
+register int flag;
 {
 	register int h;
 
 	h = 0;
 	while (*p) {
-		if(cflag) {
-			/*
-			 * Case Sensitive Hash
-			 */
-			h += *p++;
-		} else {
+		if(flag) {
 			/*
 			 * Case Insensitive Hash
 			 */
 			h += ccase[*p++ & 0x007F];
+		} else {
+			/*
+			 * Case Sensitive Hash
+			 */
+			h += *p++;
 		}
 	}
 	return (h&HMASK);
@@ -595,3 +667,5 @@ unsigned int n;
 	}
 	return (p);
 }
+
+

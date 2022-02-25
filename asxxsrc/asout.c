@@ -1,20 +1,13 @@
 /* asout.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
  *
- *   With enhancements from
- *
- *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
- *
- *	Bill McKinnon (BM)
- *	w_mckinnon@conknet.com
  */
 
 #include <stdio.h>
@@ -54,13 +47,15 @@
  *			3	 24-Bit Relocatable Addresses/Data
  *			4	 32-Bit Relocatable Addresses/Data
  *
- *		H	 Header 
- *		M	 Module
- *		A	 Area
- *		S	 Symbol
- *		T	 Object code
- *		R	 Relocation information
- *		P	 Paging information
+ *		H	Header 
+ *		M	Module
+ *		G	Merge Mode
+ *		B	Bank
+ *		A	Area
+ *		S	Symbol
+ *		T	Object code
+ *		R	Relocation information
+ *		P	Paging information
  *
  *
  *	(1)	Radix Line
@@ -89,7 +84,50 @@
  *	if the .module directive was not used in the source program.  
  *
  *
- *	(4)	Symbol Line 
+ *	(4)	Merge Mode Line
+ *
+ *		G nn ii 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+ *
+ *	The mode structure contains the specification (or partial
+ *	specification) of one of the assemblers' merge modes.
+ *	Sixteen bits may be specified on a single line.
+ *	Each assembler must specify at least one merge mode.
+ *	The merging specification allows arbitrarily defined active
+ *	bits and bit positions.  The 32 element arrays are indexed
+ *	from 0 to 31.  Index 0 corresponds to bit 0, ..., and
+ *	31 corresponds to bit 31 of a normal integer value.
+ *
+ *	1.  nn is merge mode number
+ *
+ *	2.  ii is the beginning bit position of the following data
+ *
+ *	3.  00 ... merge mode bit elements
+ *
+ *		The value of the element specifies if the normal integer bit
+ *		is active (bit <7> is set, 0x80) and what destination bit
+ *		(bits <4:0>, 0 - 31) should be loaded with this normal
+ *		integer bit.
+ *
+ *
+ *	(5)	Bank Line
+ *
+ *		B string base nn size nn flags nn fsfx string
+ *
+ *	The B line defines a bank name as 'string'.  A bank is
+ *	a structure containing a collection of areas.
+ *	The bank is treated as a unique linking
+ *	structure seperate from other banks.  Each bank
+ *	can have a unique base address (starting address).  The
+ *	size specification may be used to signal the overflow of
+ *	the banks' allocated space.  The Linker combines all areas
+ *	included within a bank as seperate from other areas.  The
+ *	code from a bank may be output to a unique file by
+ *	specifying the File Suffix parameter (fsfx).  This allows
+ *	the seperation of multiple data and code segments into
+ *	isolated output files.
+ *	
+ *	
+ *	(6)	Symbol Line 
  *
  *		S string Defnnnn 
  *
@@ -105,32 +143,34 @@
  *	zero.  
  *
  *
- *	(5)	Area Line 
+ *	(7)	Area Line 
  *
  *		A label size ss flags ff 
  *
  * 	The  area  line  defines the area label, the size (ss) of the
- *	area in bytes, and the area flags (ff).  The area flags  specify
- *	the ABS, REL, CON, OVR, and PAG parameters:  
+ *	area in PC increments, and the area flags (ff).  The area flags
+ *	specify the area properties:
  *
- *		OVR/CON (0x04/0x00 i.e.  bit position 2) 
+ *		Basic PC Increment Size in Bytes	<1:0>
+ *		OVR/CON		(0x0404/0x0400 i.e.  bit position 2) 
+ *		ABS/REL		(0x0808/0x0800 i.e.  bit position 3) 
+ *		PAG/NOPAG	(0x1010/0x1000 i.e.  bit position 4) 
+ *		DSEG/CSEG	(0x4040/0x4000 i.e.  bit position 6)
+ *		BANKED/NOBANK	(0x8080/0x8000 i.e   bit position 7)
  *
- *		ABS/REL (0x08/0x00 i.e.  bit position 3) 
  *
- *		PAG (0x10 i.e.  bit position 4) 
- *
- *
- *	(6)	T Line 
+ *	(8)	T Line 
  *
  *		T xx xx nn nn nn nn nn ...  
  *
  * 	The  T  line contains the assembled code output by the assem-
  *	bler with xx xx being the offset address from the  current  area
  *	base address and nn being the assembled instructions and data in
- *	byte format.  
+ *	byte format.  (xx xx and nn nn can be 2, 3, or 4 bytes as
+ *	specified by the .REL file header.) 
  *
  *
- *	(7)	R Line 
+ *	(9)	R Line 
  *
  *		R 0 0 nn nn n1 n2 xx xx ...  
  *
@@ -140,20 +180,22 @@
  *	coded in groups of 4 bytes:  
  *
  *	1.  n1 is the relocation mode and object format 
- *	 	1.  bit 0 word(0x00)/byte(0x01) 
- *	 	2.  bit 1 relocatable area(0x00)/symbol(0x02) 
- *	 	3.  bit 2 normal(0x00)/PC relative(0x04) relocation 
- *	 	4.  bit  3  1-byte(0x00)/n-byte(0x08) byte format
- *	 	5.  bit 4 signed(0x00)/unsigned(0x10) byte data 
- *	 	6.  bit 5 normal(0x00)/page '0'(0x20) reference 
- *	 	7.  bit 6 normal(0x00)/page 'nnn'(0x40) reference 
- *		8.  bit 7 normal(0x00)/MSB of value
+ *	 	1.  bits <1:0> specify the number of bytes to output) 
+ *	 	2.  bit 2 signed(0x00)/unsigned(0x04) byte data 
+ *		3.  bit 3 normal(0x00)/MSB(0x08) of value (2nd byte)
+ *	 	4.  bit 4 normal(0x00)/page '0'(0x10) reference 
+ *	 	5.  bit 5 normal(0x00)/page 'nnn'(0x20) reference
+ *			PAGX mode if both bits are set
+ *	 	6.  bit 6 normal(0x00)/PC relative(0x40) relocation 
+ *	 	7.  bit 7 relocatable area(0x00)/symbol(0x80) 
  *
- *	2.  n2  is  a byte index into the corresponding (i.e.  pre-
- *	 	ceeding) T line data (i.e.  a pointer to the data to be
- *	 	updated  by  the  relocation).   The T line data may be
- *	 	1-byte or  2-byte  byte  data  format  or  2-byte  word
- *	 	format.  
+ *	2.  n2 is a byte index and merge mode index
+ *		1.  bits <3:0> are a byte index into the corresponding
+ *			(i.e.  preceeding) T line data (i.e.  a pointer to
+ *			the data to be updated  by  the  relocation).
+ *		2.  bits <7:4> are an index into a selected merge mode.
+ *			Currently mode 0 simply specifies to use standard
+ *			byte addressing modes and merging is ignored.
  *
  *	3.  xx xx  is the area/symbol index for the area/symbol be-
  *	 	ing referenced.  the corresponding area/symbol is found
@@ -164,7 +206,7 @@
  *	cation in the preceeding T line.  
  *
  *
- *	(8)	P Line 
+ *	(10)	P Line 
  *
  *		P 0 0 nn nn n1 n2 xx xx 
  *
@@ -192,13 +234,16 @@
  *		int	thrdbyte();
  *		int	frthbyte();
  *		VOID	out();
- *		VOID	outarea();
- *		VOID	outdp();
  *		VOID	outall();
- *		VOID	outdot();
+ *		VOID	outarea();
+ *		VOID	outbank();
  *		VOID	outbuf();
  *		VOID	outchk();
+ *		VOID	outdp();
+ *		VOID	outdot();
  *		VOID	outgsd();
+ *		VOID	outmerge();
+ *		VOID	outmode();
  *		VOID	outsym();
  *		VOID	outab();
  *		VOID	outaw();
@@ -211,7 +256,6 @@
  *		VOID	outr3b();
  *		VOID	outr4b();
  *		VOID	outrxb();
- *		VOID	outr11();	JLH
  *		VOID	out_lb();
  *		VOID	out_lw();
  *		VOID	out_l3b();
@@ -219,22 +263,7 @@
  *		VOID	out_lxb();
  *		VOID	out_rw();
  *		VOID	out_txb();
- *
- *	The module asout.c contains the following local variables:
- *		int	rel[]		relocation data for code/data array
- *		int *	relp		pointer to rel array
- *		int	txt[]		assembled code/data array
- *		int *	txtp		pointer to txt array
  */
-
-#define	 NTXT	16
-#define	 NREL	16
-
-char	 txt[NTXT];
-char	 rel[NREL];
-
-char	*txtp = &txt[0];
-char	*relp = &rel[0];
 
 /*)Function	VOID	outab(v)
  *)Function	VOID	outaw(v)
@@ -316,6 +345,8 @@ outaxb(i, v)
 int i;
 int v;
 {
+	int p_bytes;
+
 	if (pass == 2) {
 		out_lxb(i, v, 0);
 		if (oflag) {
@@ -323,7 +354,12 @@ int v;
 			outatxb(i, v);
 		}
 	}
-	dot.s_addr += i;
+	/*
+	 * Update the Program Counter
+	 * based upon the area type.
+	 */
+	p_bytes = 1 + ((dot.s_area->a_flag) & A_BYTES);
+	dot.s_addr += (i/p_bytes) + (i % p_bytes ? 1 : 0);
 }
 
 /*)Function	VOID	outatxb(i, v)
@@ -436,14 +472,19 @@ int r;
  *	is loaded into the txt and rel buffers.
  *
  *	local variables:
- *		int	n		symbol/area reference number
+ *		int	m		signed value mask
+ *		int	n		unsigned value mask
+ *					symbol/area reference number
  *
  *	global variables:
  *		int	a_bytes		T Line byte count
  *		sym	dot		defined as sym[0]
  *		int	oflag		-o, generate relocatable output flag
  *		int	pass		assembler pass number
- *		int *	relp		pointer to rel array
+ *		char	rel[]		relocation data for code/data array
+ *		char *	relp		pointer to rel array
+ *		char	txt[]		assembled code/data array
+ *		char *	txtp		pointer to txt array
  *		
  *	functions called:
  *		int	hibyte()	asout.c
@@ -467,10 +508,37 @@ int i;
 register struct expr *esp;
 int r;
 {
+	register a_uint m;
 	register int n;
+	int p_bytes;
 
 	if (pass == 2) {
 		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+			/*
+			 * Mask Value Selection
+			 */
+			switch(i) {
+			default:
+			case 1:	m = ~0x7F;		n = ~0xFF;		break;	/* 1 byte  */
+			case 2:	m = ~0x7FFF;		n = ~0xFFFF;		break;	/* 2 bytes */
+			case 3:	m = ~0x7FFFFF;		n = ~0xFFFFFF;		break;	/* 3 bytes */
+			case 4:	m = ~0x7FFFFFFF;	n = ~0xFFFFFFFF;	break;	/* 4 bytes */
+			}
+
+			/*
+			 * Signed Byte Check
+			 */
+			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_SGND) &&
+			   ((m & esp->e_addr) != m) && ((m & esp->e_addr) != 0))
+				aerr();
+
+			/*
+			 * Unsigned/Overflow Byte Check
+			 */
+			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_USGN) &&
+			   ((n & esp->e_addr) != 0))
+				aerr();
+
 			out_lxb(i,esp->e_addr,0);
 			if (oflag) {
 				outchk(i,0);
@@ -478,9 +546,17 @@ int r;
 			}
 		} else {
 			if (i == 1) {
-				r |= R_BYTE | R_BYTX | esp->e_rlcf;
-				if (r & R_MSB) {
-					out_lb(hibyte(esp->e_addr),r|R_RELOC|R_HIGH);
+				r |= R_BYTE | esp->e_rlcf;
+				if ((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_MSB) {
+					r &= ~R_BYTES;
+					r |= as_msb;
+					switch(as_msb) {
+					default:
+					case 0:	out_lb(lobyte(esp->e_addr),r|R_RELOC);		break;
+					case 1:	out_lb(hibyte(esp->e_addr),r|R_RELOC|R_HIGH);	break;
+					case 2:	out_lb(thrdbyte(esp->e_addr),r|R_RELOC|R_BYT3);	break;
+					case 3:	out_lb(frthbyte(esp->e_addr),r|R_RELOC|R_BYT4);	break;
+					}
 				} else {
 					out_lb(lobyte(esp->e_addr),r|R_RELOC);
 				}
@@ -504,32 +580,298 @@ int r;
 					n = esp->e_base.e_ap->a_ref;
 				}
 				*relp++ = r;
-				*relp++ = txtp - txt - a_bytes;
+				*relp++ = ((r & 0x0F00) >> 4) | (txtp - txt - a_bytes);
 				out_rw(n);
 			}
 		}
 	}
-	dot.s_addr += i;
+	/*
+	 * Update the Program Counter
+	 * based upon the area type.
+	 */
+	p_bytes = 1 + ((dot.s_area->a_flag) & A_BYTES);
+	dot.s_addr += (i/p_bytes) + (i % p_bytes ? 1 : 0);
 }
 
-/*)Function	VOID	outdp(carea, esp)
+/*)Function	VOID	outrbm(esp, r, v)
+ *)Function	VOID	outrwm(esp, r, v)
+ *)Function	VOID	outr3bm(esp, r, v)
+ *)Function	VOID	outr4bm(esp, r, v)
  *
- *		area *	carea		pointer to current area strcuture
  *		expr *	esp		pointer to expr structure
+ *		int	r		relocation mode
+ *		int	v		data to merge into
+ *
+ *	Dispatch functions for processing relocatable data.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		none
+ *		
+ *	functions called:
+ *		int	outrxbm()	asout.c
+ *
+ *	side effects:
+ *	        relocatable data processed
+ */
+
+VOID
+outrbm(esp, r, v)
+register struct expr *esp;
+int r;
+int v;
+{
+	outrxbm(1, esp, r, v);
+}
+
+VOID
+outrwm(esp, r, v)
+register struct expr *esp;
+int r;
+int v;
+{
+	outrxbm(2, esp, r, v);
+}
+
+VOID
+outr3bm(esp, r, v)
+register struct expr *esp;
+int r;
+int v;
+{
+	outrxbm(3, esp, r, v);
+}
+
+VOID
+outr4bm(esp, r, v)
+register struct expr *esp;
+int r;
+int v;
+{
+	outrxbm(4, esp, r, v);
+}
+
+/*)Function	VOID	outrxbm(i, esp, r, v)
+ *
+ *		int	i		output byte count
+ *		expr *	esp		pointer to expr structure
+ *		int	r		relocation mode
+ *		int	v		data to merge into
+ *
+ *	The function outrxbm() merges the data in the expr structure esp
+ *	and the variable v (normally an opcode) using the merge
+ *	specification coded in r.  If the data in the structure esp
+ *	is absolute then esp and v are merged and output as absolute.
+ *	If esp is relocatable then the value of esp is output as a normal
+ *	relocatable object followed by the absolute value of op.  The
+ *	linker will merge the relocatable data with the op code data
+ *	using the selected merge specification.  The function outrxbm()
+ *	processes 1 to 4 bytes of generated code specified by i.
+ *	If the .REL output is enabled then the appropriate information
+ *	is loaded into the txt and rel buffers.
+ *
+ *	local variables:
+ *		int	n		symbol/area reference number
+ *		int	esprv		merged value
+ *		struct mode *mp		pointer to a merge structure
+ *		int	p_bytes		program counter update temporary
+ *
+ *	global variables:
+ *		int	a_bytes		T Line byte count
+ *		sym	dot		defined as sym[0]
+ *		int	oflag		-o, generate relocatable output flag
+ *		struct mode modep	an array of pointers to mode structures
+ *		int	pass		assembler pass number
+ *		char	rel[]		relocation data for code/data array
+ *		char *	relp		pointer to rel array
+ *		char	txt[]		assembled code/data array
+ *		char *	txtp		pointer to txt array
+ *		
+ *	functions called:
+ *		VOID	aerr()		assubr.c
+ *		int	hibyte()	asout.c
+ *		int	lobyte()	asout.c
+ *		VOID	outatxb()	asout.c
+ *		VOID	outchk()	asout.c
+ *		int	outmerge()	asout.c
+ *		VOID	out_lb()	asout.c
+ *		VOID	out_lw()	asout.c
+ *		VOID	out_lxb()	asout.c
+ *		VOID	out_rw()	asout.c
+ *		VOID	out_txb()	asout.c
+ *
+ *	side effects:
+ *		R and T Lines updated.  Listing updated.
+ *		The current assembly address is incremented by i.
+ */
+
+VOID
+outrxbm(i, esp, r, v)
+int i;
+register struct expr *esp;
+int r;
+int v;
+{
+	register a_uint m;
+	register int n;
+	register int esprv;
+	struct mode *mp;
+	int p_bytes;
+
+	if (pass == 2) {
+		esprv = outmerge(esp->e_addr, r, v);
+		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+			/*
+			 * Signed Range Check
+			 */
+			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_SGND) &&
+			   ((mp = modep[(r >> 8) & 0x0F]) != 0)) {
+			   	m = ~(mp->m_mbro >> 1);
+				if (((m & esp->e_addr) != m) && ((m & esp->e_addr) != 0))
+					aerr();
+			}
+			/*
+			 * Unsigned/Overflow Range Check
+			 */
+			if (((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_USGN) &&
+			   ((mp = modep[(r >> 8) & 0x0F]) != 0)) {
+				if (~mp->m_mbro & esp->e_addr)
+					aerr();
+			}
+			out_lxb(i,esprv,0);
+			if (oflag) {
+				outchk(i,0);
+				outatxb(i,esprv);
+			}
+		} else {
+			if (i == 1) {
+				r |= R_BYTE | esp->e_rlcf;
+				if ((r & (R_SGND | R_USGN | R_PAGX | R_PCR)) == R_MSB) {
+					r &= ~R_BYTES;
+					r |= as_msb;
+					switch(as_msb) {
+					default:
+					case 0:	out_lb(lobyte(esp->e_addr),r|R_RELOC);		break;
+					case 1:	out_lb(hibyte(esp->e_addr),r|R_RELOC|R_HIGH);	break;
+					case 2:	out_lb(thrdbyte(esp->e_addr),r|R_RELOC|R_BYT3);	break;
+					case 3:	out_lb(frthbyte(esp->e_addr),r|R_RELOC|R_BYT4);	break;
+					}
+				} else {
+					out_lb(lobyte(esprv),r|R_RELOC);
+				}
+			} else {
+				switch(i) {
+				default:
+				case 2: r |= R_WORD; break;
+				case 3: r |= R_3BYTE; break;
+				case 4: r |= R_4BYTE; break;
+				}
+				r |= esp->e_rlcf;
+				out_lxb(i,esprv,r|R_RELOC);
+			}
+			if (oflag) {
+				outchk(2*a_bytes,4);
+				out_txb(a_bytes,esp->e_addr);
+				if (esp->e_flag) {
+					n = esp->e_base.e_sp->s_ref;
+					r |= R_SYM;
+				} else {
+					n = esp->e_base.e_ap->a_ref;
+				}
+				*relp++ = r;
+				*relp++ = ((r & 0x0F00) >> 4) | (txtp - txt - a_bytes);
+				out_rw(n);
+				outatxb(a_bytes,v);
+			}
+		}
+	}
+	/*
+	 * Update the Program Counter
+	 * based upon the area type.
+	 */
+	p_bytes = 1 + ((dot.s_area->a_flag) & A_BYTES);
+	dot.s_addr += (i/p_bytes) + (i % p_bytes ? 1 : 0);
+}
+
+/*)Function	VOID	outmerge(esp, r, v)
+ *
+ *		int	esp		expr value
+ *		int	r		relocation mode
+ *		int	v		data to merge into
+ *
+ *	The function outmerge() merges the data in the expr structure esp
+ *	and the variable v using the merge specification coded in r.
+ *
+ *	local variables:
+ *		struct mode  *mp	pointer to a merge specification structure
+ *		char *	p		pointer to the merge specification string
+ *		int	i		loop counter
+ *		int	j		temporary
+ *		int	m		bit shuffled value
+ *
+ *	global variables:
+ *		struct mode  *modep[]	array of pointers to merge specification structures
+ *		FILE	*stderr		error console
+ *		
+ *	functions called:
+ *		int	fprintf()	c_library
+ *		VOID	asexit()	asmain.c
+ *
+ *	side effects:
+ *		none
+ */
+int outmerge(esp, r, v)
+int esp;
+int r;
+int v;
+{
+	struct mode *mp;
+	char *p;
+	int i, j, m;
+
+	r = (r >> 8) & 0x0F;
+
+	if ((mp = modep[r]) == NULL) {
+		fprintf(stderr, "undefined G mode\n");
+		asexit(ER_FATAL);
+	}
+
+	if (mp->m_flag) {
+		m = 0;
+		p = mp->m_def;
+		for (i=0; i<32; i++) {
+			if ((j = (int) *p++) & 0x80) {
+				m |= (esp & (1 << i)) ? (1 << (j & 0x1F)) : 0;
+			}
+		}
+	} else {
+		m = esp & mp->m_mask;
+	}
+	return((v & ~mp->m_mask) | m);
+}
+
+/*)Function	VOID	outdp(carea, esp, r)
+ *
+ *		area *	carea		pointer to current area structure
+ *		expr *	esp		pointer to expr structure
+ *		int	r		optional PAGX relocation coding
  *
  *	The function outdp() flushes the output buffer and
  *	outputs paging information to the .REL file.
  *
  *	local variables:
  *		int	n		symbol/area reference number
- *		int	r		relocation mode
- *		int *	relp		pointer to rel array
- *		int *	txtp		pointer to txt array
  *
  *	global variables:
  *		int	a_bytes		T Line byte count
  *		int	oflag		-o, generate relocatable output flag
  *		int	pass		assembler pass number
+ *		char	rel[]		relocation data for code/data array
+ *		char *	relp		pointer to rel array
+ *		char	txt[]		assembled code/data array
+ *		char *	txtp		pointer to txt array
  *		
  *	functions called:
  *		VOID	outbuf()	asout.c
@@ -538,28 +880,29 @@ int r;
  *		VOID	out_txb()	asout.c
  *
  *	side effects:
- *		Output buffer flushed to .REL fiel.
+ *		Output buffer flushed to .REL file.
  *		Paging information dumped to .REL file.
  */
 
 VOID
-outdp(carea, esp)
+outdp(carea, esp, r)
 register struct area *carea;
 register struct expr *esp;
+register int r;
 {
-	register int n, r;
+	register int n;
 
 	if (oflag && pass==2) {
 		outchk(HUGE,HUGE);
 		out_txb(a_bytes,carea->a_ref);
 		out_txb(a_bytes,esp->e_addr);
 		if (esp->e_flag || esp->e_base.e_ap!=NULL) {
-			r = R_WORD;
 			if (esp->e_flag) {
 				n = esp->e_base.e_sp->s_ref;
 				r |= R_SYM;
 			} else {
 				n = esp->e_base.e_ap->a_ref;
+				r |= R_AREA;
 			}
 			*relp++ = r;
 			*relp++ = txtp - txt - a_bytes;
@@ -608,6 +951,10 @@ outall()
  *	global variables:
  *		int	oflag		-o, generate relocatable output flag
  *		int	pass		assembler pass number
+ *		char	rel[]		relocation data for code/data array
+ *		char *	relp		pointer to rel array
+ *		char	txt[]		assembled code/data array
+ *		char *	txtp		pointer to txt array
  *
  *	functions called:
  *		int	fprintf()	c_library
@@ -644,12 +991,14 @@ outdot()
  *
  *	local variables:
  *		area *	ap		pointer to an area structure
- *		int *	relp		pointer to rel array
- *		int *	txtp		pointer to txt array
  *
  *	global variables:
  *		int	a_bytes		T Line byte count
  *		sym	dot		defined as sym[0]
+ *		char	rel[]		relocation data for code/data array
+ *		char *	relp		pointer to rel array
+ *		char	txt[]		assembled code/data array
+ *		char *	txtp		pointer to txt array
  *
  *	functions called:
  *		VOID	outbuf()	asout.c
@@ -673,7 +1022,7 @@ int nr;
 	if (txtp == txt) {
 		out_txb(a_bytes,dot.s_addr);
 		if ((ap = dot.s_area) != NULL) {
-			*relp++ = R_WORD|R_AREA;
+			*relp++ = R_AREA;
 			*relp++ = 0;
 			out_rw(ap->a_ref);
 		}
@@ -689,13 +1038,14 @@ int nr;
  *	buffer pointers and counters are initialized.
  *
  *	local variables:
- *		int	rel[]		relocation data for code/data array
- *		int *	relp		pointer to rel array
- *		int	txt[]		assembled code/data array
- *		int *	txtp		pointer to txt array
+ *		none
  *
  *	global variables:
  *		FILE *	ofp		relocation output file handle
+ *		char	rel[]		relocation data for code/data array
+ *		char *	relp		pointer to rel array
+ *		char	txt[]		assembled code/data array
+ *		char *	txtp		pointer to txt array
  *
  *	functions called:
  *		int	fprintf()	c_library
@@ -729,34 +1079,42 @@ char *s;
  *	(2)	outputs the header specifying the number
  *		of areas and global symbols
  *	(3)	outputs the module name
- *	(4)	set the reference number and output a symbol line
+ *	(4)	outputs the merge mode specifications
+ *	(5)	outputs the bank specifications
+ *	(6)	set the reference number and output a symbol line
  *		for all external global variables and absolutes
- *	(5)	output an area name, set reference number and output
+ *	(7)	output an area name, set reference number and output
  *		a symbol line for all global relocatables in the area.
  *		Repeat this proceedure for all areas.
  *
  *	local variables:
  *		area *	ap		pointer to an area structure
+ *		bank *	bp		pointer to a  bank structure
  *		sym *	sp		pointer to a sym structure
  *		int	i		loop counter
  *		int	j		loop counter
- *		int	c		string character value
- *		int	narea		number of code areas
- *		char *	ptr		string pointer
+ *		int	narea		number of areas
+ *		int	nbank		number of banks
  *		int	nglob		number of global symbols
+ *		int	nmode		number of merge modes
+ *		char *	ptr		string pointer
  *		int	rn		symbol reference number
  *
  *	global variables:
  *		area *	areap		pointer to an area structure
+ *		bank *	bankp		pointer to a  bank structure
  *		int	hilo		byte order
+ *		mode *	modep[]		array of pointers to the merge mode structures
  *		char	module[]	module name string
- *		sym * symhash[]		array of pointers to NHASH
+ *		sym *	symhash[]	array of pointers to NHASH
  *					linked symbol lists
  *		int	xflag		-x, listing radix flag
  *
  *	functions called:
  *		int	fprintf()	c_library
  *		VOID	outarea()	asout.c
+ *		VOID	outbank()	asout.c
+ *		VOID	outmode()	asout.c
  *		VOID	outsym()	asout.c
  *
  *	side effects:
@@ -768,10 +1126,11 @@ VOID
 outgsd()
 {
 	register struct area *ap;
+	register struct bank *bp;
 	register struct sym  *sp;
 	register int i, j;
 	char *ptr;
-	int narea, nglob, rn;
+	int narea, nglob, nbank, nmode, rn;
 
 	/*
 	 * Number of areas
@@ -786,25 +1145,40 @@ outgsd()
 		sp = symhash[i];
 		while (sp) {
 			if (sp->s_flag&S_GBL)
-				++nglob;
+				nglob += 1;
 			sp = sp->s_sp;
 		}
 	}
 
 	/*
-	 * Output Radix and number of areas and symbols
+	 * Banks.
+	 */
+	nbank = bankp->b_ref + 1;
+
+	/*
+	 * Modes
+	 */
+	nmode = 0;
+	for (i=0; i<16; i++) {
+		if (modep[i] != NULL) {
+			nmode += 1;
+		}
+	}
+
+	/*
+	 * Output Radix and number of  areas and symbols
 	 */
 	if (xflag == 0) {
 		fprintf(ofp, "X%c%d\n", hilo ? 'H' : 'L', a_bytes);
-		fprintf(ofp, "H %X areas %X global symbols\n", narea, nglob);
+		fprintf(ofp, "H %X areas %X global symbols %X banks %X modes\n", narea, nglob, nbank, nmode);
 	} else
 	if (xflag == 1) {
 		fprintf(ofp, "Q%c%d\n", hilo ? 'H' : 'L', a_bytes);
-		fprintf(ofp, "H %o areas %o global symbols\n", narea, nglob);
+		fprintf(ofp, "H %o areas %o global symbols %o banks %o modes\n", narea, nglob, nbank, nmode);
 	} else
 	if (xflag == 2) {
 		fprintf(ofp, "D%c%d\n", hilo ? 'H' : 'L', a_bytes);
-		fprintf(ofp, "H %u areas %u global symbols\n", narea, nglob);
+		fprintf(ofp, "H %u areas %u global symbols %u banks %u modes\n", narea, nglob, nbank, nmode);
 	}		
 
 	/*
@@ -814,6 +1188,23 @@ outgsd()
 		fprintf(ofp, "M ");
 		ptr = &module[0];
 		fprintf(ofp, "%s\n", ptr);
+	}
+
+	/*
+	 * Modes
+	 */
+	for (i=0; i<nmode; i++) {
+		outmode(i, modep[i]);
+	}
+
+	/*
+	 * Banks.
+	 */
+	for (i=0; i<nbank; ++i) {
+		bp = bankp;
+		while (bp->b_ref != i)
+			bp = bp->b_bp;
+		outbank(bp);
 	}
 
 	/*
@@ -852,16 +1243,115 @@ outgsd()
 	}
 }
 
+/*)Function	VOID	outmode(index, mp)
+ *
+ *		int index		merge mode number (0 - 15)
+ *		struct mode *mp		pointer to a merge mode structure
+ *
+ *	The function outmode() outputs the G line to the .REL
+ *	file.  The G line contains the merge mode definition.
+ *
+ *	local variables:
+ *		char *	p		pointer to bit definition
+ *		int	i		loop counter
+ *		int	lines		number of data lines per G specification
+ *
+ *	global variables:
+ *		int	a_bytes		T line addressing width
+ *		FILE *	ofp		relocation output file handle
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *		void	out()		.REL file data format processor
+ *
+ *	side effects:
+ *		The G line is sent to the .REL file.
+ */
+
+VOID
+outmode(index, mp)
+register int index;
+register struct mode *mp;
+{
+	char *p;
+	int i, lines;
+
+	p = &mp->m_def[0];
+	lines = (a_bytes > 2) ? 2 : 1;
+
+	for (i=0; i<lines; i++) {
+		if (xflag == 0) {
+			fprintf(ofp, "G %02X %02X", index, i*16);
+		} else
+		if (xflag == 1) {
+			fprintf(ofp, "G %03o %03o", index, i*16);
+		} else
+		if (xflag == 2) {
+			fprintf(ofp, "G %03u %03u", index, i*16);
+		}		
+		out(p + i*16, 16);
+		fprintf(ofp, "\n");
+	}
+}
+
+/*)Function	VOID	outbank(bp)
+ *
+ *		bank *	bp		pointer to a bank structure
+ *
+ *	The function outbank()	outputs the B line to the .REL
+ *	file.  The B line contains the bank's name, base, size,
+ *	map, flags, and file suffix.
+ *
+ *	local variables:
+ *		char *	ptr		pointer to bank id string
+ *
+ *	global variables:
+ *		FILE *	ofp		relocation output file handle
+ *		int	xflag		-x, listing radix flag
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *
+ *	side effects:
+ *		The B line is sent to the .REL file.
+ */
+
+VOID
+outbank(bp)
+register struct bank *bp;
+{
+	fprintf(ofp, "B ");
+	fprintf(ofp, "%s", &bp->b_id[0]);
+	if (xflag == 0) {
+		fprintf(ofp, " base %X size %X map %X flags %X",
+			bp->b_base & a_mask, bp->b_size & a_mask, bp->b_map, bp->b_flag);
+	} else
+	if (xflag == 1) {
+		fprintf(ofp, " base %o size %o map %o flags %o",
+			bp->b_base & a_mask, bp->b_size & a_mask, bp->b_map, bp->b_flag);
+	} else
+	if (xflag == 2) {
+		fprintf(ofp, " base %u size %u map %u flags %u",
+			bp->b_base & a_mask, bp->b_size & a_mask, bp->b_map, bp->b_flag);
+	}
+	if ((bp->b_fsfx != NULL) && *bp->b_fsfx) {
+		fprintf(ofp, " fsfx %s\n", bp->b_fsfx);
+	} else {
+		fprintf(ofp, "\n");
+	}
+}
+
 /*)Function	VOID	outarea(ap)
  *
  *		area *	ap		pointer to an area structure
  *
  *	The function outarea()	outputs the A line to the .REL
- *	file.  The A line contains the area's name, size, and
- *	attributes.
+ *	file.  The A line contains the area's name, bank, size,
+ *	and attributes.
  *
  *	local variables:
- *		char *	ptr		pointer to area id string
+ *		int	a_flag		local area flags
+ *		bank *	bp		pointer to bank structure
  *
  *	global variables:
  *		FILE *	ofp		relocation output file handle
@@ -872,25 +1362,54 @@ outgsd()
  *
  *	side effects:
  *		The A line is sent to the .REL file.
+ *
+ *		If the area attributes are not fully defined
+ *		then default attributes are specified.
  */
 
 VOID
 outarea(ap)
 register struct area *ap;
 {
-	register char *ptr;
+	register int a_flag;
+	register struct bank *bp;
+
+	a_flag = ap->a_flag;
+	switch(a_flag & (A_ABS | A_OVR)) {
+	case A_CON:	a_flag |= (A_REL | A_CON);	break;
+	case A_OVR:	a_flag |= (A_ABS | A_OVR);	break;
+	case A_REL:	a_flag |= (A_REL | A_CON);	break;
+	case A_ABS:	a_flag |= (A_ABS | A_OVR);	break;
+	default:	a_flag |= (A_REL | A_CON);	break;
+	}
 
 	fprintf(ofp, "A ");
-	ptr = &ap->a_id[0];
-	fprintf(ofp, "%s", ptr);
+	fprintf(ofp, "%s", &ap->a_id[0]);
 	if (xflag == 0) {
-		fprintf(ofp, " size %X flags %X\n", ap->a_size, ap->a_flag);
+		fprintf(ofp, " size %X flags %X",
+			ap->a_size & a_mask, a_flag);
 	} else
 	if (xflag == 1) {
-		fprintf(ofp, " size %o flags %o\n", ap->a_size, ap->a_flag);
+		fprintf(ofp, " size %o flags %o",
+			ap->a_size & a_mask, a_flag);
 	} else
 	if (xflag == 2) {
-		fprintf(ofp, " size %u flags %u\n", ap->a_size, ap->a_flag);
+		fprintf(ofp, " size %u flags %u",
+			ap->a_size & a_mask, a_flag);
+	}
+	bp = ap->b_bp;
+	if (((ap->a_flag & A_BNK) == A_BNK) && (bp != NULL)) {
+		if (xflag == 0) {
+			fprintf(ofp, " bank %X\n", bp->b_ref);
+		} else
+		if (xflag == 1) {
+			fprintf(ofp, " bank %o\n", bp->b_ref);
+		} else
+		if (xflag == 2) {
+			fprintf(ofp, " bank %u\n", bp->b_ref);
+		}
+	} else {
+		fprintf(ofp, "\n");
 	}
 }
 
@@ -922,7 +1441,7 @@ VOID
 outsym(sp)
 register struct sym *sp;
 {
-	register char *frmt, *ptr;
+	register char *frmt;
 	register int s_addr;
 
 	/*
@@ -931,8 +1450,7 @@ register struct sym *sp;
 	s_addr = sp->s_addr & a_mask;
 
 	fprintf(ofp, "S ");
-	ptr = &sp->s_id[0];	/* JLH */
-	fprintf(ofp, "%s", ptr);
+	fprintf(ofp, "%s", &sp->s_id[0]);
 	fprintf(ofp, " %s", sp->s_type==S_NEW ? "Ref" : "Def");
 	switch(xflag) {
 	default:
@@ -1098,7 +1616,6 @@ register int v, t;
  *
  *	functions called:
  *		VOID	out_lb()	asout.c
- *		VOID	out_lw()	asout.c
  *
  *	side effects:
  *		i list bytes are processed.
@@ -1129,7 +1646,7 @@ register int i, v, t;
  *	data word as two bytes ordered according to hilo.
  *
  *	local variables:
- *		int *	relp		pointer to rel array
+ *		char *	relp		pointer to rel array
  *
  *	global variables:
  *		int	hilo		byte order
@@ -1164,7 +1681,7 @@ register int v;
  *	as a_bytes bytes ordered according to hilo.
  *
  *	local variables:
- *		int *	txtp		pointer to txt array
+ *		char *	txtp		pointer to txt array
  *
  *	global variables:
  *		int	hilo		byte order
@@ -1247,180 +1764,4 @@ int v;
 	return ((v>>24)&0377);
 }
 
-/*)Function	VOID	outr11(esp, op)
- *
- *		expr *	esp		pointer to expr structure
- *		int	op		opcode
- *
- *	The function outr11() processes a word of generated code
- *	in either absolute or relocatable format dependent upon
- *	the data contained in the expr structure esp.  If the
- *	.REL output is enabled then the appropriate information
- *	is loaded into the txt and rel buffers.  The code is output
- *	in a special format to the linker to allow relocation and
- *	merging of the opcode and an 11 bit paged address as required
- *	by the 8051 architecture.
- *
- *	This function based on code by
- *
- *		John L. Hartman
- *		jhartman@compuserve.com
- *
- *	local variables:
- *		int	n		symbol/area reference number
- *		int	r		relocation mode
- *
- *	global variables:
- *		sym	dot		defined as sym[0]
- *		int	oflag		-o, generate relocatable output flag
- *		int	pass		assembler pass number
- *		int *	relp		pointer to rel array
- *		int *	txtp		pointer to txt array
- *		
- *	functions called:
- *		VOID	outchk()	asout.c
- *		VOID	out_rw()	asout.c
- *		VOID	out_txb()	asout.c
- *
- *	side effects:
- *		The current assembly address is incremented by 2.
- */
-
-VOID
-outr11(esp, op)
-register struct expr *esp;
-int op;
-{
-	register int n, r;
-
-	if (pass == 2) {
-		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
-			/*
-			 * Absolute Destination
-			 *
-			 * Use the global symbol '.__.ABS.'
-			 * of value zero and force the assembler
-			 * to use this absolute constant as the
-			 * base value for the relocation.
-			 */
-			esp->e_flag = 1;
-			esp->e_base.e_sp = &sym[1];
-		}
-		/*
-		 * Relocatable Destination.  Build THREE
-		 * byte output: relocatable word, followed
-		 * by op-code.  Linker will combine them.
-		 */
-		r = R_J11 | esp->e_rlcf;
-		n = ((esp->e_addr & 0x0700) >> 3) | (op & 0x1F);
-		n = (n << 8) | (esp->e_addr & 0xFF);
-		out_lxb(2,n,r|R_RELOC);
-		if (oflag) {
-			outchk(a_bytes+1, 4);
-			out_txb(a_bytes,esp->e_addr);
-			*txtp++ = op;
-
-			if (esp->e_flag) {
-				n = esp->e_base.e_sp->s_ref;
-				r |= R_SYM;
-			} else {
-				n = esp->e_base.e_ap->a_ref;
-			}
-			*relp++ = r;
-			*relp++ = txtp - txt - (a_bytes + 1);
-			out_rw(n);
-		}
-	}
-	dot.s_addr += 2;
-}
-
-/*)Function	VOID	outr19(esp, op)
- *
- *		expr *	esp		pointer to expr structure
- *		int	op		opcode
- *
- *	The function outr19() processes 3 bytes of generated code
- *	in either absolute or relocatable format dependent upon
- *	the data contained in the expr structure esp.  If the
- *	.REL output is enabled then the appropriate information
- *	is loaded into the txt and rel buffers.  The code is output
- *	in a special format to the linker to allow relocation and
- *	merging of the opcode and a 19 bit paged address as required
- *	by the DS80C390 architecture.
- *
- *	This function based on code by
- *
- *		Bill McKinnon (BM)
- *		w_mckinnon@conknet.com
- *
- *		John L. Hartman
- *		jhartman@compuserve.com
- *
- *	local variables:
- *		int	n		symbol/area reference number
- *		int	r		relocation mode
- *
- *	global variables:
- *		sym	dot		defined as sym[0]
- *		int	oflag		-o, generate relocatable output flag
- *		int	pass		assembler pass number
- *		int *	relp		pointer to rel array
- *		int *	txtp		pointer to txt array
- *		
- *	functions called:
- *		VOID	outchk()	asout.c
- *		VOID	out_rw()	asout.c
- *		VOID	out_txb()	asout.c
- *
- *	side effects:
- *		The current assembly address is incremented by 3.
- */
-
-VOID
-outr19(esp, op)
-register struct expr *esp;
-int op;
-{
-	register int n, r;
-
-	if (pass == 2) {
-		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
-			/*
-			 * Absolute Destination
-			 *
-			 * Use the global symbol '.__.ABS.'
-			 * of value zero and force the assembler
-			 * to use this absolute constant as the
-			 * base value for the relocation.
-			 */
-			esp->e_flag = 1;
-			esp->e_base.e_sp = &sym[1];
-		}
-		/*
-		 * Relocatable Destination.  Build THREE
-		 * byte output: relocatable word, followed
-		 * by op-code.  Linker will combine them.
-		 */
-		r = R_J19 | esp->e_rlcf;
-		n = ((esp->e_addr & 0x070000) >> 11) | (op & 0x1F);
-		n = (n << 16) | (esp->e_addr & 0xFFFF);
-		out_lxb(3,n,r|R_RELOC);
-		if (oflag) {
-			outchk(a_bytes+1, 4);
-			out_txb(a_bytes,esp->e_addr);
-			*txtp++ = op;
-
-			if (esp->e_flag) {
-				n = esp->e_base.e_sp->s_ref;
-				r |= R_SYM;
-			} else {
-				n = esp->e_base.e_ap->a_ref;
-			}
-			*relp++ = r;
-			*relp++ = txtp - txt - (a_bytes + 1);
-			out_rw(n);
-		}
-	}
-	dot.s_addr += 3;
-}
 

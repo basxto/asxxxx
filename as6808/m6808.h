@@ -1,7 +1,7 @@
 /* m6808.h */
 
 /*
- * (C) Copyright 1993-2002
+ * (C) Copyright 1993-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -21,6 +21,7 @@
 		M08ADR.C
 		M08PST.C
 		ASMAIN.C
+		ASDBG.C
 		ASLEX.C
 		ASSYM.C
 		ASSUBR.C

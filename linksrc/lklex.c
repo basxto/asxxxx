@@ -1,7 +1,7 @@
 /* lklex.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -25,7 +25,8 @@
  *	The module lklex.c contains the general lexical analysis
  *	functions used to scan the text lines from the .rel files.
  *
- *	lklex.c contains the fllowing functions:
+ *	lklex.c contains the following functions:
+ *		VOID	chopcrlf()
  *		char	endline()
  *		int	get()
  *		VOID	getfid()
@@ -370,9 +371,9 @@ int d;
  *	.rst file as each .rel file is processed.
  *
  *	local variables:
- *		int	i		string length
  *		int	ftype		file type
  *		char *	fid		file name
+ *		char *	p		temporary string pointer
  *
  *	global variables:
  *		lfile	*cfp		The pointer *cfp points to the
@@ -396,13 +397,13 @@ int d;
  *		int	uflag		update listing flag
  *
  *	called functions:
+ *		VOID	chopcrlf()	lklex.c
  *		FILE *	afile()		lkmain.c
  *		int	fclose()	c_library
  *		char *	fgets()		c_library
  *		int	fprintf()	c_library
  *		VOID	lkulist()	lklist.c
  *		VOID	lkexit()	lkmain.c
- *		int	strlen()	c_library
  *
  *	side effects:
  *		The input stream is scanned.  The .rel files will be
@@ -412,13 +413,13 @@ int d;
 int
 getline()
 {
-	register int i, ftype;
+	register int ftype;
 	register char *fid;
 
 loop:	if (cfp && cfp->f_type == F_STD)
 		fprintf(stdout, "ASlink >> ");
 
-	if (sfp == NULL || fgets(ib, sizeof(ib)-2, sfp) == NULL) {
+	if (sfp == NULL || fgets(ib, sizeof(ib), sfp) == NULL) {
 		obj_flag = 0;
 		if (sfp) {
 			if(sfp != stdin) {
@@ -444,14 +445,23 @@ loop:	if (cfp && cfp->f_type == F_STD)
 			if (ftype == F_REL) {
 				obj_flag = cfp->f_obj;
 				sfp = afile(fid, "", 0);
-				if (uflag && (obj_flag == 0) && pass != 0) {
-				 if ((tfp = afile(fid, "lst", 0)) != NULL) {
-				  if ((rfp = afile(fid, "rst", 1)) == NULL) {
+				if (sfp && (obj_flag == 0)) {
+				  if (uflag && (pass != 0)) {
+				    if ((tfp = afile(fid, "lst", 0)) != NULL) {
+				      if ((rfp = afile(fid, "rst", 1)) == NULL) {
 					fclose(tfp);
 					tfp = NULL;
+				      }
+				    }
 				  }
-				 }
 				}
+
+#if SDCDB
+				if (sfp && (pass == 0)) {
+				  SDCDBcopy(fid);
+				}
+#endif
+
 				gline = 1;
 			} else {
 				fprintf(stderr, "Invalid file type\n");
@@ -466,9 +476,7 @@ loop:	if (cfp && cfp->f_type == F_STD)
 			return(0);
 		}
 	}
-	i = strlen(ib) - 1;
-	if (ib[i] == '\n')
-		ib[i] = 0;
+	chopcrlf(ib);
 	return (1);
 }
 
@@ -535,3 +543,41 @@ endline()
 	c = getnb();
 	return( (c == '\0' || c == ';') ? 0 : c );
 }
+
+/*)Function	VOID	chopcrlf(str)
+ *
+ *		char	*str		string to chop
+ *
+ *	The function chop_crlf() removes
+ *	LF, CR, LF/CR, or CR/LF from str.
+ *
+ *	local variables:
+ *		char *	p		temporary string pointer
+ *		char	c		temporary character
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		All CR and LF characters removed.
+ */
+
+VOID
+chopcrlf(str)
+char *str;
+{
+	register char *p;
+	register char c;
+
+	p = str;
+	do {
+		c = *p++ = *str++;
+		if ((c == '\r') || (c == '\n')) {
+			p--;
+		}
+	} while (c != 0);
+}
+

@@ -1,7 +1,7 @@
 /* lkdata.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -32,6 +32,12 @@
  */
 
 /*
+ * Internal ASxxxx Version Variable
+ */
+int	ASxxxx_VERSION;
+
+
+/*
  *	Definitions for all Global Variables
  */
 
@@ -53,6 +59,17 @@ int	oflag;		/*	Output file type flag
 			 */
 int	objflg;		/*	Linked file/library object output flag
 			 */
+
+#if NOICE
+int	jflag;		/*	NoICE output flag
+			 */
+#endif
+
+#if SDCDB
+int	yflag;		/*	SDCDB output flag
+			 */
+#endif
+
 int	mflag;		/*	Map output flag
 			 */
 int	xflag;		/*	Map file radix type flag
@@ -77,6 +94,10 @@ int	lop;		/*	current line number on page
 			 */
 int	pass;		/*	linker pass number
 			 */
+a_uint	pc;		/*	current relocation address
+			 */
+int	pcb;		/*	current bytes per pc word
+			 */
 int	rtcnt;		/*	count of elements in the
 			 *	rtval[] and rtflg[] arrays
 			 */
@@ -85,9 +106,14 @@ a_uint	rtval[NTXT];	/*	data associated with relocation
 int	rtflg[NTXT];	/*	indicates if rtval[] value is
 			 *	to be sent to the output file.
 			 */
+int	rterr[NTXT];	/*	indicates if rtval[] value should
+			 *	be flagged as a relocation error.
+			 */
 char	rtbuf[NMAX];	/*	S19/IHX output buffer
 			 */
-int	rtaflg = 1;	/*	rtbuf[] processing
+struct	bank * rtabnk;	/*	rtbuf[] processing
+			 */
+int	rtaflg;		/*	rtbuf[] processing
 			 */
 a_uint	rtadr0 = 0;	/*
 			 */
@@ -148,7 +174,7 @@ struct	lfile	*filep;	/*	The pointers (lfile *) filep,
 struct	lfile	*cfp;	/*	The pointer *cfp points to the
 			 *	current lfile structure
 			 */
-struct	lfile	*startp;/*	asmlnk startup file structure
+struct	lfile	*startp;/*	aslink startup file structure
 			 */
 struct	lfile	*linkp;	/*	pointer to first lfile structure
 			 *	containing an input REL file
@@ -157,47 +183,66 @@ struct	lfile	*linkp;	/*	pointer to first lfile structure
 struct	lfile	*lfp;	/*	pointer to current lfile structure
 			 *	being processed by parse()
 			 */
-FILE	*ofp;		/*	Output file handle
+FILE	*ofp = NULL;	/*	Output file handle
 			 *	for word formats
 			 */
-FILE	*mfp;		/*	Map output file handle
+
+#if NOICE
+FILE	*jfp = NULL;	/*	NoICE output file handle
 			 */
-FILE	*rfp;		/*	File handle for output
+#endif
+
+#if SDCDB
+FILE	*yfp = NULL;	/*	SDCDB output file handle
+			 */
+#endif
+
+FILE	*mfp = NULL;	/*	Map output file handle
+			 */
+FILE	*rfp = NULL;	/*	File handle for output
 			 *	address relocated ASxxxx
 			 *	listing file
 			 */
-FILE	*sfp;		/*	The file handle sfp points to the
+FILE	*sfp = NULL;	/*	The file handle sfp points to the
 			 *	currently open file
 			 */
-FILE	*tfp;		/*	File handle for input
+FILE	*tfp = NULL;	/*	File handle for input
 			 *	ASxxxx listing file
 			 */
 
 /*
- *	The structures of head, area, areax, and sym are created
- *	as the REL files are read during the first pass of the
- *	linker.  The struct head is created upon encountering a
- *	H directive in the REL file.  The structure contains a
- *	link to a link file structure (struct lfile) which describes
- *	the file containing the H directive, the number of data/code
- *	areas contained in this header segment, the number of
+ *	The structures of head, bank, area, areax, and sym
+ *	are created as the REL files are read during the first
+ *	pass of the linker.  The struct head is created upon
+ *	encountering a H directive in the REL file.  The
+ *	structure contains a link to a link file structure
+ *	(struct lfile) which describes the file containing the H
+ *	directive, a pointer to an array of merge mode
+ *	definition pointers, the number of data/code areas
+ *	contained in this header segment, the number of
  *	symbols referenced/defined in this header segment, a pointer
  *	to an array of pointers to areax structures (struct areax)
- *	created as each A directive is read, and a pointer to an
+ *	created as each A directive is read, a pointer to an
  *	array of pointers to symbol structures (struct sym) for
- *	all referenced/defined symbols.  As H directives are read
+ *	all referenced/defined symbols and a pointer to an array
+ *	of pointers to bank structures (struct bank) referenced
+ *	by this module.  As H directives are read
  *	from the REL files a linked list of head structures is
  *	created by placing a link to the new head structure
  *	in the previous head structure.
  *
  *	struct	head
  *	{
- *		struct	head   *h_hp;		Header link
- *		struct	lfile  *h_lfile;	Associated file
+ *		struct	head  *h_hp;		Header link
+ *		struct	lfile *h_lfile;		Associated file
  *		int	h_narea;		# of areas
  *		struct	areax **a_list;		Area list
- *		int	h_nglob;		# of global symbols
- *		struct	sym   **s_list;		Global symbol list
+ *		int	h_nsym;			# of symbols
+ *		struct	sym   **s_list;		Symbol list
+ *		int	h_nbank;		# of banks
+ *		struct	bank  **b_list;		Bank list
+ *		int	h_nmode;		# of modes
+ *		struct	mode  **m_list;		Mode list
  *		char *	m_id;			Module name
  *	};
  */
@@ -209,6 +254,47 @@ struct	head	*hp;	/*	Pointer to the current
 			 */
 
 /*
+ *	The bank structure contains the parameter values for a
+ *	specific program or data bank.  The bank structure
+ *	is a linked list of banks.  The initial default bank
+ *	is unnamed and is defined in lkdata.c, the next bank structure
+ *	will be linked to this structure through the structure
+ *	element 'struct bank *b_bp'.  The structure contains the
+ *	bank name, the bank base address (default = 0)
+ *	the bank size, (default = 0, whole addressing space)
+ *	and the file name suffix. (default is none)  These optional
+ *	parameters are from  the .bank assembler directive.
+ *	The bank structure also contains the bank data output
+ *	file specificatiion, file handle pointer and the
+ *	bank first output flag.
+ *
+ *	struct	bank
+ *	{
+ *		struct	bank *b_bp;	Bank link
+ *		char *	b_id;		Bank Name
+ *		char *	b_fsfx;		Bank File Suffix
+ *		a_uint	b_base;		Bank base address
+ *		a_uint	b_size;		Bank size
+ *		a_uint	b_map		Bank mapping
+ *		int	b_flag;		Bank flags
+ *		char *	b_fspec;	Bank File Specification
+ *		FILE *	b_ofp;		Bank File Handle
+ *		int	b_rtaflg	Bank First Output flag
+ *	};
+ */
+struct	bank	bank[1] = {
+    {	NULL,	"",	"",	0,	0,	0,	0,	"",	NULL,	1	}
+};
+
+struct	bank	*bankp = &bank[0];
+			/*	The pointer to the first
+			 *	bank structure
+			 */
+struct	bank	*bp;	/*	Pointer to the current
+			 *	bank structure
+			 */
+
+/*
  *	A structure area is created for each 'unique' data/code
  *	area definition found as the REL files are read.  The
  *	struct area contains the name of the area, a flag byte
@@ -216,6 +302,9 @@ struct	head	*hp;	/*	Pointer to the current
  *	the area base address set flag byte (-b option), and the
  *	area base address and total size which will be filled
  *	in at the end of the first pass through the REL files.
+ *	The area structure also contains a link to the bank
+ *	this area is a part of and a data output file handle
+ *	pointer which is loaded from from the bank structure.
  *	As A directives are read from the REL files a linked
  *	list of unique area structures is created by placing a
  *	link to the new area structure in the previous area structure.
@@ -224,6 +313,8 @@ struct	head	*hp;	/*	Pointer to the current
  *	{
  *		struct	area	*a_ap;		Area link
  *		struct	areax	*a_axp;		Area extension link
+ *		struct	bank	*a_bp;		Bank link
+ *		FILE *	a_ofp;			Area File Handle
  *		a_uint	a_addr;			Beginning address of area
  *		a_uint	a_size;			Total size of the area
  *		char	a_bset;			Area base address set
@@ -359,7 +450,7 @@ struct	sdp	sdp;	/* Base Page Structure */
  *		int	aindex;		Linking area
  *		int	mode;		Relocation mode
  *		a_uint	rtbase;		Base address in section
- *		int	rindex;		Area/Symbol reloaction index
+ *		int	rindex;		Area/Symbol relocation index
  *		a_uint	rval;		Area/Symbol offset value
  *	};
  */

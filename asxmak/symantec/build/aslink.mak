@@ -10,7 +10,7 @@ DEBUG		= 0
 NDEBUG		= 1
 !ENDIF
 
-PROJ		= ASLINK
+PROJ		= aslink
 APPTYPE		= DOSX EXE
 PROJTYPE	= EXE
 
@@ -24,8 +24,8 @@ DISASM		= OBJ2ASM
 LNK		= LINK
 DLLS		= 
 
-HEADERS		= F:\SC\INCLUDE\stdio.h F:\SC\INCLUDE\string.h F:\SC\INCLUDE\alloc.h  \
-		F:\SC\INCLUDE\stdlib.h ..\..\..\LINKSRC\aslink.h 
+HEADERS		= C:\SC\INCLUDE\stdio.h C:\SC\INCLUDE\string.h C:\SC\INCLUDE\alloc.h  \
+		C:\SC\INCLUDE\stdlib.h ..\..\..\LINKSRC\aslink.h C:\SC\INCLUDE\setjmp.h 
 
 DEFFILE		= aslink.DEF
 
@@ -41,14 +41,14 @@ CFLAGS		=  -mx -C -S -3 -a4 -c -g -gd
 LFLAGS		=  /CO /DE /XN
 DEFINES		= 
 !ELSE
-OUTPUTDIR	= c:\asxxxx\asxmak\symantec\build
-!IF EXIST (c:\asxxxx\asxmak\symantec\build)
+OUTPUTDIR	= r:\asxv4pxx\asxmak\symantec\build
+!IF EXIST (r:\asxv4pxx\asxmak\symantec\build)
 CREATEOUTPUTDIR	=
 !ELSE
 CREATEOUTPUTDIR	= if not exist $(OUTPUTDIR)\*.* md $(OUTPUTDIR)
 !ENDIF
-TARGETDIR	= c:\asxxxx\asxmak\symantec\exe
-!IF EXIST (c:\asxxxx\asxmak\symantec\exe)
+TARGETDIR	= r:\asxv4pxx\asxmak\symantec\exe
+!IF EXIST (r:\asxv4pxx\asxmak\symantec\exe)
 CREATETARGETDIR	=
 !ELSE
 CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
@@ -57,7 +57,7 @@ CREATETARGETDIR	= if not exist $(TARGETDIR)\*.* md $(TARGETDIR)
 LIBS		= 
 
 CFLAGS		=  -A -r -J -mx -o+time -3 -a4 -c 
-LFLAGS		=  /DE /PACKF /XN
+LFLAGS		=  /NOI /DE /PACKF /XN
 DEFINES		= 
 !ENDIF
 
@@ -75,13 +75,15 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -Ic:\asxxxx\linksrc
+INCLUDES	= 
 
 INCLUDEDOBJS	= 
 
-OBJS		=  $(OUTPUTDIR)\LKAREA.OBJ  $(OUTPUTDIR)\LKDATA.OBJ  $(OUTPUTDIR)\LKEVAL.OBJ  \
-		 $(OUTPUTDIR)\LKHEAD.OBJ  $(OUTPUTDIR)\LKLEX.OBJ  $(OUTPUTDIR)\LKLIBR.OBJ  $(OUTPUTDIR)\LKLIST.OBJ  \
-		 $(OUTPUTDIR)\LKMAIN.OBJ  $(OUTPUTDIR)\LKRLOC.OBJ  $(OUTPUTDIR)\LKSYM.OBJ  $(OUTPUTDIR)\lkout.OBJ 
+OBJS		=  $(OUTPUTDIR)\lkarea.OBJ  $(OUTPUTDIR)\lkbank.OBJ  $(OUTPUTDIR)\lkdata.OBJ  \
+		 $(OUTPUTDIR)\lkeval.OBJ  $(OUTPUTDIR)\lkhead.OBJ  $(OUTPUTDIR)\lklex.OBJ  $(OUTPUTDIR)\lklibr.OBJ  \
+		 $(OUTPUTDIR)\lklist.OBJ  $(OUTPUTDIR)\lkmain.OBJ  $(OUTPUTDIR)\lknoice.OBJ  $(OUTPUTDIR)\lkout.OBJ  \
+		 $(OUTPUTDIR)\lkrloc.OBJ  $(OUTPUTDIR)\lksdcdb.OBJ  $(OUTPUTDIR)\lksym.OBJ  $(OUTPUTDIR)\lkrloc3.OBJ  \
+		 $(OUTPUTDIR)\lkrloc4.OBJ 
 
 RCFILES		= 
 
@@ -185,7 +187,7 @@ clean:
 		-del $(TARGETDIR)\$$SCW$$.$(PROJTYPE)
 		-del $(TARGETDIR)\$(PROJ).CLE
 		-del $(OUTPUTDIR)\SCPH.SYM
-		-del ASLINK.dpd
+		-del aslink.dpd
 		-del $(OBJS)
 
 cleanres:
@@ -201,64 +203,89 @@ link:
 
 
 
-!IF EXIST (ASLINK.dpd)
-!INCLUDE ASLINK.dpd
+!IF EXIST (aslink.dpd)
+!INCLUDE aslink.dpd
 !ENDIF
 
 
 
-$(OUTPUTDIR)\LKAREA.OBJ:	..\..\..\LINKSRC\LKAREA.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\LKAREA.obj ..\..\..\LINKSRC\LKAREA.C
+$(OUTPUTDIR)\lkarea.OBJ:	..\..\..\LINKSRC\lkarea.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lkarea.obj ..\..\..\LINKSRC\lkarea.c
 
 
 
-$(OUTPUTDIR)\LKDATA.OBJ:	..\..\..\LINKSRC\LKDATA.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\LKDATA.obj ..\..\..\LINKSRC\LKDATA.C
+$(OUTPUTDIR)\lkbank.OBJ:	..\..\..\LINKSRC\lkbank.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lkbank.obj ..\..\..\LINKSRC\lkbank.c
 
 
 
-$(OUTPUTDIR)\LKEVAL.OBJ:	..\..\..\LINKSRC\LKEVAL.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\LKEVAL.obj ..\..\..\LINKSRC\LKEVAL.C
+$(OUTPUTDIR)\lkdata.OBJ:	..\..\..\LINKSRC\lkdata.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lkdata.obj ..\..\..\LINKSRC\lkdata.c
 
 
 
-$(OUTPUTDIR)\LKHEAD.OBJ:	..\..\..\LINKSRC\LKHEAD.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\LKHEAD.obj ..\..\..\LINKSRC\LKHEAD.C
+$(OUTPUTDIR)\lkeval.OBJ:	..\..\..\LINKSRC\lkeval.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lkeval.obj ..\..\..\LINKSRC\lkeval.c
 
 
 
-$(OUTPUTDIR)\LKLEX.OBJ:	..\..\..\LINKSRC\LKLEX.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\LKLEX.obj ..\..\..\LINKSRC\LKLEX.C
+$(OUTPUTDIR)\lkhead.OBJ:	..\..\..\LINKSRC\lkhead.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lkhead.obj ..\..\..\LINKSRC\lkhead.c
 
 
 
-$(OUTPUTDIR)\LKLIBR.OBJ:	..\..\..\LINKSRC\LKLIBR.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\LKLIBR.obj ..\..\..\LINKSRC\LKLIBR.C
+$(OUTPUTDIR)\lklex.OBJ:	..\..\..\LINKSRC\lklex.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lklex.obj ..\..\..\LINKSRC\lklex.c
 
 
 
-$(OUTPUTDIR)\LKLIST.OBJ:	..\..\..\LINKSRC\LKLIST.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\LKLIST.obj ..\..\..\LINKSRC\LKLIST.C
+$(OUTPUTDIR)\lklibr.OBJ:	..\..\..\LINKSRC\lklibr.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lklibr.obj ..\..\..\LINKSRC\lklibr.c
 
 
 
-$(OUTPUTDIR)\LKMAIN.OBJ:	..\..\..\LINKSRC\LKMAIN.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\LKMAIN.obj ..\..\..\LINKSRC\LKMAIN.C
+$(OUTPUTDIR)\lklist.OBJ:	..\..\..\LINKSRC\lklist.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lklist.obj ..\..\..\LINKSRC\lklist.c
 
 
 
-$(OUTPUTDIR)\LKRLOC.OBJ:	..\..\..\LINKSRC\LKRLOC.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\LKRLOC.obj ..\..\..\LINKSRC\LKRLOC.C
+$(OUTPUTDIR)\lkmain.OBJ:	..\..\..\LINKSRC\lkmain.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lkmain.obj ..\..\..\LINKSRC\lkmain.c
 
 
 
-$(OUTPUTDIR)\LKSYM.OBJ:	..\..\..\LINKSRC\LKSYM.C
-		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\LKSYM.obj ..\..\..\LINKSRC\LKSYM.C
+$(OUTPUTDIR)\lknoice.OBJ:	..\..\..\LINKSRC\lknoice.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lknoice.obj ..\..\..\LINKSRC\lknoice.c
 
 
 
 $(OUTPUTDIR)\lkout.OBJ:	..\..\..\LINKSRC\lkout.c
 		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lkout.obj ..\..\..\LINKSRC\lkout.c
+
+
+
+$(OUTPUTDIR)\lkrloc.OBJ:	..\..\..\LINKSRC\lkrloc.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lkrloc.obj ..\..\..\LINKSRC\lkrloc.c
+
+
+
+$(OUTPUTDIR)\lksdcdb.OBJ:	..\..\..\LINKSRC\lksdcdb.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lksdcdb.obj ..\..\..\LINKSRC\lksdcdb.c
+
+
+
+$(OUTPUTDIR)\lksym.OBJ:	..\..\..\LINKSRC\lksym.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lksym.obj ..\..\..\LINKSRC\lksym.c
+
+
+
+$(OUTPUTDIR)\lkrloc3.OBJ:	..\..\..\LINKSRC\lkrloc3.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lkrloc3.obj ..\..\..\LINKSRC\lkrloc3.c
+
+
+
+$(OUTPUTDIR)\lkrloc4.OBJ:	..\..\..\LINKSRC\lkrloc4.c
+		$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$(OUTPUTDIR)\lkrloc4.obj ..\..\..\LINKSRC\lkrloc4.c
 
 
 

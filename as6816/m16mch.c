@@ -1,7 +1,7 @@
 /* M16MCH:C */
 
 /*
- * (C) Copyright 1991-2002
+ * (C) Copyright 1991-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -61,9 +61,9 @@ struct mne *mp;
 			}
 		}
 		if (espa) {
-			outdp(espa, &e1);
+			outdp(espa, &e1, 0);
 		} else {
-			outdp(dot.s_area, &e1);
+			outdp(dot.s_area, &e1, 0);
 		}
 		lmode = SLIST;
 		break;

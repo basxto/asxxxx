@@ -1,86 +1,99 @@
-ASxxxx and ASlink V3.11 January 2002
+ASxxxx and ASlink V4.00 November 2003
 
-    ASxxxx Cross Assemblers, Version 3.11, January 2002. The  ASxxxx
-assemblers are a series of microprocessor assemblers written in the
-C programming language.  This  collection contains cross assemblers
-for the 6800(6802/6808), 6801(hd6303), 6804,  6805,  68HC08,  6809,
-68HC11, 68HC12, 68HC16, 8051, 8085(8080), z80(hd64180), GameBoy(z80),
-H8/3xx, DS8xCxxx and 6500 series microprocessors.  The companion
-program ASLINK is a relocating linker supporting all the cross
-assemblers.  The  assemblers  and  linker  have  been  tested using
-Linux, DJGPP, Cygwin-1.3.x, Sun Solaris (GCC), Symantec C/C++
-V6.1/V7.2,  and VC6 with MS-DOS/Windows 3.x/9x/NT/2000/XP.
-Complete source code  and  documentation  for  the  assemblers
-and linker  is  included  with the distribution.  Additionally,
-test code for each assembler and several  microprocessor  monitors
-(ASSIST05  for  the  6805,  MONDEB and ASSIST09 for the 6809, and
-BUFFALO 2.5 for the 6811) are included as  working  examples  of
-use of these assemblers.  
+   The  ASxxxx  assemblers are a series of microprocessor assem-
+blers written in the C programming  language.   This  collection
+contains  cross  assemblers  for the AVR, PIC, Rabbit 2000/3000,
+DS8xCxxx,   z80(hd64180),    GameBoy(Z80),    MPS430,    H8/3xx,
+6800(6802/6808), 6801(hd6303), 6804, 6805, 68HC08, 6809, 68HC11,
+68HC12, 68HC16, 8051, 8085(8080), 6500,  1802,  740,  and  61860
+series  microprocessors.  The  companion  program  ASLINK  is  a
+relocating linker supporting all the cross assemblers.    ASLINK
+also  supports  object  files  created  with  V3.xx  assemblers.
+The  assemblers  and  linker  have  been  tested  using  Linux,
+DJGPP,  Cygwin,  Symantec  C/C++   V6.1/V7.2,   and   VC6   with
+MS-DOS/Windows  3.x/9x/NT/2000/XP.  Complete source code and do-
+cumentation for the assemblers and linker is included  with  the
+distribution.   Additionally,  test  code for each assembler and
+several microprocessor monitors ( ASSIST05 for the 6805,  MONDEB
+and ASSIST09 for the 6809, and BUFFALO 2.5 for the 6811) are in-
+cluded as working examples of use of these assemblers.  
 
 
-asxv3p11.zip	ASxxxx and ASlink V3.11 Zipped
+asxv4p00.zip	ASxxxx and ASlink V4.00 Zipped
 
 	MS-DOS:
-	Windows:	pkunzip -d asxv3p11.zip
+	DJGPP:		pkunzip -d asxv4p00.zip
 			unzips and restores directory structure
 
-	DJGPP:		unzip32 -L asxv3p11.zip
-			unzips to lower-case names.
-
-	Cygwin:		unzip -L asxv3p11.zip
-			unzips to lower-case names.
-
-	Linux:
-	Solaris:	unzip -L -a asxv3p11.zip
+	Linux:		unzip -L -a asxv4p00.zip
 			unzips to lower-case names and converts ascii
 			files to \n from \r\n form.
 
 
 Exectutables are in directories:
 
-	MS-DOS:		\asxxxx\asxmak\symantec\exe\
+	Linux:		/asxxxx/asxmak/linux/exe/
+
+	Cygwin:		\asxxxx\asxmak\cygwin\exe\
 
 	VC6:		\asxxxx\asxmak\vc6\exe\
 
 	DJGPP:		\asxxxx\asxmak\djgpp\exe\
 
-	Cygwin:		/asxxxx/asxmak/cygwin/exe/
-
-	Linux:		/asxxxx/asxmak/linux/exe/
-
-	Solaris:	/asxxxx/asxmak/solaris/exe/
+	MS-DOS:		\asxxxx\asxmak\symantec\exe\
 
 
 Makefiles or Build command files are in directories:
 
-	MS-DOS:		\asxxxx\asxmak\symantec\build\
+	Linux:		/asxxxx/asxmak/linux/build/
+
+	Cygwin:		\asxxxx\asxmak\cygwin\build\
 
 	VC6:		\asxxxx\asxmak\vc6\build\
 
 	DJGPP:		\asxxxx\asxmak\djgpp\build\
 
-	Cygwin:		/asxxxx/asxmak/cygwin/build/
-
-	Linux:		/asxxxx/asxmak/linux/build/
-
-	Solaris:	/asxxxx/asxmak/solaris/build/
+	MS-DOS:		\asxxxx\asxmak\symantec\build\
 
 
  Documentation in plain text form is
- 	\asxxxx\asxdoc\asmlnk.doc
+ 	\asxxxx\asxdoc\asmlnk.txt
 
  Documentation in HTML form may be found starting with
  	\asxxxx\asxhtml\asxxxx.htm
 
 
 
-Freeware:      Uploaded by the author.
+         
+       E N D   U S E R   L I C E N S E   A G R E E M E N T
 
-Distribution:  May be freely distributed with author's
-               permission and inclusion of copyright notice.
 
-Alan R. Baldwin,  Kent State University, Kent, Ohio, 44242
-baldwin@shop-pdp.kent.edu
-http://shop-pdp.kent.edu/
+   This software is FREEWARE which means it is NOT public domain
+but  fully  copyrighted  material  that  is  distributed  freely
+without  money.   Its  electronic distribution through BBSs, the
+Internet, or other such means is encouraged provided no money is
+requested in return.  
+
+   It is forbidden to distribute this software should this file,
+or any of the remaining files, change in any way or  be  omitted
+from the archive.  
+
+   If you would like to include this software together with your
+own work you MUST include it only as the original  complete  un-
+modified archive in which I distribute it and not as independent
+files.   If  uncertain,  simply  point  others   or   link   to:
+http://shop-pdp.kent.edu/asxhtm/asxxxx.htm 
+
+   Please note that although I have done my best to ensure there
+is no potentially dangerous code  (or  accidental  virus  infec-
+tions),  the  nature of programming is such that it forces me to
+provide absolutely no warranty, express or  implied,  with  this
+version  of the software, and I bear no responsibility for what-
+ever damages, direct or consequential, you may suffer  from  its
+use.   I definitely do not warrant this software for suitability
+for any particular purpose, either.  It is  also  possible  that
+the instructions, the extra utilities, or the examples that come
+with the software contain errors,  none  of  which  were  inten-
+tional.  
 
 

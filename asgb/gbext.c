@@ -1,12 +1,15 @@
-/* z80ext.c */
+/* gbext.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
  * Kent, Ohio  44240
+ */
+
+/* Gameboy mods by Roger Ivie (ivie at cc dot usu dot edu); see gb.h for more info 
  */
 
 #include <stdio.h>

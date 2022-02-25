@@ -1,7 +1,7 @@
 /* i51mch.c */
 
 /*
- * (C) Copyright 1998-2002
+ * (C) Copyright 1998-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -10,7 +10,8 @@
  *
  *   This Assember Ported by
  *	John L. Hartman	(JLH)
- *	jhartman@compuserve.com
+ *	jhartman at compuserve dot com
+ *	noice at noicedebugger dot com
  *
  */
 
@@ -45,7 +46,7 @@ struct mne *mp;
 		 * Top 3 bits become the MSBs of the op-code.
 		 */
 		expr(&e, 0);
-		outr11(&e, op);
+		outrwm(&e, R_PAGX2 | R_J11, op << 8);
 		break;
 
 	case S_JMP16:

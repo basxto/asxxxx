@@ -1,7 +1,7 @@
 /* m08adr.c */
 
 /*
- * (C) Copyright 1993-2002
+ * (C) Copyright 1993-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin

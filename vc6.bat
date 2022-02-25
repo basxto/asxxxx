@@ -1,2 +1,2 @@
-path=c:\dos;c:\asxxxx\asxmak\vc6\exe;c:\winedit
+path=r:\asxv4pxx\asxmak\vc6\exe
 

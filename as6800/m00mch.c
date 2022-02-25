@@ -1,7 +1,7 @@
 /* m00mch.c */
 
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -52,9 +52,9 @@ struct mne *mp;
 			}
 		}
 		if (espa) {
-			outdp(espa, &e1);
+			outdp(espa, &e1, 0);
 		} else {
-			outdp(dot.s_area, &e1);
+			outdp(dot.s_area, &e1, 0);
 		}
 		lmode = SLIST;
 		break;
@@ -101,13 +101,7 @@ struct mne *mp;
 			outab(op|B);
 			break;
 		}
-		if (t1 == S_DIR) {
-			outab(op|0x30);
-			outrw(&e1, 0);
-			aerr();
-			break;
-		}
-		if (t1 == S_EXT) {
+		if ((t1 == S_EXT) || (t1 == S_DIR)) {
 			outab(op|0x30);
 			outrw(&e1, 0);
 			break;
@@ -190,13 +184,7 @@ struct mne *mp;
 
 	case S_TYP5:
 		t1 = addr(&e1);
-		if (t1 == S_DIR) {
-			outab(op|0x10);
-			outrw(&e1, 0);
-			aerr();
-			break;
-		}
-		if (t1 == S_EXT) {
+		if ((t1 == S_EXT) || (t1 == S_DIR)) {
 			outab(op|0x10);
 			outrw(&e1, 0);
 			break;

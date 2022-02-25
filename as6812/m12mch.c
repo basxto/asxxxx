@@ -1,6 +1,7 @@
-/* M12MCH:C */
+/* m12mch.c */
+
 /*
- * (C) Copyright 1989-2002
+ * (C) Copyright 1989-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -60,9 +61,9 @@ struct mne *mp;
 			}
 		}
 		if (espa) {
-			outdp(espa, &e1);
+			outdp(espa, &e1, 0);
 		} else {
-			outdp(dot.s_area, &e1);
+			outdp(dot.s_area, &e1, 0);
 		}
 		lmode = SLIST;
 		break;
@@ -112,17 +113,18 @@ struct mne *mp;
 		comma();
 		expr(&e1, 0);
 		outab(0x04);
-		v1 = e1.e_addr - dot.s_addr - 2;
-		if ((v1 < -256) || (v1 > 255))
-			aerr();
-		if (v1 >= 0) {
-			outab(op);
+		if (mchpcr(&e1)) {
+			v1 = e1.e_addr - dot.s_addr - 2;
+			if ((v1 < -256) || (v1 > 255))
+				aerr();
+			if (v1 >= 0) {
+				outab(op);
+			} else {
+				outab(op | 0x10);
+			}
+			outab(v1);
 		} else {
-			outab(op | 0x10);
-		}
-		outab(v1);
-		if (e1.e_base.e_ap != NULL && e1.e_base.e_ap != dot.s_area) {
-			rerr();
+			outrwm(&e1, M_XBRA | R_PCR, op << 8);
 		}
 		if (e1.e_mode != S_USER)
 			rerr();
@@ -506,7 +508,7 @@ register struct expr *esp;
 			outab(op);
 			break;
 		}
-		outrb(esp, R_PAG);
+		outrb(esp, R_PAGN);
 		break;
 
 	case S_EXT:

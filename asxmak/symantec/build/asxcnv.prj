@@ -1,15 +1,15 @@
 82569
-C:\ASXXXX\ASXMAK\SYMANTEC\BUILD\ASXCNV.PRJ
+R:\ASXV4PXX\asxmak\Symantec\build\asxcnv.prj
 asxcnv.OPN
 novcs
 asxcnv.DEF
 8
-1006007854
-0 0 0 0 0 "..\..\..\ASXXMISC\ASXCNV.C"
+1040155802
 0 0 0 0 0 "asxcnv.DEF"
-0 -1 0 0 0 "F:\SC\INCLUDE\stdio.h"
-0 -1 0 0 0 "F:\SC\INCLUDE\string.h"
-0 -1 0 0 0 "F:\SC\INCLUDE\setjmp.h"
-0 -1 0 0 0 "F:\SC\INCLUDE\alloc.h"
-0 -1 0 0 0 "F:\SC\INCLUDE\stdlib.h"
 0 -1 0 0 0 "..\..\..\asxxsrc\asxxxx.h"
+0 -1 0 0 0 "C:\SC\INCLUDE\stdio.h"
+0 -1 0 0 0 "C:\SC\INCLUDE\string.h"
+0 -1 0 0 0 "C:\SC\INCLUDE\setjmp.h"
+0 -1 0 0 0 "C:\SC\INCLUDE\alloc.h"
+0 -1 0 0 0 "C:\SC\INCLUDE\stdlib.h"
+0 0 0 0 0 "..\..\..\ASXXMISC\asxxconv.c"

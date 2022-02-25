@@ -1,7 +1,7 @@
 /* h8ext.c */
 
 /*
- * (C) Copyright 1994-2002
+ * (C) Copyright 1994-2003
  * All Rights Reserved
  *
  * Alan R. Baldwin
