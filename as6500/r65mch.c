@@ -247,7 +247,7 @@ struct mne *mp;
 	case S_JSR:
 		t1 = addr(&e1);
 		outab(op);
-		outrw(&e1, R_USGN);
+		outrw(&e1, 0);
 		if (t1 != S_DIR && t1 != S_EXT)
 			aerr();
 		break;
@@ -258,18 +258,18 @@ struct mne *mp;
 		case S_DIR:
 		case S_EXT:
 	                outab(op);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		case S_IND:
 			outab(op + 0x20);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		default:
 			if (r65c02) {	/* Check 65C02 Extensions */
 				switch(t1) {
 				case S_IPREX:
 					outab(op + 0x30);
-					outrw(&e1, R_USGN);
+					outrw(&e1, 0);
 					break;
 				default:
 					outab(op);
@@ -299,13 +299,13 @@ struct mne *mp;
 			break;
 		case S_IMMED:
 			outab(op + 0x09);
-			outrb(&e1, R_USGN);
+			outrb(&e1, 0);
 			if (op == 0x80)
 				aerr();
 			break;
 		case S_EXT:
 			outab(op + 0x0D);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		case S_IPSTY:
 			outab(op + 0x11);
@@ -318,11 +318,11 @@ struct mne *mp;
 		case S_DINDY:
 		case S_INDY:
 			outab(op + 0x19);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		case S_INDX:
 			outab(op + 0x1D);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		default:
 			if (r65c02) {	/* Check 65C02 Extensions */
@@ -355,7 +355,7 @@ struct mne *mp;
 			break;
 		case S_EXT:
 			outab(op + 0x0E);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		case S_ACC:
 			if (op == 0xC0) {	/* 65C02 Extension */
@@ -377,7 +377,7 @@ struct mne *mp;
 			break;
 		case S_INDX:
 			outab(op + 0x1E);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		default:
 			outab(op + 0x06);
@@ -396,7 +396,7 @@ struct mne *mp;
 			break;
 		case S_EXT:
 			outab(op + 0x0C);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		default:
 			if (r65c02) {	/* Check 65C02 Extensions */
@@ -407,7 +407,7 @@ struct mne *mp;
 					break;
 				case S_INDX:
 					outab(op + 0x1C);
-					outrw(&e1, R_USGN);
+					outrw(&e1, 0);
 					break;
 				case S_IMMED:
 					outab(0x89);
@@ -437,14 +437,14 @@ struct mne *mp;
 			break;
 		case S_EXT:
 			outab(op+0x0C);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		default:
 			if (r65c02) {	/* Check 65C02 Extensions */
 				switch(t1) {
 				case S_IMMED:
 					outab(op);
-					outrb(&e1, R_USGN);
+					outrb(&e1, 0);
 					break;
 				default:
 					outab(op);
@@ -466,7 +466,7 @@ struct mne *mp;
 		switch (t1) {
 		case S_IMMED:
 			outab(op + 0x02);
-			outrb(&e1, R_USGN);
+			outrb(&e1, 0);
 			if (op == 0x80)
 				aerr();
 			break;
@@ -476,7 +476,7 @@ struct mne *mp;
 			break;
 		case S_EXT:
 			outab(op + 0x0E);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		case S_DINDY:
 			outab(op + 0x16);
@@ -484,7 +484,7 @@ struct mne *mp;
 			break;
 		case S_INDY:
 			outab(op + 0x1E);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		default:
 			outab(op + 0x06);
@@ -499,7 +499,7 @@ struct mne *mp;
 		switch (t1) {
 		case S_IMMED:
 			outab(op);
-			outrb(&e1, R_USGN);
+			outrb(&e1, 0);
 			if (op == 0x80)
 				aerr();
 			break;
@@ -509,7 +509,7 @@ struct mne *mp;
 			break;
 		case S_EXT:
 			outab(op + 0x0C);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		case S_DINDX:
 			outab(op + 0x14);
@@ -517,7 +517,7 @@ struct mne *mp;
 			break;
 		case S_INDX:
 			outab(op + 0x1C);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		default:
 			outab(op + 0x04);
@@ -579,11 +579,11 @@ struct mne *mp;
 			break;
 		case S_EXT:
 			outab(op + 0x3C);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		case S_INDX:
 			outab(op + 0x3E);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		default:
 			outab(op + 0x04);
@@ -605,7 +605,7 @@ struct mne *mp;
 			break;
 		case S_EXT:
 			outab(op+0x0C);
-			outrw(&e1, R_USGN);
+			outrw(&e1, 0);
 			break;
 		default:
 			outab(op);
