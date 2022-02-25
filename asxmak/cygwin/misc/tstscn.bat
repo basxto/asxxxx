@@ -161,6 +161,10 @@ rm -f ..\..\..\asxtst\asmt2blo.lst
 ..\exe\asxscn.exe ../../../asxtst/asmt2blo.lst
 
 rm -f ..\..\..\asxtst\asmt2bhi.lst
+..\exe\asrs08.exe -glacxff ../../../asxtst/asmt2bhi.asm
+..\exe\asxscn.exe ../../../asxtst/asmt2bhi.lst
+
+rm -f ..\..\..\asxtst\asmt2bhi.lst
 ..\exe\asscmp.exe -glacxff ../../../asxtst/asmt2bhi.asm
 ..\exe\asxscn.exe ../../../asxtst/asmt2bhi.lst
 
@@ -541,6 +545,15 @@ rm -f ..\..\..\asrab/trabg.rst
 ..\exe\asrab.exe -gloabcxff ../../../asrab/trabg.asm
 ..\exe\aslink.exe -nxu -g offset=0x33 -g n=0x20 -g mn=0x0584 ../../../asrab/trabg.rel
 ..\exe\asxscn.exe ../../../asrab/trabg.rst
+
+rm -f ..\..\..\asrs08/trs08.rel
+rm -f ..\..\..\asrs08/trs08.lst
+rm -f ..\..\..\asrs08/trs08.hlr
+rm -f ..\..\..\asrs08/trs08.rst
+..\exe\asrs08.exe -loxff ../../../asrs08/trs08.asm
+..\exe\asxscn.exe ../../../asrs08/trs08.lst
+..\exe\aslink.exe -nxu -g Ext=0 ../../../asrs08/trs08.rel
+..\exe\asxscn.exe -i ../../../asrs08/trs08.rst
 
 rm -f ..\..\..\asscmp/tscmp.rel
 rm -f ..\..\..\asscmp/tscmp.lst

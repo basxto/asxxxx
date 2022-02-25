@@ -3,7 +3,7 @@
 #		DJGPP V02.03  'GNU make' Version
 #		================================
 #
-#   25  August  2021		GCC 4.0.1 / make 3.79.1
+#   15  December  2021		GCC 4.0.1 / make 3.79.1
 #
 ####################################################################
 
@@ -46,6 +46,7 @@ ASXXXX =	as1802		\
 		asm8c		\
 		aspic		\
 		asrab		\
+		asrs08		\
 		asscmp		\
 		asst6		\
 		asst7		\
@@ -123,6 +124,7 @@ SRCH8=		$(ASXBAS)ash8/
 SRCM8C=		$(ASXBAS)asm8c/
 SRCPIC=		$(ASXBAS)aspic/
 SRCRAB=		$(ASXBAS)asrab/
+SRCRS08=	$(ASXBAS)asrs08/
 SRCSCMP=	$(ASXBAS)asscmp/
 SRCST6=		$(ASXBAS)asst6/
 SRCST7=		$(ASXBAS)asst7/
@@ -914,6 +916,25 @@ asrab :		$(ASXX) $(ASRAB)
 		$(LD) $(LDFLAGS) -o asrab $(ASXX) $(ASRAB)
 		mv asrab.exe $(DSTEXE)asrab.exe
 		strip $(DSTEXE)asrab.exe
+
+
+####################################################################
+# ASRS08
+####################################################################
+
+ASRS08 =	rs08pst.o rs08mch.o rs08adr.o
+
+rs08pst.o :	$(SRCRS08)rs08pst.c $(SRCRS08)rs08.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+rs08mch.o :	$(SRCRS08)rs08mch.c $(SRCRS08)rs08.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+rs08adr.o :	$(SRCRS08)rs08adr.c $(SRCRS08)rs08.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+asrs08 :	$(ASXX) $(ASRS08)
+		$(LD) $(LDFLAGS) -o asrs08 $(ASXX) $(ASRS08)
+		mv asrs08.exe $(DSTEXE)asrs08.exe
+		strip $(DSTEXE)asrs08.exe
 
 
 ####################################################################

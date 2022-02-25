@@ -38,6 +38,7 @@ make ash8
 make asm8c
 make aspic
 make asrab
+make asrs08
 make asscmp
 make asst6
 make asst7

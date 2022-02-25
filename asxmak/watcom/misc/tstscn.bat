@@ -165,6 +165,10 @@ del ..\..\..\asxtst\asmt2blo.lst
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
 
 del ..\..\..\asxtst\asmt2bhi.lst
+..\exe\asrs08.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+
+del ..\..\..\asxtst\asmt2bhi.lst
 ..\exe\asscmp.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 
@@ -545,6 +549,15 @@ del ..\..\..\asrab\trabg.rst
 ..\exe\asrab.exe -gloabcxff ..\..\..\asrab\trabg.asm
 ..\exe\aslink.exe -nxu -g offset=0x33 -g n=0x20 -g mn=0x0584 ..\..\..\asrab\trabg.rel
 ..\exe\asxscn.exe ..\..\..\asrab\trabg.rst
+
+del ..\..\..\asrs08\trs08.rel
+del ..\..\..\asrs08\trs08.lst
+del ..\..\..\asrs08\trs08.hlr
+del ..\..\..\asrs08\trs08.rst
+..\exe\asrs08.exe -loxff ..\..\..\asrs08\trs08.asm
+..\exe\asxscn.exe ..\..\..\asrs08\trs08.lst
+..\exe\aslink.exe -nxu -g Ext=0 ..\..\..\asrs08\trs08.rel
+..\exe\asxscn.exe -i ..\..\..\asrs08\trs08.rst
 
 del ..\..\..\asscmp\tscmp.rel
 del ..\..\..\asscmp\tscmp.lst

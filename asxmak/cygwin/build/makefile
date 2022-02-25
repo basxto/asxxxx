@@ -3,7 +3,7 @@
 #		Cygwin 'GNU make' Version
 #		=========================
 #
-#   25  August  2021
+#   15  December  2021
 #
 ####################################################################
 
@@ -46,6 +46,7 @@ ASXXXX =	as1802		\
 		asm8c		\
 		aspic		\
 		asrab		\
+		asrs08		\
 		asscmp		\
 		asst6		\
 		asst7		\
@@ -111,7 +112,7 @@ SRC8051=	$(ASXBAS)as8051/
 SRC8085=	$(ASXBAS)as8085/
 SRC89LP=	$(ASXBAS)as89lp/
 SRC8X300=	$(ASXBAS)as8x300/
-SRC8xcxxx=	$(ASXBAS)as8xcxxx/
+SRC8XCXXX=	$(ASXBAS)as8xcxxx/
 SRCAVR=		$(ASXBAS)asavr/
 SRCCHECK=	$(ASXBAS)ascheck/
 SRCCOP4=	$(ASXBAS)ascop4/
@@ -124,6 +125,7 @@ SRCH8=		$(ASXBAS)ash8/
 SRCM8C=		$(ASXBAS)asm8c/
 SRCPIC=		$(ASXBAS)aspic/
 SRCRAB=		$(ASXBAS)asrab/
+SRCRS08=	$(ASXBAS)asrs08/
 SRCSCMP=	$(ASXBAS)asscmp/
 SRCST6=		$(ASXBAS)asst6/
 SRCST7=		$(ASXBAS)asst7/
@@ -671,20 +673,20 @@ as8x300 :	$(ASXX) $(AS8X300)
 
 
 ####################################################################
-# AS8xcxxx
+# AS8XCXXX
 ####################################################################
 
-AS8xcxxx =	ds8pst.o ds8mch.o ds8adr.o
+AS8XCXXX =	ds8pst.o ds8mch.o ds8adr.o
 
-ds8pst.o :	$(SRC8xcxxx)ds8pst.c $(SRC8xcxxx)ds8.h $(SRCASX)asxxxx.h
+ds8pst.o :	$(SRC8XCXXX)ds8pst.c $(SRC8XCXXX)ds8.h $(SRCASX)asxxxx.h
 		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
-ds8mch.o :	$(SRC8xcxxx)ds8mch.c $(SRC8xcxxx)ds8.h $(SRCASX)asxxxx.h
+ds8mch.o :	$(SRC8XCXXX)ds8mch.c $(SRC8XCXXX)ds8.h $(SRCASX)asxxxx.h
 		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
-ds8adr.o :	$(SRC8xcxxx)ds8adr.c $(SRC8xcxxx)ds8.h $(SRCASX)asxxxx.h
+ds8adr.o :	$(SRC8XCXXX)ds8adr.c $(SRC8XCXXX)ds8.h $(SRCASX)asxxxx.h
 		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
 
-as8xcxxx :	$(ASXX) $(AS8xcxxx)
-		$(LD) $(LDFLAGS) -o as8xcxxx $(ASXX) $(AS8xcxxx)
+as8xcxxx :	$(ASXX) $(AS8XCXXX)
+		$(LD) $(LDFLAGS) -o as8xcxxx $(ASXX) $(AS8XCXXX)
 		cp as8xcxxx.exe $(DSTEXE)as8xcxxx.exe
 		strip $(DSTEXE)as8xcxxx.exe
 
@@ -915,6 +917,25 @@ asrab :		$(ASXX) $(ASRAB)
 		$(LD) $(LDFLAGS) -o asrab $(ASXX) $(ASRAB)
 		cp asrab.exe $(DSTEXE)asrab.exe
 		strip $(DSTEXE)asrab.exe
+
+
+####################################################################
+# ASRS08
+####################################################################
+
+ASRS08 =	rs08pst.o rs08mch.o rs08adr.o
+
+rs08pst.o :	$(SRCRS08)rs08pst.c $(SRCRS08)rs08.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+rs08mch.o :	$(SRCRS08)rs08mch.c $(SRCRS08)rs08.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+rs08adr.o :	$(SRCRS08)rs08adr.c $(SRCRS08)rs08.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+asrs08 :	$(ASXX) $(ASRS08)
+		$(LD) $(LDFLAGS) -o asrs08 $(ASXX) $(ASRS08)
+		cp asrs08.exe $(DSTEXE)asrs08.exe
+		strip $(DSTEXE)asrs08.exe
 
 
 ####################################################################
