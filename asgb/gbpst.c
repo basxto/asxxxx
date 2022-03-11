@@ -233,6 +233,9 @@ struct	mne	mne[] = {
     {   NULL,	"ldi",		S_LDX,		0,	0x22	},
     {	NULL,	"ldd",		S_LDX,		0,	0x32	},
 
+    {	NULL,	"lda",		S_LDA,		0,	0x7F	},
+    {   NULL,	"ldhl",		S_LDHL,		0,	0xF8	},
+
     {	NULL,	"call",		S_CALL,		0,	0xC4	},
     {	NULL,	"jp",		S_JP,		0,	0xC2	},
     {	NULL,	"jr",		S_JR,		0,	0x18	},
@@ -275,6 +278,8 @@ struct	mne	mne[] = {
     {	NULL,	"in",		S_IN,		0,	0	},
     {	NULL,	"out",		S_OUT,		0,	0	},
 
+    {	NULL,	"stop",		S_STOP,		0,	0x10	},
+
     {	NULL,	"ccf",		S_INH1,		0,	0x3F	},
     {	NULL,	"cpl",		S_INH1,		0,	0x2F	},
     {	NULL,	"daa",		S_INH1,		0,	0x27	},
@@ -287,8 +292,5 @@ struct	mne	mne[] = {
     {	NULL,	"rra",		S_INH1,		0,	0x1F	},
     {	NULL,	"rrca",		S_INH1,		0,	0x0F	},
     {	NULL,	"scf",		S_INH1,		0,	0x37	},
-    {	NULL,	"reti",		S_INH1,		0,	0xD9	},
-    {	NULL,	"lda",		S_LDA,		0,	0xE8	},
-    {	NULL,	"ldhl",		S_LDHL,		0,	0x0F	},
-    {	NULL,	"stop",		S_INH1,		S_EOL,	0x10	}
+    {	NULL,	"reti",		S_INH1,		S_EOL,	0xD9	}
 };

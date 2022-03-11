@@ -46,7 +46,7 @@
  *		int	main(argc, argv)
  *		VOID	asexit(n)
  *		VOID	asmbl()
- *		FILE *	afile(fn, ft, md)
+ *		FILE *	afile(fn, ft, wf)
  *		int	fndidx(str)
  *		int	intsiz()
  *		VOID	newdot(nap)
@@ -444,7 +444,7 @@ char *argv[];
 				asmc->flevel = 0;
 				asmc->tlevel = 0;
 				asmc->lnlist = LIST_NORM;
-				asmc->fp = afile(p, "", 0);
+				asmc->fp = afile(p, dsft, 0);
 				strcpy(asmc->afn,afn);
 				asmc->afp = afp;
 			}
@@ -1582,9 +1582,9 @@ loop:
 			 *	use path of file opening the include file
 			 */
 			if (fndidx(fn + afp) != 0) {
-				afilex(fn + afp, "");
+				afilex(fn + afp, "", 0);
 			} else {
-				afilex(fn, "");
+				afilex(fn, "", 0);
 			}
 			/*
 			 * Open File
@@ -1625,9 +1625,9 @@ loop:
 			 *	use path of file opening the .incbin file
 			 */
 			if (fndidx(fn + afp) != 0) {
-				afilex(fn + afp, "");
+				afilex(fn + afp, "", 0);
 			} else {
-				afilex(fn, "");
+				afilex(fn, "", 0);
 			}
 			/*
 			 * Skip Count
@@ -2619,6 +2619,7 @@ a_uint equtype;
  *
  *	local variables:
  *		FILE *	fp		file handle for opened file
+ *		char *	frmt		read/write format string
  *
  *	global variables:
  *		char	afn[]		afile() constructed filespec
@@ -2646,7 +2647,7 @@ int wf;
 	FILE *fp;
 	char *frmt;
 
-	afilex(fn, ft);
+	afilex(fn, ft, wf);
 
 	/*
 	 * Select (Binary) Read/Write
@@ -2675,10 +2676,14 @@ int wf;
 	return (fp);
 }
 
-/*)Function	VOID	afilex(fn, ft)
+/*)Function	VOID	afilex(fn, ft, wf)
  *
  *		char *	fn		file specification string
  *		char *	ft		file type string
+ *		int	wf		0 ==>> read
+ *					1 ==>> write
+ *					2 ==>> binary read
+ *					3 ==>> binary write
  *
  *	The function afilex() processes the file specification string:
  *		(1)	If the file type specification string ft
@@ -2697,7 +2702,6 @@ int wf;
  *		int	c		character value
  *		char *	p1		pointer into filespec string afntmp
  *		char *	p2		pointer into filespec string fn
- *		char *	p3		pointer to filetype string ft
  *
  *	global variables:
  *		char	afntmp[]	afilex() constructed filespec
@@ -2715,9 +2719,10 @@ int wf;
  */
 
 VOID
-afilex(fn, ft)
+afilex(fn, ft, wf)
 char *fn;
 char *ft;
+int wf;
 {
 	char *p1, *p2;
 	int c;
@@ -2739,6 +2744,38 @@ char *ft;
 	p1 = strrchr(&afntmp[afptmp], FSEPX);
 
 	/*
+	 * File reads allow any extension
+	 * if FSEPX is present.
+	 */
+	if ( ((wf & 1) == 0) && (p1 != NULL) ) {
+		/*
+		 * Remove FSEPX when extension is BLANK
+		 */
+		if (*(p1+1) == 0) {
+			*p1 = 0;
+		}
+	/*
+	 * NULL extensions and all writes
+	 * default to the ft extension.
+	 */
+	} else {
+		/*
+		 * Copy File Extension
+		 */
+		p2 = ft;
+		if (p1 == NULL) {
+			p1 = &afntmp[strlen(afntmp)];
+		}
+		*p1++ = FSEPX;
+		while ((c = *p2++) != 0) {
+			if (p1 < &afntmp[FILSPC-1])
+				*p1++ = c;
+		}
+		*p1++ = 0;
+	}
+
+#if 0
+	/*
 	 * Copy File Extension
 	 */
 	 p2 = ft;
@@ -2758,6 +2795,7 @@ char *ft;
 			*p1++ = c;
 	}
 	*p1++ = 0;
+#endif
 }
 
 /*)Function	int	fndidx(str)

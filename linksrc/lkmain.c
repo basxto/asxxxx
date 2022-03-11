@@ -1342,25 +1342,36 @@ int wf;
 	p1 = strrchr(&afspec[c], FSEPX);
 
 	/*
-	 * Copy File Extension
+	 * File reads allow any extension
+	 * if FSEPX is present.
 	 */
-	 p2 = ft;
-	 if (*p2 == 0) {
-		if (p1 == NULL) {
-			p2 = "rel";
-		} else {
-			p2 = strrchr(&fn[c], FSEPX) + 1;
+	if ( ((wf & 1) == 0) && (p1 != NULL) ) {
+		/*
+		 * Remove FSEPX when extension is BLANK
+		 */
+		if (*(p1+1) == 0) {
+			*p1 = 0;
 		}
+		p1 = afspec;
+	/*
+	 * NULL extensions and all
+	 * writes default to ft.
+	 */
+	} else {
+		/*
+		 * Copy File Extension
+		 */
+		p2 = ft;
+		if (p1 == NULL) {
+			p1 = &afspec[strlen(afspec)];
+		}
+		*p1++ = FSEPX;
+		while ((c = *p2++) != 0) {
+			if (p1 < &afspec[FILSPC-1])
+				*p1++ = c;
+		}
+		*p1++ = 0;
 	}
-	if (p1 == NULL) {
-		p1 = &afspec[strlen(afspec)];
-	}
-	*p1++ = FSEPX;
-	while ((c = *p2++) != 0) {
-		if (p1 < &afspec[FILSPC-1])
-			*p1++ = c;
-	}
-	*p1++ = 0;
 
 	/*
 	 * Select (Binary) Read/Write

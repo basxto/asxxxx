@@ -1190,7 +1190,7 @@ extern	VOID		exit(int n);
 
 /* asmain.c */
 extern	FILE *		afile(char *fn, char *ft, int wf);
-extern	VOID		afilex(char *fn, char *ft);
+extern	VOID		afilex(char *fn, char *ft, int wf);
 extern	VOID		asexit(int i);
 extern	VOID		asmbl(void);
 extern	VOID		boundary(a_uint n);

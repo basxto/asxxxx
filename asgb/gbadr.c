@@ -175,8 +175,7 @@ char *str;
 	}
 
 	if (!*str)
-		/* also allow hl+ and hl- */
-		if (!(ctype[*ptr & 0x007F] & LTR16) && (*ptr & 0x007F) != '-' && (*ptr & 0x007F) != '+') {
+		if (!(ctype[*ptr & 0x007F] & LTR16)) {
 			ip = ptr;
 			return(1);
 		}
@@ -199,14 +198,14 @@ struct	adsym	R8[] = {
 };
 
 struct	adsym	R16[] = {
+    {   "hl-",  HLD|0400},
+    {	"hld",	HLD|0400},
+    {   "hl+",  HLI|0400},
+    {	"hli",	HLI|0400},
     {	"bc",	BC|0400	},
     {	"de",	DE|0400	},
     {	"hl",	HL|0400	},
     {	"sp",	SP|0400	},
-    {   "hl-",  HLD|0400},
-    {   "hl+",  HLI|0400},
-    {	"hld",	HLD|0400},
-    {	"hli",	HLI|0400},
     {	"",	0000	}
 };
 

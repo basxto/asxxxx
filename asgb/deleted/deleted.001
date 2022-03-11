@@ -1,0 +1,752 @@
+ASxxxx Assembler V05.42  (Gameboy)                                      Page 1
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+                              1 	.title	Test of GB assembler
+                              2 
+                     0055     3 	offset	=	0x55		;arbitrary constants
+                     0020     4 	n	=	0x20
+                     0584     5 	nn	=	0x0584
+                              6 
+                              7 	; notes:
+                              8 	;	Leading 'a' operand is optional.
+                              9 	;	If offset is ommitted 0 is assumed.
+                             10 
+                             11 	;***********************************************************
+                             12 	; add with carry to 'a'
+   0000 8E                   13 	adc	a,(hl)			;8E
+   0001 8F                   14 	adc	a,a			;8F
+   0002 88                   15 	adc	a,b			;88
+   0003 89                   16 	adc	a,c			;89
+   0004 8A                   17 	adc	a,d			;8A
+   0005 8B                   18 	adc	a,e			;8B
+   0006 8C                   19 	adc	a,h			;8C
+   0007 8D                   20 	adc	a,l			;8D
+   0008 CE 20                21 	adc	a,#n			;CE 20
+                             22 	;***********************************************************
+   000A 8E                   23 	adc	(hl)			;8E
+   000B 8F                   24 	adc	a			;8F
+   000C 88                   25 	adc	b			;88
+   000D 89                   26 	adc	c			;89
+   000E 8A                   27 	adc	d			;8A
+   000F 8B                   28 	adc	e			;8B
+   0010 8C                   29 	adc	h			;8C
+   0011 8D                   30 	adc	l			;8D
+   0012 CE 20                31 	adc	#n			;CE 20
+                             32 	;***********************************************************
+                             33 	; add operand to 'a'
+   0014 86                   34 	add	a,(hl)			;86
+   0015 87                   35 	add	a,a			;87
+   0016 80                   36 	add	a,b			;80
+   0017 81                   37 	add	a,c			;81
+   0018 82                   38 	add	a,d			;82
+   0019 83                   39 	add	a,e			;83
+   001A 84                   40 	add	a,h			;84
+   001B 85                   41 	add	a,l			;85
+   001C C6 20                42 	add	a,#n			;C6 20
+                             43 	;***********************************************************
+                             44 	; add register pair to 'hl'
+   001E 09                   45 	add	hl,bc			;09
+   001F 19                   46 	add	hl,de			;19
+   0020 29                   47 	add	hl,hl			;29
+   0021 39                   48 	add	hl,sp			;39
+                             49 	;***********************************************************
+                             50 	; Add to stack pointer
+   0022 E8 20                51 	add	sp,#n			;E8 20
+                             52 	;***********************************************************
+                             53 	; logical 'and' operand with 'a'
+   0024 A6                   54 	and	a,(hl)			;A6
+   0025 A7                   55 	and	a,a			;A7
+ASxxxx Assembler V05.42  (Gameboy)                                      Page 2
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+   0026 A0                   56 	and	a,b			;A0
+   0027 A1                   57 	and	a,c			;A1
+   0028 A2                   58 	and	a,d			;A2
+   0029 A3                   59 	and	a,e			;A3
+   002A A4                   60 	and	a,h			;A4
+   002B A5                   61 	and	a,l			;A5
+   002C E6 20                62 	and	a,#n			;E6 20
+                             63 	;***********************************************************
+                             64 	; test bit of location or register
+   002E CB 46                65 	bit	0,(hl)			;CB 46
+   0030 CB 47                66 	bit	0,a			;CB 47
+   0032 CB 40                67 	bit	0,b			;CB 40
+   0034 CB 41                68 	bit	0,c			;CB 41
+   0036 CB 42                69 	bit	0,d			;CB 42
+   0038 CB 43                70 	bit	0,e			;CB 43
+   003A CB 44                71 	bit	0,h			;CB 44
+   003C CB 45                72 	bit	0,l			;CB 45
+   003E CB 4E                73 	bit	1,(hl)			;CB 4E
+   0040 CB 4F                74 	bit	1,a			;CB 4F
+   0042 CB 48                75 	bit	1,b			;CB 48
+   0044 CB 49                76 	bit	1,c			;CB 49
+   0046 CB 4A                77 	bit	1,d			;CB 4A
+   0048 CB 4B                78 	bit	1,e			;CB 4B
+   004A CB 4C                79 	bit	1,h			;CB 4C
+   004C CB 4D                80 	bit	1,l			;CB 4D
+   004E CB 56                81 	bit	2,(hl)			;CB 56
+   0050 CB 57                82 	bit	2,a			;CB 57
+   0052 CB 50                83 	bit	2,b			;CB 50
+   0054 CB 51                84 	bit	2,c			;CB 51
+   0056 CB 52                85 	bit	2,d			;CB 52
+   0058 CB 53                86 	bit	2,e			;CB 53
+   005A CB 54                87 	bit	2,h			;CB 54
+   005C CB 55                88 	bit	2,l			;CB 55
+   005E CB 5E                89 	bit	3,(hl)			;CB 5E
+   0060 CB 5F                90 	bit	3,a			;CB 5F
+   0062 CB 58                91 	bit	3,b			;CB 58
+   0064 CB 59                92 	bit	3,c			;CB 59
+   0066 CB 5A                93 	bit	3,d			;CB 5A
+   0068 CB 5B                94 	bit	3,e			;CB 5B
+   006A CB 5C                95 	bit	3,h			;CB 5C
+   006C CB 5D                96 	bit	3,l			;CB 5D
+   006E CB 66                97 	bit	4,(hl)			;CB 66
+   0070 CB 67                98 	bit	4,a			;CB 67
+   0072 CB 60                99 	bit	4,b			;CB 60
+   0074 CB 61               100 	bit	4,c			;CB 61
+   0076 CB 62               101 	bit	4,d			;CB 62
+   0078 CB 63               102 	bit	4,e			;CB 63
+   007A CB 64               103 	bit	4,h			;CB 64
+   007C CB 65               104 	bit	4,l			;CB 65
+   007E CB 6E               105 	bit	5,(hl)			;CB 6E
+   0080 CB 6F               106 	bit	5,a			;CB 6F
+   0082 CB 68               107 	bit	5,b			;CB 68
+   0084 CB 69               108 	bit	5,c			;CB 69
+   0086 CB 6A               109 	bit	5,d			;CB 6A
+   0088 CB 6B               110 	bit	5,e			;CB 6B
+ASxxxx Assembler V05.42  (Gameboy)                                      Page 3
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+   008A CB 6C               111 	bit	5,h			;CB 6C
+   008C CB 6D               112 	bit	5,l			;CB 6D
+   008E CB 76               113 	bit	6,(hl)			;CB 76
+   0090 CB 77               114 	bit	6,a			;CB 77
+   0092 CB 70               115 	bit	6,b			;CB 70
+   0094 CB 71               116 	bit	6,c			;CB 71
+   0096 CB 72               117 	bit	6,d			;CB 72
+   0098 CB 73               118 	bit	6,e			;CB 73
+   009A CB 74               119 	bit	6,h			;CB 74
+   009C CB 75               120 	bit	6,l			;CB 75
+   009E CB 7E               121 	bit	7,(hl)			;CB 7E
+   00A0 CB 7F               122 	bit	7,a			;CB 7F
+   00A2 CB 78               123 	bit	7,b			;CB 78
+   00A4 CB 79               124 	bit	7,c			;CB 79
+   00A6 CB 7A               125 	bit	7,d			;CB 7A
+   00A8 CB 7B               126 	bit	7,e			;CB 7B
+   00AA CB 7C               127 	bit	7,h			;CB 7C
+   00AC CB 7D               128 	bit	7,l			;CB 7D
+                            129 	;***********************************************************
+                            130 	; call subroutine at nn if condition is true
+   00AE DC 84 05            131 	call	C,nn			;DC 84 05
+   00B1 D4 84 05            132 	call	NC,nn			;D4 84 05
+   00B4 C4 84 05            133 	call	NZ,nn			;C4 84 05
+   00B7 CC 84 05            134 	call	Z,nn			;CC 84 05
+                            135 	;***********************************************************
+                            136 	; unconditional call to subroutine at nn
+   00BA CD 84 05            137 	call	nn			;CD 84 05
+                            138 	;***********************************************************
+                            139 	; complement carry flag
+   00BD 3F                  140 	ccf				;3F
+                            141 	;***********************************************************
+                            142 	; compare operand with 'a'
+   00BE BE                  143 	cp	a,(hl)			;BE
+   00BF BF                  144 	cp	a,a			;BF
+   00C0 B8                  145 	cp	a,b			;B8
+   00C1 B9                  146 	cp	a,c			;B9
+   00C2 BA                  147 	cp	a,d			;BA
+   00C3 BB                  148 	cp	a,e			;BB
+   00C4 BC                  149 	cp	a,h			;BC
+   00C5 BD                  150 	cp	a,l			;BD
+   00C6 FE 20               151 	cp	a,#n			;FE 20
+                            152 	;***********************************************************
+                            153 	; 1's complement of 'a'
+   00C8 2F                  154 	cpl				;2F
+                            155 	;***********************************************************
+                            156 	; decimal adjust 'a'
+   00C9 27                  157 	daa				;27
+                            158 	;***********************************************************
+                            159 	; decrement operand
+   00CA 35                  160 	dec	(hl)			;35
+   00CB 3D                  161 	dec	a			;3D
+   00CC 05                  162 	dec	b			;05
+   00CD 0B                  163 	dec	bc			;0B
+   00CE 0D                  164 	dec	c			;0D
+   00CF 15                  165 	dec	d			;15
+ASxxxx Assembler V05.42  (Gameboy)                                      Page 4
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+   00D0 1B                  166 	dec	de			;1B
+   00D1 1D                  167 	dec	e			;1D
+   00D2 25                  168 	dec	h			;25
+   00D3 2B                  169 	dec	hl			;2B
+   00D4 2D                  170 	dec	l			;2D
+   00D5 3B                  171 	dec	sp			;3B
+                            172 	;***********************************************************
+                            173 	; disable interrupts
+   00D6 F3                  174 	di				;F3
+                            175 	;***********************************************************
+                            176 	; enable interrupts
+   00D7 FB                  177 	ei				;FB
+                            178 	;***********************************************************
+                            179 	; halt (wait for interrupt or reset)
+   00D8 76                  180 	halt				;76
+                            181 	;***********************************************************
+                            182 	; load 'a' with input from device n or c
+   00D9 F0 20               183 	in	a,(n)			;F0 20
+   00DB F2                  184 	in	a,(c)			;F2
+                            185 	; alternates
+   00DC F0 20               186 	ldh	a,(n)			;F0 20
+   00DE F2                  187 	ldh	a,(c)			;F2
+   00DF F2                  188 	ld	a,(c)			;F2
+                            189 	;***********************************************************
+                            190 	; increment operand
+   00E0 34                  191 	inc	(hl)			;34
+   00E1 3C                  192 	inc	a			;3C
+   00E2 04                  193 	inc	b			;04
+   00E3 03                  194 	inc	bc			;03
+   00E4 0C                  195 	inc	c			;0C
+   00E5 14                  196 	inc	d			;14
+   00E6 13                  197 	inc	de			;13
+   00E7 1C                  198 	inc	e			;1C
+   00E8 24                  199 	inc	h			;24
+   00E9 23                  200 	inc	hl			;23
+   00EA 2C                  201 	inc	l			;2C
+   00EB 33                  202 	inc	sp			;33
+                            203 	;***********************************************************
+                            204 	; unconditional jump to location nn
+   00EC C3 84 05            205 	jp	nn			;C3 84 05
+   00EF E9                  206 	jp	(hl)			;E9
+                            207 	;***********************************************************
+                            208 	; jump to location if condition is true
+   00F0 DA 84 05            209 	jp	C,nn			;DA 84 05
+   00F3 D2 84 05            210 	jp	NC,nn			;D2 84 05
+   00F6 C2 84 05            211 	jp	NZ,nn			;C2 84 05
+   00F9 CA 84 05            212 	jp	Z,nn			;CA 84 05
+                            213 	;***********************************************************
+                            214 	; unconditional jump relative to PC+e
+   00FC 18 10               215 	jr	jr1+0x10		;18 10
+                            216 	;***********************************************************
+                            217 	; jump relative to PC+e if condition is true
+   00FE 38 10               218 jr1:	jr	C,jr2+0x10		;38 10
+   0100 30 10               219 jr2:	jr	NC,jr3+0x10		;30 10
+   0102 20 10               220 jr3:	jr	NZ,jr4+0x10		;20 10
+ASxxxx Assembler V05.42  (Gameboy)                                      Page 5
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+   0104 28 10               221 jr4:	jr	Z,jr5+0x10		;28 10
+   0106                     222 jr5:
+                            223 	;***********************************************************
+                            224 	; load source to destination
+   0106 7E                  225 	ld	a,(hl)			;7E
+   0107 7F                  226 	ld	a,a			;7F
+   0108 78                  227 	ld	a,b			;78
+   0109 79                  228 	ld	a,c			;79
+   010A 7A                  229 	ld	a,d			;7A
+   010B 7B                  230 	ld	a,e			;7B
+   010C 7C                  231 	ld	a,h			;7C
+   010D 7D                  232 	ld	a,l			;7D
+   010E 3E 20               233 	ld	a,#n			;3E 20
+   0110 46                  234 	ld	b,(hl)			;46
+   0111 47                  235 	ld	b,a			;47
+   0112 40                  236 	ld	b,b			;40
+   0113 41                  237 	ld	b,c			;41
+   0114 42                  238 	ld	b,d			;42
+   0115 43                  239 	ld	b,e			;43
+   0116 44                  240 	ld	b,h			;44
+   0117 45                  241 	ld	b,l			;45
+   0118 06 20               242 	ld	b,#n			;06 20
+   011A 4E                  243 	ld	c,(hl)			;4E
+   011B 4F                  244 	ld	c,a			;4F
+   011C 48                  245 	ld	c,b			;48
+   011D 49                  246 	ld	c,c			;49
+   011E 4A                  247 	ld	c,d			;4A
+   011F 4B                  248 	ld	c,e			;4B
+   0120 4C                  249 	ld	c,h			;4C
+   0121 4D                  250 	ld	c,l			;4D
+   0122 0E 20               251 	ld	c,#n			;0E 20
+   0124 56                  252 	ld	d,(hl)			;56
+   0125 57                  253 	ld	d,a			;57
+   0126 50                  254 	ld	d,b			;50
+   0127 51                  255 	ld	d,c			;51
+   0128 52                  256 	ld	d,d			;52
+   0129 53                  257 	ld	d,e			;53
+   012A 54                  258 	ld	d,h			;54
+   012B 55                  259 	ld	d,l			;55
+   012C 16 20               260 	ld	d,#n			;16 20
+   012E 5E                  261 	ld	e,(hl)			;5E
+   012F 5F                  262 	ld	e,a			;5F
+   0130 58                  263 	ld	e,b			;58
+   0131 59                  264 	ld	e,c			;59
+   0132 5A                  265 	ld	e,d			;5A
+   0133 5B                  266 	ld	e,e			;5B
+   0134 5C                  267 	ld	e,h			;5C
+   0135 5D                  268 	ld	e,l			;5D
+   0136 1E 20               269 	ld	e,#n			;1E 20
+   0138 66                  270 	ld	h,(hl)			;66
+   0139 67                  271 	ld	h,a			;67
+   013A 60                  272 	ld	h,b			;60
+   013B 61                  273 	ld	h,c			;61
+   013C 62                  274 	ld	h,d			;62
+   013D 63                  275 	ld	h,e			;63
+ASxxxx Assembler V05.42  (Gameboy)                                      Page 6
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+   013E 64                  276 	ld	h,h			;64
+   013F 65                  277 	ld	h,l			;65
+   0140 26 20               278 	ld	h,#n			;26 20
+   0142 6E                  279 	ld	l,(hl)			;6E
+   0143 6F                  280 	ld	l,a			;6F
+   0144 68                  281 	ld	l,b			;68
+   0145 69                  282 	ld	l,c			;69
+   0146 6A                  283 	ld	l,d			;6A
+   0147 6B                  284 	ld	l,e			;6B
+   0148 6C                  285 	ld	l,h			;6C
+   0149 6D                  286 	ld	l,l			;6D
+   014A 2E 20               287 	ld	l,#n			;2E 20
+                            288 	;***********************************************************
+   014C 02                  289 	ld	(bc),a			;02
+   014D 12                  290 	ld	(de),a			;12
+   014E 0A                  291 	ld	a,(bc)			;0A
+   014F 1A                  292 	ld	a,(de)			;1A
+                            293 	;***********************************************************
+   0150 77                  294 	ld	(hl),a			;77
+   0151 70                  295 	ld	(hl),b			;70
+   0152 71                  296 	ld	(hl),c			;71
+   0153 72                  297 	ld	(hl),d			;72
+   0154 73                  298 	ld	(hl),e			;73
+   0155 74                  299 	ld	(hl),h			;74
+   0156 75                  300 	ld	(hl),l			;75
+   0157 36 20               301 	ld	(hl),#n			;36 20
+                            302 	;***********************************************************
+   0159 EA 84 05            303 	ld	(nn),a			;EA 84 05
+   015C 08 84 05            304 	ld	(nn),sp			;08 84 05
+                            305 	;***********************************************************
+   015F FA 84 05            306 	ld	a,(nn)			;FA 84 05
+                            307 	;***********************************************************
+   0162 01 84 05            308 	ld	bc,#nn			;01 84 05
+   0165 11 84 05            309 	ld	de,#nn			;11 84 05
+   0168 21 84 05            310 	ld	hl,#nn			;21 84 05
+   016B 31 84 05            311 	ld	sp,#nn			;31 84 05
+                            312 	;***********************************************************
+   016E F9                  313 	ld	sp,hl			;F9
+   016F F8                  314 	ld	hl,sp			;F8
+                            315 	;***********************************************************
+                            316 	; load via (hl) then decrement hl
+   0170 3A                  317 	ld	a,(hld)			;3A
+   0171 32                  318 	ld	(hld),a			;32
+                            319 	; alternates
+   0172 3A                  320 	ldd	a,(hl)			;3A
+   0173 32                  321 	ldd	(hl),a			;32
+                            322 	;***********************************************************
+                            323 	; load via (hl) then increment hl
+   0174 2A                  324 	ld	a,(hli)			;2A
+   0175 22                  325 	ld	(hli),a			;22
+                            326 	; alternates
+   0176 2A                  327 	ldi	a,(hl)			;2A
+   0177 22                  328 	ldi	(hl),a			;22
+                            329 	;***********************************************************
+                            330 	; load 'a' with input from device c
+ASxxxx Assembler V05.42  (Gameboy)                                      Page 7
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+   0178 F2                  331 	ld	a,(c)			;F2
+                            332 	; alternates
+   0179 F2                  333 	ldh	a,(c)			;F2
+   017A F2                  334 	in	a,(c)			;F2
+                            335 	;***********************************************************
+                            336 	; load output port (c) with 'a'
+   017B E2                  337 	ld	(c),a			;E2
+                            338 	; alternates
+   017C E2                  339 	ldh	(c),a			;E2
+   017D E2                  340 	out	(c),a			;E2
+                            341 	;***********************************************************
+                            342 	; no operation
+   017E 00                  343 	nop				;00
+                            344 	;***********************************************************
+                            345 	; logical 'or' operand with 'a'
+   017F B6                  346 	or	a,(hl)			;B6
+   0180 B7                  347 	or	a,a			;B7
+   0181 B0                  348 	or	a,b			;B0
+   0182 B1                  349 	or	a,c			;B1
+   0183 B2                  350 	or	a,d			;B2
+   0184 B3                  351 	or	a,e			;B3
+   0185 B4                  352 	or	a,h			;B4
+   0186 B5                  353 	or	a,l			;B5
+   0187 F6 20               354 	or	a,#n			;F6 20
+                            355 	;***********************************************************
+                            356 	; load output port (c) or (n) with 'a'
+   0189 E2                  357 	out	(c),a			;E2
+   018A E0 20               358 	out	(n),a			;E0 20
+                            359 	; alternates
+   018C E2                  360 	ldh	(c),a			;E2
+   018D E2                  361 	ld	(c),a			;E2
+   018E E0 20               362 	ldh	(n),a			;E0 20
+                            363 	;***********************************************************
+                            364 	; load destination with top of stack
+   0190 F1                  365 	pop	af			;F1
+   0191 C1                  366 	pop	bc			;C1
+   0192 D1                  367 	pop	de			;D1
+   0193 E1                  368 	pop	hl			;E1
+                            369 	;***********************************************************
+                            370 	; put source on stack
+   0194 F5                  371 	push	af			;F5
+   0195 C5                  372 	push	bc			;C5
+   0196 D5                  373 	push	de			;D5
+   0197 E5                  374 	push	hl			;E5
+                            375 	;***********************************************************
+                            376 	; reset bit of location or register
+   0198 CB 86               377 	res	0,(hl)			;CB 86
+   019A CB 87               378 	res	0,a			;CB 87
+   019C CB 80               379 	res	0,b			;CB 80
+   019E CB 81               380 	res	0,c			;CB 81
+   01A0 CB 82               381 	res	0,d			;CB 82
+   01A2 CB 83               382 	res	0,e			;CB 83
+   01A4 CB 84               383 	res	0,h			;CB 84
+   01A6 CB 85               384 	res	0,l			;CB 85
+   01A8 CB 8E               385 	res	1,(hl)			;CB 8E
+ASxxxx Assembler V05.42  (Gameboy)                                      Page 8
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+   01AA CB 8F               386 	res	1,a			;CB 8F
+   01AC CB 88               387 	res	1,b			;CB 88
+   01AE CB 89               388 	res	1,c			;CB 89
+   01B0 CB 8A               389 	res	1,d			;CB 8A
+   01B2 CB 8B               390 	res	1,e			;CB 8B
+   01B4 CB 8C               391 	res	1,h			;CB 8C
+   01B6 CB 8D               392 	res	1,l			;CB 8D
+   01B8 CB 96               393 	res	2,(hl)			;CB 96
+   01BA CB 97               394 	res	2,a			;CB 97
+   01BC CB 90               395 	res	2,b			;CB 90
+   01BE CB 91               396 	res	2,c			;CB 91
+   01C0 CB 92               397 	res	2,d			;CB 92
+   01C2 CB 93               398 	res	2,e			;CB 93
+   01C4 CB 94               399 	res	2,h			;CB 94
+   01C6 CB 95               400 	res	2,l			;CB 95
+   01C8 CB 9E               401 	res	3,(hl)			;CB 9E
+   01CA CB 9F               402 	res	3,a			;CB 9F
+   01CC CB 98               403 	res	3,b			;CB 98
+   01CE CB 99               404 	res	3,c			;CB 99
+   01D0 CB 9A               405 	res	3,d			;CB 9A
+   01D2 CB 9B               406 	res	3,e			;CB 9B
+   01D4 CB 9C               407 	res	3,h			;CB 9C
+   01D6 CB 9D               408 	res	3,l			;CB 9D
+   01D8 CB A6               409 	res	4,(hl)			;CB A6
+   01DA CB A7               410 	res	4,a			;CB A7
+   01DC CB A0               411 	res	4,b			;CB A0
+   01DE CB A1               412 	res	4,c			;CB A1
+   01E0 CB A2               413 	res	4,d			;CB A2
+   01E2 CB A3               414 	res	4,e			;CB A3
+   01E4 CB A4               415 	res	4,h			;CB A4
+   01E6 CB A5               416 	res	4,l			;CB A5
+   01E8 CB AE               417 	res	5,(hl)			;CB AE
+   01EA CB AF               418 	res	5,a			;CB AF
+   01EC CB A8               419 	res	5,b			;CB A8
+   01EE CB A9               420 	res	5,c			;CB A9
+   01F0 CB AA               421 	res	5,d			;CB AA
+   01F2 CB AB               422 	res	5,e			;CB AB
+   01F4 CB AC               423 	res	5,h			;CB AC
+   01F6 CB AD               424 	res	5,l			;CB AD
+   01F8 CB B6               425 	res	6,(hl)			;CB B6
+   01FA CB B7               426 	res	6,a			;CB B7
+   01FC CB B0               427 	res	6,b			;CB B0
+   01FE CB B1               428 	res	6,c			;CB B1
+   0200 CB B2               429 	res	6,d			;CB B2
+   0202 CB B3               430 	res	6,e			;CB B3
+   0204 CB B4               431 	res	6,h			;CB B4
+   0206 CB B5               432 	res	6,l			;CB B5
+   0208 CB BE               433 	res	7,(hl)			;CB BE
+   020A CB BF               434 	res	7,a			;CB BF
+   020C CB B8               435 	res	7,b			;CB B8
+   020E CB B9               436 	res	7,c			;CB B9
+   0210 CB BA               437 	res	7,d			;CB BA
+   0212 CB BB               438 	res	7,e			;CB BB
+   0214 CB BC               439 	res	7,h			;CB BC
+   0216 CB BD               440 	res	7,l			;CB BD
+ASxxxx Assembler V05.42  (Gameboy)                                      Page 9
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+                            441 	;***********************************************************
+                            442 	; return from subroutine
+   0218 C9                  443 	ret				;C9
+                            444 	;***********************************************************
+                            445 	; return from subroutine if condition is true
+   0219 D8                  446 	ret	C			;D8
+   021A D0                  447 	ret	NC			;D0
+   021B C0                  448 	ret	NZ			;C0
+   021C C8                  449 	ret	Z			;C8
+                            450 	;***********************************************************
+                            451 	; return from interrupt
+   021D D9                  452 	reti				;D9
+                            453 	;***********************************************************
+                            454 	; rotate left through carry
+   021E CB 16               455 	rl	a,(hl)			;CB 16
+   0220 CB 17               456 	rl	a,a			;CB 17
+   0222 CB 10               457 	rl	a,b			;CB 10
+   0224 CB 11               458 	rl	a,c			;CB 11
+   0226 CB 12               459 	rl	a,d			;CB 12
+   0228 CB 13               460 	rl	a,e			;CB 13
+   022A CB 14               461 	rl	a,h			;CB 14
+   022C CB 15               462 	rl	a,l			;CB 15
+                            463 	;***********************************************************
+                            464 	; rotate left 'a' with carry
+   022E 17                  465 	rla				;17
+                            466 	;***********************************************************
+                            467 	; rotate left circular
+   022F CB 06               468 	rlc	a,(hl)			;CB 06
+   0231 CB 07               469 	rlc	a,a			;CB 07
+   0233 CB 00               470 	rlc	a,b			;CB 00
+   0235 CB 01               471 	rlc	a,c			;CB 01
+   0237 CB 02               472 	rlc	a,d			;CB 02
+   0239 CB 03               473 	rlc	a,e			;CB 03
+   023B CB 04               474 	rlc	a,h			;CB 04
+   023D CB 05               475 	rlc	a,l			;CB 05
+                            476 	;***********************************************************
+                            477 	; rotate left 'a' circular
+   023F 07                  478 	rlca				;07
+                            479 	;***********************************************************
+                            480 	; rotate right through carry
+   0240 CB 1E               481 	rr	a,(hl)			;CB 1E
+   0242 CB 1F               482 	rr	a,a			;CB 1F
+   0244 CB 18               483 	rr	a,b			;CB 18
+   0246 CB 19               484 	rr	a,c			;CB 19
+   0248 CB 1A               485 	rr	a,d			;CB 1A
+   024A CB 1B               486 	rr	a,e			;CB 1B
+   024C CB 1C               487 	rr	a,h			;CB 1C
+   024E CB 1D               488 	rr	a,l			;CB 1D
+                            489 	;***********************************************************
+                            490 	; rotate 'a' right with carry
+   0250 1F                  491 	rra				;1F
+                            492 	;***********************************************************
+                            493 	; rotate right circular
+   0251 CB 0E               494 	rrc	a,(hl)			;CB 0E
+   0253 CB 0F               495 	rrc	a,a			;CB 0F
+ASxxxx Assembler V05.42  (Gameboy)                                     Page 10
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+   0255 CB 08               496 	rrc	a,b			;CB 08
+   0257 CB 09               497 	rrc	a,c			;CB 09
+   0259 CB 0A               498 	rrc	a,d			;CB 0A
+   025B CB 0B               499 	rrc	a,e			;CB 0B
+   025D CB 0C               500 	rrc	a,h			;CB 0C
+   025F CB 0D               501 	rrc	a,l			;CB 0D
+                            502 	;***********************************************************
+                            503 	; rotate 'a' right circular
+   0261 0F                  504 	rrca				;0F
+                            505 	;***********************************************************
+                            506 	; restart location
+   0262 C7                  507 	rst	0x00			;C7
+   0263 CF                  508 	rst	0x08			;CF
+   0264 D7                  509 	rst	0x10			;D7
+   0265 DF                  510 	rst	0x18			;DF
+   0266 E7                  511 	rst	0x20			;E7
+   0267 EF                  512 	rst	0x28			;EF
+   0268 F7                  513 	rst	0x30			;F7
+   0269 FF                  514 	rst	0x38			;FF
+                            515 	;***********************************************************
+                            516 	; subtract with carry to 'a'
+   026A 9E                  517 	sbc	a,(hl)			;9E
+   026B 9F                  518 	sbc	a,a			;9F
+   026C 98                  519 	sbc	a,b			;98
+   026D 99                  520 	sbc	a,c			;99
+   026E 9A                  521 	sbc	a,d			;9A
+   026F 9B                  522 	sbc	a,e			;9B
+   0270 9C                  523 	sbc	a,h			;9C
+   0271 9D                  524 	sbc	a,l			;9D
+   0272 DE 20               525 	sbc	a,#n			;DE 20
+                            526 	;***********************************************************
+                            527 	; set carry flag (C=1)
+   0274 37                  528 	scf				;37
+                            529 	;***********************************************************
+                            530 	; set bit of location or register
+   0275 CB C6               531 	set	0,(hl)			;CB C6
+   0277 CB C7               532 	set	0,a			;CB C7
+   0279 CB C0               533 	set	0,b			;CB C0
+   027B CB C1               534 	set	0,c			;CB C1
+   027D CB C2               535 	set	0,d			;CB C2
+   027F CB C3               536 	set	0,e			;CB C3
+   0281 CB C4               537 	set	0,h			;CB C4
+   0283 CB C5               538 	set	0,l			;CB C5
+   0285 CB CE               539 	set	1,(hl)			;CB CE
+   0287 CB CF               540 	set	1,a			;CB CF
+   0289 CB C8               541 	set	1,b			;CB C8
+   028B CB C9               542 	set	1,c			;CB C9
+   028D CB CA               543 	set	1,d			;CB CA
+   028F CB CB               544 	set	1,e			;CB CB
+   0291 CB CC               545 	set	1,h			;CB CC
+   0293 CB CD               546 	set	1,l			;CB CD
+   0295 CB D6               547 	set	2,(hl)			;CB D6
+   0297 CB D7               548 	set	2,a			;CB D7
+   0299 CB D0               549 	set	2,b			;CB D0
+   029B CB D1               550 	set	2,c			;CB D1
+ASxxxx Assembler V05.42  (Gameboy)                                     Page 11
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+   029D CB D2               551 	set	2,d			;CB D2
+   029F CB D3               552 	set	2,e			;CB D3
+   02A1 CB D4               553 	set	2,h			;CB D4
+   02A3 CB D5               554 	set	2,l			;CB D5
+   02A5 CB DE               555 	set	3,(hl)			;CB DE
+   02A7 CB DF               556 	set	3,a			;CB DF
+   02A9 CB D8               557 	set	3,b			;CB D8
+   02AB CB D9               558 	set	3,c			;CB D9
+   02AD CB DA               559 	set	3,d			;CB DA
+   02AF CB DB               560 	set	3,e			;CB DB
+   02B1 CB DC               561 	set	3,h			;CB DC
+   02B3 CB DD               562 	set	3,l			;CB DD
+   02B5 CB E6               563 	set	4,(hl)			;CB E6
+   02B7 CB E7               564 	set	4,a			;CB E7
+   02B9 CB E0               565 	set	4,b			;CB E0
+   02BB CB E1               566 	set	4,c			;CB E1
+   02BD CB E2               567 	set	4,d			;CB E2
+   02BF CB E3               568 	set	4,e			;CB E3
+   02C1 CB E4               569 	set	4,h			;CB E4
+   02C3 CB E5               570 	set	4,l			;CB E5
+   02C5 CB EE               571 	set	5,(hl)			;CB EE
+   02C7 CB EF               572 	set	5,a			;CB EF
+   02C9 CB E8               573 	set	5,b			;CB E8
+   02CB CB E9               574 	set	5,c			;CB E9
+   02CD CB EA               575 	set	5,d			;CB EA
+   02CF CB EB               576 	set	5,e			;CB EB
+   02D1 CB EC               577 	set	5,h			;CB EC
+   02D3 CB ED               578 	set	5,l			;CB ED
+   02D5 CB F6               579 	set	6,(hl)			;CB F6
+   02D7 CB F7               580 	set	6,a			;CB F7
+   02D9 CB F0               581 	set	6,b			;CB F0
+   02DB CB F1               582 	set	6,c			;CB F1
+   02DD CB F2               583 	set	6,d			;CB F2
+   02DF CB F3               584 	set	6,e			;CB F3
+   02E1 CB F4               585 	set	6,h			;CB F4
+   02E3 CB F5               586 	set	6,l			;CB F5
+   02E5 CB FE               587 	set	7,(hl)			;CB FE
+   02E7 CB FF               588 	set	7,a			;CB FF
+   02E9 CB F8               589 	set	7,b			;CB F8
+   02EB CB F9               590 	set	7,c			;CB F9
+   02ED CB FA               591 	set	7,d			;CB FA
+   02EF CB FB               592 	set	7,e			;CB FB
+   02F1 CB FC               593 	set	7,h			;CB FC
+   02F3 CB FD               594 	set	7,l			;CB FD
+                            595 	;***********************************************************
+                            596 	; shift operand left arithmetic
+   02F5 CB 26               597 	sla	a,(hl)			;CB 26
+   02F7 CB 27               598 	sla	a,a			;CB 27
+   02F9 CB 20               599 	sla	a,b			;CB 20
+   02FB CB 21               600 	sla	a,c			;CB 21
+   02FD CB 22               601 	sla	a,d			;CB 22
+   02FF CB 23               602 	sla	a,e			;CB 23
+   0301 CB 24               603 	sla	a,h			;CB 24
+   0303 CB 25               604 	sla	a,l			;CB 25
+                            605 	;***********************************************************
+ASxxxx Assembler V05.42  (Gameboy)                                     Page 12
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+                            606 	; shift operand right arithmetic
+   0305 CB 2E               607 	sra	a,(hl)			;CB 2E
+   0307 CB 2F               608 	sra	a,a			;CB 2F
+   0309 CB 28               609 	sra	a,b			;CB 28
+   030B CB 29               610 	sra	a,c			;CB 29
+   030D CB 2A               611 	sra	a,d			;CB 2A
+   030F CB 2B               612 	sra	a,e			;CB 2B
+   0311 CB 2C               613 	sra	a,h			;CB 2C
+   0313 CB 2D               614 	sra	a,l			;CB 2D
+                            615 	;***********************************************************
+                            616 	; shift operand right logical
+   0315 CB 3E               617 	srl	a,(hl)			;CB 3E
+   0317 CB 3F               618 	srl	a,a			;CB 3F
+   0319 CB 38               619 	srl	a,b			;CB 38
+   031B CB 39               620 	srl	a,c			;CB 39
+   031D CB 3A               621 	srl	a,d			;CB 3A
+   031F CB 3B               622 	srl	a,e			;CB 3B
+   0321 CB 3C               623 	srl	a,h			;CB 3C
+   0323 CB 3D               624 	srl	a,l			;CB 3D
+                            625 	;***********************************************************
+                            626 	; Go to sleep; everything stops. How do you get out?
+   0325 10                  627 	stop				;10
+                            628 	;***********************************************************
+                            629 	; subtract operand from 'a'
+   0326 96                  630 	sub	a,(hl)			;96
+   0327 97                  631 	sub	a,a			;97
+   0328 90                  632 	sub	a,b			;90
+   0329 91                  633 	sub	a,c			;91
+   032A 92                  634 	sub	a,d			;92
+   032B 93                  635 	sub	a,e			;93
+   032C 94                  636 	sub	a,h			;94
+   032D 95                  637 	sub	a,l			;95
+   032E D6 20               638 	sub	a,#n			;D6 20
+                            639 	;***********************************************************
+                            640 	; swap nybbles
+   0330 CB 36               641 	swap	(hl)			;CB 36
+   0332 CB 37               642 	swap	a			;CB 37
+   0334 CB 30               643 	swap	b			;CB 30
+   0336 CB 31               644 	swap	c			;CB 31
+   0338 CB 32               645 	swap	d			;CB 32
+   033A CB 33               646 	swap	e			;CB 33
+   033C CB 34               647 	swap	h			;CB 34
+   033E CB 35               648 	swap	l			;CB 35
+                            649 	;***********************************************************
+                            650 	; logical 'xor' operand with 'a'
+   0340 AE                  651 	xor	a,(hl)			;AE
+   0341 AF                  652 	xor	a,a			;AF
+   0342 A8                  653 	xor	a,b			;A8
+   0343 A9                  654 	xor	a,c			;A9
+   0344 AA                  655 	xor	a,d			;AA
+   0345 AB                  656 	xor	a,e			;AB
+   0346 AC                  657 	xor	a,h			;AC
+   0347 AD                  658 	xor	a,l			;AD
+   0348 EE 20               659 	xor	a,#n			;EE 20
+                            660 	;***********************************************************
+ASxxxx Assembler V05.42  (Gameboy)                                     Page 13
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+
+
+                            661 	; pseudo-op to help build characters
+   034A 55 33               662 	.tile " .+*0123"		;55 33
+   034C 55 33 55 33         663 	.tile " .+*0123 .+*0123"	;55 33 55 33
+                            664 
+                            665 
+ASxxxx Assembler V05.42  (Gameboy)                                     Page 14
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+Symbol Table
+
+    .__.$$$.       =   2710 L   |     .__.ABS.       =   0000 G
+    .__.CPU.       =   0000 L   |     .__.H$L.       =   0000 L
+  0 jr1                00FE GR  |   0 jr2                0100 GR
+  0 jr3                0102 GR  |   0 jr4                0104 GR
+  0 jr5                0106 GR  |     n              =   0020 G
+    nn             =   0584 G   |     offset         =   0055 G
+
+ASxxxx Assembler V05.42  (Gameboy)                                     Page 15
+Hexadecimal [16-Bits]                                 Thu Dec 16 11:22:25 2021
+Test of GB assembler
+Area Table
+
+[_CSEG]
+   0 _CODE            size  350   flags C180
+[_DSEG]
+   1 _DATA            size    0   flags C0C0
+

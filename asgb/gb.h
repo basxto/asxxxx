@@ -178,12 +178,12 @@
 #define	S_INH1	79
 #define	S_SUB	80
 #define	S_SBC	81
-#define S_LDHL	90	/* LDHL SP,offset */
-#define S_LDX	91	/* Loads which increment/decrement HL */
-#define S_SWAP	92	/* SWAP A, nybble swaps the accumulator */
-#define S_TILE	93	/* .TILE pseudo-op */
-#define	S_STOP	83
-#define	S_LDA	84
+#define S_SWAP	82	/* SWAP A, nybble swaps the accumulator */
+#define	S_STOP	83	/* Requires 2 bytes due to bug */
+#define S_LDX	84	/* Loads which increment/decrement HL */
+#define	S_LDA	85	/* LDA arg  <<==  LD A,arg */
+#define S_LDHL	86	/* LDHL SP,offset  <<==  LD HL, SP+offset */
+#define S_TILE	87	/* .TILE pseudo-op */
 
 struct adsym
 {

@@ -103,12 +103,13 @@ machine(mp)
 struct mne *mp;
 {
 	register int op, t1, t2;
-	struct expr e1, e2;
+	struct expr e1, e2, e3;
 	int rf, v1, v2;
 	int d,c,i,th,tl,oops; /* for dealing with .tile */
 
 	clrexpr(&e1);
 	clrexpr(&e2);
+	clrexpr(&e3);
 	op = (int) mp->m_valu;
 	rf = mp->m_type;
 	switch (rf) {
@@ -193,7 +194,7 @@ struct mne *mp;
 	case S_SWAP:
 		t1 = 0;
 		t2 = addr(&e2);
-		if( more() ) {
+		if (more()) {
 		 	t1++;
 		}
 		if (genop(0xCB, op, &e2, 0) || t1)
@@ -253,26 +254,26 @@ struct mne *mp;
 			break;
 		}
 		if ((t1 == S_R16) && (t2 == S_R16)) {
-		  if( rf == S_ADD ) {
-		    op = 0x09;
-		    v1 = (int) e1.e_addr;
-		    v2 = (int) e2.e_addr;
-		    if( ( v1 == HL ) && ( v2 <= SP ) ) {
-		      outab( op | ( v2 << 4 ) );
-		      break;
-		    }
-		  }
+			if (rf == S_ADD) {
+				op = 0x09;
+				v1 = (int) e1.e_addr;
+				v2 = (int) e2.e_addr;
+				if ((v1 == HL) && (v2 <= SP)) {
+					outab(op | (v2 << 4));
+					break;
+				}
+			}
 		}
 		if ((t1 == S_R16) && (t2 == S_IMMED)) {
-		  if (rf != S_ADD ) {
-		    xerr('a', "ADC, SUB, and SBC are invalid.");
-		    break;
-		  }
-		  if( e1.e_addr == SP ) {
-		    outab( 0xE8 );
-		    outrb(&e2,0);
-		    break;
-		  }
+			if (rf != S_ADD) {
+				xerr('a', "ADC, SUB, and SBC are invalid.");
+				break;
+			}
+			if( e1.e_addr == SP ) {
+				outab(0xE8);
+				outrb(&e2,0);
+				break;
+			}
 		}
 		xerr('a', "Invalid Addressing Mode.");
 		break;
@@ -302,42 +303,66 @@ struct mne *mp;
 		comma(1);
 		t2 = addr(&e2);
 
-		if( ( t1 == S_R8 ) && ( t2 == S_IDHL ) )
-		{
-		  /* It's "ld? r,(rp)". Make certain r is A. */
-
-		  if( e1.e_addr != A )
-		  {
-		    xerr('a', "First argument must be A.");
-		    break;
-		  }
-
-		  outab( op | 0x08 );
-		  break;
+		if ((t1 == S_R8) && (t2 == S_IDHL)) {
+			/* It's "ld? r,(rp)". Make certain r is A. */
+			if (e1.e_addr != A)  {
+				xerr('a', "First argument must be A.");
+				break;
+			}
+			outab(op | 0x08);
+			break;
 		}
 
-		if( ( t1 == S_IDHL ) && ( t2 == S_R8 ) )
-		{
-		  /* It's ld? (rp),r". Make certain r is A. */
-
-		  if( e2.e_addr != A )
-		  {
-		    xerr('a', "Second argument must be A.");
-		    break;
-		  }
-
-		  outab( op );
-		  break;
+		if ((t1 == S_IDHL) && (t2 == S_R8)) {
+			/* It's ld? (rp),r". Make certain r is A. */
+			if (e2.e_addr != A) {
+				xerr('a', "Second argument must be A.");
+				break;
+			}
+			outab(op);
+			break;
 		}
-
-		/* It's some bogus addressing mode. */
 
 		xerr('a', "Invalid Addressing Mode.");
 		break;
 
+	case S_LDA:	/* lda  arg  ==  ld  a,arg */
+		t1 = addr(&e1);
+		v1 = (int) e1.e_addr;
+		switch(t1) {
+		case S_R8:	outab(0x78 + v1);		break;
+		case S_IMMED:	outab(0x3E);	outrb(&e1, 0);	break;
+		case S_INDM:	outab(0xFA);	outrw(&e1, 0);	break;
+		case S_IDBC:	outab(0x0A);			break;
+		case S_IDDE:	outab(0x1A);			break;
+		case S_IDC:	outab(0xF2);			break;
+		case S_IDHL:	outab(0x7E);			break;
+		case S_IDHLD:	outab(0x3A);			break;
+		case S_IDHLI:	outab(0x2A);			break;
+		default:
+			xerr('a', "Invalid Addressing Mode.");	break;
+		}
+		break;
+
 	case S_LD:
 		t1 = addr(&e1);
-		comma(1);
+		if (comma(0) == 0) {	/* ld  arg  ==  ld  a,arg */
+			v1 = (int) e1.e_addr;
+			switch(t1) {
+			case S_R8:	outab(0x78 + v1);		break;
+			case S_IMMED:	outab(0x3E);	outrb(&e1, 0);	break;
+			case S_INDM:	outab(0xFA);	outrw(&e1, 0);	break;
+			case S_IDBC:	outab(0x0A);			break;
+			case S_IDDE:	outab(0x1A);			break;
+			case S_IDC:	outab(0xF2);			break;
+			case S_IDHL:	outab(0x7E);			break;
+			case S_IDHLD:	outab(0x3A);			break;
+			case S_IDHLI:	outab(0x2A);			break;
+			default:
+				xerr('a', "Invalid Addressing Mode.");	break;
+			}
+			break;
+		}
 		t2 = addr(&e2);
 
 		if (t1 == S_R8) {
@@ -397,90 +422,68 @@ struct mne *mp;
 				break;
 			}
 		}
-		if ( ( t1 == S_R16 ) && ( t2 == S_R16 ) ) {
-		  if( ( v1 == SP ) && ( v2 == HL ) ) {
-		    outab( 0xf9 );
-		    break;
-		  }
-		  if( ( v1 == HL ) && ( v2 == SP ) ) {
-		    outab( 0xf8 );
-		    break;
-		  }
-		}
-		if( ( t1 == S_R8 ) && ( v1 == A ) && ( t2 == S_IDC ) ) {
-		    outab( 0xF2 );
-		    break;
-		}
-		if( ( t2 == S_R8 ) && ( v2 == A ) && ( t1 == S_IDC ) ) {
-		    outab( 0xE2 );
-		    break;
-		}
-		if( ( t1 == S_R8 ) && ( v1 == A ) && ( t2 == S_IDHLD ) ) {
-		    outab( 0x3A );
-		    break;
-		}
-		if( ( t2 == S_R8 ) && ( v2 == A ) && ( t1 == S_IDHLD ) ) {
-		    outab( 0x32 );
-		    break;
-		}
-		if( ( t1 == S_R8 ) && ( v1 == A ) && ( t2 == S_IDHLI ) ) {
-		    outab( 0x2A );
-		    break;
-		}
-		if( ( t2 == S_R8 ) && ( v2 == A ) && ( t1 == S_IDHLI ) ) {
-		    outab( 0x22 );
-		    break;
-		}
-		xerr('a', "Invalid Addressing Mode.");
-		break;
-
-	case S_STOP:    /* 0x10 */
-		/*
-		 * 0x10 : STOP
-		 */
-		outab(op);
-		/* due to a hardware bug it's sometimes a 2B instruction*/
-		outab(0x00);
-		break;
-
-	case S_LDA:     /* 0xE8 */
-		/*
-		 * 0xE8 : LDA SP,n(SP)
-		 * 0xF8 : LDA HL,n(SP)
-		 */
-		t1 = addr(&e1);
-		comma(1);
-		t2 = addr(&e2);
-		if ((t1 == S_R16) && (t2 == S_INDR+SP)) {
-			if (e1.e_addr == SP) {
-				outab(0xE8);
-				outrb(&e2, 0);
+		if ((t1 == S_R16) && (t2 == S_R16)) {
+			if ((v1 == SP) && (v2 == HL)) {
+				outab(0xF9);
 				break;
 			}
-			if (e1.e_addr == HL) {
+			if ((v1 == HL) && (v2 == SP)) {
 				outab(0xF8);
-				outrb(&e2, 0);
+				if (more()) {
+					expr(&e3, 0);
+					outrb(&e3, 0);
+				} else {
+					outab(0x00);
+				}
 				break;
 			}
-			xerr('a', "First argument must be SP or HL.");
+		}
+		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDC)) {
+			outab(0xF2);
+			break;
+		}
+		if ((t2 == S_R8) && (v2 == A) && (t1 == S_IDC)) {
+			outab(0xE2);
+			break;
+		}
+		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDHLD)) {
+			outab(0x3A);
+			break;
+		}
+		if ((t2 == S_R8) && (v2 == A) && (t1 == S_IDHLD)) {
+			outab(0x32);
+			break;
+		}
+		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDHLI)) {
+			outab(0x2A);
+			break;
+		}
+		if ((t2 == S_R8) && (v2 == A) && (t1 == S_IDHLI)) {
+			outab(0x22);
 			break;
 		}
 		xerr('a', "Invalid Addressing Mode.");
 		break;
 
-	case S_LDHL:    /* 0xF8 */
-		/*
-		 * 0xF8 : LDHL SP,#n
-		 */
+	case S_LDHL:
 		t1 = addr(&e1);
-		comma(1);
-		t2 = addr(&e2);
-		if ((t1 == S_R16) && (e1.e_addr == SP) && (t2 == S_IMMED)) {
-			outab(0xF8);
-			outrb(&e2,0);
+		v1 = (int) e1.e_addr;
+		if ((t1 == S_R16) && (v1 == SP)) {
+			outab(op);
+			if (more()) {
+				expr(&e2, 0);
+				outrb(&e2, 0);
+			} else {
+				outab(0x00);
+			}
 			break;
 		}
-		xerr('a', "Invalid Addressing Mode.");
+		if (t1 == S_IMMED) {
+			outab(0x21);
+			outrw(&e1, 0);
+			break;
+		}
+		xerr('a', "Allowed Arguments Are SP, SP + arg, or a #.");
 		break;
 
 	case S_DEC:
@@ -586,29 +589,29 @@ struct mne *mp;
 		 * alias:  out (c),a	; (0xFF00 + c) <- A
 		 */
 
-		t1 = addr( &e1 );
+		t1 = addr(&e1);
 		comma(1);
-		t2 = addr( &e2 );
+		t2 = addr(&e2);
 		v1 = (int) e1.e_addr;
 		v2 = (int) e2.e_addr;
 
-		if( ( t1 == S_R8 ) && ( v1 == A ) && ( t2 == S_INDM ) ) {
-		    outab( 0xF0 );
-		    outab( v2 );
-		    break;
+		if ((t1 == S_R8) && (v1 == A) && (t2 == S_INDM)) {
+			outab(0xF0);
+		 	outab(v2);
+			break;
 		}
-		if( ( t2 == S_R8 ) && ( v2 == A ) && ( t1 == S_INDM ) ) {
-		    outab( 0xE0 );
-		    outab( v1 );
-		    break;
+		if ((t2 == S_R8) && (v2 == A) && (t1 == S_INDM)) {
+			outab(0xE0);
+			outab(v1);
+			break;
 		}
-		if( ( t1 == S_R8 ) && ( v1 == A ) && ( t2 == S_IDC ) ) {
-		    outab( 0xF2 );
-		    break;
+		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDC)) {
+			outab(0xF2);
+			break;
 		}
-		if( ( t2 == S_R8 ) && ( v2 == A ) && ( t1 == S_IDC ) ) {
-		    outab( 0xE2 );
-		    break;
+		if ((t2 == S_R8) && (v2 == A) && (t1 == S_IDC)) {
+			outab(0xE2);
+			break;
 		}
 		xerr('a', "Invalid Addressing Mode.");
 		break;
@@ -630,22 +633,22 @@ struct mne *mp;
 		 * alias:  ld  a,(c)	; A <- (0xFF00 + c)
 		 */
 
-		t1 = addr( &e1 );
+		t1 = addr(&e1);
 		comma(1);
 		t2 = addr( &e2 );
 		v1 = (int) e1.e_addr;
 		v2 = (int) e2.e_addr;
 
-		if( ( t1 == S_R8 ) && ( v1 == A ) ) {
-		  if( t2 == S_IDC ) {
-		    outab( 0xF2 );
-		    break;
-		  }
-		  if( t2 == S_INDM ) {
-		    outab( 0xF0 );
-		    outab( v2 );
-		    break;
-		  }
+		if ((t1 == S_R8) && (v1 == A)) {
+			if (t2 == S_IDC) {
+				outab(0xF2);
+				break;
+			}
+			if (t2 == S_INDM) {
+				outab(0xF0);
+				outab(v2);
+				break;
+			}
 		}
 		xerr('a', "Invalid Addressing Mode.");
 		break;
@@ -666,24 +669,34 @@ struct mne *mp;
 		 * alias:  ld  (c),a)	; (0xFF00 + C) <- A
 		 */
 
-		t1 = addr( &e1 );
+		t1 = addr(&e1);
 		comma(1);
 		t2 = addr( &e2 );
 		v1 = (int) e1.e_addr;
 		v2 = (int) e2.e_addr;
 
-		if( ( t2 == S_R8 ) && ( v2 == A ) ) {
-		  if( t1 == S_IDC ) {
-		    outab( 0xE2 );
-		    break;
-		  }
-		  if( t1 == S_INDM ) {
-		    outab( 0xE0 );
-		    outab( v1 );
-		    break;
-		  }
+		if ((t2 == S_R8) && (v2 == A)) {
+			if (t1 == S_IDC) {
+				outab(0xE2);
+				break;
+			}
+			if (t1 == S_INDM) {
+				outab(0xE0);
+				outab(v1);
+				break;
+			}
 		}
 		xerr('a', "Invalid Addressing Mode.");
+		break;
+
+	case S_STOP:
+		outab(op);
+		/*
+		 * Due to a hardware bug it's
+		 * sometimes a 2B instruction.
+		 * Insert dumby 'nop' instruction.
+		 */
+		outab(0x00);
 		break;
 
 	case S_TILE:
@@ -699,7 +712,7 @@ struct mne *mp;
 		if ((d = getnb()) == '^') {
 		  d = get();
 		}
-		if(d == '\0' ) {
+		if (d == '\0' ) {
 		  xerr('q', "TILE is a chunk of 8 characters."); 
 		}
 
@@ -727,58 +740,55 @@ struct mne *mp;
 		 * the end of line.
 		 */
 
-		while( ( oops == 0 ) && ( c != d ) && ( c != 0 ) ) {
+		while ((oops == 0) && (c != d) && (c != 0)) {
 
-		  th = th << 1;
-		  tl = tl << 1;
+			th = th << 1;
+			tl = tl << 1;
 
-		  switch( c ) {
-		    case ' ':
-		    case '0':
-		      break;
-		    case '.':
-		    case '1':
-		      tl++; 
-		      break;
-		    case '+':
-		    case '2':
-		      th++; 
-		      break;
-		    case '*':
-		    case '3':
-		      th++; 
-		      tl++; 
-		      break;
-		    default:  
-		      oops = 1;
-		      break;
-		  }
+			switch( c ) {
+			case ' ':
+			case '0':			break;
 
-		  c = get();
-		  i++;
+			case '.':
+			case '1':	tl++; 		break;
 
-		  /* Spit out the tile data.
-		   */
+			case '+':
+			case '2':	th++; 		break;
 
-		  if( i == 8 ) {
-		    outab( tl );
-		    outab( th );
-		    i = 0;
-		    tl = 0;
-		    th = 0;
-		  }
+			case '*':
+			case '3':	tl++; 	th++; 	break;
+
+			default:	oops = 1;	break;
+			}
+
+			c = get();
+			i++;
+
+			/*
+			 * Spit out the tile data.
+			 */
+
+			if (i == 8) {
+				outab(tl);
+				outab(th);
+				i = 0;
+				tl = 0;
+				th = 0;
+			}
 		}
 
-		/* Figure out whether we left the while loop early. If so,
-		 * complain.
+		/*
+		 * Figure out whether we left the while loop early.
+		 * If so, complain.
 		 */
 
-		if( i != 0 ) {
+		if (i != 0) {
 		  xerr('a', "Invalid character or terminated without 8 characters.");
 		  break;
 		}
 
-		/* Make sure we have the delimiter next. This should
+		/*
+		 * Make sure we have the delimiter next. This should
 		 * already have been fetched by the end of the while().
 		 * What this primarily buys us that the check for
 		 * the modulo-8 counter does not is detecting a string
@@ -790,7 +800,6 @@ struct mne *mp;
 		  xerr('q', "Missing TILE terminator.");
 		  break;
 		}
-
 		break;
 		
 
