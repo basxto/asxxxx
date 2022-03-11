@@ -927,6 +927,7 @@ scanline()
  *	called functions:
  *		int	fprintf()	c_library
  *		int	getlnm()	assubr.c
+ *		VOID	listhlr()	aslist.c
  *		VOID	slew()		aslist.c
  *		char *	strcat()	c_library
  *		char *	strcpy()	c_library
@@ -978,6 +979,10 @@ char *id;
 					case 4: frmt = "  %32s%5u %s\n"; break;
 					}
 					fprintf(lfp, frmt, "", line, ib);
+					/*
+					 * Update HLR File
+					 */
+					listhlr(LIST_SRC, SLIST, 0);
 				}
 			}
 			/*

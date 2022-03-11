@@ -134,7 +134,6 @@ char *str;
  *		int	srcline		source file line number
  *		FILE *	stderr		console error output (c_library)
  *		FILE *	lfp		.lst file handle
- *		FILE *	hfp		.hlr file handle
  *
  *	functions called:
  *		int	fprintf()	c_library
@@ -165,7 +164,7 @@ diag()
 			fprintf(fp, "> in line ");
 			fprintf(fp, "%d", getlnm());
 			fprintf(fp, " of %s\n", afn);
-			if ((fp == lfp) && (hfp != NULL)) {
+			if (fp == lfp) {
 				listhlr(LIST_SRC, SLIST, 0);
 			}
 			p = eb;
@@ -175,13 +174,13 @@ diag()
 				}
 				if ((ex[(int) (p-eb)] != NULL) && (*ex[(int) (p-eb)] != 0)) {
 					fprintf(fp, "              <%c> %s\n", *p, ex[(int) (p-eb)]);
-					if ((fp == lfp) && (hfp != NULL)) {
+					if (fp == lfp) {
 						listhlr(LIST_SRC, SLIST, 0);
 					}
 				} else
 				if ((errstr = geterr(*p)) != NULL) {
 					fprintf(fp, "              %s\n", errstr);
-					if ((fp == lfp) && (hfp != NULL)) {
+					if (fp == lfp) {
 						listhlr(LIST_SRC, SLIST, 0);
 					}
 				}

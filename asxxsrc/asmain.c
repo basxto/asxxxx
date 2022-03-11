@@ -2773,29 +2773,6 @@ int wf;
 		}
 		*p1++ = 0;
 	}
-
-#if 0
-	/*
-	 * Copy File Extension
-	 */
-	 p2 = ft;
-	 if (*p2 == 0) {
-		if (p1 == NULL) {
-			p2 = dsft;
-		} else {
-			p2 = strrchr(&fn[afptmp], FSEPX) + 1;
-		}
-	}
-	if (p1 == NULL) {
-		p1 = &afntmp[strlen(afntmp)];
-	}
-	*p1++ = FSEPX;
-	while ((c = *p2++) != 0) {
-		if (p1 < &afntmp[FILSPC-1])
-			*p1++ = c;
-	}
-	*p1++ = 0;
-#endif
 }
 
 /*)Function	int	fndidx(str)

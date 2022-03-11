@@ -95,6 +95,9 @@ static char *gbPage[2] = {
     gbpg1, gbpg2
 };
 
+struct area *pagarea;
+struct expr pagexpr;
+
 /*
  * Process a machine op.
  */
@@ -105,6 +108,8 @@ struct mne *mp;
 	register int op, t1, t2;
 	struct expr e1, e2, e3;
 	int rf, v1, v2;
+	struct area *espa;
+	char id[NCPS];
 	int d,c,i,th,tl,oops; /* for dealing with .tile */
 
 	clrexpr(&e1);
@@ -114,7 +119,39 @@ struct mne *mp;
 	rf = mp->m_type;
 	switch (rf) {
 
-	case S_INH1:
+	case S_SPG:
+		opcycles = OPCY_SDP;
+		espa = NULL;
+		if (more()) {
+			expr(&e1, 0);
+			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
+				if (e1.e_addr != 0xFF00) {
+					xerr('a', "Only PAGE FF (= 0xFF00) Is Allowed.");
+				}
+			}
+			if ((c = getnb()) == ',') {
+				getid(id, -1);
+				espa = alookup(id);
+				if (espa == NULL) {
+					xerr('u', "Undefined Area.");
+				}
+			} else {
+				unget(c);
+			}
+		} else {
+			e1.e_addr = 0xFF000;
+		}
+		if (espa) {
+			pagarea = espa;
+ 		} else {
+			pagarea = dot.s_area;
+ 		}
+		memcpy(&pagexpr, &e1, sizeof(e1));
+		outdp(pagarea, &pagexpr, 0);
+		lmode = SLIST;
+		break;
+
+	case S_INH:
 		outab(op);
 		break;
 
@@ -130,7 +167,7 @@ struct mne *mp;
 		}
 		break;
 
-	case S_PUSH:
+	case S_PTYP:
 		if (admode(R16X)) {
 			outab(op+0x30);
 			break;
@@ -149,17 +186,6 @@ struct mne *mp;
 			v1 = 0;
 		}
 		outab(op|v1);
-		break;
-
-	case S_IM:
-		expr(&e1, 0);
-		abscheck(&e1);
-		if (e1.e_addr > 2) {
-			xerr('a', "Valid values are 0 -> 2.");
-			e1.e_addr = 0;
-		}
-		outab(op);
-		outab(imtab[(int) e1.e_addr]);
 		break;
 
 	case S_BIT:
@@ -201,39 +227,18 @@ struct mne *mp;
 			xerr('a', "Invalid Addressing Mode.");
 		break;
 
-	case S_AND:
-	case S_SUB:
+	case S_ACC:
 		t1 = 0;
 		t2 = addr(&e2);
 		if (more()) {
 			if ((t2 != S_R8) || (e2.e_addr != A))
 				++t1;
 			comma(1);
+			clrexpr(&e2);
 			t2 = addr(&e2);
 		}
 		if (genop(0, op, &e2, 1) || t1)
 			xerr('a', "Invalid Addressing Mode.");
-		break;
-
-	case S_ADC:
-	case S_SBC:
-		t1 = addr(&e1);
-		t2 = 0;
-		if (more()) {
-			comma(1);
-			t2 = addr(&e2);
-		}
-		if (t2 == 0) {
-			if (genop(0, op, &e1, 1))
-				xerr('a', "Invalid Addressing Mode.");
-			break;
-		}
-		if ((t1 == S_R8) && (e1.e_addr == A)) {
-			if (genop(0, op, &e2, 1))
-				xerr('a', "Invalid Addressing Mode.");
-			break;
-		}
-		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_ADD:
@@ -332,7 +337,30 @@ struct mne *mp;
 		switch(t1) {
 		case S_R8:	outab(0x78 + v1);		break;
 		case S_IMMED:	outab(0x3E);	outrb(&e1, 0);	break;
-		case S_INDM:	outab(0xFA);	outrw(&e1, 0);	break;
+		case S_INDM:
+			if (is_abs(&e1) && ((v1 & 0xFF00) == 0xFF00)) {
+				outab(0xF0);
+				outab(v1);
+			} else {
+				outab(0xFA);
+				outrw(&e1, 0);
+			}
+			break;
+		case S_IDIR:
+			if (is_abs(&e1)) {
+				if ((v1 & 0xFF00) == 0xFF00) {
+					outab(0xF0);
+					outab(v1);
+				} else {
+					xerr('a', "Address Not In Range 0xFF00-0xFFFF.");
+					outab(0xFA);
+					outaw(v1);
+				}
+			} else {
+				outab(0xF0);
+				outrb(&e1, R_PAGN);
+			}
+			break;
 		case S_IDBC:	outab(0x0A);			break;
 		case S_IDDE:	outab(0x1A);			break;
 		case S_IDC:	outab(0xF2);			break;
@@ -351,7 +379,30 @@ struct mne *mp;
 			switch(t1) {
 			case S_R8:	outab(0x78 + v1);		break;
 			case S_IMMED:	outab(0x3E);	outrb(&e1, 0);	break;
-			case S_INDM:	outab(0xFA);	outrw(&e1, 0);	break;
+			case S_INDM:
+				if (is_abs(&e1) && ((v1 & 0xFF00) == 0xFF00)) {
+					outab(0xF0);
+					outab(v1);
+				} else {
+					outab(0xFA);
+					outrw(&e1, 0);
+				}
+				break;
+			case S_IDIR:
+				if (is_abs(&e1)) {
+					if ((v1 & 0xFF00) == 0xFF00) {
+						outab(0xF0);
+						outab(v1);
+					} else {
+						xerr('a', "Address Not In Range 0xFF00-0xFFFF.");
+						outab(0xFA);
+						outaw(v1);
+					}
+				} else {
+					outab(0xF0);
+					outrb(&e1, R_PAGN);
+				}
+				break;
 			case S_IDBC:	outab(0x0A);			break;
 			case S_IDDE:	outab(0x1A);			break;
 			case S_IDC:	outab(0xF2);			break;
@@ -392,13 +443,55 @@ struct mne *mp;
 			} 
 		}
 		if ((t1 == S_R8) && (v1 == A) && (t2 == S_INDM)) {
-			outab(0xFA);
-			outrw(&e2, 0);
+			if (is_abs(&e2) && ((v2 & 0xFF00) == 0xFF00)) {
+				outab(0xF0);
+				outab(v2);
+			} else {
+				outab(0xFA);
+				outrw(&e2, 0);
+			}
+			break;
+		}
+		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDIR)) {
+			if (is_abs(&e2)) {
+				if ((v2 & 0xFF00) == 0xFF00) {
+					outab(0xF0);
+					outab(v2);
+				} else {
+					xerr('a', "Address Not In Range 0xFF00-0xFFFF.");
+					outab(0xFA);
+					outaw(v2);
+				}
+			} else {
+				outab(0xF0);
+				outrb(&e2, R_PAGN);
+			}
 			break;
 		}
 		if ((t1 == S_INDM) && (t2 == S_R8) && (v2 == A)) {
-			outab(0xEA);
-			outrw(&e1, 0);
+			if (is_abs(&e1) && ((v1 & 0xFF00) == 0xFF00)) {
+				outab(0xE0);
+				outab(v1);
+			} else {
+				outab(0xEA);
+				outrw(&e1, 0);
+			}
+			break;
+		}
+		if ((t1 == S_IDIR) && (t2 == S_R8) && (v2 == A)) {
+			if (is_abs(&e1)) {
+				if ((v1 & 0xFF00) == 0xFF00) {
+					outab(0xE0);
+					outab(v1);
+				} else {
+					xerr('a', "Address Not In Range 0xFF00-0xFFFF.");
+					outab(0xEA);
+					outaw(v1);
+				}
+			} else {
+				outab(0xE0);
+				outrb(&e1, R_PAGN);
+			}
 			break;
 		}
 		if ((t2 == S_R8) && (t1 == S_IDHL)) {
@@ -430,6 +523,7 @@ struct mne *mp;
 			if ((v1 == HL) && (v2 == SP)) {
 				outab(0xF8);
 				if (more()) {
+					comma(0);
 					expr(&e3, 0);
 					outrb(&e3, 0);
 				} else {
@@ -471,6 +565,7 @@ struct mne *mp;
 		if ((t1 == S_R16) && (v1 == SP)) {
 			outab(op);
 			if (more()) {
+				comma(0);
 				expr(&e2, 0);
 				outrb(&e2, 0);
 			} else {
@@ -483,11 +578,11 @@ struct mne *mp;
 			outrw(&e1, 0);
 			break;
 		}
-		xerr('a', "Allowed Arguments Are SP, SP + arg, or a #.");
+		xerr('a', "Allowed Arguments Are 'SP', 'SP+arg', 'SP,#arg', or a '#'.");
 		break;
 
-	case S_DEC:
 	case S_INC:
+	case S_DEC:
 		t1 = addr(&e1);
 		v1 = (int) e1.e_addr;
 		if (t1 == S_R8) {
@@ -530,8 +625,6 @@ struct mne *mp;
 		} else {
 			outrb(&e2, R_PCR);
 		}
-		if (e2.e_mode != S_USER)
-			rerr();
 		break;
 
 	case S_CALL:
@@ -556,7 +649,7 @@ struct mne *mp;
 			break;
 		}
 		t1 = addr(&e1);
-		if (t1 == S_USER) {
+		if (t1 == S_EXT) {
 			outab(0xC3);
 			outrw(&e1, 0);
 			break;
@@ -590,19 +683,69 @@ struct mne *mp;
 		 */
 
 		t1 = addr(&e1);
-		comma(1);
-		t2 = addr(&e2);
 		v1 = (int) e1.e_addr;
+		if (comma(0) == 0) {	/* ldh  arg  ==  ldh  a,arg */
+			switch(t1) {
+			case S_INDM:
+				if (is_abs(&e1)) {
+					if ((v1 & 0xFF00) == 0x0000) {
+						outab(0xF0);
+						outab(v1);
+					} else {
+						outab(0xFA);
+						outaw(v1);
+						xerr('a', "I/O Address Not In Range 0x00-0xFF.");
+					}
+					break;
+				} else {
+					outab(0xF0);
+					e1.e_addr += 0xFF00;
+					outrb(&e1, R_PAGN);
+				}
+				break;
+			case S_IDC:	outab(0xF2);			break;
+			default:
+				xerr('a', "Invalid Addressing Mode.");	break;
+			}
+			break;
+		}
+		t2 = addr(&e2);
 		v2 = (int) e2.e_addr;
 
 		if ((t1 == S_R8) && (v1 == A) && (t2 == S_INDM)) {
-			outab(0xF0);
-		 	outab(v2);
+			if (is_abs(&e2)) {
+				if ((v2 & 0xFF00) == 0x0000) {
+					outab(0xF0);
+					outab(v2);
+				} else {
+					outab(0xFA);
+					outaw(v2);
+					xerr('a', "I/O Address Not In Range 0x00-0xFF.");
+				}
+				break;
+			} else {
+				outab(0xF0);
+				e2.e_addr += 0xFF00;
+				outrb(&e2, R_PAGN);
+			}
 			break;
 		}
 		if ((t2 == S_R8) && (v2 == A) && (t1 == S_INDM)) {
-			outab(0xE0);
-			outab(v1);
+			if (is_abs(&e1)) {
+				if ((v1 & 0xFF00) == 0x0000) {
+					outab(0xE0);
+					outab(v1);
+				} else {
+					outab(0xEA);
+					outaw(v1);
+					xerr('a', "I/O Address Not In Range 0x00-0xFF.");
+				}
+				break;
+			} else {
+				outab(0xE0);
+				e1.e_addr += 0xFF00;
+				outrb(&e1, R_PAGN);
+			}
 			break;
 		}
 		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDC)) {
@@ -886,5 +1029,13 @@ minit()
 	 * Byte Order
 	 */
 	hilo = 0;
+
+	/*
+	 * (Re)Set PAGN Boundary
+	 */
+	clrexpr(&pagexpr);
+	pagexpr.e_addr = 0xFF00;
+	pagarea = dot.s_area;
+	outdp(pagarea, &pagexpr, 0);
 }
 

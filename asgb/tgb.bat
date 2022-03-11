@@ -1,5 +1,5 @@
-asgb -gloaxf tgb
-aslink -xu tgb
+asgb -gloaxffbbr tgb
+aslink -nf tgb
 asxscn tgb.lst
-asxscn tgb.rst
+asxscn -i tgb.rst
 

@@ -74,14 +74,19 @@ struct expr *esp;
 		if ((indx = admode(R16X)) != 0) {
 			mode = S_R16X;
 			aerr();
+		} else
+		if ((c = getnb()) == '*') {
+			mode = S_IDIR;
+			expr(esp, 0);
+			esp->e_mode = mode;
 		} else {
+			unget(c);
 			mode = S_INDM;
 			expr(esp, 0);
 			esp->e_mode = mode;
 		}
 		if (indx) {
 			esp->e_mode = mode + (indx & 0xFF);
-			esp->e_base.e_ap = NULL;
 		}
 		if ((c = getnb()) != RTIND)
 			xerr('q', "Missing ')'.");
@@ -95,15 +100,19 @@ struct expr *esp;
 		} else	
 		if ((indx = admode(R16X)) != 0) {
 			mode = S_R16X;
+		} else
+		if ((c = getnb()) == '*') {
+			expr(esp, 0);
+			esp->e_mode = S_DIR;
 		} else {
-			mode = S_USER;
+			unget(c);
+			mode = S_EXT;
 			expr(esp, 0);
 			esp->e_mode = mode;
 		}
 		if (indx) {
 			esp->e_addr = indx & 0xFF;
 			esp->e_mode = mode;
-			esp->e_base.e_ap = NULL;
 		}
 	}
 	return (esp->e_mode);
