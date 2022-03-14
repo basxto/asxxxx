@@ -1,7 +1,7 @@
 /* gb.h */
 
 /*
- *  Copyright (C) 1989-2021  Alan R. Baldwin
+ *  Copyright (C) 1989-2022  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@
 #define	S_IDBC	50	/* (BC) */
 #define	S_IDDE	51	/* (DE) */
 #define	S_IDHL	52	/* (HL) */
-#define	S_IDSP	53	/* (SP) Not Used By Game Boy */
+#define	S_IDSP	53	/* (SP) n(SP) Syntax for SP+n */
 #define	S_IDAF	54	/* (AF) Not Used By Game Boy */
 #define	S_IDHLD	55	/* ldd (hl),a | ldd a,(hl) | ld a,(hl-) | ld (hl-),a */
 #define	S_IDHLI	56	/* ldi (hl),a | ldi (hl),a | ld a,(hl+) | ld (hl+),a */
@@ -212,28 +212,26 @@ extern	struct	adsym	CND[];
 
 #ifdef	OTHERSYSTEM
 	
-	/* z80adr.c */
+	/* gbadr.c */
 extern	int		addr(struct expr *esp);
 extern	int		admode(struct adsym *sp);
 extern	int		srch(char *str);
 
-	/* z80mch.c */
+	/* gbmch.c */
 extern	int		genop(int pop, int op, struct expr *esp, int f);
-extern	int		gixiy(int v);
 extern	VOID		machine(struct mne *mp);
 extern	int		mchpcr(struct expr *esp);
 extern	VOID		minit(void);
 
 #else
 
-	/* z80adr.c */
+	/* gbadr.c */
 extern	int		addr();
 extern	int		admode();
 extern	int		srch();
 
-	/* z80mch.c */
+	/* gbmch.c */
 extern	int		genop();
-extern	int		gixiy();
 extern	VOID		machine();
 extern	int		mchpcr();
 extern	VOID		minit();

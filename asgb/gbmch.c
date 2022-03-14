@@ -1,7 +1,7 @@
 /* gbmch.c */
 
 /*
- *  Copyright (C) 1989-2021  Alan R. Baldwin
+ *  Copyright (C) 1989-2022  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ VOID
 machine(mp)
 struct mne *mp;
 {
-	register int op, t1, t2;
+	register int op, t1, t2, t3;
 	struct expr e1, e2, e3;
 	int rf, v1, v2;
 	struct area *espa;
@@ -276,7 +276,7 @@ struct mne *mp;
 			}
 			if( e1.e_addr == SP ) {
 				outab(0xE8);
-				outrb(&e2,0);
+				outrb(&e2, R_SGND);
 				break;
 			}
 		}
@@ -284,7 +284,7 @@ struct mne *mp;
 		break;
 
 
-        case S_LDX:
+	case S_LDX:
 
 		/* These are loads which increment or decrement HL. The
 		 * valid instructions are:
@@ -310,7 +310,7 @@ struct mne *mp;
 
 		if ((t1 == S_R8) && (t2 == S_IDHL)) {
 			/* It's "ld? r,(rp)". Make certain r is A. */
-			if (e1.e_addr != A)  {
+			if (e1.e_addr != A) {
 				xerr('a', "First argument must be A.");
 				break;
 			}
@@ -361,14 +361,13 @@ struct mne *mp;
 				outrb(&e1, R_PAGN);
 			}
 			break;
-		case S_IDBC:	outab(0x0A);			break;
-		case S_IDDE:	outab(0x1A);			break;
-		case S_IDC:	outab(0xF2);			break;
-		case S_IDHL:	outab(0x7E);			break;
-		case S_IDHLD:	outab(0x3A);			break;
-		case S_IDHLI:	outab(0x2A);			break;
-		default:
-			xerr('a', "Invalid Addressing Mode.");	break;
+		case S_IDBC:	outab(0x0A);	break;
+		case S_IDDE:	outab(0x1A);	break;
+		case S_IDC:	outab(0xF2);	break;
+		case S_IDHL:	outab(0x7E);	break;
+		case S_IDHLD:	outab(0x3A);	break;
+		case S_IDHLI:	outab(0x2A);	break;
+		default:	aerr();		break;
 		}
 		break;
 
@@ -403,18 +402,21 @@ struct mne *mp;
 					outrb(&e1, R_PAGN);
 				}
 				break;
-			case S_IDBC:	outab(0x0A);			break;
-			case S_IDDE:	outab(0x1A);			break;
-			case S_IDC:	outab(0xF2);			break;
-			case S_IDHL:	outab(0x7E);			break;
-			case S_IDHLD:	outab(0x3A);			break;
-			case S_IDHLI:	outab(0x2A);			break;
-			default:
-				xerr('a', "Invalid Addressing Mode.");	break;
+			case S_IDBC:	outab(0x0A);	break;
+			case S_IDDE:	outab(0x1A);	break;
+			case S_IDC:	outab(0xF2);	break;
+			case S_IDHL:	outab(0x7E);	break;
+			case S_IDHLD:	outab(0x3A);	break;
+			case S_IDHLI:	outab(0x2A);	break;
+			default:	aerr();		break;
 			}
 			break;
 		}
 		t2 = addr(&e2);
+
+		/*
+		 * Form  reg,reg / reg,(hl) / reg,#
+		 */
 
 		if (t1 == S_R8) {
 			v1 = (int) (e1.e_addr<<3);
@@ -430,133 +432,170 @@ struct mne *mp;
 		v1 = (int) e1.e_addr;
 		v2 = (int) e2.e_addr;
 
-		if ((t1 == S_R16) && (t2 == S_IMMED)) {
-			outab(0x01 | (v1<<4));
-			outrw(&e2, 0);
-			break;
-		}
-		if ((t1 == S_INDM) && (t2 == S_R16)) {
-			if (v2 == SP) {
-			  outab(0x08);
-			  outrw(&e1, 0);
-			  break;
-			} 
-		}
-		if ((t1 == S_R8) && (v1 == A) && (t2 == S_INDM)) {
-			if (is_abs(&e2) && ((v2 & 0xFF00) == 0xFF00)) {
-				outab(0xF0);
-				outab(v2);
-			} else {
-				outab(0xFA);
-				outrw(&e2, 0);
-			}
-			break;
-		}
-		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDIR)) {
-			if (is_abs(&e2)) {
-				if ((v2 & 0xFF00) == 0xFF00) {
+		/*
+		 * Form a,arg   arg != a
+		 */
+
+		if ((t1 == S_R8) && (v1 == A)) {
+			switch(t2) {
+			case S_INDM:
+				if (is_abs(&e2) && ((v2 & 0xFF00) == 0xFF00)) {
 					outab(0xF0);
 					outab(v2);
 				} else {
-					xerr('a', "Address Not In Range 0xFF00-0xFFFF.");
 					outab(0xFA);
-					outaw(v2);
+					outrw(&e2, 0);
 				}
-			} else {
-				outab(0xF0);
-				outrb(&e2, R_PAGN);
-			}
-			break;
-		}
-		if ((t1 == S_INDM) && (t2 == S_R8) && (v2 == A)) {
-			if (is_abs(&e1) && ((v1 & 0xFF00) == 0xFF00)) {
-				outab(0xE0);
-				outab(v1);
-			} else {
-				outab(0xEA);
-				outrw(&e1, 0);
-			}
-			break;
-		}
-		if ((t1 == S_IDIR) && (t2 == S_R8) && (v2 == A)) {
-			if (is_abs(&e1)) {
-				if ((v1 & 0xFF00) == 0xFF00) {
-					outab(0xE0);
-					outab(v1);
+				break;
+			case S_IDIR:
+				if (is_abs(&e2)) {
+					if ((v2 & 0xFF00) == 0xFF00) {
+						outab(0xF0);
+						outab(v2);
+					} else {
+						xerr('a', "Address Not In Range 0xFF00-0xFFFF.");
+						outab(0xFA);
+						outaw(v2);
+					}
 				} else {
-					xerr('a', "Address Not In Range 0xFF00-0xFFFF.");
-					outab(0xEA);
-					outaw(v1);
+					outab(0xF0);
+					outrb(&e2, R_PAGN);
 				}
-			} else {
-				outab(0xE0);
-				outrb(&e1, R_PAGN);
+				break;
+			case S_IDC:	outab(0xF2);	break;
+			case S_IDHLD:	outab(0x3A);	break;
+			case S_IDHLI:	outab(0x2A);	break;
+			case S_IDBC:
+			case S_IDDE:	outab(0x0A | ((t2-S_INDR)<<4));	break;
+			default:	aerr();		break;
 			}
 			break;
 		}
+
+		/*
+		 * Form  (hl),reg
+		 */
+
 		if ((t2 == S_R8) && (t1 == S_IDHL)) {
 			outab(0x70|v2);
 			break;
 		}
-		if ((t2 == S_IMMED) && (t1 == S_IDHL)) {
-			outab(0x36);
-			outrb(&e2, 0);
-			break;
-		}
-		if ((t1 == S_R8) && (v1 == A)) {
-			if ((t2 == S_IDBC) || (t2 == S_IDDE)) {
-				outab(0x0A | ((t2-S_INDR)<<4));
-				break;
-			}
-		}
+
+		/*
+		 * Form arg,a   arg != a
+		 */
+
 		if ((t2 == S_R8) && (v2 == A)) {
-			if ((t1 == S_IDBC) || (t1 == S_IDDE)) {
-				outab(0x02 | ((t1-S_INDR)<<4));
-				break;
-			}
-		}
-		if ((t1 == S_R16) && (t2 == S_R16)) {
-			if ((v1 == SP) && (v2 == HL)) {
-				outab(0xF9);
-				break;
-			}
-			if ((v1 == HL) && (v2 == SP)) {
-				outab(0xF8);
-				if (more()) {
-					comma(0);
-					expr(&e3, 0);
-					outrb(&e3, 0);
+			switch(t1) {
+			case S_INDM:
+				if (is_abs(&e1) && ((v1 & 0xFF00) == 0xFF00)) {
+					outab(0xE0);
+					outab(v1);
 				} else {
-					outab(0x00);
+					outab(0xEA);
+					outrw(&e1, 0);
 				}
 				break;
+			case S_IDIR:
+				if (is_abs(&e1)) {
+					if ((v1 & 0xFF00) == 0xFF00) {
+						outab(0xE0);
+						outab(v1);
+					} else {
+						xerr('a', "Address Not In Range 0xFF00-0xFFFF.");
+						outab(0xEA);
+						outaw(v1);
+					}
+				} else {
+					outab(0xE0);
+					outrb(&e1, R_PAGN);
+				}
+				break;
+			case S_IDC:	outab(0xE2);	break;
+			case S_IDBC:
+			case S_IDDE:	outab(0x02 | ((t1-S_INDR)<<4));	break;
+			case S_IDHLD:	outab(0x32);	break;
+			case S_IDHLI:	outab(0x22);	break;
+			default:	aerr();		break;
 			}
-		}
-		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDC)) {
-			outab(0xF2);
 			break;
 		}
-		if ((t2 == S_R8) && (v2 == A) && (t1 == S_IDC)) {
-			outab(0xE2);
+
+		/*
+		 * Forms With 16 Bit Arguments
+		 */
+
+		switch(t1) {
+		case S_INDM:
+			if ((t2 == S_R16) && (v2 == SP)) {
+				outab(0x08);
+				outrw(&e1, 0);
+			} else {
+				xerr('a', "SP Is Required For The Second Argument.");
+			}
+			break;
+		case S_IDHL:
+			if (t2 == S_IMMED) {
+				outab(0x36);
+				outrb(&e2, 0);
+			} else {
+				xerr('a', "#n Is required For The Second Argument.");
+			}
+			break;
+		case S_R16:
+			if (t2 == S_R16) {
+				if ((v1 == SP) && (v2 == HL)) {
+					outab(0xF9);
+					break;
+				}
+				if ((v1 == HL) && (v2 == SP)) {
+					outab(0xF8);
+					if (more()) {
+						comma(0);
+						expr(&e3, 0);
+						outrb(&e3, 0);
+					} else {
+						outab(0x00);
+					}
+					break;
+				}
+			}
+			if (v1 == HL) {
+				if (t2 == S_IMMED) {
+					if (more()) {
+						t3 = addr(&e3);
+						if (t3 == S_IDSP) {
+							outab(0xF8);
+							outrb(&e2, R_SGND);
+							break;
+						}
+					} else {
+						outab(0x21);
+						outrw(&e2, 0);
+						break;
+					}
+				}
+				if (t2 == S_EXT) {
+					if (more()) {
+						t3 = addr(&e3);
+						if (t3 == S_IDSP) {
+							outab(0xF8);
+							outrb(&e2, R_SGND);
+							break;
+						}
+					}
+				}
+			}
+			if ((v1 == BC) || (v1 == DE) || (v1 == SP)) {
+				if (t2 == S_IMMED) {
+					outab(0x01 | (v1<<4));
+					outrw(&e2, 0);
+					break;
+				}
+			}
+			aerr();
 			break;
 		}
-		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDHLD)) {
-			outab(0x3A);
-			break;
-		}
-		if ((t2 == S_R8) && (v2 == A) && (t1 == S_IDHLD)) {
-			outab(0x32);
-			break;
-		}
-		if ((t1 == S_R8) && (v1 == A) && (t2 == S_IDHLI)) {
-			outab(0x2A);
-			break;
-		}
-		if ((t2 == S_R8) && (v2 == A) && (t1 == S_IDHLI)) {
-			outab(0x22);
-			break;
-		}
-		xerr('a', "Invalid Addressing Mode.");
 		break;
 
 	case S_LDHL:
@@ -574,11 +613,30 @@ struct mne *mp;
 			break;
 		}
 		if (t1 == S_IMMED) {
-			outab(0x21);
-			outrw(&e1, 0);
-			break;
+			if (more()) {
+				t2 = addr(&e2);
+				if (t2 == S_IDSP) {
+					outab(op);
+					outrb(&e1, 0);
+					break;
+				}
+			} else {
+				outab(0x21);
+				outrw(&e1, 0);
+				break;
+			}
 		}
-		xerr('a', "Allowed Arguments Are 'SP', 'SP+arg', 'SP,#arg', or a '#'.");
+		if (t1 == S_EXT) {
+			if (more()) {
+				t2 = addr(&e2);
+				if (t2 == S_IDSP) {
+					outab(op);
+					outrb(&e1, 0);
+					break;
+				}
+			}
+		}
+		xerr('a', "Allowed Arguments Are 'SP', n(SP), #n(SP), 'SP+n', 'SP,#n', or a '#'.");
 		break;
 
 	case S_INC:
@@ -603,7 +661,7 @@ struct mne *mp;
 				break;
 			}
 		}
-		xerr('a', "Invalid Addressing Mode.");
+		aerr();
 		break;
 
 	case S_JR:
@@ -688,7 +746,8 @@ struct mne *mp;
 			switch(t1) {
 			case S_INDM:
 				if (is_abs(&e1)) {
-					if ((v1 & 0xFF00) == 0x0000) {
+					if (((v1 & 0xFF00) == 0x0000) ||
+				 	    ((v1 & 0xFF00) == 0xFF00)) {
 						outab(0xF0);
 						outab(v1);
 					} else {
@@ -714,7 +773,8 @@ struct mne *mp;
 
 		if ((t1 == S_R8) && (v1 == A) && (t2 == S_INDM)) {
 			if (is_abs(&e2)) {
-				if ((v2 & 0xFF00) == 0x0000) {
+				if (((v2 & 0xFF00) == 0x0000) ||
+			 	    ((v1 & 0xFF00) == 0xFF00)) {
 					outab(0xF0);
 					outab(v2);
 				} else {
@@ -732,7 +792,8 @@ struct mne *mp;
 		}
 		if ((t2 == S_R8) && (v2 == A) && (t1 == S_INDM)) {
 			if (is_abs(&e1)) {
-				if ((v1 & 0xFF00) == 0x0000) {
+				if (((v1 & 0xFF00) == 0x0000) ||
+			 	    ((v1 & 0xFF00) == 0xFF00)) {
 					outab(0xE0);
 					outab(v1);
 				} else {
@@ -853,10 +914,10 @@ struct mne *mp;
 		 */
 
 		if ((d = getnb()) == '^') {
-		  d = get();
+			d = get();
 		}
 		if (d == '\0' ) {
-		  xerr('q', "TILE is a chunk of 8 characters."); 
+			xerr('q', "TILE is a chunk of 8 characters."); 
 		}
 
 		/* .tile deals with chunks of 8 characters. We need to
@@ -926,8 +987,8 @@ struct mne *mp;
 		 */
 
 		if (i != 0) {
-		  xerr('a', "Invalid character or terminated without 8 characters.");
-		  break;
+			xerr('a', "Invalid character or terminated without 8 characters.");
+			break;
 		}
 
 		/*
@@ -940,8 +1001,8 @@ struct mne *mp;
 		 */
 
 		if( c != d ) {
-		  xerr('q', "Missing TILE terminator.");
-		  break;
+			xerr('q', "Missing TILE terminator.");
+			break;
 		}
 		break;
 		

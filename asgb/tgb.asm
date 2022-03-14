@@ -677,10 +677,14 @@
 	  ld	hl,sp+#d8	; F8 20
 	  ld	hl,sp,d8	; F8 20
 	  ld	hl,sp,#d8	; F8 20
+	  ld	hl,d8(sp)	; F8 20
+	  ld	hl,#d8(sp)	; F8 20
 	  ldhl	sp+d8		; F8 20
 	  ldhl	sp+#d8		; F8 20
 	  ldhl	sp,d8		; F8 20
 	  ldhl	sp,#d8		; F8 20
+	  ldhl	d8(sp)		; F8 20
+	  ldhl	#d8(sp)		; F8 20
 
 	add	a,#d8		; C6 20
 	  add	#d8		; C6 20
@@ -1526,10 +1530,14 @@
 	  ld	hl,sp+#d8	; F8r20
 	  ld	hl,sp,d8	; F8r20
 	  ld	hl,sp,#d8	; F8r20
+	  ld	hl,d8(sp)	; F8r20
+	  ld	hl,#d8(sp)	; F8r20
 	  ldhl	sp+d8		; F8r20
 	  ldhl	sp+#d8		; F8r20
 	  ldhl	sp,d8		; F8r20
 	  ldhl	sp,#d8		; F8r20
+	  ldhl	d8(sp)		; F8r20
+	  ldhl	#d8(sp)		; F8r20
 
 	add	a,#d8		; C6r20
 	  add	#d8		; C6r20
