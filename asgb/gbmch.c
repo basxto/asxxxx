@@ -336,6 +336,50 @@ struct mne *mp;
 		v1 = (int) e1.e_addr;
 		switch(t1) {
 		case S_R8:	outab(0x78 + v1);		break;
+		case S_R16:
+			if (v1 == HL) {
+				comma(1);
+				t2 = addr(&e2);
+				v2 = (int) e2.e_addr;
+				if ((t2 == S_R16) && (v2 == SP)) {
+					outab(0xF8);
+					if (more()) {
+						comma(0);
+						expr(&e3, 0);
+						outrb(&e3, 0);
+					} else {
+						outab(0x00);
+					}
+					break;
+				}
+				if (t2 == S_IMMED) {
+					if (more()) {
+						t3 = addr(&e3);
+						if (t3 == S_IDSP) {
+							outab(0xF8);
+							outrb(&e2, R_SGND);
+							break;
+						}
+					} else {
+						outab(0x21);
+						outrw(&e2, 0);
+						break;
+					}
+				}
+				if (t2 == S_EXT) {
+					if (more()) {
+						t3 = addr(&e3);
+						if (t3 == S_IDSP) {
+							outab(0xF8);
+							outrb(&e2, R_SGND);
+							break;
+						}
+					}
+				}
+			}
+			xerr('a', "Invalid Addressing Mode.");
+			break;
+
 		case S_IMMED:	outab(0x3E);	outrb(&e1, 0);	break;
 		case S_INDM:
 			if (is_abs(&e1) && ((v1 & 0xFF00) == 0xFF00)) {

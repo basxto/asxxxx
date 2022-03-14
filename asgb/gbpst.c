@@ -123,7 +123,8 @@ struct	mne	mne[] = {
     {	NULL,	".incbin",	S_INCL,		0,	I_BNRY	},
     {	NULL,	".area",	S_AREA,		0,	0	},
     {	NULL,	".bank",	S_BANK,		0,	0	},
-    {	NULL,	".oix",		S_RADIX,	0,	0	},
+    {	NULL,	".org",		S_ORG,		0,	0	},
+    {	NULL,	".radix",	S_RADIX,	0,	0	},
     {	NULL,	".globl",	S_GLOBL,	0,	0	},
     {	NULL,	".local",	S_LOCAL,	0,	0	},
     {	NULL,	".if",		S_CONDITIONAL,	0,	O_IF	},
@@ -200,8 +201,7 @@ struct	mne	mne[] = {
 /*    {	NULL,	".msb",		S_MSB,		0,	0	},	*/
 /*    {	NULL,	".lohi",	S_MSB,		0,	O_LOHI	},	*/
 /*    {	NULL,	".hilo",	S_MSB,		0,	O_HILO	},	*/
-/*    {	NULL,	".8bit",	S_BITS,		0,	O_1BYTE	},	*/rg",		S_ORG,		0,	0	},
-    {	NULL,	".rad
+/*    {	NULL,	".8bit",	S_BITS,		0,	O_1BYTE	},	*/
 /*    {	NULL,	".16bit",	S_BITS,		0,	O_2BYTE	},	*/
 /*    {	NULL,	".24bit",	S_BITS,		0,	O_3BYTE	},	*/
 /*    {	NULL,	".32bit",	S_BITS,		0,	O_4BYTE	},	*/
