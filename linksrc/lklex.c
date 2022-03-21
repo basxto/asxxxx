@@ -449,7 +449,7 @@ loop:	if (cfp && cfp->f_type == F_STD)
 				sfp = stdin;
 			} else
 			if (ftype == F_LNK) {
-				sfp = afile(fid, "lnk", 0);
+				sfp = afile(fid, "lnk", 8);
 			} else
 			if (ftype == F_REL) {
 				obj_flag = cfp->f_obj;

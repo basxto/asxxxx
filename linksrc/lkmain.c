@@ -1279,6 +1279,9 @@ setgbl()
  *					add 4 to the wf code to
  *					suppress the error reporting
  *
+ *					add 8 to the wf code to allow
+ *					any extension on a file
+ *
  *	The function afile() opens a file for reading or writing.
  *		(1)	If the file type specification string ft
  *			is not NULL then a file specification is
@@ -1342,20 +1345,19 @@ int wf;
 	p1 = strrchr(&afspec[c], FSEPX);
 
 	/*
-	 * File reads allow any extension
-	 * if FSEPX is present.
+	 * Allow any extension if FSEPX
+	 * is present. <path><name><FSEPX>...
 	 */
-	if ( ((wf & 1) == 0) && (p1 != NULL) ) {
+	if (((wf & 8) == 8) && (p1 != NULL)) {
 		/*
 		 * Remove FSEPX when extension is BLANK
 		 */
 		if (*(p1+1) == 0) {
 			*p1 = 0;
 		}
-		p1 = afspec;
 	/*
-	 * NULL extensions and all
-	 * writes default to ft.
+	 * Else all reads and writes default to ft.
+	 * <path><name>... -> <path><name><FSEPX><ft>
 	 */
 	} else {
 		/*

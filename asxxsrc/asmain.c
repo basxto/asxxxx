@@ -444,7 +444,7 @@ char *argv[];
 				asmc->flevel = 0;
 				asmc->tlevel = 0;
 				asmc->lnlist = LIST_NORM;
-				asmc->fp = afile(p, dsft, 0);
+				asmc->fp = afile(p, dsft, 8);
 				strcpy(asmc->afn,afn);
 				asmc->afp = afp;
 			}
@@ -1582,9 +1582,9 @@ loop:
 			 *	use path of file opening the include file
 			 */
 			if (fndidx(fn + afp) != 0) {
-				afilex(fn + afp, "", 0);
+				afilex(fn + afp, "", 8);
 			} else {
-				afilex(fn, "", 0);
+				afilex(fn, "", 8);
 			}
 			/*
 			 * Open File
@@ -1625,9 +1625,9 @@ loop:
 			 *	use path of file opening the .incbin file
 			 */
 			if (fndidx(fn + afp) != 0) {
-				afilex(fn + afp, "", 0);
+				afilex(fn + afp, "", 8);
 			} else {
-				afilex(fn, "", 0);
+				afilex(fn, "", 8);
 			}
 			/*
 			 * Skip Count
@@ -1646,7 +1646,12 @@ loop:
 			/*
 			 * Open File
 			 */
-    			if ((fp = fopen(afntmp, "rb")) == NULL) {
+#ifdef	DECUS
+			p = "rn";
+#else
+			p = "rb";
+#endif
+    			if ((fp = fopen(afntmp, p)) == NULL) {
 				xerr('i', "File not found.");
 				break;
 			}
@@ -2612,6 +2617,9 @@ a_uint equtype;
  *					2 ==>> binary read
  *					3 ==>> binary write
  *
+ *					add 8 to the wf code to allow
+ *					any extension on a file
+ *
  *	The function afile() opens a file for reading or writing.
  *
  *	afile() returns a file handle for the opened file or aborts
@@ -2685,6 +2693,9 @@ int wf;
  *					2 ==>> binary read
  *					3 ==>> binary write
  *
+ *					add 8 to the wf code to allow
+ *					any extension on a file
+ *
  *	The function afilex() processes the file specification string:
  *		(1)	If the file type specification string ft
  *			is not NULL then a file specification is
@@ -2744,10 +2755,10 @@ int wf;
 	p1 = strrchr(&afntmp[afptmp], FSEPX);
 
 	/*
-	 * File reads allow any extension
-	 * if FSEPX is present.
+	 * Allow any extension if FSEPX
+	 * is present. <path><name><FSEPX>...
 	 */
-	if ( ((wf & 1) == 0) && (p1 != NULL) ) {
+	if (((wf & 8) == 8) && (p1 != NULL)) {
 		/*
 		 * Remove FSEPX when extension is BLANK
 		 */
@@ -2755,8 +2766,8 @@ int wf;
 			*p1 = 0;
 		}
 	/*
-	 * NULL extensions and all writes
-	 * default to the ft extension.
+	 * Else all reads and writes default to ft.
+	 * <path><name>... -> <path><name><FSEPX><ft>
 	 */
 	} else {
 		/*

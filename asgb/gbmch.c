@@ -22,7 +22,9 @@
  * Kent, Ohio  44240
  */
 
-/* Gameboy mods by Roger Ivie (ivie at cc dot usu dot edu); see gb.h for more info 
+/*
+ * Gameboy mods by Roger Ivie (ivie at cc dot usu dot edu); see gb.h for more info
+ * Gameboy testing and updates by Sebastian 'basxto' Riedel (sdcc at basxto dot de>
  */
 
 #include "asxxxx.h"
@@ -337,7 +339,7 @@ struct mne *mp;
 		switch(t1) {
 		case S_R8:	outab(0x78 + v1);		break;
 		case S_R16:
-			if (v1 == HL || v1 == SP) {
+			if ((v1 == HL) || (v1 == SP)) {
 				op = (v1 == SP) ? 0x10 : 0x00;
 				comma(1);
 				t2 = addr(&e2);
@@ -605,8 +607,19 @@ struct mne *mp;
 					break;
 				}
 			}
-			if (v1 == HL || v1 == SP) {
+			if ((v1 == HL) || (v1 == SP)) {
 				op = (v1 == SP) ? 0x10 : 0x00;
+				if ((t2 == S_R16) && (v2 == SP)) {
+					outab(0xF8 - op);
+					if (more()) {
+						comma(0);
+						expr(&e3, 0);
+						outrb(&e3, 0);
+					} else {
+						outab(0x00);
+					}
+					break;
+				}
 				if (t2 == S_IMMED) {
 					if (more()) {
 						t3 = addr(&e3);
@@ -632,7 +645,7 @@ struct mne *mp;
 					}
 				}
 			}
-			if ((v1 == BC) || (v1 == DE) || (v1 == SP)) {
+			if ((v1 == BC) || (v1 == DE)) {
 				if (t2 == S_IMMED) {
 					outab(0x01 | (v1<<4));
 					outrw(&e2, 0);

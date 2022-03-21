@@ -1,7 +1,7 @@
 /* r65mch.c */
 
 /*
- *  Copyright (C) 1995-2019  Alan R. Baldwin
+ *  Copyright (C) 1995-2022  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -304,6 +304,7 @@ struct mne *mp;
 
 	case S_DOP:
 		t1 = addr(&e1);
+		v1 = (int) e1.e_addr;
 		switch (t1) {
 		case S_IPREX:
 			outab(op + 0x01);
@@ -484,23 +485,18 @@ struct mne *mp;
 			outab(op + 0x0E);
 			outrw(&e1, 0);
 			break;
-		case S_INDY:
-			if (op != 0x80) {
-				outab(op + 0x1E);
-				outrw(&e1, 0);
-				break;
-			}
-			if((e1.e_flag) || (e1.e_base.e_ap!=NULL)
-				|| (e1.e_addr & ~0xFF)) {
-				outab(op + 0x06);
-				outab(0);
-				aerr();
-				break;
-			}
-			// fall through if it lies in ZP
 		case S_DINDY:
 			outab(op + 0x16);
 			outrb(&e1, R_PAG0);
+			break;
+		case S_INDY:
+			if (op == 0x80) {
+				outab(op + 0x16);
+				outrb(&e1, R_PAG0);
+			} else {
+				outab(op + 0x1E);
+				outrw(&e1, 0);
+			}
 			break;
 		default:
 			outab(op + 0x06);
@@ -527,23 +523,18 @@ struct mne *mp;
 			outab(op + 0x0C);
 			outrw(&e1, 0);
 			break;
-		case S_INDX:
-			if (op != 0x80) {
-				outab(op + 0x1C);
-				outrw(&e1, 0);
-				break;
-			}
-			if((e1.e_flag) || (e1.e_base.e_ap!=NULL)
-				|| (e1.e_addr & ~0xFF)) {
-				outab(op + 0x04);
-				outab(0);
-				aerr();
-				break;
-			}
-			// fall through if it lies in ZP
 		case S_DINDX:
 			outab(op + 0x14);
 			outrb(&e1, R_PAG0);
+			break;
+		case S_INDX:
+			if (op == 0x80) {
+				outab(op + 0x14);
+				outrb(&e1, R_PAG0);
+			} else {
+				outab(op + 0x1C);
+				outrw(&e1, 0);
+			}
 			break;
 		default:
 			outab(op + 0x04);
@@ -602,13 +593,13 @@ struct mne *mp;
 			outab(op + 0x04);
 			outrb(&e1, R_PAG0);
 			break;
-		case S_DINDX:
-			outab(op + 0x14);
-			outrb(&e1, R_PAG0);
-			break;
 		case S_EXT:
 			outab(op + 0x3C);
 			outrw(&e1, 0);
+			break;
+		case S_DINDX:
+			outab(op + 0x14);
+			outrb(&e1, R_PAG0);
 			break;
 		case S_INDX:
 			outab(op + 0x3E);
