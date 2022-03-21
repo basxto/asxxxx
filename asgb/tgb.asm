@@ -671,6 +671,7 @@
 	  lda	a		; 7F
 
 	ld	hl,#d16		; 21 84 05
+	  lda	hl,#d16		; 21 84 05
 	  ldhl	#d16		; 21 84 05
 
 	ld	hl,sp+d8	; F8 20
@@ -679,6 +680,8 @@
 	  ld	hl,sp,#d8	; F8 20
 	  ld	hl,d8(sp)	; F8 20
 	  ld	hl,#d8(sp)	; F8 20
+	  ld	hl,0(sp)	; F8 00
+	  ld	hl,sp		; F8 00
 
 	  lda	hl,sp+d8	; F8 20
 	  lda	hl,sp+#d8	; F8 20
@@ -686,6 +689,8 @@
 	  lda	hl,sp,#d8	; F8 20
 	  lda	hl,d8(sp)	; F8 20
 	  lda	hl,#d8(sp)	; F8 20
+	  lda	hl,0(sp)	; F8 00
+	  lda	hl,sp		; F8 00
 
 	  ldhl	sp+d8		; F8 20
 	  ldhl	sp+#d8		; F8 20
@@ -693,6 +698,21 @@
 	  ldhl	sp,#d8		; F8 20
 	  ldhl	d8(sp)		; F8 20
 	  ldhl	#d8(sp)		; F8 20
+	  ldhl	0(sp)		; F8 00
+	  ldhl	sp		; F8 00
+
+	ld	sp,#d16		; 31 84 05
+	  lda	sp,#d16		; 31 84 05
+
+	add	sp,#d8		; E8 20
+	  ld	sp,d8(sp)	; E8 20
+	  ld	sp,#d8(sp)	; E8 20
+	  ld	sp,0(sp)	; E8 00
+
+	  lda	sp,d8(sp)	; E8 20
+	  lda	sp,#d8(sp)	; E8 20
+	  lda	sp,0(sp)	; E8 00
+	  lda	sp,sp		; E8 00
 
 	add	a,#d8		; C6 20
 	  add	#d8		; C6 20
@@ -1532,6 +1552,7 @@
 	  lda	a		; 7F
 
 	ld	hl,#d16		; 21r84s05
+	  lda	hl,#d16		; 21r84s05
 	  ldhl	#d16		; 21r84s05
 
 	ld	hl,sp+d8	; F8r20
@@ -1554,6 +1575,16 @@
 	  ldhl	sp,#d8		; F8r20
 	  ldhl	d8(sp)		; F8r20
 	  ldhl	#d8(sp)		; F8r20
+
+	ld	sp,#d16		; 31r84s05
+	  lda	sp,#d16		; 31r84s05
+
+	add	sp,#d8		; E8r20
+	  ld	sp,d8(sp)	; E8r20
+	  ld	sp,#d8(sp)	; E8r20
+
+	  lda	sp,d8(sp)	; E8r20
+	  lda	sp,#d8(sp)	; E8r20
 
 	add	a,#d8		; C6r20
 	  add	#d8		; C6r20

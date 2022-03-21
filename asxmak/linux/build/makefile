@@ -1,3 +1,6 @@
+# Disable implicit rules
+.SUFFIXES:
+
 ####################################################################
 #  Makefile
 #		Linux 'GNU make' Version
@@ -69,8 +72,26 @@ CCFLAGS=	-Wall -funsigned-char $(CCOPT)
 
 LD=		gcc
 LDOPT=
-LDFLAGS=	-Wall $(LDOPT)
+LDFLAGS=	-Wall -Wl,-z,relro,-z,now $(LDOPT)
 
+####################################################################
+# Install Definitions
+# Follows https://www.gnu.org/prep/standards/html_node/Makefile-Conventions.html
+####################################################################
+
+pkgname=	asxxxx
+DESTDIR=
+prefix=		/usr/local
+exec_prefix=	$(prefix)
+bindir=		$(exec_prefix)/bin
+datarootdir=	$(prefix)/share
+datadir=	$(datarootdir)
+docdir=		$(datarootdir)/doc/$(pkgname)
+htmldir=	$(docdir)
+pdfdir=		$(docdir)
+INSTALL=	install
+INSTALL_PROGRAM=$(INSTALL)
+INSTALL_DATA=	$(INSTALL) -m 644
 
 ####################################################################
 # ASXXXX Directories
@@ -85,6 +106,7 @@ SRCLNK=		$(ASXBAS)linksrc/
 SRCMISC=	$(ASXBAS)asxxmisc/
 SRCS19OS9=	$(ASXBAS)s19os9/
 DSTEXE=		../exe/
+DSTMISC=	../misc/
 
 SRC1802=	$(ASXBAS)as1802/
 SRC2650=	$(ASXBAS)as2650/
@@ -139,22 +161,58 @@ SRCZ280=	$(ASXBAS)asz280/
 # Special
 ####################################################################
 
-.PHONY:	all clean prep
+.PHONY:	all clean prep check install uninstall
 
 all:	$(ASXXXX)
 
-clean:
-	rm -f as*
-	rm -f s19os9
-	rm -f *.o
-	rm -f $(DSTEXE)as*
-	rm -f $(DSTEXE)s19os9
+clean: prep
+	$(RM) $(DSTEXE)as*
+	$(RM) $(DSTEXE)s19os9
+	$(RM) $(ASXBAS)as*/*.cdb
+	$(RM) $(ASXBAS)as*/*.hex
+	$(RM) $(ASXBAS)as*/*.hlr
+	$(RM) $(ASXBAS)as*/*.ihx
+	$(RM) $(ASXBAS)as*/*.i86
+	$(RM) $(ASXBAS)as*/*.lst
+	$(RM) $(ASXBAS)as*/*.map
+	$(RM) $(ASXBAS)as*/*.noi
+	$(RM) $(ASXBAS)as*/*.o
+	$(RM) $(ASXBAS)as*/*.rel
+	$(RM) $(ASXBAS)as*/*.rst
+	$(RM) $(ASXBAS)as*/*.s19
+	$(RM) $(ASXBAS)as*/*.s28
+	$(RM) $(ASXBAS)as*/*.s37
+	$(RM) $(ASXBAS)as*/*.sym
 
+# Prepare all directories for distribution.
 prep:
-	rm -f as*
-	rm -f s19os9
-	rm -f *.o
+	$(RM) as*
+	$(RM) s19os9
+	$(RM) *.o
 
+check: all
+	chmod 755 $(DSTMISC)/tstscn
+	$(DSTMISC)/tstscn
+
+install: $(ASXXXX)
+	$(INSTALL) -d "$(DESTDIR)$(bindir)"
+	$(INSTALL) -d "$(DESTDIR)$(datadir)/$(pkgname)"
+	$(INSTALL) -d "$(DESTDIR)$(docdir)"
+	$(INSTALL) -d "$(DESTDIR)$(pdfdir)"
+	$(INSTALL) -d "$(DESTDIR)$(htmldir)"
+
+	$(INSTALL_PROGRAM) $^ "$(DESTDIR)$(bindir)/"
+	$(INSTALL_DATA) $(ASXBAS)asxhtml/*.htm $(ASXBAS)asxhtml/*.gif "$(DESTDIR)$(htmldir)/"
+	$(INSTALL_DATA) $(ASXBAS)asxhtml/*.pdf "$(DESTDIR)$(pdfdir)/"
+	$(INSTALL_DATA) $(ASXBAS)asxhtml/*.txt "$(DESTDIR)$(docdir)/"
+	$(INSTALL_DATA) $(ASXBAS)LICENSE $(ASXBAS)readme.txt $(ASXBAS)changes.txt "$(DESTDIR)$(datadir)/$(pkgname)/"
+
+uninstall:
+	$(RM) "$(DESTDIR)$(htmldir)/*.htm" "$(DESTDIR)$(htmldir)/*.gif"
+	$(RM) "$(DESTDIR)$(pdfdir)/*.pdf"
+	$(RM) "$(DESTDIR)$(docdir)/*.txt"
+	$(RM) -r "$(DESTDIR)$(datadir)/$(pkgname)/"
+	cd "$(DESTDIR)$(bindir)" && $(RM) $(ASXXXX)
 
 ####################################################################
 # ASXXXX ASSEMBLER BASE FILES

@@ -116,32 +116,20 @@ struct expr *esp;
 				switch(admode(axy)) {
 				case S_X:
 					if ((!esp->e_flag)
-						&& (esp->e_base.e_ap==NULL)
-						&& !(esp->e_addr & ~0xFF)) {
+						&& (zpg != NULL)
+						&& (esp->e_base.e_ap==zpg)) {
 						esp->e_mode = S_DINDX;
 					} else {
-					    if ((!esp->e_flag)
-						    && (zpg != NULL)
-						    && (esp->e_base.e_ap==zpg)) {
-						    esp->e_mode = S_DINDX;
-					    } else {
-						    esp->e_mode = S_INDX;
-					    }
+						esp->e_mode = S_INDX;
 					}
 					break;
 				case S_Y:
 					if ((!esp->e_flag)
-						&& (esp->e_base.e_ap==NULL)
-						&& !(esp->e_addr & ~0xFF)) {
+						&& (zpg != NULL)
+						&& (esp->e_base.e_ap==zpg)) {
 						esp->e_mode = S_DINDY;
 					} else {
-					    if ((!esp->e_flag)
-						    && (zpg != NULL)
-						    && (esp->e_base.e_ap==zpg)) {
-						    esp->e_mode = S_DINDY;
-					    } else {
-						    esp->e_mode = S_INDY;
-					    }
+						esp->e_mode = S_INDY;
 					}
 					break;
 				default:

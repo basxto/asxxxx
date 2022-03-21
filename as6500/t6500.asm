@@ -51,9 +51,9 @@ adc 12		; 65 12
 adc *dir	; 65 83
 adc *extext	; 65*00
 		; ---
-adc 12,x	; 75 12
+adc 12,x	; 7D 12 00
 adc *dir,x	; 75 83
-adc offset,x	; 75 84
+adc offset,x	; 7D 84 00
 adc *extdir,x	; 75*00
 		; ---
 adc 1234,x	; 7D 34 12
@@ -96,9 +96,9 @@ and 12		; 25 12
 and *dir	; 25 83
 and *extext	; 25*00
 		; ---
-and 12,x	; 35 12
+and 12,x	; 3D 12 00
 and *dir,x	; 35 83
-and offset,x	; 35 84
+and offset,x	; 3D 84 00
 and *extdir,x	; 35*00
 		; ---
 and 1234,x	; 3D 34 12
@@ -142,9 +142,9 @@ asl 12		; 06 12
 asl *dir	; 06 83
 asl *extext	; 06*00
 		; ---
-asl 12,x	; 16 12
+asl 12,x	; 1E 12 00
 asl *dir,x	; 16 83
-asl offset,x	; 16 84
+asl offset,x	; 1E 84 00
 asl *extdir,x	; 16*00
 		; ---
 asl 1234,x	; 1E 34 12
@@ -198,9 +198,9 @@ bit *dir	; 24 83
 bit *extext	; 24*00
 		; ---
 .if	r65c02
-bit 12,x	; 34 12
+bit 12,x	; 3C 12 00
 bit *dir,x	; 34 83
-bit offset,x	; 34 84
+bit offset,x	; 3C 84 00
 bit *extdir,x	; 34*00
 		; ---
 bit 1234,x	; 3C 34 12
@@ -242,9 +242,9 @@ cmp 12		; C5 12
 cmp *dir	; C5 83
 cmp *extext	; C5*00
 		; ---
-cmp 12,x	; D5 12
+cmp 12,x	; DD 12 00
 cmp *dir,x	; D5 83
-cmp offset,x	; D5 84
+cmp offset,x	; DD 84 00
 cmp *extdir,x	; D5*00
 		; ---
 cmp 1234,x	; DD 34 12
@@ -310,9 +310,9 @@ dec 12		; C6 12
 dec *dir	; C6 83
 dec *extext	; C6*00
 		; ---
-dec 12,x	; D6 12
+dec 12,x	; DE 12 00
 dec *dir,x	; D6 83
-dec offset,x	; D6 84
+dec offset,x	; DE 84 00
 dec *extdir,x	; D6*00
 		; ---
 dec 1234,x	; DE 34 12
@@ -333,9 +333,9 @@ eor 12		; 45 12
 eor *dir	; 45 83
 eor *extext	; 45*00
 		; ---
-eor 12,x	; 55 12
+eor 12,x	; 5D 12 00
 eor *dir,x	; 55 83
-eor offset,x	; 55 84
+eor offset,x	; 5D 84 00
 eor *extdir,x	; 55*00
 		; ---
 eor 1234,x	; 5D 34 12
@@ -381,9 +381,9 @@ inc 12		; E6 12
 inc *dir	; E6 83
 inc *extext	; E6*00
 		; ---
-inc 12,x	; F6 12
+inc 12,x	; FE 12 00
 inc *dir,x	; F6 83
-inc offset,x	; F6 84
+inc offset,x	; FE 84 00
 inc *extdir,x	; F6*00
 		; ---
 inc 1234,x	; FE 34 12
@@ -429,9 +429,9 @@ lda 12		; A5 12
 lda *dir	; A5 83
 lda *extext	; A5*00
 		; ---
-lda 12,x	; B5 12
+lda 12,x	; BD 12 00
 lda *dir,x	; B5 83
-lda offset,x	; B5 84
+lda offset,x	; BD 84 00
 lda *extdir,x	; B5*00
 		; ---
 lda 1234,x	; BD 34 12
@@ -470,7 +470,7 @@ ldx 12		; A6 12
 ldx *dir	; A6 83
 ldx *extdir	; A6*00
 		; ---
-ldx 12,y	; B6 12
+ldx 12,y	; BE 12 00
 ldx *dir,y	; B6 83
 ldx *extdir,y	; B6*00
 		; ---
@@ -488,7 +488,7 @@ ldy 12		; A4 12
 ldy *dir	; A4 83
 ldy *extdir	; A4*00
 		; ---
-ldy 12,x	; B4 12
+ldy 12,x	; BC 12 00
 ldy *dir,x	; B4 83
 ldy *extdir,x	; B4*00
 		; ---
@@ -511,9 +511,9 @@ lsr 12		; 46 12
 lsr *dir	; 46 83
 lsr *extext	; 46*00
 		; ---
-lsr 12,x	; 56 12
+lsr 12,x	; 5E 12 00
 lsr *dir,x	; 56 83
-lsr offset,x	; 56 84
+lsr offset,x	; 5E 84 00
 lsr *extdir,x	; 56*00
 		; ---
 lsr 1234,x	; 5E 34 12
@@ -536,9 +536,9 @@ ora 12		; 05 12
 ora *dir	; 05 83
 ora *extext	; 05*00
 		; ---
-ora 12,x	; 15 12
+ora 12,x	; 1D 12 00
 ora *dir,x	; 15 83
-ora offset,x	; 15 84
+ora offset,x	; 1D 84 00
 ora *extdir,x	; 15*00
 		; ---
 ora 1234,x	; 1D 34 12
@@ -618,9 +618,9 @@ rol 12		; 26 12
 rol *dir	; 26 83
 rol *extext	; 26*00
 		; ---
-rol 12,x	; 36 12
+rol 12,x	; 3E 12 00
 rol *dir,x	; 36 83
-rol offset,x	; 36 84
+rol offset,x	; 3E 84 00
 rol *extdir,x	; 36*00
 		; ---
 rol 1234,x	; 3E 34 12
@@ -638,9 +638,9 @@ ror 12		; 66 12
 ror *dir	; 66 83
 ror *extext	; 66*00
 		; ---
-ror 12,x	; 76 12
+ror 12,x	; 7E 12 00
 ror *dir,x	; 76 83
-ror offset,x	; 76 84
+ror offset,x	; 7E 84 00
 ror *extdir,x	; 76*00
 		; ---
 ror 1234,x	; 7E 34 12
@@ -661,9 +661,9 @@ sbc 12		; E5 12
 sbc *dir	; E5 83
 sbc *extext	; E5*00
 		; ---
-sbc 12,x	; F5 12
+sbc 12,x	; FD 12 00
 sbc *dir,x	; F5 83
-sbc offset,x	; F5 84
+sbc offset,x	; FD 84 00
 sbc *extdir,x	; F5*00
 		; ---
 sbc 1234,x	; FD 34 12
@@ -726,9 +726,9 @@ sta 12		; 85 12
 sta *dir	; 85 83
 sta *extext	; 85*00
 		; ---
-sta 12,x	; 95 12
+sta 12,x	; 9D 12 00
 sta *dir,x	; 95 83
-sta offset,x	; 95 84
+sta offset,x	; 9D 84 00
 sta *extdir,x	; 95*00
 		; ---
 sta 1234,x	; 9D 34 12
@@ -794,7 +794,7 @@ stz 1234	; 9C 34 12
 stz ext		; 9C 22 81
 stz extext	; 9Cr00s00
 		; ---
-stz 12,x	; 74 12
+stz 12,x	; 9E 12 00
 stz *dir,x	; 74 83
 stz *extdir,x	; 74*00
 		; ---

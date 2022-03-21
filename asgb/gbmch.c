@@ -337,12 +337,13 @@ struct mne *mp;
 		switch(t1) {
 		case S_R8:	outab(0x78 + v1);		break;
 		case S_R16:
-			if (v1 == HL) {
+			if (v1 == HL || v1 == SP) {
+				op = (v1 == SP) ? 0x10 : 0x00;
 				comma(1);
 				t2 = addr(&e2);
 				v2 = (int) e2.e_addr;
 				if ((t2 == S_R16) && (v2 == SP)) {
-					outab(0xF8);
+					outab(0xF8 - op);
 					if (more()) {
 						comma(0);
 						expr(&e3, 0);
@@ -356,12 +357,12 @@ struct mne *mp;
 					if (more()) {
 						t3 = addr(&e3);
 						if (t3 == S_IDSP) {
-							outab(0xF8);
+							outab(0xF8 - op);
 							outrb(&e2, R_SGND);
 							break;
 						}
 					} else {
-						outab(0x21);
+						outab(0x21 + op);
 						outrw(&e2, 0);
 						break;
 					}
@@ -370,7 +371,7 @@ struct mne *mp;
 					if (more()) {
 						t3 = addr(&e3);
 						if (t3 == S_IDSP) {
-							outab(0xF8);
+							outab(0xF8 - op);
 							outrb(&e2, R_SGND);
 							break;
 						}
@@ -604,17 +605,18 @@ struct mne *mp;
 					break;
 				}
 			}
-			if (v1 == HL) {
+			if (v1 == HL || v1 == SP) {
+				op = (v1 == SP) ? 0x10 : 0x00;
 				if (t2 == S_IMMED) {
 					if (more()) {
 						t3 = addr(&e3);
 						if (t3 == S_IDSP) {
-							outab(0xF8);
+							outab(0xF8 - op);
 							outrb(&e2, R_SGND);
 							break;
 						}
 					} else {
-						outab(0x21);
+						outab(0x21 + op);
 						outrw(&e2, 0);
 						break;
 					}
@@ -623,7 +625,7 @@ struct mne *mp;
 					if (more()) {
 						t3 = addr(&e3);
 						if (t3 == S_IDSP) {
-							outab(0xF8);
+							outab(0xF8 - op);
 							outrb(&e2, R_SGND);
 							break;
 						}

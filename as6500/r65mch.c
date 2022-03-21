@@ -484,13 +484,23 @@ struct mne *mp;
 			outab(op + 0x0E);
 			outrw(&e1, 0);
 			break;
+		case S_INDY:
+			if (op != 0x80) {
+				outab(op + 0x1E);
+				outrw(&e1, 0);
+				break;
+			}
+			if((e1.e_flag) || (e1.e_base.e_ap!=NULL)
+				|| (e1.e_addr & ~0xFF)) {
+				outab(op + 0x06);
+				outab(0);
+				aerr();
+				break;
+			}
+			// fall through if it lies in ZP
 		case S_DINDY:
 			outab(op + 0x16);
 			outrb(&e1, R_PAG0);
-			break;
-		case S_INDY:
-			outab(op + 0x1E);
-			outrw(&e1, 0);
 			break;
 		default:
 			outab(op + 0x06);
@@ -517,13 +527,23 @@ struct mne *mp;
 			outab(op + 0x0C);
 			outrw(&e1, 0);
 			break;
+		case S_INDX:
+			if (op != 0x80) {
+				outab(op + 0x1C);
+				outrw(&e1, 0);
+				break;
+			}
+			if((e1.e_flag) || (e1.e_base.e_ap!=NULL)
+				|| (e1.e_addr & ~0xFF)) {
+				outab(op + 0x04);
+				outab(0);
+				aerr();
+				break;
+			}
+			// fall through if it lies in ZP
 		case S_DINDX:
 			outab(op + 0x14);
 			outrb(&e1, R_PAG0);
-			break;
-		case S_INDX:
-			outab(op + 0x1C);
-			outrw(&e1, 0);
 			break;
 		default:
 			outab(op + 0x04);
