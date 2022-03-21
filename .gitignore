@@ -12,3 +12,6 @@ backup/
 release/
 *.lst
 *.map
+*.hlr
+*.patch
+*.diff
