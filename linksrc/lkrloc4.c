@@ -297,7 +297,7 @@ relr4()
 	a_uint reli, relv;
 	int mode;
 	a_uint rtbase, rtofst, rtpofst, rtbofst;
-	a_uint paga, pags, pagx, pcrv;
+	a_uint pagx, pcrv;
 	a_uint m, n, v;
 	int aindex, argb, argm, rindex, rtp, rxm, error, i;
 	struct areax **a;
@@ -404,7 +404,7 @@ relr4()
 			}
 			reli = symval(s[rindex]);
 #if DEBUG
-fprintf(stdout, "relr4-sym:  reli = %X, rindex = %d\n", reli, rindex);
+fprintf(stdout, "RELR4-SYM:  reli = %X, rindex = %d\n", reli, rindex);
 #endif
 		} else {
 			if (rindex >= hp->h_narea) {
@@ -414,7 +414,7 @@ fprintf(stdout, "relr4-sym:  reli = %X, rindex = %d\n", reli, rindex);
 			}
 			reli = a[rindex]->a_addr;
 #if DEBUG
-fprintf(stdout, "relr4-area: reli = %X, rindex = %d\n", reli, rindex);
+fprintf(stdout, "RELR4-AREA: reli = %X, rindex = %d\n", reli, rindex);
 #endif
 		}
 
@@ -423,12 +423,8 @@ fprintf(stdout, "relr4-area: reli = %X, rindex = %d\n", reli, rindex);
 		 */
 		if (rxm == 0) {
 			/*
-			 * PAGE addressing and
 			 * PCR  addressing
 			 */
-			paga = 0;
-			pags = 0;
-
 			pcrv  = rtp - rtofst;
 
 			switch(mode & (R4_PCR | R4_PBITS)) {
@@ -442,7 +438,7 @@ fprintf(stdout, "relr4-area: reli = %X, rindex = %d\n", reli, rindex);
 				pcrv  = (pcrv + argb) / pcb;
 				reli -= (pc + pcrv);
 #if DEBUG
-fprintf(stdout, "R4_PCRX: reli = %X\n", reli);
+fprintf(stdout, "R4_PCRN: pcrv = %X, reli = %X\n", pcrv, reli);
 #endif
 				break;
 			/*
@@ -462,17 +458,11 @@ fprintf(stdout, "R4_PCRX: reli = %X\n", reli);
 				pcrv /=  pcb;
 				reli -= (pc + pcrv);
 #if DEBUG
-fprintf(stdout, "R4_PCRX: reli = %X\n", reli);
+fprintf(stdout, "R4_PCRX: pcrv = %X, reli = %X\n", pcrv, reli);
 #endif
 				break;
 			case R4_PAG0:
 			case R4_PAGN:
-				paga  = sdp.s_area->a_addr;
-				pags  = sdp.s_addr;
-				reli -= paga + pags;
-#if DEBUG
-fprintf(stdout, "R4_PAGN: paga = %X, pags = %X, reli = %X\n", paga, pags, reli);
-#endif
 				break;
 			case R4_PAGX0:
 			case R4_PAGX1:
@@ -553,16 +543,22 @@ fprintf(stdout, "     : mode = %X\n", mode);
 			 * Signed Value Checking
 			 */
 			if (((mode & (R4_SGND | R4_USGN | R4_PAGX | R4_PCR)) == R4_SGND) &&
-			   ((relv & m) != m) && ((relv & m) != 0))
+			   ((relv & m) != m) && ((relv & m) != 0)) {
 				error = 1;
-
+#if DEBUG
+fprintf(stdout, "R4_SGND: relv = %X, m = %X, n = %d, error = %d\n", relv, m, n, error);
+#endif
+			}
 			/*
 			 * Unsigned Value Checking
 			 */
 			if (((mode & (R4_SGND | R4_USGN | R4_PAGX | R4_PCR)) == R4_USGN) &&
-			   ((relv & n) != 0))
+			   ((relv & n) != 0)) {
 				error = 2;
-
+#if DEBUG
+fprintf(stdout, "R4_USGN: relv = %X, m = %X, n = %d, error = %d\n", relv, m, n, error);
+#endif
+			}
 			/*
 			 * PCR  Relocation Error Checking
 			 */
@@ -576,14 +572,25 @@ fprintf(stdout, "     : mode = %X\n", mode);
 				if (((relv & m) != m) && ((relv & m) != 0)) {
 					error = 3 + argm;
 				}
+#if DEBUG
+fprintf(stdout, "R4_PCR: relv = %X, m = %X, n = %X, error = %d\n", relv, m, n, error);
+#endif
 				break;
 			case R4_PAG0:
-				if (relv & ~((a_uint) 0x000000FF) || paga || pags)
+				if ((relv & ~((a_uint) p_mask)) != 0x0000) {
 					error = 7;
+				}
+#if DEBUG
+fprintf(stdout, "R4_PAG0: relv = %X, p_mask = %X, error = %d\n", relv, p_mask, error);
+#endif
 				break;
 			case R4_PAGN:
-				if (relv & ~((a_uint) 0x000000FF))
+				if ((relv & ~((a_uint) p_mask)) != sdp.s_addr) {
 					error = 8;
+				}
+#if DEBUG
+fprintf(stdout, "R4_PAGN: relv = %X, p_mask = %X, error = %d\n", relv, p_mask, error);
+#endif
 				break;
 			case R4_PAGX0:	/* Paged from pc + 0 */
 			case R4_PAGX1:	/* Paged from pc + 1 */
@@ -598,13 +605,17 @@ fprintf(stdout, "     : mode = %X\n", mode);
 				default:
 					break;
 				}
-				pagx = pcrv & ~((a_uint) 0x000000FF);
+				pagx = pcrv & n;
 				/*
 				 * Paging Error if:
 				 *     Destination Page != Current Page
 				 */
-				if ((relv & ~((a_uint) 0x000000FF)) != pagx)
+				if ((relv & n) != pagx) {
 					error = 9;
+				}
+#if DEBUG
+fprintf(stdout, "R4_PAGX: relv = %X, pmask = %X, pagx = %X, error = %d\n", relv, p_mask, pagx, error);
+#endif
 				break;
 			default:
 				break;
@@ -614,12 +625,8 @@ fprintf(stdout, "     : mode = %X\n", mode);
 		 */
 		} else {
 			/*
-			 * PAGE addressing and
 			 * PCR  addressing
 			 */
-			paga = 0;
-			pags = 0;
-
 			pcrv  = rtp - rtofst;
 
 			switch(mode & (R4_PCR | R4_PBITS)) {
@@ -635,7 +642,7 @@ fprintf(stdout, "     : mode = %X\n", mode);
 				pcrv  = (pcrv + argb) / pcb;
 				reli -= (pc + pcrv);
 #if DEBUG
-fprintf(stdout, "R4_PCRX_MERGE: reli = %X\n", reli);
+fprintf(stdout, "R4_PCRN_MERGE: reli = %X\n", reli);
 #endif
 				break;
 			/*
@@ -660,12 +667,6 @@ fprintf(stdout, "R4_PCRX_MERGE: reli = %X\n", reli);
 				break;
 			case R4_PAG0:
 			case R4_PAGN:
-				paga  = sdp.s_area->a_addr;
-				pags  = sdp.s_addr;
-				reli -= paga + pags;
-#if DEBUG
-fprintf(stdout, "R4_PAGN_MERGE: paga = %X, pags = %X, reli = %X\n", paga, pags, reli);
-#endif
 				break;
 			case R4_PAGX0:
 			case R4_PAGX1:
@@ -684,7 +685,7 @@ fprintf(stdout, "R4_PAGN_MERGE: paga = %X, pags = %X, reli = %X\n", paga, pags, 
 				relv = adw_xb(argb, reli, rtp);
 			}
 #if DEBUG
-fprintf(stdout, "relr4-merge: relv = %X\n", relv);
+fprintf(stdout, "RELR4-MERGE: relv = %X\n", relv);
 #endif
 
 			/*
@@ -706,7 +707,7 @@ fprintf(stdout, "relr4-merge: relv = %X\n", relv);
 			ptb_xb(0 , rtp);
 			adw_xb(argb, v, rtp);
 #if DEBUG
-fprintf(stdout, "relr4-merge: v = %X\n", v);
+fprintf(stdout, "RELR4-MERGE: v = %X\n", v);
 #endif
 
 			/*
@@ -716,7 +717,7 @@ fprintf(stdout, "relr4-merge: v = %X\n", v);
 			m = ~(n >> 1);
 			n = ~(n >> 0);
 #if DEBUG
-fprintf(stdout, "relr4-merge: relv = %X\n", relv);
+fprintf(stdout, "RELR4-MERGE: relv = %X\n", relv);
 fprintf(stdout, "           :    m = %X\n", m);
 fprintf(stdout, "           :    n = %X\n", n);
 fprintf(stdout, "           : mode = %X\n", mode);
@@ -732,16 +733,23 @@ fprintf(stdout, "           : mode = %X\n", mode);
 				 * Signed Merge Bit Range Checking
 				 */
 				if (((mode & (R4_SGND | R4_USGN)) == R4_SGND) &&
-				   ((relv & m) != m) && ((relv & m) != 0))
+				   ((relv & m) != m) && ((relv & m) != 0)) {
 					error = 10;
-			
+#if DEBUG
+fprintf(stdout, "R4_SGND-MERGE: relv = %X, m = %X, n = %d, error = %d\n", relv, m, n, error);
+#endif
+				}
 				/*
 				 * Unsigned Merge Bit Range Checking
 				 * Overflow Merge Bit Range Checking
 				 */
 				if (((mode & (R4_SGND | R4_USGN)) == R4_USGN) &&
-				   (relv & n))
+				   (relv & n)) {
 					error = 11;
+#if DEBUG
+fprintf(stdout, "R4_USGN-MERGE: relv = %X, m = %X, n = %d, error = %d\n", relv, m, n, error);
+#endif
+				}
 			}
 
 			/*
@@ -757,14 +765,25 @@ fprintf(stdout, "           : mode = %X\n", mode);
 				if (((relv & m) != m) && ((relv & m) != 0)) {
 					error = 3 + argm;
 				}
+#if DEBUG
+fprintf(stdout, "R4_PCR-MERGE: relv = %X, m = %X, n = %X, error = %d\n", relv, m, n, error);
+#endif
 				break;
 			case R4_PAG0:
-				if (relv & n || paga || pags)
+				if (relv & n) {
 					error = 7;
+				}
+#if DEBUG
+fprintf(stdout, "R4_PAG0_MERGE: relv = %X, n = %X, error = %d\n", relv, n, error);
+#endif
 				break;
 			case R4_PAGN:
-				if (relv & n)
+				if ((relv & ~((a_uint) p_mask)) != sdp.s_addr) {
 					error = 8;
+				}
+#if DEBUG
+fprintf(stdout, "R4_PAGN_MERGE: relv = %X, p_mask = %X, sdp.s_addr = %X, error = %d\n", relv, p_mask, sdp.s_addr, error);
+#endif
 				break;
 			case R4_PAGX3:	/* Paged from pc + 3 */
 			case R4_PAGX2:	/* Paged from pc + 2 */
@@ -784,8 +803,12 @@ fprintf(stdout, "           : mode = %X\n", mode);
 				 * Paging Error if:
 				 *     Destination Page != Current Page
 				 */
-				if ((relv & n) != pagx)
+				if ((relv & n) != pagx) {
 					error = 9;
+				}
+#if DEBUG
+fprintf(stdout, "R4_PAGX-MERGE: relv = %X, pcrv = %X, pagx = %X, n = %X, error = %d\n", relv, pcrv, pagx, n, error);
+#endif
 				break;
 			default:
 				break;
@@ -989,6 +1012,8 @@ fprintf(stdout, "relp4-paged: aindex = %4X\n", aindex);
 	sdp.s_addr = adb_xb(0,a_bytes*2);
 	if (rtcnt > a_bytes*3) {
 		p_mask = adb_xb(0,a_bytes*3);
+	} else {
+		p_mask = DEFAULT_PMASK;
 	}
 #if DEBUG
 fprintf(stdout, "relp4-sdp: area = %s, addr = %X, p_mask = %X\n", sdp.s_areax->a_bap->a_id, sdp.s_addr, p_mask);

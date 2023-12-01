@@ -1,7 +1,7 @@
 /* cop4mch.c */
 
 /*
- *  Copyright (C) 2021  Alan R. Baldwin
+ *  Copyright (C) 2021-2023  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@ char	*dsft	= "asm";
 #define	OPCY_SDP	((char) (0xFF))
 #define	OPCY_ERR	((char) (0xFE))
 
-/*	OPCY_NONE	((char) (0x80))	*/
-/*	OPCY_MASK	((char) (0x7F))	*/
+#define	OPCY_NONE	((char) (0x80))
+#define	OPCY_MASK	((char) (0x7F))
 
 #define	OPCY_SKP	((char)	(0xFD))
 
@@ -137,11 +137,16 @@ machine(mp)
 struct mne *mp;
 {
 	unsigned int op,c;
-	struct area *espa;
 	char id[NCPS];
 	struct expr e1,e2;
 	int t1,t2;
 	a_uint v1,v2;
+
+	/*
+	 * Using Internal Format
+	 * For Cycle Counting
+	 */
+	opcycles = OPCY_NONE;
 
 	clrexpr(&e1);
 	clrexpr(&e2);
@@ -155,31 +160,27 @@ struct mne *mp;
 
 	case S_SPG:
 		opcycles = OPCY_SDP;
-		espa = NULL;
+		pagarea = dot.s_area;
+		e1.e_addr = 0x0080;
 		if (more()) {
 			expr(&e1, 0);
 			if (e1.e_flag == 0 && e1.e_base.e_ap == NULL) {
 				if (e1.e_addr != 0x80) {
+					e1.e_addr = 0x80;
 					xerr('a', "Only PAGE 2 (= 0x0080) Is Allowed.");
 				}
 			}
 			if ((c = getnb()) == ',') {
 				getid(id, -1);
-				espa = alookup(id);
-				if (espa == NULL) {
+				pagarea = alookup(id);
+				if (pagarea == NULL) {
+					pagarea = dot.s_area;
 					xerr('u', "Undefined Area.");
 				}
 			} else {
 				unget(c);
 			}
-		} else {
-			e1.e_addr = 0x0080;
 		}
-		if (espa) {
-			pagarea = espa;
- 		} else {
-			pagarea = dot.s_area;
- 		}
 		memcpy(&pagexpr, &e1, sizeof(e1));
 		outdp(pagarea, &pagexpr, 0);
 		lmode = SLIST;
@@ -427,7 +428,7 @@ struct mne *mp;
 	 * new instruction mnemonic, jp23, is introduced to
 	 * to indicate a jp instruction within pages 2 and 3.
 	 * The linker verifies that any jp23 jump address is
-	 * in this region.  Th jump addresses are checked to
+	 * in this region.  The jump addresses are checked to
 	 * be within the address range 0x80 to 0xFF.
 	 *
 	 *	jp	Use in pages 0, 1, and >= 4
@@ -687,6 +688,11 @@ struct mne *mp;
 			opcycles = Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
 		}
 	}
+ 	/*
+	 * Translate To External Format
+	 */
+	if (opcycles == OPCY_NONE) { opcycles  =  CYCL_NONE; } else
+	if (opcycles  & OPCY_NONE) { opcycles |= (CYCL_NONE | 0x3F00); }
 }
 
 /*

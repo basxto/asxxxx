@@ -18,9 +18,9 @@ del ..\..\..\asxtst\as12bthi.lst
 ..\exe\as6100.exe -glacxff ..\..\..\asxtst\as12bthi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\as12bthi.lst
 
-del ..\..\..\asxtst\asmt3bhi.lst
-..\exe\as6816.exe -glacxff ..\..\..\asxtst\asmt3bhi.asm
-..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3bhi.lst
+del ..\..\..\asxtst\asmt2bhi.lst
+..\exe\as61860.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 
 del ..\..\..\asxtst\asmt2blo.lst
 ..\exe\as6500.exe -glacxff ..\..\..\asxtst\asmt2blo.asm
@@ -62,9 +62,13 @@ del ..\..\..\asxtst\asmt3bhi.lst
 ..\exe\as6816.exe -glacxff ..\..\..\asxtst\asmt3bhi.asm
 ..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3bhi.lst
 
-del ..\..\..\asxtst\asmt2bhi.lst
-..\exe\as61860.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
-..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+del ..\..\..\asxtst\asmt4bhi.lst
+..\exe\as68cf.exe -glacxff ..\..\..\asxtst\asmt4bhi.asm
+..\exe\asxscn.exe -4 ..\..\..\asxtst\asmt4bhi.lst
+
+del ..\..\..\asxtst\asmt4bhi.lst
+..\exe\as68k.exe -glacxff ..\..\..\asxtst\asmt4bhi.asm
+..\exe\asxscn.exe -4 ..\..\..\asxtst\asmt4bhi.lst
 
 del ..\..\..\asxtst\asmt2blo.lst
 ..\exe\as740.exe -glacxff ..\..\..\asxtst\asmt2blo.asm
@@ -110,7 +114,7 @@ del ..\..\..\asxtst\asmt2bhi.lst
 ..\exe\as8xcxxx.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 del ..\..\..\asxtst\asmt3bhi.lst
-..\exe\as8xcxxx.exe -glacxff ..\..\..\asxtst\asmt3bhi ..\..\..\asxtst\a24bit.asm ..\..\..\asxtst\asmt3bhi.asm
+..\exe\as8xcxxx.exe -glacxff -o+ ..\..\..\asxtst\asmt3bhi ..\..\..\asxtst\a24bit.asm ..\..\..\asxtst\asmt3bhi.asm
 ..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3bhi.lst
 
 del ..\..\..\asxtst\asmt2blo.lst
@@ -118,7 +122,7 @@ del ..\..\..\asxtst\asmt2blo.lst
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
 
 del ..\..\..\asxtst\asmt4blo.lst
-..\exe\asavr.exe -glacxff ..\..\..\asxtst\asmt4blo ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4blo.asm
+..\exe\asavr.exe -glacxff -o+ ..\..\..\asxtst\asmt4blo ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4blo.asm
 ..\exe\asxscn.exe -4 ..\..\..\asxtst\asmt4blo.lst
 
 del ..\..\..\asxtst\asmt2bhi.lst
@@ -127,6 +131,10 @@ del ..\..\..\asxtst\asmt2bhi.lst
 
 del ..\..\..\asxtst\asmt2bhi.lst
 ..\exe\ascop8.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+
+del ..\..\..\asxtst\asmt2bhi.lst
+..\exe\asez8.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 
 del ..\..\..\asxtst\asmt3blo.lst
@@ -154,10 +162,14 @@ del ..\..\..\asxtst\asmt2bhi.lst
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 
 del ..\..\..\asxtst\asmt2blo.lst
+..\exe\aspdp11.exe -glacxff ..\..\..\asxtst\asmt2blo.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
+
+del ..\..\..\asxtst\asmt2blo.lst
 ..\exe\aspic.exe -glacxff ..\..\..\asxtst\asmt2blo.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
 del ..\..\..\asxtst\asmt4blo.lst
-..\exe\aspic.exe -glacxff ..\..\..\asxtst\asmt4blo ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4blo.asm
+..\exe\aspic.exe -glacxff -o+ ..\..\..\asxtst\asmt4blo ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4blo.asm
 ..\exe\asxscn.exe -4 ..\..\..\asxtst\asmt4blo.lst
 
 del ..\..\..\asxtst\asmt2blo.lst
@@ -185,6 +197,10 @@ del ..\..\..\asxtst\asmt3bhi.lst
 ..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3bhi.lst
 
 del ..\..\..\asxtst\asmt2bhi.lst
+..\exe\assx.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
+..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
+
+del ..\..\..\asxtst\asmt2bhi.lst
 ..\exe\asz8.exe -glacxff ..\..\..\asxtst\asmt2bhi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 
@@ -197,22 +213,22 @@ del ..\..\..\asxtst\asmt2blo.lst
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
 
 del ..\..\..\asxtst\asmt2bhi.lst
-..\exe\ascheck.exe -glacxff ..\..\..\asxtst\asmt2bhi ..\..\..\asxtst\hilo.asm ..\..\..\asxtst\a16bit.asm ..\..\..\asxtst\asmt2bhi.asm
+..\exe\ascheck.exe -glacxff -o+ ..\..\..\asxtst\asmt2bhi ..\..\..\asxtst\hilo.asm ..\..\..\asxtst\a16bit.asm ..\..\..\asxtst\asmt2bhi.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2bhi.lst
 del ..\..\..\asxtst\asmt2blo.lst
-..\exe\ascheck.exe -glacxff ..\..\..\asxtst\asmt2blo ..\..\..\asxtst\lohi.asm ..\..\..\asxtst\a16bit.asm ..\..\..\asxtst\asmt2blo.asm
+..\exe\ascheck.exe -glacxff -o+ ..\..\..\asxtst\asmt2blo ..\..\..\asxtst\lohi.asm ..\..\..\asxtst\a16bit.asm ..\..\..\asxtst\asmt2blo.asm
 ..\exe\asxscn.exe ..\..\..\asxtst\asmt2blo.lst
 del ..\..\..\asxtst\asmt3bhi.lst
-..\exe\ascheck.exe -glacxff ..\..\..\asxtst\asmt3bhi ..\..\..\asxtst\hilo.asm ..\..\..\asxtst\a24bit.asm ..\..\..\asxtst\asmt3bhi.asm
+..\exe\ascheck.exe -glacxff -o+ ..\..\..\asxtst\asmt3bhi ..\..\..\asxtst\hilo.asm ..\..\..\asxtst\a24bit.asm ..\..\..\asxtst\asmt3bhi.asm
 ..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3bhi.lst
 del ..\..\..\asxtst\asmt3blo.lst
-..\exe\ascheck.exe -glacxff ..\..\..\asxtst\asmt3blo ..\..\..\asxtst\lohi.asm ..\..\..\asxtst\a24bit.asm ..\..\..\asxtst\asmt3blo.asm
+..\exe\ascheck.exe -glacxff -o+ ..\..\..\asxtst\asmt3blo ..\..\..\asxtst\lohi.asm ..\..\..\asxtst\a24bit.asm ..\..\..\asxtst\asmt3blo.asm
 ..\exe\asxscn.exe -3 ..\..\..\asxtst\asmt3blo.lst
 del ..\..\..\asxtst\asmt4bhi.lst
-..\exe\ascheck.exe -glacxff ..\..\..\asxtst\asmt4bhi ..\..\..\asxtst\hilo.asm ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4bhi.asm
+..\exe\ascheck.exe -glacxff -o+ ..\..\..\asxtst\asmt4bhi ..\..\..\asxtst\hilo.asm ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4bhi.asm
 ..\exe\asxscn.exe -4 ..\..\..\asxtst\asmt4bhi.lst
 del ..\..\..\asxtst\asmt4blo.lst
-..\exe\ascheck.exe -glacxff ..\..\..\asxtst\asmt4blo ..\..\..\asxtst\lohi.asm ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4blo.asm
+..\exe\ascheck.exe -glacxff -o+ ..\..\..\asxtst\asmt4blo ..\..\..\asxtst\lohi.asm ..\..\..\asxtst\a32bit.asm ..\..\..\asxtst\asmt4blo.asm
 ..\exe\asxscn.exe -4 ..\..\..\asxtst\asmt4blo.lst
 
 del ..\..\..\as1802\t1802.lst
@@ -356,6 +372,22 @@ del ..\..\..\as6816\t6816.rel
 ..\exe\aslink.exe -nxuf ..\..\..\as6816\t6816.lnk
 ..\exe\asxscn.exe -3 -i ..\..\..\as6816\t6816.rst
 
+del ..\..\..\as68cf\t68cf.lst
+del ..\..\..\as68cf\t68cf.rst
+del ..\..\..\as68cf\t68cf.hlr
+del ..\..\..\as68cf\t68cf.rel
+..\exe\as68cf.exe -lox ..\..\..\as68cf\t68cf.asm
+..\exe\aslink -nux -g xb=0 -g xw=0 -g xl=0 ..\..\..\as68cf\t68cf
+..\exe\asxscn.exe -4x ..\..\..\as68cf\t68cf.rst
+
+del ..\..\..\as68k\t68k.lst
+del ..\..\..\as68k\t68k.rst
+del ..\..\..\as68k\t68k.hlr
+del ..\..\..\as68k\t68k.rel
+..\exe\as68k.exe -locx ..\..\..\as68k\t68k.asm
+..\exe\aslink -nux -g xb=0 -g xw=0 -g xl=0 ..\..\..\as68k\t68k
+..\exe\asxscn.exe -4x ..\..\..\as68k\t68k.rst
+
 del ..\..\..\as740\t740sym.lst
 del ..\..\..\as740\t740sym.rst
 del ..\..\..\as740\t740sym.hlr
@@ -462,7 +494,7 @@ del ..\..\..\ascop4\tcop4.hlr
 del ..\..\..\ascop4\tcop4.rst
 ..\exe\ascop4.exe -gloacxff ..\..\..\ascop4\tcop4.asm
 ..\exe\asxscn.exe ..\..\..\ascop4\tcop4.lst
-..\exe\aslink.exe -nxu -b COP4A=0x0000 -b COP4B=0x0040 -g x$=0x0000 ..\..\..\ascop4\tcop4.rel
+..\exe\aslink.exe -nxu -a COP4A=0x0000 -a COP4B=0x0040 -g x$=0x0000 ..\..\..\ascop4\tcop4.rel
 ..\exe\asxscn.exe -i ..\..\..\ascop4\tcop4.rst
 
 del ..\..\..\ascop8\tcop8.rel
@@ -473,6 +505,15 @@ del ..\..\..\ascop8\tcop8.rst
 ..\exe\asxscn.exe ..\..\..\ascop8\tcop8.lst
 ..\exe\aslink.exe -nxu -g x$=0x0000 ..\..\..\ascop8\tcop8.rel
 ..\exe\asxscn.exe -i ..\..\..\ascop8\tcop8.rst
+
+del ..\..\..\asez8\tez8.rel
+del ..\..\..\asez8\tez8.lst
+del ..\..\..\asez8\tez8.hlr
+del ..\..\..\asez8\tez8.rst
+..\exe\asez8.exe -gloacxff ..\..\..\asez8\tez8.asm
+..\exe\asxscn.exe -i ..\..\..\asez8\tez8.lst
+..\exe\aslink.exe -nxu -g X=0 ..\..\..\asez8\tez8.rel
+..\exe\asxscn.exe -i ..\..\..\asez8\tez8.rst
 
 del ..\..\..\asez80\tez80.rel
 del ..\..\..\asez80\tez80.lst
@@ -507,8 +548,11 @@ del ..\..\..\asf8\tf8ext.rst
 ..\exe\asxscn.exe -i ..\..\..\asf8\tf8seq.rst
 
 del ..\..\..\asgb\tgb.lst
-..\exe\asgb.exe -glacxff ..\..\..\asgb\tgb.asm
+del ..\..\..\asgb\tgb.rst
+..\exe\asgb.exe -glacoxff ..\..\..\asgb\tgb.asm
 ..\exe\asxscn.exe ..\..\..\asgb\tgb.lst
+..\exe\aslink -nxu -g xn8=0 -g xp8=0xFF00 -g xa8=0 -g xd8=0 -g xa16=0 -g xd16=0 ..\..\..\asgb\tgb.rel
+..\exe\asxscn -i ..\..\..\asgb\tgb.rst
 
 del ..\..\..\ash8\th8.lst
 ..\exe\ash8.exe -glacxff ..\..\..\ash8\th8.asm
@@ -517,6 +561,17 @@ del ..\..\..\ash8\th8.lst
 del ..\..\..\asm8c\tm8cs.lst
 ..\exe\asm8c.exe -glacxff ..\..\..\asm8c\tm8cs.asm
 ..\exe\asxscn.exe ..\..\..\asm8c\tm8cs.lst
+
+del ..\..\..\aspdp11\t11.lst
+del ..\..\..\aspdp11\t11.rel
+..\exe\aspdp11.exe -locqff -i ".define .lst" ..\..\..\aspdp11\t11
+..\exe\asxscn.exe -q ..\..\..\aspdp11\t11.lst
+del ..\..\..\aspdp11\t11.lst
+del ..\..\..\aspdp11\t11.rel
+del ..\..\..\aspdp11\t11.rst
+..\exe\aspdp11.exe -locqff -i ".define .rst" ..\..\..\aspdp11\t11
+..\exe\aslink.exe -nqu -g XA=0 ..\..\..\aspdp11\t11.rel
+..\exe\asxscn.exe -qi ..\..\..\aspdp11\t11.rst
 
 del ..\..\..\aspic\p12c5xx\tp12c5xx.lst
 ..\exe\aspic.exe -glacxff ..\..\..\aspic\p12c5xx\tp12c5xx.asm
@@ -579,7 +634,7 @@ del ..\..\..\asst6\st6gbl.lst
 del ..\..\..\asst6\st6gbl.hlr
 del ..\..\..\asst6\st6gbl.rst
 ..\exe\asst6.exe -gloacxff ..\..\..\asst6\st6gbl.asm
-..\exe\aslink.exe -nxu ..\..\..\asst6\tst6.rel ..\..\..\asst6\tst6.rel ..\..\..\asst6\st6gbl.rel
+..\exe\aslink.exe -nxu ..\..\..\asst6\tst6.rel ..\..\..\asst6\st6gbl.rel
 ..\exe\asxscn.exe -i ..\..\..\asst6\tst6.rst
 
 del ..\..\..\asst7\tst7.rel
@@ -593,7 +648,7 @@ del ..\..\..\asst7\st7gbl.lst
 del ..\..\..\asst7\st7gbl.hlr
 del ..\..\..\asst7\st7gbl.rst
 ..\exe\asst7.exe -gloacxff ..\..\..\asst7\st7gbl.asm
-..\exe\aslink.exe -nxu ..\..\..\asst7\tst7.rel ..\..\..\asst7\tst7.rel ..\..\..\asst7\st7gbl.rel
+..\exe\aslink.exe -nxu ..\..\..\asst7\tst7.rel ..\..\..\asst7\st7gbl.rel
 ..\exe\asxscn.exe -i ..\..\..\asst7\tst7.rst
 
 del ..\..\..\asst8\tst8.rel
@@ -607,8 +662,17 @@ del ..\..\..\asst8\st8gbl.lst
 del ..\..\..\asst8\st8gbl.hlr
 del ..\..\..\asst8\st8gbl.rst
 ..\exe\asst8.exe -gloacxff ..\..\..\asst8\st8gbl.asm
-..\exe\aslink.exe -nxu ..\..\..\asst8\tst8.rel ..\..\..\asst8\tst8.rel ..\..\..\asst8\st8gbl.rel
+..\exe\aslink.exe -nxu ..\..\..\asst8\tst8.rel ..\..\..\asst8\st8gbl.rel
 ..\exe\asxscn.exe -3 -i ..\..\..\asst8\tst8.rst
+
+del ..\..\..\assx\tsx.rel
+del ..\..\..\assx\tsx.lst
+del ..\..\..\assx\tsx.hlr
+del ..\..\..\assx\tsx.rst
+..\exe\assx.exe -gloacxff ..\..\..\assx\tsx.asm
+..\exe\asxscn.exe -i ..\..\..\assx\tsx.lst
+..\exe\aslink.exe -nxu -g X=0 ..\..\..\assx\tsx.rel
+..\exe\asxscn.exe -i ..\..\..\assx\tsx.rst
 
 del ..\..\..\asz8\tz8.rel
 del ..\..\..\asz8\tz8.lst
@@ -627,24 +691,24 @@ del ..\..\..\asz280\*.rel
 del ..\..\..\asz280\*.lst
 del ..\..\..\asz280\*.hlr
 del ..\..\..\asz280\*.rst
-..\exe\asz280 -lbcoxff -p ..\..\..\asz280\tzx_CL ..\..\..\asz280\asz_CL ..\..\..\asz280\tz280x 
+..\exe\asz280 -lbcxff -p -o+ ..\..\..\asz280\tzx_CL ..\..\..\asz280\asz_CL ..\..\..\asz280\tz280x 
 ..\exe\asxscn ..\..\..\asz280\tzx_CL.lst
 
-..\exe\asz280 -lbcoxff -p ..\..\..\asz280\tzx_CR ..\..\..\asz280\asz_CR ..\..\..\asz280\tz280x 
+..\exe\asz280 -lbcxff -p -o+ ..\..\..\asz280\tzx_CR ..\..\..\asz280\asz_CR ..\..\..\asz280\tz280x 
 ..\exe\aslink -nxuf ..\..\..\asz280\tzx_CR
 ..\exe\asxscn ..\..\..\asz280\tzx_CR.rst
 
-..\exe\asz280 -lbcoxff -p ..\..\..\asz280\tzx_XL ..\..\..\asz280\asz_XL ..\..\..\asz280\tz280x 
+..\exe\asz280 -lbcxff -p -o+ ..\..\..\asz280\tzx_XL ..\..\..\asz280\asz_XL ..\..\..\asz280\tz280x 
 ..\exe\asxscn ..\..\..\asz280\tzx_XL.lst
 
-..\exe\asz280 -lbcoxff -p ..\..\..\asz280\tzx_XR ..\..\..\asz280\asz_XR ..\..\..\asz280\tz280x 
+..\exe\asz280 -lbcxff -p -o+ ..\..\..\asz280\tzx_XR ..\..\..\asz280\asz_XR ..\..\..\asz280\tz280x 
 ..\exe\aslink -nxuf ..\..\..\asz280\tzx_XR
 ..\exe\asxscn ..\..\..\asz280\tzx_XR.rst
 
-..\exe\asz280 -lbcoxff -p ..\..\..\asz280\tzx_EXL ..\..\..\asz280\asz_EXL ..\..\..\asz280\tz280x 
+..\exe\asz280 -lbcxff -p -o+ ..\..\..\asz280\tzx_EXL ..\..\..\asz280\asz_EXL ..\..\..\asz280\tz280x 
 ..\exe\asxscn ..\..\..\asz280\tzx_EXL.lst
 
-..\exe\asz280 -lbcoxff -p ..\..\..\asz280\tzx_EXR ..\..\..\asz280\asz_EXR ..\..\..\asz280\tz280x 
+..\exe\asz280 -lbcxff -p -o+ ..\..\..\asz280\tzx_EXR ..\..\..\asz280\asz_EXR ..\..\..\asz280\tz280x 
 ..\exe\aslink -nxuf ..\..\..\asz280\tzx_EXR
 ..\exe\asxscn ..\..\..\asz280\tzx_EXR.rst
 

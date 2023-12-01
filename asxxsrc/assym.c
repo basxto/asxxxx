@@ -109,7 +109,7 @@ syminit()
 		h = hash(mp->m_id, 1);
 		mp->m_mp = mnehash[h];
 		mnehash[h] = mp;
-		if (mp->m_flag&S_EOL)
+		if (mp->m_flag & S_EOL)
 			break;
 		++mp;
 	}
@@ -122,7 +122,7 @@ syminit()
 		h = hash(sp->s_id, zflag);
 		sp->s_sp = symhash[h];
 		symhash[h] = sp;
-		if (sp->s_flag&S_EOL)
+		if (sp->s_flag & S_EOL)
 			break;
 		++sp;
 	}
@@ -606,14 +606,14 @@ int flag;
 
 static	char *	pnext = NULL;
 static	int	bytes = 0;
-   
+
 char *
 strsto(str)
 char *str;
 {
 	int  len;
 	char *p;
-   
+
 	/*
 	 * What we need, including a null.
 	 */

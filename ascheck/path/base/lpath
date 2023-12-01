@@ -1,3 +1,0 @@
-#!/bin/bash
-bin/ascheck -l -o -s  obj/prj/lpath  src/prj/lpath
-

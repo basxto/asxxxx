@@ -977,7 +977,9 @@
 	.sbttl	Verify JP Instruction Paging
 
 	.macro	jp_Paging	A
-	  .list	(!,err,loc,bin,eqt,cyc,lin,src,me,meb)
+	  .list
+	  .list	(mel)
+
 	  .org	'A * 0x0040
 jpg'A:	  jp	.			;*C0
 	  jp	. + 0x3D		;*FE
@@ -1041,7 +1043,8 @@ page3A:	jp23	page2A		;*80
 	.sbttl	Verify jsrp Instruction Paging
 
 	.macro	jsrp_Paging	A
-	  .list	(!,err,loc,bin,eqt,cyc,lin,src,me,meb)
+	  .list
+	  .list	(mel)
 	  .org	'A * 0x0040
 jsrpg'A:  .ifne	'A - 2
 	  jsrp	jsrpg2			;*80

@@ -1,7 +1,7 @@
 /* i40mch.c */
 
 /*
- *  Copyright (C) 2021  Alan R. Baldwin
+ *  Copyright (C) 2021-2023  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@ char	*dsft	= "asm";
 #define	OPCY_SDP	((char) (0xFF))
 #define	OPCY_ERR	((char) (0xFE))
 
-/*	OPCY_NONE	((char) (0x80))	*/
-/*	OPCY_MASK	((char) (0x7F))	*/
+#define	OPCY_NONE	((char) (0x80))
+#define	OPCY_MASK	((char) (0x7F))
 
 #define	UN	((char) (OPCY_NONE | 0x00))
 
@@ -78,6 +78,12 @@ struct mne *mp;
 	struct expr e1,e2;
 	int t1,t2;
 	a_uint v1,v2;
+
+	/*
+	 * Using Internal Format
+	 * For Cycle Counting
+	 */
+	opcycles = OPCY_NONE;
 
 	clrexpr(&e1);
 	clrexpr(&e2);
@@ -299,6 +305,11 @@ struct mne *mp;
 			opcycles = i40pg1[cb[0] & 0xFF];
 		}
 	}
+ 	/*
+	 * Translate To External Format
+	 */
+	if (opcycles == OPCY_NONE) { opcycles  =  CYCL_NONE; } else
+	if (opcycles  & OPCY_NONE) { opcycles |= (CYCL_NONE | 0x3F00); }
 }
 
 /*
@@ -308,10 +319,6 @@ struct mne *mp;
 VOID
 minit()
 {
-	int i,j;
-	struct sym *sp;
-	char id[NCPS];
-
 	/*
 	 * Byte Order
 	 */
@@ -321,61 +328,6 @@ minit()
 	 * CPU Type
 	 */
 	sym[2].s_addr = S_4040;
-
-	/*
-	 * (Re)Define Condition Code Constants
-	 */
-	for (i=0,j=0; *cc[i].a_str; i++) {
-		sp = lookup(cc[i].a_str);
-		if (sp->s_addr != (a_uint) cc[i].a_val) {
-			if (pass == 2) {
-				sprintf(id, "\n");
-				errdmp(id);
-				j = 1;
-				break;
-			}
-		}
-	}
-	for (i=0; *cc[i].a_str; i++) {
-		sp = lookup(cc[i].a_str);
-		if (sp->s_addr != (a_uint) cc[i].a_val) {
-			if (pass == 2) {
-				sprintf(id, "?ASxxxx-Error-<a> Detected Condition Code %s value changed.\n", cc[i].a_str);
-				errdmp(id);
-			}
-		}
-		sp->s_type = S_LOCAL;
-		sp->s_flag = 0;
-		sp->s_area = NULL;
-		sp->s_addr = (a_uint) cc[i].a_val;
-	}
-	if (j) {
-		sprintf(id, "\n");
-		errdmp(id);
-	}
-}
-
-VOID
-errdmp(id)
-char * id;
-{
-	FILE *fp;
-
-	fp = stderr;
-	while (fp != NULL) {
-		fprintf(fp, id);
-		if ((fp == lfp) && (hfp != NULL)) {
-			listhlr(LIST_SRC, SLIST, 0);
-		}
-		if (fp == lfp) { fp = NULL; }
-		if (fp == stderr) {
-			if (kflag) {
-				fp = NULL;
-			} else {
-				fp = lfp;
-			}
-		}
-	}
 }
 
 
