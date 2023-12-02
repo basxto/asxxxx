@@ -15,6 +15,8 @@ make as6809
 make as6811
 make as6812
 make as6816
+make as68cf
+make as68k
 make as740
 make as78k0
 make as78k0s
@@ -30,12 +32,14 @@ make asavr
 make ascheck
 make ascop4
 make ascop8
+make asez8
 make asez80
 make asf2mc8
 make asf8
 make asgb
 make ash8
 make asm8c
+make aspdp11
 make aspic
 make asrab
 make asrs08
@@ -43,6 +47,7 @@ make asscmp
 make asst6
 make asst7
 make asst8
+make assx
 make asz8
 make asz80
 make asz280

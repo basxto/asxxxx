@@ -963,6 +963,7 @@ a_uint base;
  *
  *	global variables:
  *		int	a_bytes		T Line byte count
+ *		int	p_mask		user specified page mask
  *		int	oflag		-o, generate relocatable output flag
  *		int	pass		assembler pass number
  *		char	rel[]		relocation data for code/data array
@@ -1011,7 +1012,7 @@ int r;
 			*relp++ = txtp - txt - a_bytes;
 			out_rw(n);
 		}
-		if (p_mask != 0xFF) {
+		if (p_mask != DEFAULT_PMASK) {
 			out_txb(a_bytes,p_mask);
 		}
 		outbuf("P");

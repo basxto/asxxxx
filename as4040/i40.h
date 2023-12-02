@@ -113,7 +113,6 @@ extern	int		srch(char *str);
 
 	/* i40mch.c */
 extern	int		cputype;
-extern	VOID		errdmp(char *id);
 extern	VOID		machine(struct mne *mp);
 extern	VOID		minit(void);
 
@@ -129,7 +128,6 @@ extern	int		srch();
 
 	/* i40mch.c */
 extern	int		cputype;
-extern	VOID		errdmp();
 extern	VOID		machine();
 extern	VOID		minit();
 

@@ -6,7 +6,7 @@
 	.include	/define.def/
 
 
-	.area	ACQVARBL(ABS,OVR)
+	.area	ACQVARBL (ABS,OVR)
 
 	;  This area contains the variable definitions for the
 	; each of the channels in the acquisition module.
@@ -67,7 +67,7 @@ cor$lpht::	.blkb	2		; Corrected LED amplitude
 
 
 	.page
-	.area	ACQBUFR(ABS,OVR)
+	.area	ACQBUFR (ABS,OVR)
 
 	;  This area contains the buffer definitions for the
 	; acquisition module.
@@ -85,7 +85,7 @@ acq$time::	.blkw	0d64		; time of update (1 minute increments)
 	ACQBUFSZ  = . - acq$phs		; size of acquisition segment
 
 
-	.area	ACQDATA(REL,CON)
+	.area	ACQDATA (REL,CON)
 
 upd$inh::	.blkb	1		; acquisition inhibited flag
 upd$seq::	.blkb	1		; sequence state
@@ -117,7 +117,7 @@ acqvar::
 
 
 	.page
-	.area	ACQ(REL,CON)
+	.area	ACQ (REL,CON)
 
 	;  This module contains the acquisition code used to
 	; acquire data from the LED pulsed scintillators.
@@ -962,7 +962,7 @@ phs$init::
 	.page
 	.sbttl	Temperature channel update
 
-	.area	ACQDATA(REL,CON)
+	.area	ACQDATA (REL,CON)
 
 tmpbufr::
 		.blkb	TMPBUFSZ	; allocation for temperature buffers
@@ -971,7 +971,7 @@ tmpvar::
 
 
 
-	.area	ACQ(REL,CON)
+	.area	ACQ (REL,CON)
 
 
 	;  Temperature update code:

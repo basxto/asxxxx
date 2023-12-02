@@ -178,8 +178,7 @@
 #define	S_RL	71
 #define	S_RST	72
 #define	S_INH	73
-#define S_SWAP	74	/* SWAP A, nibble swaps the accumulator */
-#define	S_STOP	75	/* Requires 2 bytes due to bug */
+#define	S_STOP	74	/* Requires 2 bytes due to bug */
 /*
  * Defined Instructions
  */
@@ -220,7 +219,7 @@ extern	int		srch(char *str);
 	/* gbmch.c */
 extern	int		genop(int pop, int op, struct expr *esp, int f);
 extern	VOID		machine(struct mne *mp);
-extern	int		mchpcr(struct expr *esp);
+extern	int		mchpcr(struct expr *esp, int *v, int n);
 extern	VOID		minit(void);
 
 #else

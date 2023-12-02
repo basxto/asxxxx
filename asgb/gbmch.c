@@ -1,7 +1,7 @@
 /* gbmch.c */
 
 /*
- *  Copyright (C) 1989-2022  Alan R. Baldwin
+ *  Copyright (C) 1989-2023  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,8 +41,8 @@ char	imtab[3] = { 0x46, 0x56, 0x5E };
 #define	OPCY_SDP	((char) (0xFF))
 #define	OPCY_ERR	((char) (0xFE))
 
-/*	OPCY_NONE	((char) (0x80))	*/
-/*	OPCY_MASK	((char) (0x7F))	*/
+#define	OPCY_NONE	((char) (0x80))
+#define	OPCY_MASK	((char) (0x7F))
 
 #define	UN	((char) (OPCY_NONE | 0x00))
 #define	P2	((char) (OPCY_NONE | 0x01))
@@ -113,6 +113,12 @@ struct mne *mp;
 	struct area *espa;
 	char id[NCPS];
 	int d,c,i,th,tl,oops; /* for dealing with .tile */
+
+	/*
+	 * Using Internal Format
+	 * For Cycle Counting
+	 */
+	opcycles = OPCY_NONE;
 
 	clrexpr(&e1);
 	clrexpr(&e2);
@@ -207,25 +213,8 @@ struct mne *mp;
 		break;
 
 	case S_RL:
-		t1 = 0;
-		t2 = addr(&e2);
-		if (more()) {
-			if ((t2 != S_R8) || (e2.e_addr != A))
-				++t1;
-			comma(1);
-			t2 = addr(&e2);
-		}
-		if (genop(0xCB, op, &e2, 0) || t1)
-			xerr('a', "Invalid Addressing Mode.");
-		break;
-
-	case S_SWAP:
-		t1 = 0;
-		t2 = addr(&e2);
-		if (more()) {
-		 	t1++;
-		}
-		if (genop(0xCB, op, &e2, 0) || t1)
+		t1 = addr(&e1);
+		if (genop(0xCB, op, &e1, 0))
 			xerr('a', "Invalid Addressing Mode.");
 		break;
 
@@ -291,16 +280,16 @@ struct mne *mp;
 		/* These are loads which increment or decrement HL. The
 		 * valid instructions are:
 		 *
-		 *	ldi a,(hl)	; A <- (HL), HL++
-		 *	ldi (hl),a	; (HL) <- A, HL++
-		 *	ldd a,(hl)	; A <- (HL), HL--
-		 *	ldd (hl),a	; (HL) <- A, HL--
+		 *	ldi a,(hl)	; A <- (HL), HL <- HL + 1
+		 *	ldi (hl),a	; (HL) <- A, HL <- HL + 1
+		 *	ldd a,(hl)	; A <- (HL), HL <- HL - 1
+		 *	ldd (hl),a	; (HL) <- A, HL <- HL - 1
 		 *
 		 * aliases:
-		 *	ld  a,(hli)	; A <- (HL), HL++
-		 *	ld  (hli),a	; (HL) <- A, HL++
-		 *	ld  a,(hld)	; A <- (HL), HL--
-		 *	ld  (hld),a	; (HL) <- A, HL--
+		 *	ld  a,(hli)	; A <- (HL), HL <- HL + 1
+		 *	ld  (hli),a	; (HL) <- A, HL <- HL + 1
+		 *	ld  a,(hld)	; A <- (HL), HL <- HL - 1
+		 *	ld  (hld),a	; (HL) <- A, HL <- HL - 1
 		 *
 		 * op is output unchanged for "ld? (hl),a" and 0x08 is
 		 * added for "ld? a,(hl)".
@@ -357,6 +346,7 @@ struct mne *mp;
 				}
 				if (t2 == S_IMMED) {
 					if (more()) {
+						comma(0);
 						t3 = addr(&e3);
 						if (t3 == S_IDSP) {
 							outab(0xF8 - op);
@@ -371,6 +361,7 @@ struct mne *mp;
 				}
 				if (t2 == S_EXT) {
 					if (more()) {
+						comma(0);
 						t3 = addr(&e3);
 						if (t3 == S_IDSP) {
 							outab(0xF8 - op);
@@ -614,7 +605,7 @@ struct mne *mp;
 					if (more()) {
 						comma(0);
 						expr(&e3, 0);
-						outrb(&e3, 0);
+						outrb(&e3, R_SGND);
 					} else {
 						outab(0x00);
 					}
@@ -622,6 +613,7 @@ struct mne *mp;
 				}
 				if (t2 == S_IMMED) {
 					if (more()) {
+						comma(0);
 						t3 = addr(&e3);
 						if (t3 == S_IDSP) {
 							outab(0xF8 - op);
@@ -636,6 +628,7 @@ struct mne *mp;
 				}
 				if (t2 == S_EXT) {
 					if (more()) {
+						comma(0);
 						t3 = addr(&e3);
 						if (t3 == S_IDSP) {
 							outab(0xF8 - op);
@@ -673,6 +666,7 @@ struct mne *mp;
 		}
 		if (t1 == S_IMMED) {
 			if (more()) {
+				comma(0);
 				t2 = addr(&e2);
 				if (t2 == S_IDSP) {
 					outab(op);
@@ -687,6 +681,7 @@ struct mne *mp;
 		}
 		if (t1 == S_EXT) {
 			if (more()) {
+				comma(0);
 				t2 = addr(&e2);
 				if (t2 == S_IDSP) {
 					outab(op);
@@ -695,7 +690,7 @@ struct mne *mp;
 				}
 			}
 		}
-		xerr('a', "Allowed Arguments Are 'SP', n(SP), #n(SP), 'SP+n', 'SP,#n', or a '#'.");
+		xerr('a', "Allowed Arguments Are 'SP', '(#)n(,)(SP)', 'SP+(#)n', 'SP,(#)n', or a '#'.");
 		break;
 
 	case S_INC:
@@ -734,8 +729,7 @@ struct mne *mp;
 		}
 		expr(&e2, 0);
 		outab(op);
-		if (mchpcr(&e2)) {
-			v2 = (int) (e2.e_addr - dot.s_addr - 1);
+		if (mchpcr(&e2, &v2, 1)) {
 			if ((v2 < -128) || (v2 > 127))
 				xerr('a', "Branching Range Exceeded.");
 			outab(v2);
@@ -1078,6 +1072,11 @@ struct mne *mp;
 			opcycles = gbPage[opcycles & OPCY_MASK][cb[1] & 0xFF];
 		}
 	}
+	/*
+	 * Translate To External Format
+	 */
+	if (opcycles == OPCY_NONE) { opcycles  =  CYCL_NONE; } else
+	if (opcycles  & OPCY_NONE) { opcycles |= (CYCL_NONE | 0x3F00); }
 }
 
 /*
@@ -1118,10 +1117,28 @@ int f;
  * Branch/Jump PCR Mode Check
  */
 int
-mchpcr(esp)
+mchpcr(esp, v, n)
 struct expr *esp;
+int *v;
+int n;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
+		if (v != NULL) {
+#if 1
+			/* Allows branching from top-to-bottom and bottom-to-top */
+ 			*v = (int) (esp->e_addr - dot.s_addr - n);
+			/* only bits 'a_mask' are significant, make circular */
+			if (*v & s_mask) {
+				*v |= (int) ~a_mask;
+			}
+			else {
+				*v &= (int) a_mask;
+			}
+#else
+			/* Disallows branching from top-to-bottom and bottom-to-top */
+			*v = (int) ((esp->e_addr & a_mask) - (dot.s_addr & a_mask) - n);
+#endif
+		}
 		return(1);
 	}
 	if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {

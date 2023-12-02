@@ -110,11 +110,12 @@
  * Set Direct Pointer
  */
 #define	S_SDP	90
+#define	S_PGD	91
 
 /*
  * Mode For Common S_ADDR And S_SFR Addresses
  */
-#define	S_MODE	91
+#define	S_MODE	92
 
 /*
  * Register Definitions
@@ -141,7 +142,6 @@
 #define	RB1		1
 #define	RB2		2
 #define	RB3		3
-
 
 struct	sdp
 {
@@ -183,13 +183,14 @@ extern	int		srch(char *str);
 
 	/* r78kmch.c */
 extern	VOID		machine(struct mne *mp);
-extern	int		mchpcr(struct expr *esp);
+extern	int		mchpcr(struct expr *esp, int *v, int n);
 extern	VOID		minit(void);
 extern	VOID		pcrbra(struct expr *esp);
 extern	int		setbit(int b);
 extern	int		getbit(void);
 extern	VOID		mcherr(char *str);
 extern	struct	sdp	sdp;
+extern	struct  area	*zpg;
 
 #else
 
@@ -212,6 +213,7 @@ extern	int		setbit();
 extern	int		getbit();
 extern	VOID		mcherr();
 extern	struct	sdp	sdp;
+extern	struct  area	*zpg;
 
 #endif
 

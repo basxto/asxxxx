@@ -1,5 +1,5 @@
 -xu
 t78k0p
--b SFR  = 0xFF00
--b PROG = 0x0000
+-a SFR  = 0xFF00
+-a PROG = 0x0000
 -e

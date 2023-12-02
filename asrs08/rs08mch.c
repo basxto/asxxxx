@@ -1,7 +1,7 @@
 /* rs08mch.c */
 
 /*
- *  Copyright (C) 2021  Alan R. Baldwin
+ *  Copyright (C) 2021-2023  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,9 +35,8 @@ char	*dsft	= "asm";
 #define	OPCY_ERR	((char) (0xFE))
 #define	OPCY_CPU	((char)	(0xFD))
 
-
-/*	OPCY_NONE	((char) (0x80))	*/
-/*	OPCY_MASK	((char) (0x7F))	*/
+#define	OPCY_NONE	((char) (0x80))
+#define	OPCY_MASK	((char) (0x7F))
 
 #define	UN	((char) (OPCY_NONE | 0x00))
 
@@ -76,7 +75,13 @@ struct mne *mp;
 {
 	int op, t1, t2, type;
 	struct expr e1, e2, e3;
-	int v1, v3;
+	int v1, v2, v3;
+
+	/*
+	 * Using Internal Format
+	 * For Cycle Counting
+	 */
+	opcycles = OPCY_NONE;
 
 	clrexpr(&e1);
 	clrexpr(&e2);
@@ -88,8 +93,7 @@ struct mne *mp;
 	case S_BRN:
 		expr(&e1, 0);
 		outab(op);
-		if (mchpcr(&e1)) {
-			v1 = (int) (e1.e_addr - dot.s_addr - 1);
+		if (mchpcr(&e1, &v1, 1)) {
 			if ((v1 < -128) || (v1 > 127))
 				xerr('a', "Branching Range Exceeded.");
 		}
@@ -101,8 +105,7 @@ struct mne *mp;
 	case S_BRA:	/* BRA | BRN | BCC | BHS | BCS | BLO | BNE | BEQ */
 		expr(&e1, 0);
 		outab(op);
-		if (mchpcr(&e1)) {
-			v1 = (int) (e1.e_addr - dot.s_addr - 1);
+		if (mchpcr(&e1, &v1, 1)) {
 			if ((v1 < -128) || (v1 > 127))
 				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
@@ -338,8 +341,7 @@ struct mne *mp;
 		case S_EXT:	outrb(&e2, R_PAG0);	break;
 		default:	xerr('a', "Invalid Addressing Mode.");	return;
 		}
-		if (mchpcr(&e3)) {
-			v3 = (int) (e3.e_addr - dot.s_addr - 1);
+		if (mchpcr(&e3, &v3, 1)) {
 			if ((v3 < -128) || (v3 > 127))
 				xerr('a', "Branching Range Exceeded.");
 			outab(v3);
@@ -354,8 +356,7 @@ struct mne *mp;
 		expr(&e1, 0);
 		outab(op);
 		outab(0x0F);
-		if (mchpcr(&e1)) {
-			v1 = (int) (e1.e_addr - dot.s_addr - 1);
+		if (mchpcr(&e1, &v1, 1)) {
 			if ((v1 < -128) || (v1 > 127))
 				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
@@ -390,11 +391,10 @@ struct mne *mp;
 		case S_EXT:	outab(0x31);	outrb(&e1, R_PAG0);	break;
 		default:	xerr('a', "Invalid Addressing Mode.");	return;
 		}
-		if (mchpcr(&e2)) {
-			v1 = (int) (e2.e_addr - dot.s_addr - 1);
-			if ((v1 < -128) || (v1 > 127))
+		if (mchpcr(&e2, &v2, 1)) {
+			if ((v2 < -128) || (v2 > 127))
 				xerr('a', "Branching Range Exceeded.");
-			outab(v1);
+			outab(v2);
 		} else {
 			outrb(&e2, R_PCR);
 		}
@@ -410,8 +410,7 @@ struct mne *mp;
 		case S_DBNZX:	outab(0x3B);	outab(0x0F);	break;
 		default:	break;
 		}
-		if (mchpcr(&e1)) {
-			v1 = (int) (e1.e_addr - dot.s_addr - 1);
+		if (mchpcr(&e1, &v1, 1)) {
 			if ((v1 < -128) || (v1 > 127))
 				xerr('a', "Branching Range Exceeded.");
 			outab(v1);
@@ -439,11 +438,10 @@ struct mne *mp;
 		case S_EXT:	outab(0x3B);	outrb(&e1, R_PAG0);	break;
 		default:	xerr('a', "Invalid Addressing Mode.");	return;
 		}
-		if (mchpcr(&e2)) {
-			v1 = (int) (e2.e_addr - dot.s_addr - 1);
-			if ((v1 < -128) || (v1 > 127))
+		if (mchpcr(&e2, &v2, 1)) {
+			if ((v2 < -128) || (v2 > 127))
 				xerr('a', "Branching Range Exceeded.");
-			outab(v1);
+			outab(v2);
 		} else {
 			outrb(&e2, R_PCR);
 		}
@@ -591,16 +589,39 @@ struct mne *mp;
 	if (opcycles == OPCY_NONE) {
 		opcycles = rs08cyc[cb[0] & 0xFF];
 	}
+	/*
+	 * Translate To External Format
+	 */
+	if (opcycles == OPCY_NONE) { opcycles  =  CYCL_NONE; } else
+	if (opcycles  & OPCY_NONE) { opcycles |= (CYCL_NONE | 0x3F00); }
 }
 
 /*
  * Branch/Jump PCR Mode Check
  */
 int
-mchpcr(esp)
+mchpcr(esp, v, n)
 struct expr *esp;
+int *v;
+int n;
 {
 	if (esp->e_base.e_ap == dot.s_area) {
+		if (v != NULL) {
+#if 1
+			/* Allows branching from top-to-bottom and bottom-to-top */
+ 			*v = (int) (esp->e_addr - dot.s_addr - n);
+			/* only bits 'a_mask' are significant, make circular */
+			if (*v & s_mask) {
+				*v |= (int) ~a_mask;
+			}
+			else {
+				*v &= (int) a_mask;
+			}
+#else
+			/* Disallows branching from top-to-bottom and bottom-to-top */
+			*v = (int) ((esp->e_addr & a_mask) - (dot.s_addr & a_mask) - n);
+#endif
+		}
 		return(1);
 	}
 	if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {

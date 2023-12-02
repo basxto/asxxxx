@@ -3,7 +3,7 @@
 #		DJGPP V02.03  'GNU make' Version
 #		================================
 #
-#   15  December  2021		GCC 4.0.1 / make 3.79.1
+#   4  February  2023		GCC 4.0.1 / make 3.79.1
 #
 ####################################################################
 
@@ -23,6 +23,8 @@ ASXXXX =	as1802		\
 		as6811		\
 		as6812		\
 		as6816		\
+		as68cf		\
+		as68k		\
 		as740		\
 		as78k0		\
 		as78k0s		\
@@ -38,6 +40,7 @@ ASXXXX =	as1802		\
 		ascheck		\
 		ascop4		\
 		ascop8		\
+		asez8		\
 		asez80		\
 		asf2mc8		\
 		asf8		\
@@ -45,12 +48,14 @@ ASXXXX =	as1802		\
 		ash8		\
 		asm8c		\
 		aspic		\
+		aspdp11		\
 		asrab		\
 		asrs08		\
 		asscmp		\
 		asst6		\
 		asst7		\
 		asst8		\
+		assx		\
 		asz8		\
 		asz80		\
 		asz280		\
@@ -101,6 +106,8 @@ SRC6809=	$(ASXBAS)as6809/
 SRC6811=	$(ASXBAS)as6811/
 SRC6812=	$(ASXBAS)as6812/
 SRC6816=	$(ASXBAS)as6816/
+SRC68CF=	$(ASXBAS)as68cf/
+SRC68K=		$(ASXBAS)as68k/
 SRC740=		$(ASXBAS)as740/
 SRC78K0=	$(ASXBAS)as78k0/
 SRC78K0S=	$(ASXBAS)as78k0s/
@@ -116,6 +123,7 @@ SRCAVR=		$(ASXBAS)asavr/
 SRCCHECK=	$(ASXBAS)ascheck/
 SRCCOP4=	$(ASXBAS)ascop4/
 SRCCOP8=	$(ASXBAS)ascop8/
+SRCEZ8=		$(ASXBAS)asez8/
 SRCEZ80=	$(ASXBAS)asez80/
 SRCF2MC8=	$(ASXBAS)asf2mc8/
 SRCF8=		$(ASXBAS)asf8/
@@ -123,12 +131,14 @@ SRCGB=		$(ASXBAS)asgb/
 SRCH8=		$(ASXBAS)ash8/
 SRCM8C=		$(ASXBAS)asm8c/
 SRCPIC=		$(ASXBAS)aspic/
+SRCPDP11=	$(ASXBAS)aspdp11/
 SRCRAB=		$(ASXBAS)asrab/
 SRCRS08=	$(ASXBAS)asrs08/
 SRCSCMP=	$(ASXBAS)asscmp/
 SRCST6=		$(ASXBAS)asst6/
 SRCST7=		$(ASXBAS)asst7/
 SRCST8=		$(ASXBAS)asst8/
+SRCSX=		$(ASXBAS)assx/
 SRCZ8=		$(ASXBAS)asz8/
 SRCZ80=		$(ASXBAS)asz80/
 SRCZ280=	$(ASXBAS)asz280/
@@ -484,6 +494,50 @@ as6816 :	$(ASXX) $(AS6816)
 
 
 ####################################################################
+# AS68CF
+####################################################################
+
+AS68CF =	m68cfpst.o m68cfmch.o m68cfadr.o m68cffpp.o
+
+m68cfpst.o :	$(SRC68CF)m68cfpst.c $(SRC68CF)m68cf.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+m68cfmch.o :	$(SRC68CF)m68cfmch.c $(SRC68CF)m68cf.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+m68cfadr.o :	$(SRC68CF)m68cfadr.c $(SRC68CF)m68cf.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+m68cffpp.o :	$(SRC68CF)m68cffpp.c $(SRC68CF)m68cf.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+as68cf :	$(ASXX) $(AS68CF)
+		$(LD) $(LDFLAGS) -o as68cf $(ASXX) $(AS68CF)
+		cp as68cf.exe $(DSTEXE)as68cf.exe
+		strip $(DSTEXE)as68cf.exe
+
+
+####################################################################
+# AS68K
+####################################################################
+
+AS68K =		m68kpst.o m68kmch.o m68kadr.o m68kcyc.o m68kfpp.o
+
+m68kpst.o :	$(SRC68K)m68kpst.c $(SRC68K)m68k.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+m68kmch.o :	$(SRC68K)m68kmch.c $(SRC68K)m68k.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+m68kadr.o :	$(SRC68K)m68kadr.c $(SRC68K)m68k.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+m68kcyc.o :	$(SRC68K)m68kcyc.c $(SRC68K)m68k.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+m68kfpp.o :	$(SRC68K)m68kfpp.c $(SRC68K)m68k.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+as68k :		$(ASXX) $(AS68K)
+		$(LD) $(LDFLAGS) -o as68k $(ASXX) $(AS68K)
+		mv as68k.exe $(DSTEXE)as68k.exe
+		strip $(DSTEXE)as68k.exe
+
+
+####################################################################
 # AS740
 ####################################################################
 
@@ -767,6 +821,25 @@ ascop8 :	$(ASXX) $(ASCOP8)
 
 
 ####################################################################
+# ASEZ8
+####################################################################
+
+ASEZ8 =		ez8pst.o ez8mch.o ez8adr.o
+
+ez8pst.o :	$(SRCEZ8)ez8pst.c $(SRCEZ8)ez8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+ez8mch.o :	$(SRCEZ8)ez8mch.c $(SRCEZ8)ez8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+ez8adr.o :	$(SRCEZ8)ez8adr.c $(SRCEZ8)ez8.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+asez8 :		$(ASXX) $(ASEZ8)
+		$(LD) $(LDFLAGS) -o asez8 $(ASXX) $(ASEZ8)
+		mv asez8.exe $(DSTEXE)asez8.exe
+		strip $(DSTEXE)asez8.exe
+
+
+####################################################################
 # ASEZ80
 ####################################################################
 
@@ -878,6 +951,29 @@ asm8c :		$(ASXX) $(ASM8C)
 		$(LD) $(LDFLAGS) -o asm8c $(ASXX) $(ASM8C)
 		mv asm8c.exe $(DSTEXE)asm8c.exe
 		strip $(DSTEXE)asm8c.exe
+
+
+####################################################################
+# ASPDP11
+####################################################################
+
+ASPDP11 =	pdp11pst.o pdp11mch.o pdp11adr.o pdp11cyc.o pdp11fpp.o
+
+pdp11pst.o :	$(SRCPDP11)pdp11pst.c $(SRCPDP11)pdp11.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+pdp11mch.o :	$(SRCPDP11)pdp11mch.c $(SRCPDP11)pdp11.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+pdp11adr.o :	$(SRCPDP11)pdp11adr.c $(SRCPDP11)pdp11.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+pdp11cyc.o :	$(SRCPDP11)pdp11cyc.c $(SRCPDP11)pdp11.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+pdp11fpp.o :	$(SRCPDP11)pdp11fpp.c $(SRCPDP11)pdp11.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+aspdp11 :	$(ASXX) $(ASPDP11)
+		$(LD) $(LDFLAGS) -o aspdp11 $(ASXX) $(ASPDP11)
+		mv aspdp11.exe $(DSTEXE)aspdp11.exe
+		strip $(DSTEXE)aspdp11.exe
 
 
 ####################################################################
@@ -1011,6 +1107,25 @@ asst8 :		$(ASXX) $(ASST8)
 		$(LD) $(LDFLAGS) -o asst8 $(ASXX) $(ASST8)
 		mv asst8.exe $(DSTEXE)asst8.exe
 		strip $(DSTEXE)asst8.exe
+
+
+####################################################################
+# ASSX
+####################################################################
+
+ASSX =		sxpst.o sxmch.o sxadr.o
+
+sxpst.o :	$(SRCSX)sxpst.c $(SRCSX)sx.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+sxmch.o :	$(SRCSX)sxmch.c $(SRCSX)sx.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+sxadr.o :	$(SRCSX)sxadr.c $(SRCSX)sx.h $(SRCASX)asxxxx.h
+		$(CC) $(CCFLAGS) -I$(SRCASX) -I$(SRCMISC) -c $< -o $(@F)
+
+assx :		$(ASXX) $(ASSX)
+		$(LD) $(LDFLAGS) -o assx $(ASXX) $(ASSX)
+		mv assx.exe $(DSTEXE)assx.exe
+		strip $(DSTEXE)assx.exe
 
 
 ####################################################################

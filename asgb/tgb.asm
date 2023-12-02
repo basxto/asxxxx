@@ -324,6 +324,7 @@
 	rlc	l		; CB 05
 	rlc	(hl)		; CB 06
 	rlc	a		; CB 07
+	  rlca			; 07
 
 	rrc	b		; CB 08
 	rrc	c		; CB 09
@@ -333,6 +334,7 @@
 	rrc	l		; CB 0D
 	rrc	(hl)		; CB 0E
 	rrc	a		; CB 0F
+	  rrca			; 0F
 
 	rl	b		; CB 10
 	rl	c		; CB 11
@@ -342,6 +344,7 @@
 	rl	l		; CB 15
 	rl	(hl)		; CB 16
 	rl	a		; CB 17
+	  rla			; 17
 
 	rr	b		; CB 18
 	rr	c		; CB 19
@@ -351,6 +354,7 @@
 	rr	l		; CB 1D
 	rr	(hl)		; CB 1E
 	rr	a		; CB 1F
+	  rra			; 1F
 
 	sla	b		; CB 20
 	sla	c		; CB 21
@@ -1203,6 +1207,7 @@
 	rlc	l		; CB 05
 	rlc	(hl)		; CB 06
 	rlc	a		; CB 07
+	  rlca			; 07
 
 	rrc	b		; CB 08
 	rrc	c		; CB 09
@@ -1212,6 +1217,7 @@
 	rrc	l		; CB 0D
 	rrc	(hl)		; CB 0E
 	rrc	a		; CB 0F
+	  rrca			; 0F
 
 	rl	b		; CB 10
 	rl	c		; CB 11
@@ -1221,6 +1227,7 @@
 	rl	l		; CB 15
 	rl	(hl)		; CB 16
 	rl	a		; CB 17
+	  rla			; 17
 
 	rr	b		; CB 18
 	rr	c		; CB 19
@@ -1230,6 +1237,7 @@
 	rr	l		; CB 1D
 	rr	(hl)		; CB 1E
 	rr	a		; CB 1F
+	  rra			; 1F
 
 	sla	b		; CB 20
 	sla	c		; CB 21

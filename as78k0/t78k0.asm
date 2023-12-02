@@ -12,7 +12,11 @@
 	;
 	;	If the 'sfr' or 'saddr' address is external then the
 	;	user is responsible to ensure the addresses are in the
-	;	proper ranges.  NO ERRORS will be reported by the linker.
+	;	proper ranges.  ERRORS will be reported by the linker
+	;	if the DIRECT PAGE ADDRESS is not specified using the
+	;	.setdp directive.
+
+	.setdp	0xFF00
 
 			; sfr addresses
 	sfrFF00		=	0xFF00
@@ -1249,7 +1253,11 @@
 	;
 	;	If the 'sfr' or 'saddr' address is external then the
 	;	user is responsible to ensure the addresses are in the
-	;	proper ranges.  NO ERRORS will be reported by the linker.
+	;	proper ranges.  ERRORS will be reported by the linker
+	;	if the DIRECT PAGE ADDRESS is not specified using the
+	;	.setdp directive.
+
+	.setdp	0xFF00
 
 			; sfr addresses
 	.globl	xsfrFF		; =	0xFF00

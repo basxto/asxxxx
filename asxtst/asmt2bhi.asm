@@ -45,7 +45,7 @@
 	.byte	0H024			; 24
 	.byte	0x024			; 24
 	.byte	0X024			; 24
-	.byte	$$24			; 24
+	.byte	$@24			; 24
 
 	.db	0			; 00
 	.dw	0			; 00 00
@@ -368,6 +368,14 @@ bndry_6:
 	.ascii	"abcde"			; 61 62 63 64 65
 	.asciz	"abcde"			; 61 62 63 64 65 00
 	.ascis	"abcde"			; 61 62 63 64 E5
+
+	.ascii	/a/(13)/b/(10)		; 61 0D 62 0A
+	.asciz	/a/(13)/b/(10)		; 61 0D 62 0A 00
+	.ascis	/a/(13)/b/(10)		; 61 0D 62 8A
+
+	.ascii	(13)/a/			; 0D 61
+	.asciz	(13)/a/			; 0D 61 00
+	.ascis	(13)/a/			; 0D E1
 
 
 	.sbttl	Expression Evaluation

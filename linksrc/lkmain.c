@@ -1,7 +1,7 @@
 /* lkmain.c */
 
 /*
- *  Copyright (C) 1989-2021  Alan R. Baldwin
+ *  Copyright (C) 1989-2022  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,11 +34,13 @@
  *
  *	lkmain.c contains the following functions:
  *		FILE *	afile()
- *		VOID	bassav()
- *		VOID	gblsav()
+ *		VOID	areasav()
+ *		VOID	banksav()
+ *		VOID	glblsav()
  *		int	intsiz()
  *		VOID	link()
  *		VOID	lkexit()
+ *		char *	filespec()
  *		int	fndext()
  *		int	fndidx()
  *		int	main()
@@ -50,7 +52,7 @@
  *
  *	lkmain.c contains the following local variables:
  *		char *	usetext[]	array of pointers to the
- *					command option tect lines
+ *					command option text lines
  *
  */
 
@@ -62,7 +64,7 @@
  *
  *	The function main() evaluates the command line arguments to
  *	determine if the linker parameters are to input through 'stdin'
- *	or read from a command file.  The functiond nxtline() and parse()
+ *	or read from a command file.  The functions nxtline() and parse()
  *	are to input and evaluate the linker parameters.  The linking process
  *	proceeds by making the first pass through each .rel file in the order
  *	presented to the linker.  At the end of the first pass the setbase(),
@@ -149,7 +151,8 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-	int c, i, j, k;
+	char *p;
+	int c, i;
 
 	if (argc == 1) {
 		usage();
@@ -163,6 +166,9 @@ char *argv[];
 
 	fprintf(stdout, "\n");
 
+	outnam = NULL;
+	outext = NULL;
+
 	startp = (struct lfile *) new (sizeof (struct lfile));
 	startp->f_idp = "";
 
@@ -170,22 +176,52 @@ char *argv[];
 
 	for(i=1; i<argc; i++) {
 		ip = ib;
-		if(argv[i][0] == '-') {
+		p = argv[i];
+		if(*p == '-') {
 			if (linkp != NULL) {
 				usage();
 				fprintf(stderr, "?ASlink-Error-Options come first\n");
 				lkexit(ER_FATAL);
 			}
-			j = i;
-			k = 1;
-			while((c = argv[j][k]) != '\0') {
+			++p;
+			while((c = *p++) != '\0') {
 				ip = ib;
 				sprintf(ip, "-%c", c);
 				switch(c) {
 
 				/*
+				 * Options with options
+				 */
+				case 'm':
+				case 'M':
+					if (*p == '1') {
+						sprintf(ip+2, "%c", *p++);
+					}
+					break;
+
+				/*
+				 * Options With A Conditional (+) Option
+				 */
+
+				case 'i':
+				case 'I':
+				case 's':
+				case 'S':
+				case 't':
+				case 'T':
+					if (*p == '+') {
+						sprintf(ip+2, "%c", *p++);
+					} else {
+						break;
+					}
+					/* Fall Through */
+
+				/*
 				 * Options with arguments
 				 */
+				case 'a':
+				case 'A':
+
 				case 'b':
 				case 'B':
 
@@ -201,28 +237,16 @@ char *argv[];
 				case 'f':
 				case 'F':
 					strcat(ip, " ");
-					strcat(ip, argv[++i]);
-					break;
-
-				/*
-				 * Options with options
-				 */
-				case 'i':
-				case 'I':
-					if (argv[i][++k] == '1') {
-						sprintf(ip+2, "%c", argv[i][k]);
-					} else {
-						--k;
+					/* allow -*arg or -* arg */
+					if (*p == '\0') {
+						if (++i >= argc) {
+							fprintf(stderr, "?ASlink-Error-Missing -%c argument\n", c);
+							lkexit(ER_FATAL);
+						}
+						p = argv[i];
 					}
-					break;
-
-				case 'm':
-				case 'M':
-					if (argv[i][++k] == '1') {
-						sprintf(ip+2, "%c", argv[i][k]);
-					} else {
-						--k;
-					}
+					strcat(ip, p);
+					p += strlen(p);
 					break;
 
 				/*
@@ -253,7 +277,6 @@ char *argv[];
 				if(pflag)
 					fprintf(stdout, "ASlink >> %s\n", ip);
 				parse();
-				k++;
 			}
 		} else {
 			strcpy(ip, argv[i]);
@@ -266,20 +289,6 @@ char *argv[];
 	if (linkp == NULL) {
 		fprintf(stderr, "?ASlink-Error-Missing input file(s)\n");
 		lkexit(ER_FATAL);
-	}
-
-	/*
-	 * If no input file is specified
-	 * then assume a single file with
-	 * the same name as the output file.
-	 */
-	if (lfp == linkp) {
-		lfp->f_flp = (struct lfile *) new (sizeof (struct lfile));
-		lfp = lfp->f_flp;
-		lfp->f_idp = strsto(linkp->f_idp);
-		lfp->f_idx = fndidx(linkp->f_idp);
-		lfp->f_obj = objflg;
-		lfp->f_type = F_REL;
 	}
 
 	syminit();
@@ -398,7 +407,7 @@ intsiz()
  *	global variables:
  *		FILE *	jfp		file handle for .noi
  *		FILE *	mfp		file handle for .map
- *		FILE *	rfp		file hanlde for .rst
+ *		FILE *	rfp		file handle for .rst
  *		FILE *	sfp		file handle for stdin
  *		FILE *	tfp		file handle for .lst
  *		FILE *	hfp		file handle for .hlr
@@ -650,10 +659,10 @@ link()
  *				 	area structure
  *		area	*areap		The pointer to the first
  *				 	area structure of a linked list
- *		base	*basep		The pointer to the first
- *				 	base structure
- *		base	*bsp		Pointer to the current
- *				 	base structure
+ *		base	*a_basep	The pointer to the first
+ *				 	area base structure
+ *		base	*a_bsp		Pointer to the current
+ *				 	area base structure
  *		lfile	*filep	 	The pointer *filep points to the
  *				 	beginning of a linked list of
  *				 	lfile structures.
@@ -741,7 +750,7 @@ map()
 	/*
 	 * List Linked Libraries
 	 */
-	if (lbfhead != NULL) {
+	if (lbfhead) {
 		fprintf(mfp,
 "\nLibraries Linked                          [ object file ]\n\n");
 		for (lbfh=lbfhead; lbfh; lbfh=lbfh->next) {
@@ -751,16 +760,30 @@ map()
 		fprintf(mfp, "\n");
 	}
 	/*
-	 * List Base Address Definitions
+	 * List Area Base Address Definitions
 	 */
-	if (basep) {
+	if (a_basep) {
 		newpag(mfp);
-		fprintf(mfp, "\nUser Base Address Definitions\n\n");
-		bsp = basep;
-		while (bsp) {
-			fprintf(mfp, "%s\n", bsp->b_strp);
-			bsp = bsp->b_base;
+		fprintf(mfp, "\nUser Area Base Address Definitions\n\n");
+		a_bsp = a_basep;
+		while (a_bsp) {
+			fprintf(mfp, "%s\n", a_bsp->strp);
+			a_bsp = a_bsp->link;
 		}
+		fprintf(mfp, "\n");
+	}
+	/*
+	 * List Bank Base Address Definitions
+	 */
+	if (b_basep) {
+		newpag(mfp);
+		fprintf(mfp, "\nUser Bank Base Address Definitions\n\n");
+		b_bsp = b_basep;
+		while (b_bsp) {
+			fprintf(mfp, "%s\n", b_bsp->strp);
+			b_bsp = b_bsp->link;
+		}
+		fprintf(mfp, "\n");
 	}
 	/*
 	 * List Global Definitions
@@ -773,6 +796,7 @@ map()
 			fprintf(mfp, "%s\n", gsp->g_strp);
 			gsp = gsp->g_globl;
 		}
+		fprintf(mfp, "\n");
 	}
 	fprintf(mfp, "\n\f");
 	chkbank(mfp);
@@ -814,10 +838,12 @@ map()
  *	Functions called:
  *		VOID	addlib()	lklibr.c
  *		VOID	addpath()	lklibr.c
- *		VOID	bassav()	lkmain.c
+ *		VOID	areasav()	lkmain.c
+ *		VOID	banksav()	lkmain.c
  *		VOID	doparse()	lkmain.c
+ *		char *	filespec()	lkmain.c
  *		int	fprintf()	c_library
- *		VOID	gblsav()	lkmain.c
+ *		VOID	glblsav()	lkmain.c
  *		VOID	getfid()	lklex.c
  *		int	get()		lklex.c
  *		int	getnb()		lklex.c
@@ -846,9 +872,15 @@ parse()
 			while (ctype[c=get()] & LETTER) {
 				switch(c) {
 
-				case 'h':
-				case 'H':
-					break;
+				case 'a':
+				case 'A':
+					areasav();
+					return(0);
+
+				case 'b':
+				case 'B':
+					banksav();
+					return(0);
 
 				case 'c':
 				case 'C':
@@ -857,6 +889,15 @@ parse()
 					startp->f_type = F_STD;
 					doparse();
 					return(0);
+
+				case 'd':
+				case 'D':
+					xflag = 2;
+					break;
+
+				case 'e':
+				case 'E':
+					return(1);
 
 				case 'f':
 				case 'F':
@@ -880,44 +921,19 @@ parse()
 					}
 					return(0);
 
+				case 'g':
+				case 'G':
+					glblsav();
+					return(0);
+
+				case 'h':
+				case 'H':
+					break;
+
 				case 'i':
 				case 'I':
 					oflag = 1;
-					if ((c=get()) == '1') {
-						o1flag = 1;
-					} else {
-						unget(c);
-					}
-					break;
-
-				case 's':
-				case 'S':
-					oflag = 2;
-					break;
-
-				case 't':
-				case 'T':
-					oflag = 3;
-					break;
-
-				case 'o':
-				case 'O':
-					objflg = 0;
-					break;
-
-				case 'v':
-				case 'V':
-					objflg = 1;
-					break;
-
-				case 'm':
-				case 'M':
-					mflag = 1;
-					if ((c=get()) == '1') {
-						m1flag = 1;
-					} else {
-						unget(c);
-					}
+					ip = filespec(ip);
 					break;
 
 #if NOICE
@@ -926,50 +942,6 @@ parse()
 					jflag = 1;
 					break;
 #endif
-
-				case 'u':
-				case 'U':
-					uflag = 1;
-					break;
-
-				case 'x':
-				case 'X':
-					xflag = 0;
-					break;
-
-				case 'q':
-				case 'Q':
-					xflag = 1;
-					break;
-
-				case 'd':
-				case 'D':
-					xflag = 2;
-					break;
-
-				case 'e':
-				case 'E':
-					return(1);
-
-				case 'n':
-				case 'N':
-					pflag = 0;
-					break;
-
-				case 'p':
-				case 'P':
-					pflag = 1;
-					break;
-
-				case 'b':
-				case 'B':
-					bassav();
-					return(0);
-
-				case 'g':
-				case 'G':
-					gblsav();
-					return(0);
 
 				case 'k':
 				case 'K':
@@ -981,9 +953,66 @@ parse()
 					addlib();
 					return(0);
 
+				case 'm':
+				case 'M':
+					mflag = 1;
+					if ((c=get()) == '1') {
+						m1flag = 1;
+					} else {
+						unget(c);
+					}
+					break;
+
+				case 'n':
+				case 'N':
+					pflag = 0;
+					break;
+
+				case 'o':
+				case 'O':
+					objflg = 0;
+					break;
+
+				case 'p':
+				case 'P':
+					pflag = 1;
+					break;
+
+				case 'q':
+				case 'Q':
+					xflag = 1;
+					break;
+
+				case 's':
+				case 'S':
+					oflag = 2;
+					ip = filespec(ip);
+					break;
+
+				case 't':
+				case 'T':
+					oflag = 3;
+					ip = filespec(ip);
+					break;
+
+				case 'u':
+				case 'U':
+					uflag = 1;
+					break;
+
+				case 'v':
+				case 'V':
+					objflg = 1;
+					break;
+
 				case 'w':
 				case 'W':
 					wflag = 1;
+					break;
+
+				case 'x':
+				case 'X':
+					xflag = 0;
 					break;
 
 #if SDCDB
@@ -1005,17 +1034,6 @@ parse()
 			}
 		} else
 		if (ctype[c] != ILL) {
-			if (linkp == NULL) {
-				linkp = (struct lfile *)
-						new (sizeof (struct lfile));
-				lfp = linkp;
-				lfp->f_type = F_OUT;
-			} else {
-				lfp->f_flp = (struct lfile *)
-						new (sizeof (struct lfile));
-				lfp = lfp->f_flp;
-				lfp->f_type = F_REL;
-			}
 			/*
 			 * Copy Path from .LNK file
 			 */
@@ -1039,6 +1057,19 @@ parse()
 			/*
 			 * Save file specification
 			 */
+			if (linkp == NULL) {
+				linkp = (struct lfile *)
+						new (sizeof (struct lfile));
+				lfp = linkp;
+				lfp->f_type = F_OUT;
+				lfp->f_idp = strsto(p);
+				lfp->f_idx = fndidx(p);
+				lfp->f_obj = objflg;
+			}
+			lfp->f_flp = (struct lfile *)
+					new (sizeof (struct lfile));
+			lfp = lfp->f_flp;
+			lfp->f_type = F_REL;
 			lfp->f_idp = strsto(p);
 			lfp->f_idx = fndidx(p);
 			lfp->f_obj = objflg;
@@ -1109,19 +1140,89 @@ doparse()
 	startp->f_type = 0;
 }
 
-/*)Function	VOID	bassav()
+/*)Function	char *	filespec(p)
  *
- *	The function bassav() creates a linked structure containing
- *	the base address strings input to the linker.
+ *		char *		p	pointer to option string
+ *
+ *	local variables:
+ *		int		opt	option character
+ *		int		pFile	index to beginning of p filename
+ *		char *		q	pointer into p string
+ *
+ *	global variables:
+ *		char *		outnam	Output Name String
+ *		char *		outext	Output Extension String
+ *
+ *	functions called:
+ *		lkexit()		lkmain.c
+ *		fndidx()		lkmain.c
+ *		fprintf()		c_library
+ *		strchr()		c_library
+ *		strlen()		c_library
+ *		strsto()		lksym.c
+ *
+ *	side effects:
+ *		evaluates an option for a file name and/or extension
+ *		and saves outnam/outext respectively
+ */
+char *filespec(p)
+char *p;
+{
+	int opt;
+	int pFile;
+	char *q;
+
+	if (*p == '+') {
+		opt = *(p-1);
+		/* Skip '+' */
+		++p;
+		/* Skip White Space */
+		while ((*p == ' ') || (*p == '\t')) p++;
+		/* Forms: -*+name. / -*+.ext / -*+name.ext */
+		pFile = fndidx(p);
+		if ((q = strchr(p + pFile, FSEPX)) != NULL) {
+			if ((p == q) && (*p == FSEPX)) {
+				if (*(++p)) {
+					outext = strsto(p);
+					p += strlen(p);
+				}
+			} else {
+				*q = '\0';
+				if (*p) {
+					outnam = strsto(p);
+					p += strlen(p);
+				}
+				if (*(++q)) {
+					outext = strsto(q);
+					p = q + strlen(q);
+				}
+			}
+		} else
+		/* Form -*+name */
+		if (*p != '\0') {
+			outnam = strsto(p);
+			p += strlen(p);
+		} else {
+			fprintf(stderr, "?ASlink-Error-Missing [name][.ext] After -%c+", opt);
+			lkexit(ER_FATAL);
+		}
+	}
+	return(p);
+}
+
+/*)Function	VOID	areasav()
+ *
+ *	The function areasav() creates a linked structure containing
+ *	the area base address strings input to the linker.
  *
  *	local variables:
  *		none
  *
  *	global variables:
- *		base	*basep		The pointer to the first
- *				 	base structure
- *		base	*bsp		Pointer to the current
- *				 	base structure
+ *		base	*a_basep	The pointer to the first
+ *				 	area base structure
+ *		base	*a_bsp		Pointer to the current
+ *				 	area base structure
  *		char	*ip		pointer into the REL file
  *				 	text line in ib[]
  *
@@ -1133,30 +1234,75 @@ doparse()
  *		VOID	unget()		lklex.c
  *
  *	side effects:
- *		The basep structure is created.
+ *		The a_base structure is created.
  */
 
 VOID
-bassav()
+areasav()
 {
-	if (basep == NULL) {
-		basep = (struct base *)
+	if (a_basep == NULL) {
+		a_basep = (struct base *)
 			new (sizeof (struct base));
-		bsp = basep;
+		a_bsp = a_basep;
 	} else {
-		bsp->b_base = (struct base *)
-				new (sizeof (struct base));
-		bsp = bsp->b_base;
+		a_bsp->link = (struct base *)
+			new (sizeof (struct base));
+		a_bsp = a_bsp->link;
 	}
 	unget(getnb());
-	bsp->b_strp = (char *) new (strlen(ip)+1);
-	strcpy(bsp->b_strp, ip);
+	a_bsp->strp = (char *) new (strlen(ip)+1);
+	strcpy(a_bsp->strp, ip);
 }
 
 
-/*)Function	VOID	gblsav()
+/*)Function	VOID	banksav()
  *
- *	The function gblsav() creates a linked structure containing
+ *	The function banksav() creates a linked structure containing
+ *	the bank base address strings input to the linker.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		base	*b_basep	The pointer to the first
+ *				 	area base structure
+ *		base	*b_bsp		Pointer to the current
+ *				 	area base structure
+ *		char	*ip		pointer into the REL file
+ *				 	text line in ib[]
+ *
+ *	 functions called:
+ *		int	getnb()		lklex.c
+ *		VOID *	new()		lksym.c
+ *		int	strlen()	c_library
+ *		char *	strcpy()	c_library
+ *		VOID	unget()		lklex.c
+ *
+ *	side effects:
+ *		The b_base structure is created.
+ */
+
+VOID
+banksav()
+{
+	if (b_basep == NULL) {
+		b_basep = (struct base *)
+			new (sizeof (struct base));
+		b_bsp = b_basep;
+	} else {
+		b_bsp->link = (struct base *)
+			new (sizeof (struct base));
+		b_bsp = b_bsp->link;
+	}
+	unget(getnb());
+	b_bsp->strp = (char *) new (strlen(ip)+1);
+	strcpy(b_bsp->strp, ip);
+}
+
+
+/*)Function	VOID	glblsav()
+ *
+ *	The function glblsav() creates a linked structure containing
  *	the global variable strings input to the linker.
  *
  *	local variable:
@@ -1182,7 +1328,7 @@ bassav()
  */
 
 VOID
-gblsav()
+glblsav()
 {
 	if (globlp == NULL) {
 		globlp = (struct globl *)
@@ -1283,15 +1429,10 @@ setgbl()
  *					any extension on a file
  *
  *	The function afile() opens a file for reading or writing.
- *		(1)	If the file type specification string ft
- *			is not NULL then a file specification is
- *			constructed with the file path\name in fn
- *			and the extension in ft.
- *		(2)	If the file type specification string ft
- *			is NULL then the file specification is
- *			constructed from fn.  If fn does not have
- *			a file type then the default .rel file
- *			type is appended to the file specification.
+ *		(1)	If (wf & 8) == 8 and there is an extension
+ *			seperator then any file name is allowed.
+ *		(2)	The file type specification string ft
+ *			is appended to the file specification.
  *
  *	afile() returns a file handle for the opened file or aborts
  *	the assembler on an open error.
@@ -1348,7 +1489,7 @@ int wf;
 	 * Allow any extension if FSEPX
 	 * is present. <path><name><FSEPX>...
 	 */
-	if (((wf & 8) == 8) && (p1 != NULL)) {
+	if ((wf & 8) && (p1 != NULL)) {
 		/*
 		 * Remove FSEPX when extension is BLANK
 		 */
@@ -1378,7 +1519,7 @@ int wf;
 	/*
 	 * Select (Binary) Read/Write
 	 */
-	switch(wf % 4) {
+	switch(wf & 3) {
 	default:
 	case 0:	frmt = "r";	break;
 	case 1:	frmt = "w";	break;
@@ -1391,11 +1532,11 @@ int wf;
 #endif
 	}
 	if ((fp = fopen(afspec, frmt)) == NULL) {
-		if (wf < 4) {
+		if (wf & 4) {
+			fprintf(stderr, "?ASlink-Warning-<cannot %s> : \"%s\"\n", (frmt[0] == 'w')?"create":"open", afspec);
+		} else {
 			fprintf(stderr, "?ASlink-Error-<cannot %s> : \"%s\"\n", (frmt[0] == 'w')?"create":"open", afspec);
 			lkerr++;
-		} else {
-			fprintf(stderr, "?ASlink-Warning-<cannot %s> : \"%s\"\n", (frmt[0] == 'w')?"create":"open", afspec);
 		}
 	}
 	return (fp);
@@ -1483,8 +1624,7 @@ char * str;
 
 
 char *usetxt[] = {
-	"Usage: [-Options] [-Option with arg] file",
-	"Usage: [-Options] [-Option with arg] outfile file1 [file2 ...]",
+	"Usage: [-Options] [-Option with arg] file1 [file2 ...]",
 	"  -h   or NO ARGUMENTS  Show this help list",
 	"  -p   Echo commands to stdout (default)",
 	"  -n   No echo of commands to stdout",
@@ -1495,28 +1635,32 @@ char *usetxt[] = {
 	"  -k   Library path specification, one per -k",
 	"  -l   Library file specification, one per -l",
 	"Relocation:",
-	"  -b   area base address=expression",
-	"  -g   global symbol=expression",
+	"  -a   Area base address=expression",
+	"  -b   Bank base address=expression",
+	"  -g   Global symbol=expression",
 	"Map format:",
-	"  -m   Map output generated as (out)file[.map]",
-	"  -m1    Linker generated symbols included in (out)file[.map]",
+	"  -m   Map output generated as file1[.map]",
+	"  -m1    Linker generated symbols included in file1[.map]",
 	"  -w   Wide listing format for map file",
 	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
-	"  -i   Intel Hex as (out)file[.i--]",
-	"  -i1    Legacy: start adddress record type set to 1",
-	"  -s   Motorola S Record as (out)file[.s--]",
-	"  -t   Tandy CoCo Disk BASIC binary as (out)file[.bi-]",
+	"  -i   Intel Hex as file1[.hex]",
+	"  -s   Motorola S Record as file1[.s--]",
+	"  -t   Tandy CoCo Disk BASIC binary as file1[.bin]",
+	"  -*+  -i+/-s+/-t+ Renaming Options   -*+[ ][name][.ext]",
+	"    '-*+.ext'      (or)  '-*+  .ext'      ->  file1.ext ",
+	"    '-*+name'      (or)  '-*+  name'      ->  name[.---]",
+	"    '-*+name.ext'  (or)  '-*+  name.ext'  ->   name.ext",
+	"  -o   Linked file/library output enable (default)",
+	"  -v   Linked file/library output disable",
 #if NOICE
-	"  -j   NoICE Debug output as (out)file[.noi]",
+	"  -j   NoICE Debug output as file1[.noi]",
 #endif
 #if SDCDB
-	"  -y   SDCDB Debug output as (out)file[.cdb]",
+	"  -y   SDCDB Debug output as file1[.cdb]",
 #endif
-	"  -o   Linked file/library object output enable (default)",
-	"  -v   Linked file/library object output disable",
 	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
 	"Case Sensitivity:",

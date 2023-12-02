@@ -4,7 +4,7 @@
 	;*
 	;*			Bank Usage Example
 	;*
-	;*   1)	Create two banks each containing multiple
+	;*   1)	Create three banks each containing multiple
 	;*	areas of varying size and content.
 	;*
 	;*   2)	Each area will be built in this file and then
@@ -28,22 +28,24 @@
 	;*			(if the base address is not specified here
 	;*			it can be specified as an option at link time)
 	;*
-	;*		.bank	Bank_1	(base=0x1000)
+	;*		.bank	A	(base=0x8000)
 	;*
-	;*		.bank	Bank_2	(base=0x2000)
+	;*		.bank	B	(base=0x4000)
+	;*
+	;*		.bank	C	(base=0x6000
 	;*
 	;*	Parameters -	set the code type
 	;*			in this example the sections are
 	;*			relocatable, concatenated, and
 	;*			associated with a specific bank
 	;*
-	;*		.area	A1	(rel,con,bank=Bank_1)
-	;*		.area	A2	(rel,con,bank=Bank_1)
-	;*		.area	A3	(rel,con,bank=Bank_1)
+	;*		.area	A1	(rel,con,bank=A)
+	;*		.area	A2	(rel,con,bank=A)
+	;*		.area	A3	(rel,con,bank=A)
 	;*
-	;*		.area	B1	(rel,con,bank=Bank_2)
-	;*		.area	B2	(rel,con,bank=Bank_2)
-	;*		.area	B3	(rel,con,bank=Bank_2)
+	;*		.area	B1	(rel,con,bank=B)
+	;*		.area	B2	(rel,con,bank=B)
+	;*		.area	B3	(rel,con,bank=B)
 	;*
 	;*	NOTE:	Within a single file, area parameters
 	;*		need to be specified in the first definition.
@@ -51,26 +53,31 @@
 	;*		have the same parameters.
 	;*
 	;*	NOTE:	The areas are loaded in the order given to the linker:
-	;*		In this example the order is A1, A2, and A3 in Bank_1
-	;*		and B1, B2, and B3 in Bank_2.
+	;*		In this example the order is A1, A2, and A3 in Bank A,
+	;*		B1, B2, and B3 in Bank B. and C1, C2, and C3 in Bank C.
 	;*
 	;*****-----*****-----*****-----*****-----*****-----*****-----*****
 	;*
 	;*  Local Definition Of Banks and Areas -
 	;*
 
-	.bank	Bank_1	(base=0x1000)
-	.bank	Bank_2	(base=0x2000)
+	.bank	A	(base=0x8000)
+	.bank	B	(base=0x4000)
+	.bank	C	(base=0x6000)
 
-	;*  Areas Will Concatenated In This Order
+	;*  Areas Will Be Concatenated In This Order
 
-	.area	A1	(rel,con,bank=Bank_1)
-	.area	A2	(rel,con,bank=Bank_1)
-	.area	A3	(rel,con,bank=Bank_1)
+	.area	A1	(rel,con,bank=A)
+	.area	A2	(rel,con,bank=A)
+	.area	A3	(rel,con,bank=A)
 
-	.area	B1	(rel,con,bank=Bank_2)
-	.area	B2	(rel,con,bank=Bank_2)
-	.area	B3	(rel,con,bank=Bank_2)
+	.area	B1	(rel,con,bank=B)
+	.area	B2	(rel,con,bank=B)
+	.area	B3	(rel,con,bank=B)
+
+	.area	C1	(abs,ovr,bank=C)
+	.area	C2	(abs,ovr,bank=C)
+	.area	C3	(abs,con,bank=C)
 
 
 	; Areas To Assemble
@@ -142,6 +149,37 @@ a1:	.word	a1
 
 	.blkb	0x180		; allocate 0x180 bytes
 end_a1:
+
+	;*****
+
+	.area	A1
+a1x:	.word	a1x
+	.area	A2
+a2x:	.word	a2x
+	.area	A3
+a3x:	.word	a3x
+
+	;*****
+
+	.area	C3
+
+	.org	0x100
+
+c3:	.word	c3
+
+	;*****
+
+	.area	C2
+
+	.org	0x200
+
+c2:	.word	c2
+
+	;*****
+
+	.area	C1
+
+c1:	.word	c1
 
 
 	.end

@@ -765,7 +765,6 @@ ee DDDDDDDDDD ddd ddd ddd ddd [nn]LLLLL *********	DECIMAL(32)
  *	functions called:
  *		a_uint	adb_xb()	lkrloc.c
  *		int	fclose()	c_library
- *		int	fgets()		c_library
  *		int	fprintf()	c_library
  *		VOID	lkalist()	lklist.c
  *		VOID	lklist()	lklist.c
@@ -913,7 +912,6 @@ int i;
  *	functions called:
  *		int	dgt()		lklist.c
  *		int	fclose()	c_library
- *		int	fgets()		c_library
  *		int	fprintf()	c_library
  *		int	sprintf()	c_library
  *		char *	strncpy()	c_library
@@ -1092,7 +1090,6 @@ loop:	if (getlst(1) == 0) {
  *	functions called:
  *		int	dgt()		lklist.c
  *		int	fclose()	c_library
- *		int	fgets()		c_library
  *		int	fprintf()	c_library
  *		int	sprintf()	c_library
  *		char *	strncpy()	c_library
@@ -1316,7 +1313,7 @@ int ngline;
 	 * Get next LST text line
 	 */
 	if (tfp != NULL) {
-		if (fgets(rb, sizeof(rb)-2, tfp) == NULL) {
+		if (fgets(rb, sizeof(rb), tfp) == NULL) {
 			fclose(tfp);
 			tfp = NULL;
 			fclose(rfp);
@@ -1385,7 +1382,6 @@ int ngline;
  *	functions called:
  *		int	dgt()		lklist.c
  *		int	fclose()	c_library
- *		int	fgets()		c_library
  *		VOID	gethlr()	lklist.c
  *		int	fprintf()	c_library
  *		int	sprintf()	c_library
@@ -2120,6 +2116,7 @@ hlrelist()
  *	functions called:
  *		int	fclose()	c_library
  *		int	fgets()		c_library
+ *		int	sscanf()	c_library
  *
  *	side effects:
  *		parameters are read from the .hlr file

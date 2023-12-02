@@ -93,11 +93,12 @@
  * Set Direct Pointer
  */
 #define	S_SDP	90
+#define	S_PGD	91
 
 /*
  * Extended Instructions
  */
-#define	S_XTND	91
+#define	S_XTND	92
 
 /*
  * Extended Addressing Modes
@@ -127,7 +128,7 @@ extern	int		srch(char *str);
 	/* cop8mch.c */
 extern	VOID		icheck(unsigned int op);
 extern	VOID		machine(struct mne *mp);
-extern	int		mchpcr(struct expr *esp);
+extern	int		mchpcr(struct expr *esp, int *v, int n);
 extern	VOID		minit(void);
 extern	VOID		setgbl(struct expr *esp);
 

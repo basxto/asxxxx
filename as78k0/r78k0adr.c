@@ -166,6 +166,17 @@ struct expr *esp;
 			return(S_EXT);
 		}
 	} else {
+		if (zpg != NULL) {
+			if (esp->e_flag) {
+				if (esp->e_base.e_sp->s_area == zpg) {
+					return(S_SFR);	/* ___  (*)arg */
+				}
+			} else {
+				if (esp->e_base.e_ap == zpg) {
+					return(S_SFR);	/* ___  (*)arg */
+				}
+			}
+		}
 		return(S_EXT);
 	}
 }
